@@ -12,7 +12,14 @@ const connect = () => {
   const server = asTransport(port2);
   port1.start();
   port2.start();
-  return { client, server, close: () => (port1.close(), port2.close()) };
+  return {
+    client,
+    server,
+    close: () => {
+      port1.close();
+      port2.close();
+    },
+  };
 };
 
 describe("echo RPC over a MessagePort", () => {
@@ -21,7 +28,9 @@ describe("echo RPC over a MessagePort", () => {
     const { client, server, close } = connect();
     serveEcho(server);
     const rpc = createEchoClient(client);
-    await expect(Promise.all([rpc.echo("one"), rpc.echo("two"), rpc.echo("three")])).resolves.toEqual(["one", "two", "three"]);
+    await expect(
+      Promise.all([rpc.echo("one"), rpc.echo("two"), rpc.echo("three")]),
+    ).resolves.toEqual(["one", "two", "three"]);
     close();
   });
 
@@ -38,7 +47,9 @@ describe("echo RPC over a MessagePort", () => {
   // Guards: the UI must not wait forever when the worker is dead.
   it("rejects when the worker never answers", async () => {
     const { client, close } = connect();
-    await expect(createEchoClient(client, 20).echo("hello")).rejects.toThrow("worker did not answer");
+    await expect(createEchoClient(client, 20).echo("hello")).rejects.toThrow(
+      "worker did not answer",
+    );
     close();
   });
 });

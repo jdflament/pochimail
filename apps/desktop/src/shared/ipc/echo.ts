@@ -1,11 +1,19 @@
 import { z } from "zod";
 
 /** Echo RPC spoken between renderer and worker over a MessagePort (ADR 0002). Schemas are shared by both sides. */
-export const echoRequestSchema = z.object({ id: z.number().int().nonnegative(), type: z.literal("echo"), text: z.string() });
-export const echoResponseSchema = z.object({ id: z.number().int().nonnegative(), type: z.literal("echo"), text: z.string() });
+const echoRequestSchema = z.object({
+  id: z.number().int().nonnegative(),
+  type: z.literal("echo"),
+  text: z.string(),
+});
+const echoResponseSchema = z.object({
+  id: z.number().int().nonnegative(),
+  type: z.literal("echo"),
+  text: z.string(),
+});
 
-export type EchoRequest = z.infer<typeof echoRequestSchema>;
-export type EchoResponse = z.infer<typeof echoResponseSchema>;
+type EchoRequest = z.infer<typeof echoRequestSchema>;
+type EchoResponse = z.infer<typeof echoResponseSchema>;
 
 /** The smallest surface the RPC needs from a MessagePort, so it works with DOM ports, MessagePortMain and test doubles. */
 export type Transport = {

@@ -18,7 +18,11 @@ describe("worker connection across page loads", () => {
 
     // Main side: real linking code with Node MessageChannels standing in for MessageChannelMain.
     linkWorkerOnEveryLoad(
-      { on: (event: string, listener: () => void) => loads.on(event, listener), postMessage: (_channel: string, _msg: unknown, ports: unknown[]) => void toRenderer.push(ports[0] as MessagePort) } as never,
+      {
+        on: (event: string, listener: () => void) => loads.on(event, listener),
+        postMessage: (_channel: string, _msg: unknown, ports: unknown[]) =>
+          void toRenderer.push(ports[0] as MessagePort),
+      } as never,
       { postMessage: (_msg: unknown, ports: unknown[]) => void parent.emit("message", { ports }) },
       () => new MessageChannel() as never,
     );
@@ -36,12 +40,16 @@ describe("worker connection across page loads", () => {
     expect(toRenderer).toHaveLength(2);
     const [firstPage, secondPage] = toRenderer as [MessagePort, MessagePort];
     secondPage.start();
-    await expect(createEchoClient(asTransport(secondPage)).echo("after reload")).resolves.toBe("after reload");
+    await expect(createEchoClient(asTransport(secondPage)).echo("after reload")).resolves.toBe(
+      "after reload",
+    );
 
     firstPage.start();
-    await expect(createEchoClient(asTransport(firstPage), 50).echo("stale page")).rejects.toThrow("worker did not answer");
+    await expect(createEchoClient(asTransport(firstPage), 50).echo("stale page")).rejects.toThrow(
+      "worker did not answer",
+    );
     firstPage.close();
     secondPage.close();
-    workerPorts.forEach((port) => port.close());
+    for (const port of workerPorts) port.close();
   });
 });

@@ -13,10 +13,16 @@ const workspaces = groups.flatMap((group) =>
 
 const sourceFiles = (dir: string): string[] =>
   existsSync(dir)
-    ? readdirSync(dir).filter((entry) => entry !== "node_modules").flatMap((entry) => {
-        const path = join(dir, entry);
-        return statSync(path).isDirectory() ? sourceFiles(path) : /\.(ts|tsx)$/.test(entry) ? [path] : [];
-      })
+    ? readdirSync(dir)
+        .filter((entry) => entry !== "node_modules")
+        .flatMap((entry) => {
+          const path = join(dir, entry);
+          return statSync(path).isDirectory()
+            ? sourceFiles(path)
+            : /\.(ts|tsx)$/.test(entry)
+              ? [path]
+              : [];
+        })
     : [];
 
 const manifest = (dir: string) => JSON.parse(readFileSync(join(dir, "package.json"), "utf8"));
@@ -25,7 +31,17 @@ describe("workspace rules (ADR 0001)", () => {
   it("finds every expected workspace", () => {
     const names = workspaces.map((dir) => manifest(dir).name).sort();
     expect(names).toEqual(
-      ["@pochimail/ai", "@pochimail/cli", "@pochimail/core", "@pochimail/db", "@pochimail/desktop", "@pochimail/mail", "@pochimail/testing", "@pochimail/typescript-config", "@pochimail/ui"].sort(),
+      [
+        "@pochimail/ai",
+        "@pochimail/cli",
+        "@pochimail/core",
+        "@pochimail/db",
+        "@pochimail/desktop",
+        "@pochimail/mail",
+        "@pochimail/testing",
+        "@pochimail/typescript-config",
+        "@pochimail/ui",
+      ].sort(),
     );
   });
 
@@ -45,7 +61,9 @@ describe("workspace rules (ADR 0001)", () => {
   });
 
   it("has no barrel file (index.ts) in any package", () => {
-    const barrels = workspaces.flatMap((dir) => sourceFiles(dir).filter((f) => /\/index\.tsx?$/.test(f)));
+    const barrels = workspaces.flatMap((dir) =>
+      sourceFiles(dir).filter((f) => /\/index\.tsx?$/.test(f)),
+    );
     expect(barrels).toEqual([]);
   });
 
@@ -53,8 +71,11 @@ describe("workspace rules (ADR 0001)", () => {
     const offenders: string[] = [];
     for (const dir of workspaces) {
       for (const file of sourceFiles(dir)) {
-        for (const [, spec] of readFileSync(file, "utf8").matchAll(/(?:from|import)\s*\(?\s*["'](\.\.?\/[^"']*)["']/g)) {
-          if (!resolve(file, "..", spec as string).startsWith(dir + "/")) offenders.push(`${file} -> ${spec}`);
+        for (const [, spec] of readFileSync(file, "utf8").matchAll(
+          /(?:from|import)\s*\(?\s*["'](\.\.?\/[^"']*)["']/g,
+        )) {
+          if (!resolve(file, "..", spec as string).startsWith(`${dir}/`))
+            offenders.push(`${file} -> ${spec}`);
         }
       }
     }
@@ -70,7 +91,11 @@ describe("workspace rules (ADR 0001)", () => {
 
   it("keeps the strict flags in the base config", () => {
     const base = JSON.parse(readFileSync(join(root, "tooling/typescript/base.json"), "utf8"));
-    expect(base.compilerOptions).toMatchObject({ strict: true, noUncheckedIndexedAccess: true, exactOptionalPropertyTypes: true });
+    expect(base.compilerOptions).toMatchObject({
+      strict: true,
+      noUncheckedIndexedAccess: true,
+      exactOptionalPropertyTypes: true,
+    });
   });
 
   it("reads the repository URL from one place", () => {

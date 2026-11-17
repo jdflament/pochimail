@@ -1,5 +1,7 @@
 type Port = { close: () => void };
-type Parent<P extends Port> = { on: (event: "message", listener: (event: { ports: P[] }) => void) => void };
+type Parent<P extends Port> = {
+  on: (event: "message", listener: (event: { ports: P[] }) => void) => void;
+};
 
 /** Every renderer load sends a fresh port. Serve the newest and close the previous one, so a reload never leaves a dead connection. */
 export const acceptPorts = <P extends Port>(parent: Parent<P>, serve: (port: P) => void): void => {

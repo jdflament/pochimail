@@ -14,15 +14,21 @@
     "pnpm": ">=12.21.0 <13"
   },
   "scripts": {
-    "check": "turbo run typecheck test",
+    "check": "turbo run typecheck lint knip test && pnpm lint:root && pnpm manypkg",
     "typecheck": "turbo run typecheck",
-    "lint": "turbo run lint",
+    "lint": "turbo run lint && pnpm lint:root",
+    "lint:root": "biome check biome.json package.json turbo.json",
+    "format": "biome format --write .",
+    "manypkg": "manypkg check",
     "test": "turbo run test",
     "build": "turbo run build",
     "knip": "turbo run knip",
     "eval": "turbo run eval"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.6.8",
+    "@manypkg/cli": "0.25.1",
+    "knip": "6.45.1",
     "turbo": "2.11.11"
   }
 }
