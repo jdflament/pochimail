@@ -1,7 +1,19 @@
-import { getLlama, LlamaChatSession, resolveModelFile, type Llama, type LlamaGrammar } from "node-llama-cpp";
+import {
+  getLlama,
+  type Llama,
+  LlamaChatSession,
+  type LlamaGrammar,
+  resolveModelFile,
+} from "node-llama-cpp";
 import { z } from "zod";
-import { categories, languages, type Category, type Language, type SyntheticEmail } from "./dataset.ts";
-import { classificationReport, percentile, type ClassificationReport } from "./metrics.ts";
+import {
+  type Category,
+  categories,
+  type Language,
+  languages,
+  type SyntheticEmail,
+} from "./dataset.ts";
+import { type ClassificationReport, classificationReport, percentile } from "./metrics.ts";
 import type { GenerativeModel } from "./models.ts";
 
 export interface LlmResult {
@@ -11,22 +23,41 @@ export interface LlmResult {
   /** Decode speed on a free-text generation (tokens/s) and prompt-processing speed (tokens/s). */
   decodeTokensPerSecond: number;
   promptTokensPerSecond: number;
-  classification: ClassificationReport & { emailsPerMinute: number; p50LatencyMs: number; jsonParseRate: number; byLanguage: Record<Language, number> };
-  extraction: { exactDateRate: number; nullCorrectRate: number; emailsPerMinute: number; jsonParseRate: number };
+  classification: ClassificationReport & {
+    emailsPerMinute: number;
+    p50LatencyMs: number;
+    jsonParseRate: number;
+    byLanguage: Record<Language, number>;
+  };
+  extraction: {
+    exactDateRate: number;
+    nullCorrectRate: number;
+    emailsPerMinute: number;
+    jsonParseRate: number;
+  };
 }
 
 const classifyOut = z.object({ category: z.enum(categories) });
 const extractOut = z.object({ deadline: z.string().nullable() });
 
-const classifySchema = { type: "object", properties: { category: { enum: [...categories] } }, required: ["category"] } as const;
-const extractSchema = { type: "object", properties: { deadline: { type: ["string", "null"] } }, required: ["deadline"] } as const;
+const classifySchema = {
+  type: "object",
+  properties: { category: { enum: [...categories] } },
+  required: ["category"],
+} as const;
+const extractSchema = {
+  type: "object",
+  properties: { deadline: { type: ["string", "null"] } },
+  required: ["deadline"],
+} as const;
 
 const classifySystem = `You sort one email into exactly one category. Emails may be in English, French or Japanese.
 Categories: people (real personal or work conversation), records (bank, tax, insurance, health, contracts), purchases-travel (orders, receipts, shipping, bookings, tickets), sign-ins-security (login codes, password resets, new-device alerts), notifications (apps, social, calendar, comments), newsletters (subscribed editorial content), promotions (sales, marketing offers).
 Answer with JSON only.`;
 const extractSystem = `You read one email (English, French or Japanese) and extract its deadline: the date by which the reader must act, or on which an offer, delivery or check-in falls. Dates have no year: use 2027. Answer {"deadline":"YYYY-MM-DD"} or {"deadline":null} when the email states no date. Answer with JSON only.`;
 
-const emailPrompt = (e: SyntheticEmail): string => `From: ${e.from}\nSubject: ${e.subject}\n\n${e.snippet}`;
+const emailPrompt = (e: SyntheticEmail): string =>
+  `From: ${e.from}\nSubject: ${e.subject}\n\n${e.snippet}`;
 
 export interface LlmOptions {
   modelsDir: string;
@@ -34,7 +65,11 @@ export interface LlmOptions {
   cpuOnly: boolean;
 }
 
-export async function benchGenerative(model: GenerativeModel, emails: SyntheticEmail[], options: LlmOptions): Promise<LlmResult> {
+export async function benchGenerative(
+  model: GenerativeModel,
+  emails: SyntheticEmail[],
+  options: LlmOptions,
+): Promise<LlmResult> {
   const llama: Llama = await getLlama(options.cpuOnly ? { gpu: false } : {});
   const loadStart = performance.now();
   const modelPath = await resolveModelFile(model.uri, options.modelsDir);
@@ -46,10 +81,19 @@ export async function benchGenerative(model: GenerativeModel, emails: SyntheticE
 
   const classifyGrammar = await llama.createGrammarForJsonSchema(classifySchema);
   const extractGrammar = await llama.createGrammarForJsonSchema(extractSchema);
-  const run = async (system: string, grammar: LlamaGrammar, email: SyntheticEmail): Promise<{ text: string; ms: number }> => {
+  const run = async (
+    system: string,
+    grammar: LlamaGrammar,
+    email: SyntheticEmail,
+  ): Promise<{ text: string; ms: number }> => {
     const session = new LlamaChatSession({ contextSequence: sequence, systemPrompt: system });
     const t = performance.now();
-    const text = await session.prompt(emailPrompt(email), { grammar, temperature: 0, maxTokens: 64, budgets: { thoughtTokens: 0 } });
+    const text = await session.prompt(emailPrompt(email), {
+      grammar,
+      temperature: 0,
+      maxTokens: 64,
+      budgets: { thoughtTokens: 0 },
+    });
     const ms = performance.now() - t;
     session.dispose({ disposeSequence: false });
     return { text, ms };
@@ -80,7 +124,11 @@ export async function benchGenerative(model: GenerativeModel, emails: SyntheticE
   const latencies: number[] = [];
   let parsed = 0;
   const cStart = performance.now();
-  const hits: Record<Language, { ok: number; n: number }> = { en: { ok: 0, n: 0 }, fr: { ok: 0, n: 0 }, ja: { ok: 0, n: 0 } };
+  const hits: Record<Language, { ok: number; n: number }> = {
+    en: { ok: 0, n: 0 },
+    fr: { ok: 0, n: 0 },
+    ja: { ok: 0, n: 0 },
+  };
   for (const email of subset) {
     const { text, ms } = await run(classifySystem, classifyGrammar, email);
     latencies.push(ms);
@@ -118,7 +166,9 @@ export async function benchGenerative(model: GenerativeModel, emails: SyntheticE
   await context.dispose();
   await loaded.dispose();
   await llama.dispose();
-  const byLanguage = Object.fromEntries(languages.map((l) => [l, round(hits[l].n ? hits[l].ok / hits[l].n : 0)])) as Record<Language, number>;
+  const byLanguage = Object.fromEntries(
+    languages.map((l) => [l, round(hits[l].n ? hits[l].ok / hits[l].n : 0)]),
+  ) as Record<Language, number>;
   return {
     model: model.id,
     backend,

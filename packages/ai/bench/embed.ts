@@ -1,7 +1,7 @@
 import { pipeline } from "@huggingface/transformers";
 import { categories, type SyntheticEmail } from "./dataset.ts";
+import { type ClassificationReport, classificationReport, percentile } from "./metrics.ts";
 import type { EmbeddingModel } from "./models.ts";
-import { classificationReport, percentile, type ClassificationReport } from "./metrics.ts";
 
 export interface EmbeddingResult {
   model: string;
@@ -25,7 +25,10 @@ function normalize(v: Float32Array): Float32Array {
 }
 
 /** Nearest-centroid classifier by cosine similarity: a deliberately simple head so models are compared on the embedding, not on tuning. */
-export function nearestCentroid(train: { vector: Float32Array; label: string }[], test: Float32Array[]): string[] {
+function nearestCentroid(
+  train: { vector: Float32Array; label: string }[],
+  test: Float32Array[],
+): string[] {
   const dim = train[0]?.vector.length ?? 0;
   const centroids = new Map<string, Float32Array>();
   for (const { vector, label } of train) {
@@ -49,9 +52,15 @@ export function nearestCentroid(train: { vector: Float32Array; label: string }[]
   });
 }
 
-export async function benchEmbedding(model: EmbeddingModel, emails: SyntheticEmail[]): Promise<EmbeddingResult> {
+export async function benchEmbedding(
+  model: EmbeddingModel,
+  emails: SyntheticEmail[],
+): Promise<EmbeddingResult> {
   const loadStart = performance.now();
-  const extractor = await pipeline("feature-extraction", model.hubId, { dtype: model.dtype, device: "cpu" });
+  const extractor = await pipeline("feature-extraction", model.hubId, {
+    dtype: model.dtype,
+    device: "cpu",
+  });
   const loadMs = performance.now() - loadStart;
 
   const vectors: Float32Array[] = [];
@@ -59,7 +68,10 @@ export async function benchEmbedding(model: EmbeddingModel, emails: SyntheticEma
   const start = performance.now();
   for (const email of emails) {
     const t = performance.now();
-    const out = await extractor(model.prefix + textOf(email), { pooling: model.pooling, normalize: true });
+    const out = await extractor(model.prefix + textOf(email), {
+      pooling: model.pooling,
+      normalize: true,
+    });
     latencies.push(performance.now() - t);
     vectors.push(Float32Array.from(out.data as Float32Array));
   }
@@ -71,19 +83,37 @@ export async function benchEmbedding(model: EmbeddingModel, emails: SyntheticEma
     const trainIdx = emails.map((_, i) => i).filter((i) => i % folds !== fold);
     const testIdx = emails.map((_, i) => i).filter((i) => i % folds === fold);
     const predicted = nearestCentroid(
-      trainIdx.map((i) => ({ vector: vectors[i] as Float32Array, label: (emails[i] as SyntheticEmail).category })),
+      trainIdx.map((i) => ({
+        vector: vectors[i] as Float32Array,
+        label: (emails[i] as SyntheticEmail).category,
+      })),
       testIdx.map((i) => vectors[i] as Float32Array),
     );
-    testIdx.forEach((i, k) => mixedPairs.push({ expected: (emails[i] as SyntheticEmail).category, predicted: predicted[k] as string }));
+    for (const [k, i] of testIdx.entries()) {
+      mixedPairs.push({
+        expected: (emails[i] as SyntheticEmail).category,
+        predicted: predicted[k] as string,
+      });
+    }
   }
 
-  const enIdx = emails.map((_, i) => i).filter((i) => (emails[i] as SyntheticEmail).language === "en");
-  const otherIdx = emails.map((_, i) => i).filter((i) => (emails[i] as SyntheticEmail).language !== "en");
+  const enIdx = emails
+    .map((_, i) => i)
+    .filter((i) => (emails[i] as SyntheticEmail).language === "en");
+  const otherIdx = emails
+    .map((_, i) => i)
+    .filter((i) => (emails[i] as SyntheticEmail).language !== "en");
   const crossPredicted = nearestCentroid(
-    enIdx.map((i) => ({ vector: vectors[i] as Float32Array, label: (emails[i] as SyntheticEmail).category })),
+    enIdx.map((i) => ({
+      vector: vectors[i] as Float32Array,
+      label: (emails[i] as SyntheticEmail).category,
+    })),
     otherIdx.map((i) => vectors[i] as Float32Array),
   );
-  const crossPairs = otherIdx.map((i, k) => ({ expected: (emails[i] as SyntheticEmail).category, predicted: crossPredicted[k] as string }));
+  const crossPairs = otherIdx.map((i, k) => ({
+    expected: (emails[i] as SyntheticEmail).category,
+    predicted: crossPredicted[k] as string,
+  }));
 
   await extractor.dispose();
   return {

@@ -23,7 +23,8 @@ const here = import.meta.dirname;
 const modelsDir = join(here, ".models");
 mkdirSync(modelsDir, { recursive: true });
 const wanted = values.models?.split(",");
-const pick = <T extends { id: string }>(all: T[]): T[] => (wanted ? all.filter((m) => wanted.includes(m.id)) : all);
+const pick = <T extends { id: string }>(all: T[]): T[] =>
+  wanted ? all.filter((m) => wanted.includes(m.id)) : all;
 const limit = values.limit ? Number(values.limit) : undefined;
 const all = buildDataset();
 // --limit takes an evenly spaced sample so every category and language stays represented.
@@ -32,7 +33,13 @@ const task = values.task ?? "all";
 
 const report: Record<string, unknown> = {
   date: new Date().toISOString().slice(0, 10),
-  machine: { platform: platform(), arch: arch(), cpu: cpus()[0]?.model, cores: cpus().length, ramGb: Math.round(totalmem() / 2 ** 30) },
+  machine: {
+    platform: platform(),
+    arch: arch(),
+    cpu: cpus()[0]?.model,
+    cores: cpus().length,
+    ramGb: Math.round(totalmem() / 2 ** 30),
+  },
   cpuOnly: values["cpu-only"],
   emails: emails.length,
   embeddings: [] as unknown[],
@@ -48,10 +55,12 @@ if (task === "embed" || task === "all") {
 if (task === "llm" || task === "all") {
   for (const model of pick(generativeModels)) {
     console.error(`generative: ${model.id}`);
-    (report.generative as unknown[]).push(await benchGenerative(model, emails, { modelsDir, cpuOnly: values["cpu-only"] ?? false }));
+    (report.generative as unknown[]).push(
+      await benchGenerative(model, emails, { modelsDir, cpuOnly: values["cpu-only"] ?? false }),
+    );
   }
 }
 
 const json = JSON.stringify(report, null, 2);
-if (values.out) writeFileSync(values.out, json + "\n");
+if (values.out) writeFileSync(values.out, `${json}\n`);
 console.log(json);

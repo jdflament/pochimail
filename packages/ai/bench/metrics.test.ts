@@ -13,8 +13,8 @@ it("computes per-class precision/recall and counts invalid outputs as errors", (
     ["a", "b", "c"],
   );
   expect(report.accuracy).toBe(0.5);
-  expect(report.perClass["a"]).toMatchObject({ precision: 0.5, recall: 0.5, support: 2 });
-  expect(report.perClass["b"]).toMatchObject({ precision: 1, recall: 0.5 });
+  expect(report.perClass.a).toMatchObject({ precision: 0.5, recall: 0.5, support: 2 });
+  expect(report.perClass.b).toMatchObject({ precision: 1, recall: 0.5 });
   // "c" has no support and is excluded from the macro average.
   expect(report.macroF1).toBeCloseTo((0.5 + 2 / 3) / 2);
 });

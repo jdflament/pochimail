@@ -1,4 +1,4 @@
-export interface ClassMetrics {
+interface ClassMetrics {
   precision: number;
   recall: number;
   f1: number;
@@ -12,7 +12,10 @@ export interface ClassificationReport {
 }
 
 /** Precision/recall/F1 per label plus accuracy and macro-F1 (labels with no support are skipped in the macro average). */
-export function classificationReport(pairs: readonly { expected: string; predicted: string }[], labels: readonly string[]): ClassificationReport {
+export function classificationReport(
+  pairs: readonly { expected: string; predicted: string }[],
+  labels: readonly string[],
+): ClassificationReport {
   const perClass: Record<string, ClassMetrics> = {};
   let correct = 0;
   for (const p of pairs) if (p.expected === p.predicted) correct++;
@@ -22,10 +25,18 @@ export function classificationReport(pairs: readonly { expected: string; predict
     const fn = pairs.filter((p) => p.expected === label && p.predicted !== label).length;
     const precision = tp + fp === 0 ? 0 : tp / (tp + fp);
     const recall = tp + fn === 0 ? 0 : tp / (tp + fn);
-    perClass[label] = { precision, recall, f1: precision + recall === 0 ? 0 : (2 * precision * recall) / (precision + recall), support: tp + fn };
+    perClass[label] = {
+      precision,
+      recall,
+      f1: precision + recall === 0 ? 0 : (2 * precision * recall) / (precision + recall),
+      support: tp + fn,
+    };
   }
   const supported = labels.filter((l) => (perClass[l]?.support ?? 0) > 0);
-  const macroF1 = supported.length === 0 ? 0 : supported.reduce((sum, l) => sum + (perClass[l]?.f1 ?? 0), 0) / supported.length;
+  const macroF1 =
+    supported.length === 0
+      ? 0
+      : supported.reduce((sum, l) => sum + (perClass[l]?.f1 ?? 0), 0) / supported.length;
   return { accuracy: pairs.length === 0 ? 0 : correct / pairs.length, macroF1, perClass };
 }
 

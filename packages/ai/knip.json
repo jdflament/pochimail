@@ -1,4 +1,5 @@
 {
   "$schema": "https://unpkg.com/knip@6.45.1/schema.json",
+  "entry": ["bench/run.ts"],
   "ignoreBinaries": ["biome", "knip"]
 }

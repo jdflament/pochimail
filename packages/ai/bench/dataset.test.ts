@@ -7,9 +7,12 @@ describe("benchmark dataset", () => {
   // Guards: a skewed set would let a model look good by ignoring a language or category.
   it("has ~200 emails, balanced over every category and language", () => {
     expect(emails).toHaveLength(210);
-    for (const category of categories) for (const language of languages) {
-      expect(emails.filter((e) => e.category === category && e.language === language)).toHaveLength(10);
-    }
+    for (const category of categories)
+      for (const language of languages) {
+        expect(
+          emails.filter((e) => e.category === category && e.language === language),
+        ).toHaveLength(10);
+      }
   });
 
   // Guards: a leftover placeholder or ground-truth mismatch would silently corrupt extraction scores.
@@ -25,7 +28,8 @@ describe("benchmark dataset", () => {
   // Guards: AGENTS.md §5, no real addresses in fixtures.
   it("only uses reserved example domains", () => {
     for (const e of emails) {
-      for (const [, domain] of e.from.matchAll(/@([^>\s]+)/g)) expect(domain, e.id).toMatch(/^(example\.(com|org|net)|[a-z]+\.example)$/);
+      for (const [, domain] of e.from.matchAll(/@([^>\s]+)/g))
+        expect(domain, e.id).toMatch(/^(example\.(com|org|net)|[a-z]+\.example)$/);
     }
   });
 
