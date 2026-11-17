@@ -1,0 +1,48 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:best-practices", "group:monorepos", "group:recommended"],
+  "schedule": ["before 6am on monday"],
+  "timezone": "UTC",
+  "rangeStrategy": "pin",
+  "minimumReleaseAge": "1 day",
+  "internalChecksFilter": "strict",
+  "prConcurrentLimit": 5,
+  "labels": ["chore", "dependencies"],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 6am on monday"]
+  },
+  "vulnerabilityAlerts": {
+    "labels": ["security"],
+    "schedule": ["at any time"]
+  },
+  "packageRules": [
+    {
+      "description": "One weekly PR per dependency type, majors kept apart for review",
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["dependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "dependencies (non-major)"
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "devDependencies (non-major)"
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions",
+      "pinDigests": true
+    },
+    {
+      "description": "Electron supports only the latest majors: track every new major, never automerge, review by hand",
+      "matchPackageNames": ["electron"],
+      "groupName": "electron",
+      "separateMajorMinor": true,
+      "separateMultipleMajor": false,
+      "automerge": false,
+      "labels": ["chore", "dependencies", "electron"]
+    }
+  ]
+}

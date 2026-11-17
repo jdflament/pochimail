@@ -27,8 +27,8 @@ Source: [§5.1](docs/brief.md), [§5.2](docs/brief.md), [ADR 0001](docs/adr/0001
 - Events, outbox, idempotent reversible actions, bounded concurrency and cancellation follow [§5.3](docs/brief.md).
 
 ## 4. Code standards
-Source: [§8](docs/brief.md). Gates: `pnpm check` runs typecheck, lint (Biome), knip, test and manypkg. CI runs it on macOS, Windows and Linux (`.github/workflows/ci.yml`, M0-05); `pnpm gates` fails any gate that runs zero tasks. Renovate is planned (M0-06).
-- TypeScript strict + `noUncheckedIndexedAccess` + `exactOptionalPropertyTypes`. **No `any`.** Biome (lint + format), manypkg, knip (live, M0-04); CI (live, M0-05); Renovate (planned: M0-06).
+Source: [§8](docs/brief.md). Gates: `pnpm check` runs typecheck, lint (Biome), knip, test and manypkg. CI runs it on macOS, Windows and Linux (`.github/workflows/ci.yml`, M0-05); `pnpm gates` fails any gate that runs zero tasks. Renovate (`renovate.json`) and an `osv-scanner` CI job are live (M0-06).
+- TypeScript strict + `noUncheckedIndexedAccess` + `exactOptionalPropertyTypes`. **No `any`.** Biome (lint + format), manypkg, knip (live, M0-04); CI (live, M0-05); Renovate (live, M0-06).
 - zod at every boundary: IPC, provider responses, LLM output. Expected failures are `Result` values; exceptions are for bugs. Branded IDs (`MessageId`, `AccountId`, `WorkspaceId`).
 - Explicit use cases with dependencies injected through ports.
 - Frontend: React 19 function components (no `forwardRef`), `data-slot`, CVA variants, `cn()`, exported `VariantProps`, `asChild` via Slot, `focus-visible`; wrap primitives, don't fork them. Composition over boolean props. Renderer layout `features/<name>/` + `components/`. Worker data in TanStack Query fed by IPC events; filters in the router; virtualize large lists; forms with react-hook-form + zod.
@@ -50,7 +50,7 @@ Source: [§5.10](docs/brief.md), [§5.4](docs/brief.md), [ADR 0002](docs/adr/000
 - Electron: `contextIsolation`, sandbox, no `nodeIntegration`, narrow preload via `contextBridge`, strict CSP, navigation and new-window blocking, `webSecurity` on, Fuses set.
 - Email content is untrusted: never execute or render remote content; remote images blocked; never follow links in email bodies. Unsubscribe only via RFC 8058 one-click or `mailto:` ([§4](docs/brief.md)). Attachments are hashed and stored, never opened automatically.
 - OAuth client IDs come from env/config, never hard-coded ([§9b](docs/brief.md)).
-- Supply chain: pinned lockfile, minimal dependencies; ask before adding a heavyweight one ([§10](docs/brief.md)). Planned CI: osv-scanner/audit and an SBOM per release ([§5.10](docs/brief.md)).
+- Supply chain: pinned lockfile, minimal dependencies; ask before adding a heavyweight one ([§10](docs/brief.md)). CI runs osv-scanner on the lockfile; planned: an SBOM per release ([§5.10](docs/brief.md)).
 - pnpm's `minimumReleaseAge` stays on: we rely on pnpm 12's default, so do not add config for it; never add release-age exclusions without an ADR note.
 - Releases: signed and notarized builds with signed update metadata; SHA-256 checks on model files; keep Electron on a supported version ([§5.10](docs/brief.md)).
 - Threat model: [docs/security/threat-model.md](docs/security/threat-model.md); outbound hosts: [docs/security/network.md](docs/security/network.md). Update both when you add a boundary, a mitigation or a host.
