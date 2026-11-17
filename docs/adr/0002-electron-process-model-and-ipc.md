@@ -21,7 +21,7 @@ The UI must stay instant while a 100k-message sync and model inference run. Mail
 - The page requests the worker port through `window.pochimail.requestWorkerPort()`; the preload forwards the `MessagePort` main created with `window.postMessage`. After that, renderer and worker talk directly.
 - CSP is injected into `index.html` at build time from `src/shared/csp.ts` (strict in production, relaxed for the Vite dev server only). The production CSP has no `unsafe-inline` at all (React style props set styles through CSSOM, which CSP does not block).
 - The session request filter (`src/main/security.ts`) has an empty host allowlist and logs the blocked host only.
-- Fuses are defined in `src/main/fuses.ts` and applied at packaging (M0-10). `GrantFileProtocolExtraPrivileges` is left at its default while the renderer loads from `file://`.
+- Fuses are defined in `src/main/fuses.ts` and applied at packaging (M0-10) by `apps/desktop/packaging/apply-fuses.ts`, an electron-builder `afterPack` hook (skipped for the per-arch slices of the macOS universal build; the merged app is flipped). `pnpm package:smoke` reads the fuses back from the packaged binary. `GrantFileProtocolExtraPrivileges` is left at its default while the renderer loads from `file://`.
 - Electronegativity's last release is from 2023, so the baseline is enforced by a checklist test (`src/main/security.test.ts`).
 
 ## IPC transport research (M0-14)
