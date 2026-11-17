@@ -197,7 +197,7 @@ The app must feel instant on mailboxes with 100k+ messages. Use these patterns w
 - Pochimail shows previews/snippets only. Any HTML rendering of mail content is untrusted: sandboxed iframe, strict CSP, remote images blocked by default, never in a context that can reach the preload API.
 
 ### 5.5 Keep it tidy, scheduling and notifications
-- User-chosen cadence: **As mail arrives** (on each delta sync), **Once a day**, **Once a week**, **Only when I ask**.
+- User-chosen cadence: **As it arrives** (on each delta sync), **Once a day**, **Once a week**, **Only when I ask**.
 - Toggles: label new mail, save new documents, suggest unsubscribes, weekly summary.
 - A `Scheduler` port (implemented in the worker) triggers incremental scans; the app can keep running in the menu bar/tray, with an optional login item.
 - **Notifications**: native OS notifications for scan completed, digest ready ("3 people are waiting on you, 1 deadline Friday") and Autopilot summaries; an in-app notification center; quiet hours; grouped/coalesced so they never spam. **Privacy by default:** notifications show counts, not subjects or sender names, unless the user opts in.
@@ -362,7 +362,7 @@ Everything Pochimail knows is stored locally, so offline is a normal state, not 
 One scrolling page of grouped lists (macOS System Settings pattern), applying to all accounts:
 - **Accounts**: each account with provider logo, address, status ("synced 2 minutes ago" / "needs you to sign in again"), Reconnect, Remove (confirm; revokes access and deletes that account's local data), + Add an account.
 - **Pochi**: autonomy (Just look / Suggest / Autopilot) and the four capabilities as switches.
-- **Keep it tidy**: cadence (As it arrives / Daily / Weekly / Off), run in the menu bar, open at login.
+- **Keep it tidy**: cadence (segmented control: As it arrives / Daily / Weekly / Off, same values as the full labels As it arrives · Once a day · Once a week · Only when I ask; "Off" is the short label for "Only when I ask"), run in the menu bar, open at login.
 - **Notifications**: weekly summary, sorting finished, Autopilot reports, show names and subjects (off by default), quiet hours.
 - **Appearance**: theme (System / Light / Dark), Animations (off = static poses and instant transitions), Show Pochi (off = no mascot anywhere). System "reduce motion" always wins.
 - **Privacy & data**: local storage size + Show in Finder, documents folder (change), export my data, delete all local data (confirm; mailboxes untouched).

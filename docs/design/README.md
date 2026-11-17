@@ -24,6 +24,14 @@ Design reference only. The build material (tokens, fonts, shadcn setup, brand, m
 
 Brand and mascot folders (and `apps/desktop/build/`) carry a CC BY-NC-ND 4.0 `LICENSE`.
 
+## Canonical screens
+
+The **light desktop screens** are canonical (plan P7): everything in `screens/light/`, plus in `screens/html/` only Main, Connect, Mode, Scan, Overview, Settings, States and Mascot. The `Dark*` and `Phone*` files there are theme/layout references only. Dark, phone and narrow-window exports are references for theme and layout only; their export glitches are not reproduced: empty percentages and blank Pause on dark/phone Overview, missing checkboxes on phone Setup, crushed segmented labels on phone Settings, and the outline on unselected modes in dark Setup.
+
+## Motion source of truth
+
+`screens/source/Motion.dc.html` is the source of truth for every timing (plan P5); `../design.md` and `../mascot.md` follow it.
+
 ## shadcn/ui
 
 Add components from the app; they land in `packages/ui/src/components` and imports become `@pochimail/ui/components/...`:

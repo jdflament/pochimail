@@ -57,12 +57,12 @@ Button (primary charcoal, secondary outline, ghost), Switch, Checkbox card, Radi
 | Numbers arrive | Counts roll up once from 0 when results land, then stay still | 600ms, ease-out cubic |
 | Storage settles | Bar fills once: keep segment, then the hatched cleanable segment; after a cleanup the hatched part shrinks | 700ms, +140ms |
 | Clean up, then undo | Row folds away (height + fade) instead of vanishing; dark undo toast rises from below for 5s; Undo unfolds the row | 260ms fold, 220ms toast |
-| Pochi at rest | Slow breathing (scale 1 → 1.012/1.025, from the base) and random blinks every 3–7s | 4.2s loop |
+| Pochi at rest | Slow breathing (scale 1 → 1.012 wide / 1.025 tall, from the base) and blinks | 4.2s breathing loop, 5.3s blink loop |
 | Pochi finds something | Squish, bounce up 14px, settle | 620ms |
-| Summary arrives | Scrim fades in, sheet slides down 18px and fades in; stamp lands with a small overshoot and settles at 3°; first paragraph follows | 420ms, stamp +260ms, text +320ms |
+| Summary arrives | Scrim fades in, sheet slides down 18px and fades in; stamp lands with a small overshoot and settles at 3°; first paragraph follows | 420ms, stamp 520ms (+260ms), text 300ms (+320ms) |
 | Choices respond | Checkmark draws itself; ring and background cross-fade; switch thumb glides | 150–220ms |
 | Screen to screen | Mascot stays; content slides in 16px from the right; step indicator stretches to the active step | 220–240ms |
-| Panels and menus | Fade + 4px scale-up from the trigger | 180ms |
+| Panels and menus | Fade + 4px scale-up from the trigger | 220ms |
 
 Never animate: layout jumps, decorative loops, pulsing indicators, skeleton shimmer longer than needed. With `prefers-reduced-motion`, every motion becomes an instant cross-fade and the mascot holds still.
 
