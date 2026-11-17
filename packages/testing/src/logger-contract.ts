@@ -51,7 +51,7 @@ export function loggerContract(name: string, make: (sink: LogSink) => Logger): v
     it("leak: bearer token and JWT in free text", () => {
       const { records, logger } = capture();
       logger.error("failed: Authorization: Bearer abc.def-123", {
-        detail: "eyJhbGciOi.eyJzdWIiOi.sig_nature",
+        detail: "eyJFAKE.eyJFAKE.FAKE_sig",
       });
       expect(dump(records)).not.toMatch(/abc\.def|eyJ/);
     });
@@ -66,13 +66,13 @@ export function loggerContract(name: string, make: (sink: LogSink) => Logger): v
 
     it("leak: 'Authorization: token ghp_…' and bare provider token prefixes", () => {
       const { records, logger } = capture();
-      const ghp = `ghp_${"a1B2".repeat(6)}`;
-      const ya = "ya29.a0AfH6SMBx-y_z";
+      const ghp = "ghp_FAKEFAKEFAKEFAKEFAKE";
+      const ya = "ya29.FAKE-fake_fake";
       logger.error(`Authorization: token ${ghp}`);
       logger.error(
-        `got ${ya} then xoxb-1234567890-abcdef and sk-${"q".repeat(24)} and 1//0gLongRefreshTokenValue123`,
+        `got ${ya} then xoxb-FAKE-FAKE-FAKE and sk-FAKE_FAKE_FAKE_FAKE and 1//FAKE_FAKE_FAKE_FAKE_FAKE`,
       );
-      expect(dump(records)).not.toMatch(/ghp_|ya29|xoxb|sk-q|1\/\/0g/);
+      expect(dump(records)).not.toMatch(/ghp_|ya29|xoxb|sk-FAKE|1\/\/FAKE/);
     });
 
     it("leak: display name next to an address ('Jane Doe <jane@…>')", () => {
@@ -85,6 +85,19 @@ export function loggerContract(name: string, make: (sink: LogSink) => Logger): v
       const { records, logger } = capture();
       logger.info("a jane%40example.com b jane(at)example.com c rick [at] example [dot] org");
       expect(dump(records)).not.toMatch(/jane|rick|example/i);
+    });
+
+    it("leak: a token in a thrown Error's message, code or cause chain", () => {
+      const { records, logger } = capture();
+      const cause = new Error("upstream said Bearer FAKE_cause_token_123");
+      const thrown = Object.assign(
+        new Error("refresh failed access_token=FAKE_msg_token_123", { cause }),
+        {
+          code: "ghp_FAKEFAKEFAKEFAKEFAKE",
+        },
+      );
+      logger.error("request failed", { err: thrown, cause: thrown.cause, errors: [thrown] });
+      expect(dump(records)).not.toMatch(/FAKE_cause|FAKE_msg|ghp_FAKE|FAKEFAKE/);
     });
 
     it("leak: PII inside an Error message", () => {

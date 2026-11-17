@@ -79,7 +79,7 @@ function redactValue(value: unknown, safe: boolean, depth: number, path: Set<obj
   if (value instanceof Error) {
     // Error messages may embed third-party PII: keep only the name and stable code.
     const code = (value as { code?: unknown }).code;
-    return { name: value.name, ...(typeof code === "string" ? { code } : {}) };
+    return { name: value.name, ...(typeof code === "string" ? { code: redactString(code) } : {}) };
   }
   path.add(value);
   try {
