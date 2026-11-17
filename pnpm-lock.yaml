@@ -326,6 +326,9 @@ importers:
 
   packages/db:
     devDependencies:
+      '@pochimail/testing':
+        specifier: workspace:*
+        version: link:../testing
       '@pochimail/typescript-config':
         specifier: workspace:*
         version: link:../../tooling/typescript
