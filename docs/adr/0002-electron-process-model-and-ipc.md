@@ -16,6 +16,14 @@ The UI must stay instant while a 100k-message sync and model inference run. Mail
 - **Hardening**: contextIsolation, sandbox, no nodeIntegration, `webSecurity`, strict CSP (no remote, no inline scripts), navigation and `window.open` blocked, permission requests denied by default, Electron Fuses (RunAsNode off, cookie encryption on, ASAR integrity on, only-load-app-from-asar), Electron kept on a supported major.
 - **Untrusted HTML** (only if a preview ever needs it): sandboxed `<iframe sandbox>` with its own CSP, remote images blocked, no preload.
 
+## Implementation notes (M0-09)
+- Skeleton in `apps/desktop`: `electron-vite` 6, Electron 45, React 19 + React Compiler (`@vitejs/plugin-react` 6 with `@rolldown/plugin-babel`), TanStack Router (code-based, memory history because the renderer loads from `file://`).
+- The page requests the worker port through `window.pochimail.requestWorkerPort()`; the preload forwards the `MessagePort` main created with `window.postMessage`. After that, renderer and worker talk directly.
+- CSP is injected into `index.html` at build time from `src/shared/csp.ts` (strict in production, relaxed for the Vite dev server only). The production CSP has no `unsafe-inline` at all (React style props set styles through CSSOM, which CSP does not block).
+- The session request filter (`src/main/security.ts`) has an empty host allowlist and logs the blocked host only.
+- Fuses are defined in `src/main/fuses.ts` and applied at packaging (M0-10). `GrantFileProtocolExtraPrivileges` is left at its default while the renderer loads from `file://`.
+- Electronegativity's last release is from 2023, so the baseline is enforced by a checklist test (`src/main/security.test.ts`).
+
 ## Consequences
 - Every IPC message is schema-validated twice (cheap at our volumes; batch events).
 - The worker can be restarted by main without losing state (jobs are persistent, ADR 0003).
