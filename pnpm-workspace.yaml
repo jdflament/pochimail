@@ -2,10 +2,14 @@ packages:
   - apps/*
   - packages/*
   - tooling/*
+# node-llama-cpp / onnxruntime-node / protobufjs: prebuilt binaries ship in the packages (ADR 0006); their install scripts stay off.
 allowBuilds:
   electron: true
   electron-winstaller: false
   esbuild: false
+  node-llama-cpp: false
+  onnxruntime-node: false
+  protobufjs: false
 # osv-scanner: storybook's docgen plugin pulls glob 13.0.7 / minimatch 10.2.6 (GHSA-3g3m-2fjr-6pw4, GHSA-g3hv-75wg-m249); fixed in glob 14.0.2 / minimatch 11.0.1. Dev-only; drop once the plugin updates.
 # electron-builder: the global glob/minimatch overrides above break packaging, because the consumers below use the old callback/default-export APIs. @electron/asar promisifies glob 7's callback API (glob >= 10 returns promises: asar hangs), and glob 7 and dir-compare call minimatch 3 as a function (minimatch 11 has named exports only: the universal macOS merge writes an empty app.asar). Pin those consumers to their own majors, none flagged by the advisories above; drop each once its consumer moves off the old API.
 # M0-12: once the app has asarUnpack, the universal merge re-packs app.asar with @electron/asar's `unpack` option, which calls minimatch 3 as a function (same cause as above).
