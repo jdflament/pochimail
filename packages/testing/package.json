@@ -10,7 +10,8 @@
     "./logger-contract": "./src/logger-contract.ts",
     "./domain-samples": "./src/domain-samples.ts",
     "./entity-contract": "./src/entity-contract.ts",
-    "./unit-of-work-contract": "./src/unit-of-work-contract.ts"
+    "./unit-of-work-contract": "./src/unit-of-work-contract.ts",
+    "./policy-contract": "./src/policy-contract.ts"
   },
   "scripts": {
     "typecheck": "tsc",

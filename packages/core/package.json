@@ -29,7 +29,9 @@
     "./ports/repositories": "./src/ports/repositories.ts",
     "./ports/scheduler": "./src/ports/scheduler.ts",
     "./ports/secret-store": "./src/ports/secret-store.ts",
-    "./ports/unit-of-work": "./src/ports/unit-of-work.ts"
+    "./ports/unit-of-work": "./src/ports/unit-of-work.ts",
+    "./policies/autonomy": "./src/policies/autonomy.ts",
+    "./policies/authorize": "./src/policies/authorize.ts"
   },
   "scripts": {
     "typecheck": "tsc",
