@@ -12,6 +12,8 @@
     "build": "electron-vite build",
     "preview": "electron-vite preview",
     "typecheck": "tsc",
+    "lint": "biome check .",
+    "knip": "knip",
     "test": "vitest run"
   },
   "devDependencies": {

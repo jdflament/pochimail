@@ -5,7 +5,7 @@ Pochimail is a privacy-first, local-only desktop assistant that sorts and cleans
 ## 1. Read first
 - Read the brief sections your ticket lists, plus [§1 vision and principles](docs/brief.md) and [§8 standards](docs/brief.md). Skim `docs/plan.md` and the ADRs in `docs/adr/` that touch your area.
 - UI work: `docs/design.md`, `docs/mascot.md`, `docs/product.md`, and the reference screens in `docs/design/screens/` ([§6](docs/brief.md)).
-- Verify versions and docs of every tool or dependency against the registry (`npm view`) and current docs; never from memory ([§9](docs/brief.md)). Pin exact versions.
+- Verify versions and docs of every tool or dependency against the registry (`npm view`) and current docs; never from memory ([§9](docs/brief.md)). Pin exact versions in `dependencies` and `devDependencies`; `peerDependencies` use ranges.
 
 ## 2. Product invariants (never break)
 Source: [§1 core principles](docs/brief.md), [§2 invariants](docs/brief.md).
@@ -27,8 +27,8 @@ Source: [§5.1](docs/brief.md), [§5.2](docs/brief.md), [ADR 0001](docs/adr/0001
 - Events, outbox, idempotent reversible actions, bounded concurrency and cancellation follow [§5.3](docs/brief.md).
 
 ## 4. Code standards
-Source: [§8](docs/brief.md). Tooling is planned (M0-04 to M0-06); until then only typecheck and test exist.
-- TypeScript strict + `noUncheckedIndexedAccess` + `exactOptionalPropertyTypes`. **No `any`.** Biome (lint + format), manypkg, knip, Renovate (planned: M0-04 to M0-06).
+Source: [§8](docs/brief.md). Gates: `pnpm check` runs typecheck, lint (Biome), knip, test and manypkg. Renovate and CI are planned (M0-05, M0-06).
+- TypeScript strict + `noUncheckedIndexedAccess` + `exactOptionalPropertyTypes`. **No `any`.** Biome (lint + format), manypkg, knip (live, M0-04); Renovate (planned: M0-06).
 - zod at every boundary: IPC, provider responses, LLM output. Expected failures are `Result` values; exceptions are for bugs. Branded IDs (`MessageId`, `AccountId`, `WorkspaceId`).
 - Explicit use cases with dependencies injected through ports.
 - Frontend: React 19 function components (no `forwardRef`), `data-slot`, CVA variants, `cn()`, exported `VariantProps`, `asChild` via Slot, `focus-visible`; wrap primitives, don't fork them. Composition over boolean props. Renderer layout `features/<name>/` + `components/`. Worker data in TanStack Query fed by IPC events; filters in the router; virtualize large lists; forms with react-hook-form + zod.
@@ -51,7 +51,7 @@ Source: [§5.10](docs/brief.md), [§5.4](docs/brief.md), [ADR 0002](docs/adr/000
 - Email content is untrusted: never execute or render remote content; remote images blocked; never follow links in email bodies. Unsubscribe only via RFC 8058 one-click or `mailto:` ([§4](docs/brief.md)). Attachments are hashed and stored, never opened automatically.
 - OAuth client IDs come from env/config, never hard-coded ([§9b](docs/brief.md)).
 - Supply chain: pinned lockfile, minimal dependencies; ask before adding a heavyweight one ([§10](docs/brief.md)). Planned CI: osv-scanner/audit and an SBOM per release ([§5.10](docs/brief.md)).
-- pnpm's `minimumReleaseAge` stays on; never add release-age exclusions without an ADR note.
+- pnpm's `minimumReleaseAge` stays on: we rely on pnpm 12's default, so do not add config for it; never add release-age exclusions without an ADR note.
 - Releases: signed and notarized builds with signed update metadata; SHA-256 checks on model files; keep Electron on a supported version ([§5.10](docs/brief.md)).
 - Threat model: `docs/security/threat-model.md` (not yet present, planned M0-16).
 

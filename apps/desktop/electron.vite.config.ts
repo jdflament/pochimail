@@ -21,7 +21,10 @@ export default defineConfig({
   main: {
     build: {
       rollupOptions: {
-        input: { index: resolve(import.meta.dirname, "src/main/main.ts"), worker: resolve(import.meta.dirname, "src/worker/worker.ts") },
+        input: {
+          index: resolve(import.meta.dirname, "src/main/main.ts"),
+          worker: resolve(import.meta.dirname, "src/worker/worker.ts"),
+        },
       },
     },
   },
@@ -36,7 +39,9 @@ export default defineConfig({
   },
   renderer: {
     root: resolve(import.meta.dirname, "src/renderer"),
-    build: { rollupOptions: { input: { index: resolve(import.meta.dirname, "src/renderer/index.html") } } },
+    build: {
+      rollupOptions: { input: { index: resolve(import.meta.dirname, "src/renderer/index.html") } },
+    },
     plugins: [injectCsp(), tailwindcss(), react(), babel({ presets: [reactCompilerPreset()] })],
   },
 });

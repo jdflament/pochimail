@@ -1,17 +1,26 @@
 import { EventEmitter } from "node:events";
-import type { WebContents } from "electron";
 import { FuseV1Options } from "@electron/fuses";
+import type { WebContents } from "electron";
 import { describe, expect, it } from "vitest";
 import { buildCsp } from "../shared/csp.ts";
 import { fuses } from "./fuses.ts";
-import { allowedHosts, hardenWebContents, isAppUrl, isRequestAllowed, webPreferences } from "./security.ts";
+import {
+  allowedHosts,
+  hardenWebContents,
+  isAppUrl,
+  isRequestAllowed,
+  webPreferences,
+} from "./security.ts";
 
 const fakeWebContents = () => {
   const emitter = new EventEmitter();
   let openHandler: (() => { action: string }) | undefined;
   const contents = {
-    setWindowOpenHandler: (handler: () => { action: "deny" }) => void (openHandler = handler),
-    on: (event: string, listener: (e: { preventDefault: () => void }, url: string) => void) => void emitter.on(event, listener),
+    setWindowOpenHandler: (handler: () => { action: "deny" }) => {
+      openHandler = handler;
+    },
+    on: (event: string, listener: (e: { preventDefault: () => void }, url: string) => void) =>
+      void emitter.on(event, listener),
   };
   const fire = (event: string, url = "") => {
     let prevented = false;
@@ -47,8 +56,12 @@ describe("window hardening", () => {
     expect(isAppUrl("file:///etc/passwd")).toBe(false);
     expect(isAppUrl("https://evil.example/renderer/index.html")).toBe(false);
     expect(isAppUrl("garbage")).toBe(false);
-    expect(isAppUrl("http://localhost:5173/x", { devServerOrigin: "http://localhost:5173" })).toBe(true);
-    expect(isAppUrl("http://localhost:6666/x", { devServerOrigin: "http://localhost:5173" })).toBe(false);
+    expect(isAppUrl("http://localhost:5173/x", { devServerOrigin: "http://localhost:5173" })).toBe(
+      true,
+    );
+    expect(isAppUrl("http://localhost:6666/x", { devServerOrigin: "http://localhost:5173" })).toBe(
+      false,
+    );
   });
 });
 
@@ -62,8 +75,14 @@ describe("session request filter", () => {
 
   it("allows local content, the dev server, and explicitly allowlisted hosts", () => {
     expect(isRequestAllowed("file:///app/renderer/index.html")).toBe(true);
-    expect(isRequestAllowed("http://localhost:5173/src/main.tsx", { devServerOrigin: "http://localhost:5173" })).toBe(true);
-    expect(isRequestAllowed("http://localhost:9999/", { devServerOrigin: "http://localhost:5173" })).toBe(false);
+    expect(
+      isRequestAllowed("http://localhost:5173/src/main.tsx", {
+        devServerOrigin: "http://localhost:5173",
+      }),
+    ).toBe(true);
+    expect(
+      isRequestAllowed("http://localhost:9999/", { devServerOrigin: "http://localhost:5173" }),
+    ).toBe(false);
     expect(isRequestAllowed("https://api.example/v1", { allowlist: ["api.example"] })).toBe(true);
   });
 });
@@ -71,7 +90,14 @@ describe("session request filter", () => {
 // Equivalent checklist for Electronegativity (last release 2023, predates this Electron major): the settings it flags as high.
 describe("security baseline checklist", () => {
   it("keeps the renderer isolated", () => {
-    expect(webPreferences).toMatchObject({ contextIsolation: true, sandbox: true, nodeIntegration: false, webSecurity: true, allowRunningInsecureContent: false, webviewTag: false });
+    expect(webPreferences).toMatchObject({
+      contextIsolation: true,
+      sandbox: true,
+      nodeIntegration: false,
+      webSecurity: true,
+      allowRunningInsecureContent: false,
+      webviewTag: false,
+    });
   });
 
   it("ships a production CSP with no remote origin, inline script or network", () => {

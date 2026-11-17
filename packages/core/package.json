@@ -9,6 +9,8 @@
   },
   "scripts": {
     "typecheck": "tsc",
+    "lint": "biome check .",
+    "knip": "knip",
     "test": "vitest run"
   },
   "devDependencies": {

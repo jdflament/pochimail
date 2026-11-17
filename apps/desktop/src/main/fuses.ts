@@ -1,4 +1,4 @@
-import { FuseV1Options, FuseVersion, type FuseConfig } from "@electron/fuses";
+import { type FuseConfig, FuseV1Options, FuseVersion } from "@electron/fuses";
 
 /** Electron Fuses flipped on the packaged binary (ADR 0002). Applied by the packaging step (M0-10) through `flipFuses`. */
 export const fuses = {

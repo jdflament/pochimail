@@ -8,5 +8,9 @@
     "./node-library.json": "./node-library.json",
     "./react-library.json": "./react-library.json",
     "./electron.json": "./electron.json"
+  },
+  "scripts": {
+    "lint": "biome check .",
+    "knip": "knip"
   }
 }

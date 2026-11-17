@@ -10,7 +10,8 @@ export const connectWorker = (): Promise<ReturnType<typeof createEchoClient>> =>
       window.removeEventListener("message", onMessage);
       const transport: Transport = {
         post: (message) => port.postMessage(message),
-        onMessage: (handler) => port.addEventListener("message", (portEvent) => handler(portEvent.data)),
+        onMessage: (handler) =>
+          port.addEventListener("message", (portEvent) => handler(portEvent.data)),
       };
       port.start();
       resolve(createEchoClient(transport));
