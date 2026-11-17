@@ -1,3 +1,15 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="packages/ui/src/assets/brand/lockup-light-text.svg">
+    <img src="packages/ui/src/assets/brand/lockup-dark-text.svg" alt="Pochimail" width="420">
+  </picture>
+</p>
+
+<p align="center">
+  <a href="https://github.com/jdflament/pochimail/actions/workflows/ci.yml"><img src="https://github.com/jdflament/pochimail/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <img src="packages/ui/src/assets/mascot/pochi-default@2x.png" alt="Pochi, the Pochimail assistant" width="96">
+</p>
+
 # Pochimail
 
 A private assistant for the email accounts you already have. It shows you the big picture of your mailboxes, flags what matters, proposes cleanups and saves your important documents. **Your email never leaves your computer.**

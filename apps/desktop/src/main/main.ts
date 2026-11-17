@@ -6,6 +6,7 @@ import {
   app,
   BrowserWindow,
   MessageChannelMain,
+  nativeImage,
   nativeTheme,
   safeStorage,
   session,
@@ -18,6 +19,8 @@ import { linkWorkerOnEveryLoad } from "./worker-link.ts";
 const devServerUrl = process.env.ELECTRON_RENDERER_URL;
 const devServerOrigin = devServerUrl === undefined ? undefined : new URL(devServerUrl).origin;
 const rendererFile = join(import.meta.dirname, "../renderer/index.html");
+// Dev only: a packaged app gets its icon from the installer (electron-builder, apps/desktop/build); `electron .` would show Electron's.
+const devIconPath = app.isPackaged ? undefined : join(import.meta.dirname, "../../build/icon.png");
 
 /** Session-wide guards: deny all permissions and cancel every request to a host that is not allowlisted. */
 const lockDownSession = (): void => {
@@ -85,6 +88,7 @@ const createWindow = (): void => {
     minWidth: 720,
     minHeight: 560,
     show: false,
+    ...(devIconPath !== undefined && process.platform !== "darwin" ? { icon: devIconPath } : {}),
     ...(process.platform === "darwin"
       ? { titleBarStyle: "hiddenInset" as const, trafficLightPosition: { x: 16, y: 16 } }
       : {}),
@@ -111,6 +115,8 @@ app.on("web-contents-created", (_event, contents) =>
 
 void app.whenReady().then(() => {
   nativeTheme.themeSource = "system";
+  if (devIconPath !== undefined && process.platform === "darwin")
+    app.dock?.setIcon(nativeImage.createFromPath(devIconPath));
   lockDownSession();
   createWindow();
   app.on("activate", () => {
