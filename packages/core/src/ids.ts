@@ -10,6 +10,9 @@ export type MessageId = Brand<string, "MessageId">;
 export type ThreadId = Brand<string, "ThreadId">;
 export type ActionId = Brand<string, "ActionId">;
 export type SuggestionId = Brand<string, "SuggestionId">;
+export type AttachmentId = Brand<string, "AttachmentId">;
+export type TopicId = Brand<string, "TopicId">;
+export type ActionLogId = Brand<string, "ActionLogId">;
 
 const MAX_ID_LENGTH = 512;
 // Control characters (incl. NUL, newlines) never belong in an identifier or a log line.
@@ -36,13 +39,27 @@ export const MessageId = makeId<MessageId>("MessageId");
 export const ThreadId = makeId<ThreadId>("ThreadId");
 export const ActionId = makeId<ActionId>("ActionId");
 export const SuggestionId = makeId<SuggestionId>("SuggestionId");
+export const AttachmentId = makeId<AttachmentId>("AttachmentId");
+export const TopicId = makeId<TopicId>("TopicId");
+export const ActionLogId = makeId<ActionLogId>("ActionLogId");
 
 /**
  * Strict, log-safe shape of OUR OWN identifiers: `<prefix>_<ULID>` or `<prefix>_<UUID>`.
  * Provider-assigned opaque IDs (see the constructors above) are intentionally more permissive
  * and therefore never pass this check: they must not reach a log line verbatim.
  */
-export const ID_PREFIXES = ["wsp", "acc", "msg", "thr", "act", "sug", "mbx"] as const;
+export const ID_PREFIXES = [
+  "wsp",
+  "acc",
+  "msg",
+  "thr",
+  "act",
+  "sug",
+  "mbx",
+  "att",
+  "top",
+  "log",
+] as const;
 const ULID = "[0-7][0-9A-HJKMNP-TV-Z]{25}";
 const UUID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
 export const LOG_ID_FORMAT = new RegExp(`^(?:${ID_PREFIXES.join("|")})_(?:${ULID}|${UUID})$`);

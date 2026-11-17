@@ -7,7 +7,9 @@
   "exports": {
     "./package-info": "./src/package-info.ts",
     "./fake-clock": "./src/fake-clock.ts",
-    "./logger-contract": "./src/logger-contract.ts"
+    "./logger-contract": "./src/logger-contract.ts",
+    "./domain-samples": "./src/domain-samples.ts",
+    "./entity-contract": "./src/entity-contract.ts"
   },
   "scripts": {
     "typecheck": "tsc",
