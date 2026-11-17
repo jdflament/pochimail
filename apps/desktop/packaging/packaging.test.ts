@@ -1,3 +1,4 @@
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { electronBinaryPath, isUniversalSlice } from "./apply-fuses.ts";
 import { sizeTable } from "./size-report.ts";
@@ -7,9 +8,9 @@ const app = { appOutDir: "release/x", productFilename: "Pochimail", executableNa
 describe("fuse target", () => {
   // Guards: fuses flipped on the wrong file (or not at all) so the shipped binary keeps RunAsNode.
   it.each([
-    ["darwin", "release/x/Pochimail.app/Contents/MacOS/Pochimail"],
-    ["win32", "release/x/Pochimail.exe"],
-    ["linux", "release/x/pochimail"],
+    ["darwin", join("release/x", "Pochimail.app", "Contents", "MacOS", "Pochimail")],
+    ["win32", join("release/x", "Pochimail.exe")],
+    ["linux", join("release/x", "pochimail")],
   ])("points at the Electron binary on %s", (platform, expected) => {
     expect(electronBinaryPath({ ...app, platform })).toBe(expected);
   });
