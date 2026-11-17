@@ -1,5 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@6.45.1/schema.json",
+  "entry": ["src/renderer/src/main.tsx"],
   "ignoreBinaries": ["biome", "knip"],
   "ignoreDependencies": ["tailwindcss", "tw-animate-css"]
 }
