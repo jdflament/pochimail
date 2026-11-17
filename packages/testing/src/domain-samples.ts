@@ -121,6 +121,7 @@ export const sampleBuilders = {
       ...base(r),
       id: id(r, "log"),
       actionId: id(r, "act"),
+      idempotencyKey: id(r, "key"),
       outcome: irreversible ? "applied" : r.pick(["applied", "undone"]),
       command: cmd,
       inverse: irreversible ? null : command(r),

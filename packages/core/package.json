@@ -34,7 +34,12 @@
     "./policies/authorize": "./src/policies/authorize.ts",
     "./events/catalog": "./src/events/catalog.ts",
     "./events/bus": "./src/events/bus.ts",
-    "./events/batching": "./src/events/batching.ts"
+    "./events/batching": "./src/events/batching.ts",
+    "./ports/id-generator": "./src/ports/id-generator.ts",
+    "./use-cases/apply-action": "./src/use-cases/apply-action.ts",
+    "./use-cases/undo-action": "./src/use-cases/undo-action.ts",
+    "./use-cases/action-events": "./src/use-cases/action-events.ts",
+    "./use-cases/action-contract": "./src/use-cases/action-contract.ts"
   },
   "scripts": {
     "typecheck": "tsc",

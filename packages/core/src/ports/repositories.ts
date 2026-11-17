@@ -90,6 +90,13 @@ export interface ActionLogReader {
     ws: WorkspaceId,
     actionId: ActionId,
   ): AsyncResult<readonly ActionLog[], StorageError>;
+  /** Every entry (applied, failed, refused) recorded for the key, oldest first. */
+  listForKey(
+    ws: WorkspaceId,
+    idempotencyKey: string,
+  ): AsyncResult<readonly ActionLog[], StorageError>;
+  /** Every entry of a batch, oldest first, so undo can reverse the whole batch after a restart. */
+  listForBatch(ws: WorkspaceId, batchId: string): AsyncResult<readonly ActionLog[], StorageError>;
   list(ws: WorkspaceId, page: PageRequest): AsyncResult<Page<ActionLog>, StorageError>;
 }
 export interface ActionLogWriter {
