@@ -5,7 +5,9 @@
   "license": "AGPL-3.0-only",
   "type": "module",
   "exports": {
-    "./package-info": "./src/package-info.ts"
+    "./package-info": "./src/package-info.ts",
+    "./fake-clock": "./src/fake-clock.ts",
+    "./logger-contract": "./src/logger-contract.ts"
   },
   "scripts": {
     "typecheck": "tsc",
@@ -14,6 +16,7 @@
     "test": "vitest run"
   },
   "devDependencies": {
+    "@pochimail/core": "workspace:*",
     "@pochimail/typescript-config": "workspace:*",
     "@types/node": "26.6.6",
     "typescript": "7.0.2",

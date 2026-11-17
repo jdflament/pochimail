@@ -1,0 +1,63 @@
+export type ErrorCode =
+  | "domain.invalid_id"
+  | "domain.invalid_state"
+  | "provider.rate_limited"
+  | "provider.offline"
+  | "provider.auth_expired"
+  | "provider.conflict";
+
+/** Base of all expected failures. `code` is stable and safe to log; `message` must carry no PII. */
+export class DomainError extends Error {
+  readonly code: ErrorCode;
+
+  constructor(code: ErrorCode, message: string, options?: { cause?: unknown }) {
+    super(message, options);
+    this.name = new.target.name;
+    this.code = code;
+  }
+}
+
+export class InvalidIdError extends DomainError {
+  readonly kind: string;
+
+  constructor(kind: string, reason: string) {
+    super("domain.invalid_id", `Invalid ${kind}: ${reason}`);
+    this.kind = kind;
+  }
+}
+
+export class InvalidStateError extends DomainError {
+  constructor(message: string) {
+    super("domain.invalid_state", message);
+  }
+}
+
+/** Failures reported by (or while reaching) a mail provider. */
+export abstract class ProviderError extends DomainError {}
+
+export class RateLimited extends ProviderError {
+  readonly retryAfterMs: number | undefined;
+
+  constructor(options: { retryAfterMs?: number } = {}) {
+    super("provider.rate_limited", "Provider rate limit reached");
+    this.retryAfterMs = options.retryAfterMs;
+  }
+}
+
+export class Offline extends ProviderError {
+  constructor() {
+    super("provider.offline", "Provider is unreachable");
+  }
+}
+
+export class AuthExpired extends ProviderError {
+  constructor() {
+    super("provider.auth_expired", "Provider credentials expired");
+  }
+}
+
+export class Conflict extends ProviderError {
+  constructor(message = "Provider state changed since it was last read") {
+    super("provider.conflict", message);
+  }
+}

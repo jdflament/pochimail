@@ -343,6 +343,9 @@ importers:
 
   packages/testing:
     devDependencies:
+      '@pochimail/core':
+        specifier: workspace:*
+        version: link:../core
       '@pochimail/typescript-config':
         specifier: workspace:*
         version: link:../../tooling/typescript
