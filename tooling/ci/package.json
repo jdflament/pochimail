@@ -1,0 +1,22 @@
+{
+  "name": "@pochimail/ci",
+  "private": true,
+  "version": "0.0.0",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "exports": {
+    "./gate-counts": "./src/gate-counts.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc",
+    "lint": "biome check .",
+    "knip": "knip",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@pochimail/typescript-config": "workspace:*",
+    "@types/node": "26.6.6",
+    "typescript": "7.0.2",
+    "vitest": "5.1.0"
+  }
+}

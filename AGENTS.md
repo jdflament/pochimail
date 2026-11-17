@@ -27,8 +27,8 @@ Source: [§5.1](docs/brief.md), [§5.2](docs/brief.md), [ADR 0001](docs/adr/0001
 - Events, outbox, idempotent reversible actions, bounded concurrency and cancellation follow [§5.3](docs/brief.md).
 
 ## 4. Code standards
-Source: [§8](docs/brief.md). Gates: `pnpm check` runs typecheck, lint (Biome), knip, test and manypkg. Renovate and CI are planned (M0-05, M0-06).
-- TypeScript strict + `noUncheckedIndexedAccess` + `exactOptionalPropertyTypes`. **No `any`.** Biome (lint + format), manypkg, knip (live, M0-04); Renovate (planned: M0-06).
+Source: [§8](docs/brief.md). Gates: `pnpm check` runs typecheck, lint (Biome), knip, test and manypkg. CI runs it on macOS, Windows and Linux (`.github/workflows/ci.yml`, M0-05); `pnpm gates` fails any gate that runs zero tasks. Renovate is planned (M0-06).
+- TypeScript strict + `noUncheckedIndexedAccess` + `exactOptionalPropertyTypes`. **No `any`.** Biome (lint + format), manypkg, knip (live, M0-04); CI (live, M0-05); Renovate (planned: M0-06).
 - zod at every boundary: IPC, provider responses, LLM output. Expected failures are `Result` values; exceptions are for bugs. Branded IDs (`MessageId`, `AccountId`, `WorkspaceId`).
 - Explicit use cases with dependencies injected through ports.
 - Frontend: React 19 function components (no `forwardRef`), `data-slot`, CVA variants, `cn()`, exported `VariantProps`, `asChild` via Slot, `focus-visible`; wrap primitives, don't fork them. Composition over boolean props. Renderer layout `features/<name>/` + `components/`. Worker data in TanStack Query fed by IPC events; filters in the router; virtualize large lists; forms with react-hook-form + zod.

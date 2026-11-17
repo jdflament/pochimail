@@ -33,6 +33,7 @@ describe("workspace rules (ADR 0001)", () => {
     expect(names).toEqual(
       [
         "@pochimail/ai",
+        "@pochimail/ci",
         "@pochimail/cli",
         "@pochimail/core",
         "@pochimail/db",
