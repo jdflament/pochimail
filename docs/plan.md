@@ -17,6 +17,7 @@ Status: **draft for review** (2026-11-17). Nothing is created on GitHub yet.
 | D4 | **Any provider in v1**: Gmail API, Microsoft Graph, and a generic IMAP connector with presets (Yahoo, iCloud, Fastmail, GMX…). OAuth/XOAUTH2 where allowed, app password in the keychain otherwise | 2026-11-17 | brief §1, §4, §5.1, §5.3, §7 |
 | D5 | **7 fixed categories, empty ones hidden** in sidebar/Overview for the current account selection | 2026-11-17 | brief §3 |
 | D7 | **`apps/cli` dev-only pipeline CLI (ADR 0001)**: private, never shipped; it is the brief §10 M1 "CLI running the full pipeline on fixtures" | 2026-11-17 | brief §5.1, §10, ADR 0001 |
+| D8 | **Unsubscribe is the one irreversible action**: its ActionLog entry has `inverse: null`, `irreversible: true` and a reason; every other applied action must record its inverse (M1-02, accepted deviation from "undo everything") | 2026-11-17 | brief §2, §5.3, M1-02 |
 | D6 | **Tracker = GitHub Project "Pochimail v1"** with draft items; a draft becomes an issue only when work starts | 2026-11-17 | brief §10 |
 
 ### Pending (proposed default in bold — I proceed with it unless you object)

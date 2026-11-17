@@ -10,7 +10,12 @@
     "./errors": "./src/errors.ts",
     "./ids": "./src/ids.ts",
     "./clock": "./src/clock.ts",
-    "./logger": "./src/logger.ts"
+    "./logger": "./src/logger.ts",
+    "./domain/common": "./src/domain/common.ts",
+    "./domain/category": "./src/domain/category.ts",
+    "./domain/account": "./src/domain/account.ts",
+    "./domain/mail": "./src/domain/mail.ts",
+    "./domain/action": "./src/domain/action.ts"
   },
   "scripts": {
     "typecheck": "tsc",
@@ -22,5 +27,8 @@
     "@pochimail/typescript-config": "workspace:*",
     "typescript": "7.0.2",
     "vitest": "5.1.0"
+  },
+  "dependencies": {
+    "zod": "4.6.7"
   }
 }
