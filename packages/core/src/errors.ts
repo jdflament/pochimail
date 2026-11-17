@@ -12,6 +12,8 @@ export const ERROR_CODES = [
   "ai.unavailable",
   "operation.cancelled",
   "event.invalid",
+  "event.handler_failed",
+  "event.handler_timeout",
 ] as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[number];

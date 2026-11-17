@@ -31,7 +31,10 @@
     "./ports/secret-store": "./src/ports/secret-store.ts",
     "./ports/unit-of-work": "./src/ports/unit-of-work.ts",
     "./policies/autonomy": "./src/policies/autonomy.ts",
-    "./policies/authorize": "./src/policies/authorize.ts"
+    "./policies/authorize": "./src/policies/authorize.ts",
+    "./events/catalog": "./src/events/catalog.ts",
+    "./events/bus": "./src/events/bus.ts",
+    "./events/batching": "./src/events/batching.ts"
   },
   "scripts": {
     "typecheck": "tsc",
