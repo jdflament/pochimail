@@ -39,7 +39,10 @@
     "./repositories-contract": "./src/repositories-contract.ts",
     "./scheduler-contract": "./src/scheduler-contract.ts",
     "./secret-store-contract": "./src/secret-store-contract.ts",
-    "./unit-of-work-contract": "./src/unit-of-work-contract.ts"
+    "./unit-of-work-contract": "./src/unit-of-work-contract.ts",
+    "./in-memory-outbox": "./src/in-memory-outbox.ts",
+    "./outbox-contract": "./src/outbox-contract.ts",
+    "./leased-job-queue-contract": "./src/leased-job-queue-contract.ts"
   },
   "scripts": {
     "typecheck": "tsc",

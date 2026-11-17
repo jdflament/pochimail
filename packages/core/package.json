@@ -39,7 +39,10 @@
     "./use-cases/apply-action": "./src/use-cases/apply-action.ts",
     "./use-cases/undo-action": "./src/use-cases/undo-action.ts",
     "./use-cases/action-events": "./src/use-cases/action-events.ts",
-    "./use-cases/action-contract": "./src/use-cases/action-contract.ts"
+    "./use-cases/action-contract": "./src/use-cases/action-contract.ts",
+    "./ports/outbox": "./src/ports/outbox.ts",
+    "./jobs/retry": "./src/jobs/retry.ts",
+    "./jobs/outbox-relay": "./src/jobs/outbox-relay.ts"
   },
   "scripts": {
     "typecheck": "tsc",
