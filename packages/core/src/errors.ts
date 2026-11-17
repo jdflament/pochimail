@@ -2,6 +2,7 @@
 export const ERROR_CODES = [
   "domain.invalid_id",
   "domain.invalid_state",
+  "policy.denied",
   "provider.rate_limited",
   "provider.offline",
   "provider.auth_expired",
@@ -102,5 +103,26 @@ export class Cancelled extends DomainError {
 export class EventError extends DomainError {
   constructor(message = "Event is invalid") {
     super("event.invalid", message);
+  }
+}
+
+export const POLICY_DENIAL_REASONS = [
+  "unknown-action-kind",
+  "read-only",
+  "needs-confirmation",
+  "protected-category",
+  "unknown-category",
+  "below-confidence-threshold",
+  "not-autopilot-eligible",
+] as const;
+export type PolicyDenialReason = (typeof POLICY_DENIAL_REASONS)[number];
+
+/** An action refused by policy. `reason` is a closed set, safe to log. */
+export class PolicyDenied extends DomainError {
+  readonly reason: PolicyDenialReason;
+
+  constructor(reason: PolicyDenialReason) {
+    super("policy.denied", `Action denied by policy: ${reason}`);
+    this.reason = reason;
   }
 }
