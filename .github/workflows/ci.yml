@@ -54,6 +54,78 @@ jobs:
       - name: Manypkg
         run: pnpm manypkg
 
+  # Unsigned packaging smoke build per OS (brief §5.9). Runs on main, and on PRs that touch packaging inputs.
+  # Not a required check: when a PR touches nothing relevant the job still runs and reports success, but every step after the scope check is skipped.
+  package:
+    name: package (${{ matrix.os }})
+    needs: check
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Decide whether packaging inputs changed
+        id: scope
+        shell: bash
+        env:
+          EVENT: ${{ github.event_name }}
+          REF: ${{ github.ref }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          run=false
+          if [ "$EVENT" = push ] && [ "$REF" = refs/heads/main ]; then
+            run=true
+          elif [ "$EVENT" = pull_request ]; then
+            git fetch --no-tags --depth=1 origin "$BASE_SHA"
+            if git diff --name-only "$BASE_SHA" HEAD | grep -E '^apps/desktop/(build|packaging/|electron-builder\.config\.ts|package\.json)|^\.github/workflows/ci\.yml$|^pnpm-lock\.yaml$'; then
+              run=true
+            fi
+          fi
+          echo "run=$run" >> "$GITHUB_OUTPUT"
+      - if: steps.scope.outputs.run == 'true'
+        uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - if: steps.scope.outputs.run == 'true'
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - if: steps.scope.outputs.run == 'true'
+        run: pnpm install --frozen-lockfile
+      - name: Install Linux packaging tools
+        if: steps.scope.outputs.run == 'true' && runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends rpm xvfb
+      - name: Package
+        if: steps.scope.outputs.run == 'true'
+        run: pnpm --filter @pochimail/desktop package
+      - name: Smoke (fuses and headless launch)
+        if: steps.scope.outputs.run == 'true' && runner.os != 'Linux'
+        run: pnpm --filter @pochimail/desktop package:smoke
+      - name: Smoke (fuses and headless launch)
+        if: steps.scope.outputs.run == 'true' && runner.os == 'Linux'
+        run: xvfb-run --auto-servernum pnpm --filter @pochimail/desktop package:smoke
+      - name: Report artifact sizes
+        if: steps.scope.outputs.run == 'true'
+        run: pnpm --filter @pochimail/desktop package:size "${{ runner.os }} artifacts"
+      - name: Upload artifacts
+        if: steps.scope.outputs.run == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: pochimail-${{ runner.os }}
+          path: |
+            apps/desktop/release/*.dmg
+            apps/desktop/release/*.zip
+            apps/desktop/release/*.exe
+            apps/desktop/release/*.AppImage
+            apps/desktop/release/*.deb
+            apps/desktop/release/*.rpm
+          retention-days: 7
+          if-no-files-found: error
+
   # Stub until M1-11 wires the eval-regression run; keep the job name stable for branch protection.
   eval:
     name: eval

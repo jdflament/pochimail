@@ -60,6 +60,12 @@ const createWindow = (): void => {
   });
   window.once("ready-to-show", () => window.show());
   connectWorker(window);
+  // Packaging smoke test (M0-10): report that the renderer loaded, then quit.
+  if (process.env.POCHIMAIL_SMOKE === "1")
+    window.webContents.once("did-finish-load", () => {
+      console.log("smoke:window-loaded");
+      app.quit();
+    });
   if (devServerUrl === undefined) void window.loadFile(rendererFile);
   else void window.loadURL(devServerUrl);
 };
