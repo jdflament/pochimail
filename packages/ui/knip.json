@@ -1,5 +1,5 @@
 {
   "$schema": "https://unpkg.com/knip@6.45.1/schema.json",
   "ignoreBinaries": ["biome", "knip"],
-  "ignoreDependencies": ["motion", "@tailwindcss/vite"]
+  "ignoreDependencies": ["motion"]
 }
