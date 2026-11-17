@@ -36,3 +36,17 @@ export const MessageId = makeId<MessageId>("MessageId");
 export const ThreadId = makeId<ThreadId>("ThreadId");
 export const ActionId = makeId<ActionId>("ActionId");
 export const SuggestionId = makeId<SuggestionId>("SuggestionId");
+
+/**
+ * Strict, log-safe shape of OUR OWN identifiers: `<prefix>_<ULID>` or `<prefix>_<UUID>`.
+ * Provider-assigned opaque IDs (see the constructors above) are intentionally more permissive
+ * and therefore never pass this check: they must not reach a log line verbatim.
+ */
+export const ID_PREFIXES = ["wsp", "acc", "msg", "thr", "act", "sug", "mbx"] as const;
+const ULID = "[0-7][0-9A-HJKMNP-TV-Z]{25}";
+const UUID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
+export const LOG_ID_FORMAT = new RegExp(`^(?:${ID_PREFIXES.join("|")})_(?:${ULID}|${UUID})$`);
+
+export function isLogSafeId(value: string): boolean {
+  return LOG_ID_FORMAT.test(value);
+}
