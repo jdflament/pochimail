@@ -105,7 +105,7 @@ S spoofing · T tampering · R repudiation · I information disclosure · D deni
 
 | ID | Cat | Threat | Actor | Mitigation | Draft / ADR |
 |---|---|---|---|---|---|
-| S1 | I | Database file copied from disk | T3 | SQLCipher-compatible encryption (`better-sqlite3-multiple-ciphers`); random 256-bit key in `safeStorage` | E2 (SQLite adapters) · M0-12 · [ADR 0005](../adr/0005-local-storage.md) |
+| S1 | I | Database file copied from disk | T3 | SQLCipher-compatible encryption (`better-sqlite3-multiple-ciphers`); random 256-bit key in `safeStorage`; on Linux `basic_text` the key is refused, not written (see S4) | E2 (SQLite adapters) · M0-12 · [ADR 0005](../adr/0005-local-storage.md) |
 | S2 | I | Blob store read from disk | T3 | AES-256-GCM per blob with a key derived from the DB key; plaintext only on user export to a chosen folder | E6 · [ADR 0005](../adr/0005-local-storage.md) |
 | S3 | I | Refresh token or app password in a file, log, crash dump or the renderer | T3 T6 | tokens only in the keychain via `SecretStore`; access tokens in memory; logger redaction; tokens never cross to renderer | E2 (SecretStore) · [ADR 0007](../adr/0007-oauth-credentials-scopes.md) |
 | S4 | I | Linux without a secret service stores the key with the `basic_text` backend, which is weak | T3 | detect the backend; warn in plain language and ask before continuing; **Accepted risk** if the user continues | E2 · [ADR 0005](../adr/0005-local-storage.md) |
