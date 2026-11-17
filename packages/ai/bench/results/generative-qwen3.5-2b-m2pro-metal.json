@@ -1,0 +1,84 @@
+{
+  "date": "2026-11-17",
+  "machine": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "cpu": "Apple M2 Pro",
+    "cores": 12,
+    "ramGb": 16
+  },
+  "cpuOnly": false,
+  "emails": 210,
+  "embeddings": [],
+  "generative": [
+    {
+      "model": "qwen3.5-2b",
+      "backend": "metal",
+      "loadMs": 876,
+      "decodeTokensPerSecond": 93.8,
+      "promptTokensPerSecond": 148.3,
+      "classification": {
+        "accuracy": 0.7,
+        "macroF1": 0.6721129504286133,
+        "perClass": {
+          "people": {
+            "precision": 1,
+            "recall": 0.3333333333333333,
+            "f1": 0.5,
+            "support": 30
+          },
+          "records": {
+            "precision": 1,
+            "recall": 0.8,
+            "f1": 0.888888888888889,
+            "support": 30
+          },
+          "purchases-travel": {
+            "precision": 0.9032258064516129,
+            "recall": 0.9333333333333333,
+            "f1": 0.9180327868852459,
+            "support": 30
+          },
+          "sign-ins-security": {
+            "precision": 0.9375,
+            "recall": 1,
+            "f1": 0.967741935483871,
+            "support": 30
+          },
+          "notifications": {
+            "precision": 0.32558139534883723,
+            "recall": 0.9333333333333333,
+            "f1": 0.4827586206896553,
+            "support": 30
+          },
+          "newsletters": {
+            "precision": 0,
+            "recall": 0,
+            "f1": 0,
+            "support": 30
+          },
+          "promotions": {
+            "precision": 1,
+            "recall": 0.9,
+            "f1": 0.9473684210526316,
+            "support": 30
+          }
+        },
+        "emailsPerMinute": 100.8,
+        "p50LatencyMs": 546,
+        "jsonParseRate": 1,
+        "byLanguage": {
+          "en": 0.7,
+          "fr": 0.729,
+          "ja": 0.671
+        }
+      },
+      "extraction": {
+        "exactDateRate": 1,
+        "nullCorrectRate": 0.645,
+        "emailsPerMinute": 98.3,
+        "jsonParseRate": 1
+      }
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "date": "2026-11-17",
+  "machine": {
+    "platform": "darwin",
+    "arch": "arm64",
+    "cpu": "Apple M2 Pro",
+    "cores": 12,
+    "ramGb": 16
+  },
+  "cpuOnly": false,
+  "emails": 210,
+  "embeddings": [],
+  "generative": [
+    {
+      "model": "qwen3.5-4b",
+      "backend": "metal",
+      "loadMs": 2433,
+      "decodeTokensPerSecond": 45.9,
+      "promptTokensPerSecond": 38.2,
+      "classification": {
+        "accuracy": 0.9809523809523809,
+        "macroF1": 0.9808673469387755,
+        "perClass": {
+          "people": {
+            "precision": 0.8823529411764706,
+            "recall": 1,
+            "f1": 0.9375,
+            "support": 30
+          },
+          "records": {
+            "precision": 1,
+            "recall": 1,
+            "f1": 1,
+            "support": 30
+          },
+          "purchases-travel": {
+            "precision": 1,
+            "recall": 1,
+            "f1": 1,
+            "support": 30
+          },
+          "sign-ins-security": {
+            "precision": 1,
+            "recall": 1,
+            "f1": 1,
+            "support": 30
+          },
+          "notifications": {
+            "precision": 1,
+            "recall": 0.8666666666666667,
+            "f1": 0.9285714285714286,
+            "support": 30
+          },
+          "newsletters": {
+            "precision": 1,
+            "recall": 1,
+            "f1": 1,
+            "support": 30
+          },
+          "promotions": {
+            "precision": 1,
+            "recall": 1,
+            "f1": 1,
+            "support": 30
+          }
+        },
+        "emailsPerMinute": 66.4,
+        "p50LatencyMs": 855,
+        "jsonParseRate": 1,
+        "byLanguage": {
+          "en": 1,
+          "fr": 0.986,
+          "ja": 0.957
+        }
+      },
+      "extraction": {
+        "exactDateRate": 1,
+        "nullCorrectRate": 0.522,
+        "emailsPerMinute": 63.7,
+        "jsonParseRate": 1
+      }
+    }
+  ]
+}
