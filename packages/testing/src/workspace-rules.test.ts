@@ -33,11 +33,13 @@ describe("workspace rules (ADR 0001)", () => {
     expect(readdirSync(root).filter((f) => /^tsconfig.*\.json$/.test(f))).toEqual([]);
   });
 
-  it("uses exports (never main) and stays private", () => {
+  it("uses exports (never main, except the Electron app entry) and stays private", () => {
     for (const dir of workspaces) {
       const pkg = manifest(dir);
       expect(pkg.exports, pkg.name).toBeTypeOf("object");
-      expect(pkg.main, pkg.name).toBeUndefined();
+      // Electron requires `main` to find the app entry; it is not a library entry point.
+      if (pkg.name === "@pochimail/desktop") expect(pkg.main).toBe("./out/main/index.js");
+      else expect(pkg.main, pkg.name).toBeUndefined();
       expect(pkg.private, pkg.name).toBe(true);
     }
   });
