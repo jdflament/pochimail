@@ -6,7 +6,7 @@ Rule: **the app contacts only the hosts below.** A session-level request filter 
 
 Mitigation links point to Project "Pochimail v1" Draft IDs (`E2` = "Epic: M2 Accounts & sync", etc.; see the [threat model](threat-model.md)) or ADRs.
 
-Status: **v0, nothing is implemented yet.** Hosts marked *to confirm* come from a provider page that was summarised, not read verbatim, or from a decision still pending; each names where it gets confirmed.
+Status: **v0, nothing is implemented yet.** Hosts marked *to confirm* come from a provider page that was summarised, not read verbatim, or from a decision still open; each names where it gets confirmed.
 
 ## 1. Always-on, by feature
 
@@ -21,7 +21,7 @@ Status: **v0, nothing is implemented yet.** Hosts marked *to confirm* come from 
 | H7 | SMTP host of each connected account (e.g. `smtp.mail.me.com:587`) | worker | Only if the user opts in to `mailto:` unsubscribe by send (P2) | Send the unsubscribe message | the prepared message | E2 · E5 · [ADR 0007](../adr/0007-oauth-credentials-scopes.md) |
 | H8 | `github.com` and `release-assets.githubusercontent.com` (GitHub Releases; exact hosts, no wildcard) | main (updater) | Update check, update download | `electron-updater` metadata and installers, signed | none (no identifiers, no account) | E8 (*to confirm in M8: exact host list electron-updater uses; on 2026-11-17 a release download redirected to `release-assets.githubusercontent.com`, formerly `objects.githubusercontent.com`; add the legacy host only if still observed*) · [brief §5.7](../brief.md) |
 | H9 | Model manifest on GitHub Releases (same hosts as H8) | worker | First launch and model updates | Signed manifest with model files and SHA-256 | none | E3 · E8 · plan P3 · [ADR 0006](../adr/0006-local-ai-runtimes-and-models.md) |
-| H10 | Model hosts: `huggingface.co` and its download CDN (to confirm), fallback: our GitHub Releases | worker | Model download (hardware tier) | Fetch model files, resumable, SHA-256 verified | none | E3 · plan P3 · *to confirm* which CDN hostnames Hugging Face redirects to when the downloader is built |
+| H10 | `huggingface.co` and `us.aws.cdn.hf.co` (exact names, no wildcard; accepted 2026-11-17); fallback: our GitHub Releases | worker | Model download (hardware tier) | Fetch model files, resumable, SHA-256 verified | none | E3 · plan P3 · [ADR 0006](../adr/0006-local-ai-runtimes-and-models.md) · re-check the CDN name when the downloader is built (if it changes, the allow-list needs a release) |
 
 Notes:
 - H1, H4 and H6 are the only places mail content crosses the network, and only between the device and the provider the user connected. Pochimail never sends mail content anywhere else.
@@ -36,7 +36,7 @@ Notes:
 |---|---|---|---|---|---|
 | X1 | The exact HTTPS URL found in a message's `List-Unsubscribe` header (any sender host) | worker, one dedicated path | The user confirmed an unsubscribe in a reviewed batch, and the message has `List-Unsubscribe-Post: List-Unsubscribe=One-Click` | RFC 8058 one-click unsubscribe | POST body `List-Unsubscribe=One-Click` only |
 
-**Status: PENDING the maintainer's decision (proposed default of plan P1, not yet accepted).** If P1 is rejected, delete X1: unsubscribe is then `mailto:` only (P2).
+**Status: ACCEPTED by the maintainer on 2026-11-17 (plan P1).** If it is ever withdrawn, delete X1: unsubscribe is then `mailto:` only (P2).
 
 Conditions (full reasoning in [threat model section 6](threat-model.md#6-plan-p1-one-click-unsubscribe-path-documented-exception)): exact URL only, `https` only, no cookies, no redirects followed, no custom headers or `Referer`, not an IP literal or a private/loopback/`localhost` address, short timeout, response discarded, every call logged without the address, built in E5 (unsubscribe), no other code may use this bypass.
 

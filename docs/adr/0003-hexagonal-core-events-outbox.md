@@ -1,6 +1,6 @@
 # 0003 — Hexagonal core, event bus, outbox and job queue
 
-Status: Proposed · Brief: §5.2, §5.3, §8 › Backend
+Status: Accepted (2026-11-17, maintainer, M0-15) · Brief: §5.2, §5.3, §8 › Backend
 
 ## Decision
 - **Ports** in `core`: `MailProvider`, `MessageRepository` (+ Sender/Thread/Suggestion/ActionLog repositories), `BlobStore`, `SecretStore`, `Classifier`/`Embedder`/`LlmProvider`, `Exporter`, `JobQueue`, `EventBus`, `Scheduler`, `Notifier`, `Clock`, `Logger`, `PowerMonitor`, `Platform` (deviceName, paths).
