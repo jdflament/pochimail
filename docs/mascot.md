@@ -51,7 +51,7 @@ Settings › Appearance lets people turn **Animations** off (static poses only) 
 State machine:
 | State | Motion | Trigger |
 |---|---|---|
-| Idle | Slow breathing squash (scale 1 → 1.015, 4s), blink every 3–7s at random | default |
+| Idle | Slow breathing squash (scale 1 → 1.012 wide / 1.025 tall, from the base, 4.2s loop), blink on a 5.3s loop | default |
 | Looking | Eyes follow the cursor a few pixels; slight body lean | pointer near the mascot |
 | Sorting | Glasses on, small reading bob, eyes scanning | scan in progress |
 | Found | Quick squish-and-bounce, flap lifts a little | `DocumentSaved`, `ScanCompleted` |

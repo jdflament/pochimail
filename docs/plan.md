@@ -118,7 +118,7 @@ Max parallelism; one issue = one worker = one PR. Issue numbers are draft IDs (`
 ---
 
 ## 5. How work is tracked
-- GitHub Project "Pochimail v1": one draft item per ticket; fields Status, Milestone (M0–M8), Priority, Size, Area, Draft ID; views Board (by Status) and Plan (table grouped by Milestone). Repo milestones M0–M8 exist for when drafts become issues.
+- GitHub Project "Pochimail v1": one draft item per ticket; fields Status, Plan milestone (M0–M8; "Milestone" is reserved by GitHub), Priority, Size, Area, Draft ID; views Board (by Status) and Plan (table grouped by Plan milestone). Repo milestones M0–M8 exist for when drafts become issues.
 - Labels: `type:feature|bug|chore|docs`, `area:core|mail|ai|ui|desktop|infra|design`, `p0|p1`, `blocked`.
 - A draft is converted to a repo issue when a worker picks it up (so its PR closes it); no other repo issues before v1.
 - ADRs: `docs/adr/` (drafts 0001–0008, status *Proposed* until you accept them in M0-15).
