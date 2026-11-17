@@ -5,3 +5,7 @@ packages:
 allowBuilds:
   electron: true
   esbuild: false
+# osv-scanner: storybook's docgen plugin pulls glob 13.0.7 / minimatch 10.2.6 (GHSA-3g3m-2fjr-6pw4, GHSA-g3hv-75wg-m249); fixed in glob 14.0.2 / minimatch 11.0.1. Dev-only; drop once the plugin updates.
+overrides:
+  glob: 14.0.4
+  minimatch: 11.0.4
