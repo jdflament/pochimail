@@ -1,10 +1,14 @@
-export type ErrorCode =
-  | "domain.invalid_id"
-  | "domain.invalid_state"
-  | "provider.rate_limited"
-  | "provider.offline"
-  | "provider.auth_expired"
-  | "provider.conflict";
+/** Closed set of stable error codes. The logger lets only these through under a `code` key. */
+export const ERROR_CODES = [
+  "domain.invalid_id",
+  "domain.invalid_state",
+  "provider.rate_limited",
+  "provider.offline",
+  "provider.auth_expired",
+  "provider.conflict",
+] as const;
+
+export type ErrorCode = (typeof ERROR_CODES)[number];
 
 /** Base of all expected failures. `code` is stable and safe to log; `message` must carry no PII. */
 export class DomainError extends Error {
