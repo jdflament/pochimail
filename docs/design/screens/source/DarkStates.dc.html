@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dark · Empty and error states</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,450;6..72,500&amp;family=Instrument+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0C0D0E}
+a{color:#EEF0F2}a:hover{color:#FFFFFF}
+button:focus-visible,a:focus-visible{outline:2px solid #EEF0F2;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 1200px; min-height: 760px; box-sizing: border-box; padding: 40px; background: #121315; font-family: 'Instrument Sans', sans-serif; color: #EEF0F2; display: flex; flex-direction: column; gap: 24px">
+<h1 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 450; letter-spacing: -0.02em; font-size: 32px">When things don’t go as planned</h1>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px">
+<section style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 24px 20px; border-radius: 16px; background: #1A1C1F; box-shadow: inset 0 0 0 1px #2A2D32">
+<svg width="90" height="76" viewBox="0 0 400 340" aria-hidden="true"><defs>
+<filter id="fze1" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="3" seed="11" result="f"></feTurbulence><feDiffuseLighting in="f" surfaceScale="4.5" lighting-color="#FFFFFF" result="lit"><feDistantLight azimuth="235" elevation="50"></feDistantLight></feDiffuseLighting><feComposite in="lit" in2="d" operator="in" result="li"></feComposite><feComposite in="d" in2="li" operator="arithmetic" k1="0.85" k2="0.3" k3="0" k4="0"></feComposite></filter>
+<filter id="fre1" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="5" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<radialGradient id="lte1" cx="0.32" cy="0.2" r="0.7"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.42"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient>
+<radialGradient id="aoe1" cx="0.5" cy="0.42" r="0.62"><stop offset="0.55" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.32"></stop></radialGradient>
+<linearGradient id="dke1" x1="0" y1="0" x2="0" y2="1"><stop offset="0.6" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.3"></stop></linearGradient>
+<radialGradient id="bbe1" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#4A4744"></stop><stop offset="1" stop-color="#0A0A0A"></stop></radialGradient>
+<radialGradient id="bwe1" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#CFCAC0"></stop></radialGradient>
+<linearGradient id="mte1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E6E6E6"></stop><stop offset="0.5" stop-color="#8E8E8E"></stop><stop offset="1" stop-color="#D2D2D2"></stop></linearGradient>
+<filter id="fqe1" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="2.2" numOctaves="2" seed="21" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<filter id="sbe1" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+<filter id="ese1" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
+<filter id="sme1" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+</defs>
+<ellipse cx="200" cy="306" rx="132" ry="13" fill="#000000" opacity="0.35" filter="url(#sbe1)"></ellipse>
+<ellipse cx="200" cy="300" rx="96" ry="6" fill="#000000" opacity="0.35" filter="url(#ese1)"></ellipse>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#BEB8AE" opacity="0.28" filter="url(#fqe1)"></path><path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#BEB8AE" opacity="0.6" filter="url(#fre1)"></path>
+<g filter="url(#fze1)">
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#BEB8AE"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#aoe1)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#lte1)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#dke1)"></path>
+<path d="M84 106 Q200 216 316 106" fill="none" stroke="#000000" stroke-opacity="0.35" stroke-width="12" stroke-linecap="round" filter="url(#sme1)"></path>
+<path d="M84 104 Q200 212 316 104" fill="none" stroke="#8E877C" stroke-width="5" stroke-linecap="round"></path>
+<path d="M90 118 Q200 224 310 118" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="8" stroke-linecap="round" filter="url(#ese1)"></path>
+</g>
+<g><rect x="140" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#ese1)"></rect><rect x="144" y="190" width="20" height="34" rx="10.0" fill="url(#bbe1)"></rect><ellipse cx="150.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="157.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g><g><rect x="232" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#ese1)"></rect><rect x="236" y="190" width="20" height="34" rx="10.0" fill="url(#bbe1)"></rect><ellipse cx="242.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="249.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g>
+</svg><h2 style="margin: 0; font-size: 17px; font-weight: 600">Sign-in was cancelled</h2><p style="margin: 0; max-width: 260px; font-size: 14px; line-height: 1.5; color: #A4A9B0">No problem. I didn’t get access to anything. You can try again whenever you’re ready.</p>
+<div style="display: flex; gap: 6px; margin-top: 4px"><a href="#" style="display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 10px; background: #EEF0F2; color: #1A1C1F; text-decoration: none; font-size: 13px; font-weight: 500">Try again</a><a href="#" style="display: inline-flex; align-items: center; height: 36px; padding: 0 12px; border-radius: 10px; color: #A4A9B0; text-decoration: none; font-size: 13px">Choose another account</a></div>
+</section>
+<section style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 24px 20px; border-radius: 16px; background: #1A1C1F; box-shadow: inset 0 0 0 1px #2A2D32">
+<svg width="90" height="76" viewBox="0 0 400 340" aria-hidden="true"><defs>
+<filter id="fze2" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="3" seed="11" result="f"></feTurbulence><feDiffuseLighting in="f" surfaceScale="4.5" lighting-color="#FFFFFF" result="lit"><feDistantLight azimuth="235" elevation="50"></feDistantLight></feDiffuseLighting><feComposite in="lit" in2="d" operator="in" result="li"></feComposite><feComposite in="d" in2="li" operator="arithmetic" k1="0.85" k2="0.3" k3="0" k4="0"></feComposite></filter>
+<filter id="fre2" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="5" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<radialGradient id="lte2" cx="0.32" cy="0.2" r="0.7"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.22"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient>
+<radialGradient id="aoe2" cx="0.5" cy="0.42" r="0.62"><stop offset="0.55" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.45"></stop></radialGradient>
+<linearGradient id="dke2" x1="0" y1="0" x2="0" y2="1"><stop offset="0.6" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.3"></stop></linearGradient>
+<radialGradient id="bbe2" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#4A4744"></stop><stop offset="1" stop-color="#0A0A0A"></stop></radialGradient>
+<radialGradient id="bwe2" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#CFCAC0"></stop></radialGradient>
+<linearGradient id="mte2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E6E6E6"></stop><stop offset="0.5" stop-color="#8E8E8E"></stop><stop offset="1" stop-color="#D2D2D2"></stop></linearGradient>
+<filter id="fqe2" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="2.2" numOctaves="2" seed="21" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<filter id="sbe2" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+<filter id="ese2" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
+<filter id="sme2" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+</defs>
+<ellipse cx="200" cy="306" rx="132" ry="13" fill="#000000" opacity="0.35" filter="url(#sbe2)"></ellipse>
+<ellipse cx="200" cy="300" rx="96" ry="6" fill="#000000" opacity="0.35" filter="url(#ese2)"></ellipse>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#2B2A28" opacity="0.28" filter="url(#fqe2)"></path><path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#2B2A28" opacity="0.6" filter="url(#fre2)"></path>
+<g filter="url(#fze2)">
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#2B2A28"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#aoe2)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#lte2)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#dke2)"></path>
+<path d="M84 106 Q200 216 316 106" fill="none" stroke="#000000" stroke-opacity="0.35" stroke-width="12" stroke-linecap="round" filter="url(#sme2)"></path>
+<path d="M84 104 Q200 212 316 104" fill="none" stroke="#121110" stroke-width="5" stroke-linecap="round"></path>
+<path d="M90 118 Q200 224 310 118" fill="none" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="8" stroke-linecap="round" filter="url(#ese2)"></path>
+</g>
+<g transform="rotate(8 150.0 207.0)"><rect x="132" y="187" width="36" height="52" rx="18.0" fill="#000000" opacity="0.35" filter="url(#ese2)"></rect><rect x="136" y="184" width="28" height="46" rx="14.0" fill="url(#bwe2)"></rect><ellipse cx="145.52" cy="195.04" rx="5.04" ry="5.98" fill="#FFFFFF" opacity="0.55"></ellipse><ellipse cx="154.48" cy="219.88" rx="2.52" ry="2.3000000000000003" fill="#FFFFFF" opacity="0.45"></ellipse></g><g transform="rotate(8 246.0 207.0)"><rect x="228" y="187" width="36" height="52" rx="18.0" fill="#000000" opacity="0.35" filter="url(#ese2)"></rect><rect x="232" y="184" width="28" height="46" rx="14.0" fill="url(#bwe2)"></rect><ellipse cx="241.52" cy="195.04" rx="5.04" ry="5.98" fill="#FFFFFF" opacity="0.55"></ellipse><ellipse cx="250.48" cy="219.88" rx="2.52" ry="2.3000000000000003" fill="#FFFFFF" opacity="0.45"></ellipse></g>
+</svg><h2 style="margin: 0; font-size: 17px; font-weight: 600">You’re offline</h2><p style="margin: 0; max-width: 260px; font-size: 14px; line-height: 1.5; color: #A4A9B0">Keep browsing as usual. I’ll sync again and apply what you approved as soon as you’re back. (Shown in the status line, never as a pop-up.)</p>
+<div style="display: flex; gap: 6px; margin-top: 4px"><a href="#" style="display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 10px; background: #EEF0F2; color: #1A1C1F; text-decoration: none; font-size: 13px; font-weight: 500">Got it</a></div>
+</section>
+<section style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 24px 20px; border-radius: 16px; background: #1A1C1F; box-shadow: inset 0 0 0 1px #2A2D32">
+<svg width="90" height="76" viewBox="0 0 400 340" aria-hidden="true"><defs>
+<filter id="fze3" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="3" seed="11" result="f"></feTurbulence><feDiffuseLighting in="f" surfaceScale="4.5" lighting-color="#FFFFFF" result="lit"><feDistantLight azimuth="235" elevation="50"></feDistantLight></feDiffuseLighting><feComposite in="lit" in2="d" operator="in" result="li"></feComposite><feComposite in="d" in2="li" operator="arithmetic" k1="0.85" k2="0.3" k3="0" k4="0"></feComposite></filter>
+<filter id="fre3" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="5" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<radialGradient id="lte3" cx="0.32" cy="0.2" r="0.7"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.42"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient>
+<radialGradient id="aoe3" cx="0.5" cy="0.42" r="0.62"><stop offset="0.55" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.32"></stop></radialGradient>
+<linearGradient id="dke3" x1="0" y1="0" x2="0" y2="1"><stop offset="0.6" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.3"></stop></linearGradient>
+<radialGradient id="bbe3" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#4A4744"></stop><stop offset="1" stop-color="#0A0A0A"></stop></radialGradient>
+<radialGradient id="bwe3" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#CFCAC0"></stop></radialGradient>
+<linearGradient id="mte3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E6E6E6"></stop><stop offset="0.5" stop-color="#8E8E8E"></stop><stop offset="1" stop-color="#D2D2D2"></stop></linearGradient>
+<filter id="fqe3" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="2.2" numOctaves="2" seed="21" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<filter id="sbe3" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+<filter id="ese3" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
+<filter id="sme3" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+</defs>
+<ellipse cx="200" cy="306" rx="132" ry="13" fill="#000000" opacity="0.35" filter="url(#sbe3)"></ellipse>
+<ellipse cx="200" cy="300" rx="96" ry="6" fill="#000000" opacity="0.35" filter="url(#ese3)"></ellipse>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#BEB8AE" opacity="0.28" filter="url(#fqe3)"></path><path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#BEB8AE" opacity="0.6" filter="url(#fre3)"></path>
+<g filter="url(#fze3)">
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#BEB8AE"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#aoe3)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#lte3)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#dke3)"></path>
+<path d="M84 106 Q200 216 316 106" fill="none" stroke="#000000" stroke-opacity="0.35" stroke-width="12" stroke-linecap="round" filter="url(#sme3)"></path>
+<path d="M84 104 Q200 212 316 104" fill="none" stroke="#8E877C" stroke-width="5" stroke-linecap="round"></path>
+<path d="M90 118 Q200 224 310 118" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="8" stroke-linecap="round" filter="url(#ese3)"></path>
+</g>
+<g><rect x="140" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#ese3)"></rect><rect x="144" y="190" width="20" height="34" rx="10.0" fill="url(#bbe3)"></rect><ellipse cx="150.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="157.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g><g><rect x="232" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#ese3)"></rect><rect x="236" y="190" width="20" height="34" rx="10.0" fill="url(#bbe3)"></rect><ellipse cx="242.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="249.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g><g fill="none" stroke="#000000" stroke-opacity="0.3" stroke-width="8" filter="url(#ese3)"><circle cx="155" cy="212" r="31"></circle><circle cx="245" cy="212" r="31"></circle></g><g fill="none" stroke="#141414" stroke-width="6.5" stroke-linecap="round"><circle cx="155" cy="208" r="31"></circle><circle cx="245" cy="208" r="31"></circle><path d="M186 205 Q200 195 214 205"></path><path d="M124 200 L90 190"></path><path d="M276 200 L310 190"></path></g><g fill="none" stroke="#FFFFFF" stroke-opacity="0.45" stroke-width="2" stroke-linecap="round"><path d="M134 190 A26 26 0 0 1 150 182"></path><path d="M224 190 A26 26 0 0 1 240 182"></path></g>
+</svg><h2 style="margin: 0; font-size: 17px; font-weight: 600">I lost access to your Gmail</h2><p style="margin: 0; max-width: 260px; font-size: 14px; line-height: 1.5; color: #A4A9B0">Google asked you to sign in again. Your sorting and settings are safe.</p>
+<div style="display: flex; gap: 6px; margin-top: 4px"><a href="#" style="display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 10px; background: #EEF0F2; color: #1A1C1F; text-decoration: none; font-size: 13px; font-weight: 500">Reconnect</a><a href="#" style="display: inline-flex; align-items: center; height: 36px; padding: 0 12px; border-radius: 10px; color: #A4A9B0; text-decoration: none; font-size: 13px">Remove account</a></div>
+</section>
+<section style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 24px 20px; border-radius: 16px; background: #1A1C1F; box-shadow: inset 0 0 0 1px #2A2D32">
+<svg width="90" height="76" viewBox="0 0 400 340" aria-hidden="true"><defs>
+<filter id="fze4" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="3" seed="11" result="f"></feTurbulence><feDiffuseLighting in="f" surfaceScale="4.5" lighting-color="#FFFFFF" result="lit"><feDistantLight azimuth="235" elevation="50"></feDistantLight></feDiffuseLighting><feComposite in="lit" in2="d" operator="in" result="li"></feComposite><feComposite in="d" in2="li" operator="arithmetic" k1="0.85" k2="0.3" k3="0" k4="0"></feComposite></filter>
+<filter id="fre4" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="5" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<radialGradient id="lte4" cx="0.32" cy="0.2" r="0.7"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.42"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient>
+<radialGradient id="aoe4" cx="0.5" cy="0.42" r="0.62"><stop offset="0.55" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.32"></stop></radialGradient>
+<linearGradient id="dke4" x1="0" y1="0" x2="0" y2="1"><stop offset="0.6" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.3"></stop></linearGradient>
+<radialGradient id="bbe4" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#4A4744"></stop><stop offset="1" stop-color="#0A0A0A"></stop></radialGradient>
+<radialGradient id="bwe4" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#CFCAC0"></stop></radialGradient>
+<linearGradient id="mte4" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E6E6E6"></stop><stop offset="0.5" stop-color="#8E8E8E"></stop><stop offset="1" stop-color="#D2D2D2"></stop></linearGradient>
+<filter id="fqe4" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="2.2" numOctaves="2" seed="21" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<filter id="sbe4" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+<filter id="ese4" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
+<filter id="sme4" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+</defs>
+<ellipse cx="200" cy="306" rx="132" ry="13" fill="#000000" opacity="0.35" filter="url(#sbe4)"></ellipse>
+<ellipse cx="200" cy="300" rx="96" ry="6" fill="#000000" opacity="0.35" filter="url(#ese4)"></ellipse>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#A9B3A0" opacity="0.28" filter="url(#fqe4)"></path><path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#A9B3A0" opacity="0.6" filter="url(#fre4)"></path>
+<g filter="url(#fze4)">
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#A9B3A0"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#aoe4)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#lte4)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#dke4)"></path>
+<path d="M84 106 Q200 216 316 106" fill="none" stroke="#000000" stroke-opacity="0.35" stroke-width="12" stroke-linecap="round" filter="url(#sme4)"></path>
+<path d="M84 104 Q200 212 316 104" fill="none" stroke="#7C8773" stroke-width="5" stroke-linecap="round"></path>
+<path d="M90 118 Q200 224 310 118" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="8" stroke-linecap="round" filter="url(#ese4)"></path>
+</g>
+<g><rect x="140" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#ese4)"></rect><rect x="144" y="190" width="20" height="34" rx="10.0" fill="url(#bbe4)"></rect><ellipse cx="150.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="157.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g><g><rect x="232" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#ese4)"></rect><rect x="236" y="190" width="20" height="34" rx="10.0" fill="url(#bbe4)"></rect><ellipse cx="242.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="249.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g>
+</svg><h2 style="margin: 0; font-size: 17px; font-weight: 600">The assistant model didn’t download</h2><p style="margin: 0; max-width: 260px; font-size: 14px; line-height: 1.5; color: #A4A9B0">I can still sort with simple rules while you retry. Results will be a bit less precise.</p>
+<div style="display: flex; gap: 6px; margin-top: 4px"><a href="#" style="display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 10px; background: #EEF0F2; color: #1A1C1F; text-decoration: none; font-size: 13px; font-weight: 500">Retry download</a><a href="#" style="display: inline-flex; align-items: center; height: 36px; padding: 0 12px; border-radius: 10px; color: #A4A9B0; text-decoration: none; font-size: 13px">Continue with rules</a></div>
+</section>
+<section style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 24px 20px; border-radius: 16px; background: #1A1C1F; box-shadow: inset 0 0 0 1px #2A2D32">
+<svg width="90" height="76" viewBox="0 0 400 340" aria-hidden="true"><defs>
+<filter id="fze5" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="3" seed="11" result="f"></feTurbulence><feDiffuseLighting in="f" surfaceScale="4.5" lighting-color="#FFFFFF" result="lit"><feDistantLight azimuth="235" elevation="50"></feDistantLight></feDiffuseLighting><feComposite in="lit" in2="d" operator="in" result="li"></feComposite><feComposite in="d" in2="li" operator="arithmetic" k1="0.85" k2="0.3" k3="0" k4="0"></feComposite></filter>
+<filter id="fre5" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="5" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<radialGradient id="lte5" cx="0.32" cy="0.2" r="0.7"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.42"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient>
+<radialGradient id="aoe5" cx="0.5" cy="0.42" r="0.62"><stop offset="0.55" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.32"></stop></radialGradient>
+<linearGradient id="dke5" x1="0" y1="0" x2="0" y2="1"><stop offset="0.6" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.3"></stop></linearGradient>
+<radialGradient id="bbe5" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#4A4744"></stop><stop offset="1" stop-color="#0A0A0A"></stop></radialGradient>
+<radialGradient id="bwe5" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#CFCAC0"></stop></radialGradient>
+<linearGradient id="mte5" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E6E6E6"></stop><stop offset="0.5" stop-color="#8E8E8E"></stop><stop offset="1" stop-color="#D2D2D2"></stop></linearGradient>
+<filter id="fqe5" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="2.2" numOctaves="2" seed="21" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<filter id="sbe5" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+<filter id="ese5" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
+<filter id="sme5" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+</defs>
+<ellipse cx="200" cy="306" rx="132" ry="13" fill="#000000" opacity="0.35" filter="url(#sbe5)"></ellipse>
+<ellipse cx="200" cy="300" rx="96" ry="6" fill="#000000" opacity="0.35" filter="url(#ese5)"></ellipse>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.28" filter="url(#fqe5)"></path><path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.6" filter="url(#fre5)"></path>
+<g filter="url(#fze5)">
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#aoe5)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#lte5)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#dke5)"></path>
+<path d="M84 106 Q200 216 316 106" fill="none" stroke="#000000" stroke-opacity="0.35" stroke-width="12" stroke-linecap="round" filter="url(#sme5)"></path>
+<path d="M84 104 Q200 212 316 104" fill="none" stroke="#B8AA94" stroke-width="5" stroke-linecap="round"></path>
+<path d="M90 118 Q200 224 310 118" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="8" stroke-linecap="round" filter="url(#ese5)"></path>
+</g>
+<path d="M140 212 Q155 196 170 212" fill="none" stroke="#000000" stroke-opacity="0.25" stroke-width="10" stroke-linecap="round" filter="url(#ese5)"></path><path d="M230 212 Q245 196 260 212" fill="none" stroke="#000000" stroke-opacity="0.25" stroke-width="10" stroke-linecap="round" filter="url(#ese5)"></path><path d="M140 210 Q155 194 170 210" fill="none" stroke="#151413" stroke-width="7" stroke-linecap="round"></path><path d="M230 210 Q245 194 260 210" fill="none" stroke="#151413" stroke-width="7" stroke-linecap="round"></path>
+</svg><h2 style="margin: 0; font-size: 17px; font-weight: 600">Nothing to clean here</h2><p style="margin: 0; max-width: 260px; font-size: 14px; line-height: 1.5; color: #A4A9B0">This category is already tidy. I’ll let you know when that changes.</p>
+<div style="display: flex; gap: 6px; margin-top: 4px"><a href="#" style="display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 10px; background: #EEF0F2; color: #1A1C1F; text-decoration: none; font-size: 13px; font-weight: 500">Back to overview</a></div>
+</section>
+<section style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 24px 20px; border-radius: 16px; background: #1A1C1F; box-shadow: inset 0 0 0 1px #2A2D32">
+<svg width="90" height="76" viewBox="0 0 400 340" aria-hidden="true"><defs>
+<filter id="fze6" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="3" seed="11" result="f"></feTurbulence><feDiffuseLighting in="f" surfaceScale="4.5" lighting-color="#FFFFFF" result="lit"><feDistantLight azimuth="235" elevation="50"></feDistantLight></feDiffuseLighting><feComposite in="lit" in2="d" operator="in" result="li"></feComposite><feComposite in="d" in2="li" operator="arithmetic" k1="0.85" k2="0.3" k3="0" k4="0"></feComposite></filter>
+<filter id="fre6" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="5" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<radialGradient id="lte6" cx="0.32" cy="0.2" r="0.7"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.42"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient>
+<radialGradient id="aoe6" cx="0.5" cy="0.42" r="0.62"><stop offset="0.55" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.32"></stop></radialGradient>
+<linearGradient id="dke6" x1="0" y1="0" x2="0" y2="1"><stop offset="0.6" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.3"></stop></linearGradient>
+<radialGradient id="bbe6" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#4A4744"></stop><stop offset="1" stop-color="#0A0A0A"></stop></radialGradient>
+<radialGradient id="bwe6" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#CFCAC0"></stop></radialGradient>
+<linearGradient id="mte6" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E6E6E6"></stop><stop offset="0.5" stop-color="#8E8E8E"></stop><stop offset="1" stop-color="#D2D2D2"></stop></linearGradient>
+<filter id="fqe6" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="2.2" numOctaves="2" seed="21" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<filter id="sbe6" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+<filter id="ese6" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
+<filter id="sme6" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+</defs>
+<ellipse cx="200" cy="306" rx="132" ry="13" fill="#000000" opacity="0.35" filter="url(#sbe6)"></ellipse>
+<ellipse cx="200" cy="300" rx="96" ry="6" fill="#000000" opacity="0.35" filter="url(#ese6)"></ellipse>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#BEB8AE" opacity="0.28" filter="url(#fqe6)"></path><path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#BEB8AE" opacity="0.6" filter="url(#fre6)"></path>
+<g filter="url(#fze6)">
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#BEB8AE"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#aoe6)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#lte6)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#dke6)"></path>
+<path d="M84 106 Q200 216 316 106" fill="none" stroke="#000000" stroke-opacity="0.35" stroke-width="12" stroke-linecap="round" filter="url(#sme6)"></path>
+<path d="M84 104 Q200 212 316 104" fill="none" stroke="#8E877C" stroke-width="5" stroke-linecap="round"></path>
+<path d="M90 118 Q200 224 310 118" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="8" stroke-linecap="round" filter="url(#ese6)"></path>
+</g>
+<g><rect x="140" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#ese6)"></rect><rect x="144" y="190" width="20" height="34" rx="10.0" fill="url(#bbe6)"></rect><ellipse cx="150.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="157.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g><g><rect x="232" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#ese6)"></rect><rect x="236" y="190" width="20" height="34" rx="10.0" fill="url(#bbe6)"></rect><ellipse cx="242.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="249.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g>
+</svg><h2 style="margin: 0; font-size: 17px; font-weight: 600">Google is slowing me down</h2><p style="margin: 0; max-width: 260px; font-size: 14px; line-height: 1.5; color: #A4A9B0">Large mailboxes hit Google’s limits. I’ll continue automatically in 4 minutes.</p>
+<div style="display: flex; gap: 6px; margin-top: 4px"><a href="#" style="display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 10px; background: #EEF0F2; color: #1A1C1F; text-decoration: none; font-size: 13px; font-weight: 500">Got it</a></div>
+</section>
+<section style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 24px 20px; border-radius: 16px; background: #1A1C1F; box-shadow: inset 0 0 0 1px #2A2D32">
+<svg width="90" height="76" viewBox="0 0 400 340" aria-hidden="true"><defs>
+<filter id="fze7" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="3" seed="11" result="f"></feTurbulence><feDiffuseLighting in="f" surfaceScale="4.5" lighting-color="#FFFFFF" result="lit"><feDistantLight azimuth="235" elevation="50"></feDistantLight></feDiffuseLighting><feComposite in="lit" in2="d" operator="in" result="li"></feComposite><feComposite in="d" in2="li" operator="arithmetic" k1="0.85" k2="0.3" k3="0" k4="0"></feComposite></filter>
+<filter id="fre7" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="5" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<radialGradient id="lte7" cx="0.32" cy="0.2" r="0.7"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.42"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient>
+<radialGradient id="aoe7" cx="0.5" cy="0.42" r="0.62"><stop offset="0.55" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.32"></stop></radialGradient>
+<linearGradient id="dke7" x1="0" y1="0" x2="0" y2="1"><stop offset="0.6" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.3"></stop></linearGradient>
+<radialGradient id="bbe7" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#4A4744"></stop><stop offset="1" stop-color="#0A0A0A"></stop></radialGradient>
+<radialGradient id="bwe7" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#CFCAC0"></stop></radialGradient>
+<linearGradient id="mte7" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E6E6E6"></stop><stop offset="0.5" stop-color="#8E8E8E"></stop><stop offset="1" stop-color="#D2D2D2"></stop></linearGradient>
+<filter id="fqe7" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="2.2" numOctaves="2" seed="21" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<filter id="sbe7" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+<filter id="ese7" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
+<filter id="sme7" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+</defs>
+<ellipse cx="200" cy="306" rx="132" ry="13" fill="#000000" opacity="0.35" filter="url(#sbe7)"></ellipse>
+<ellipse cx="200" cy="300" rx="96" ry="6" fill="#000000" opacity="0.35" filter="url(#ese7)"></ellipse>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.28" filter="url(#fqe7)"></path><path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.6" filter="url(#fre7)"></path>
+<g filter="url(#fze7)">
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#aoe7)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#lte7)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#dke7)"></path>
+<path d="M84 106 Q200 216 316 106" fill="none" stroke="#000000" stroke-opacity="0.35" stroke-width="12" stroke-linecap="round" filter="url(#sme7)"></path>
+<path d="M84 104 Q200 212 316 104" fill="none" stroke="#B8AA94" stroke-width="5" stroke-linecap="round"></path>
+<path d="M90 118 Q200 224 310 118" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="8" stroke-linecap="round" filter="url(#ese7)"></path>
+</g>
+<path d="M140 212 Q155 196 170 212" fill="none" stroke="#000000" stroke-opacity="0.25" stroke-width="10" stroke-linecap="round" filter="url(#ese7)"></path><path d="M230 212 Q245 196 260 212" fill="none" stroke="#000000" stroke-opacity="0.25" stroke-width="10" stroke-linecap="round" filter="url(#ese7)"></path><path d="M140 210 Q155 194 170 210" fill="none" stroke="#151413" stroke-width="7" stroke-linecap="round"></path><path d="M230 210 Q245 194 260 210" fill="none" stroke="#151413" stroke-width="7" stroke-linecap="round"></path>
+</svg><h2 style="margin: 0; font-size: 17px; font-weight: 600">A new version is ready</h2><p style="margin: 0; max-width: 260px; font-size: 14px; line-height: 1.5; color: #A4A9B0">Pochimail 1.2 brings faster sorting and better newsletter detection. It installs when you restart.</p>
+<div style="display: flex; gap: 6px; margin-top: 4px"><a href="#" style="display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 10px; background: #EEF0F2; color: #1A1C1F; text-decoration: none; font-size: 13px; font-weight: 500">Restart now</a><a href="#" style="display: inline-flex; align-items: center; height: 36px; padding: 0 12px; border-radius: 10px; color: #A4A9B0; text-decoration: none; font-size: 13px">What’s new</a></div>
+</section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1200,"height":760}}'>
+class Component extends DCLogic {
+
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

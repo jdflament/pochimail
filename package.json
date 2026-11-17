@@ -1,0 +1,28 @@
+{
+  "name": "pochimail",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Pochimail monorepo root. Not a package: orchestration scripts only.",
+  "license": "AGPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jdflament/pochimail.git"
+  },
+  "packageManager": "pnpm@12.21.0",
+  "engines": {
+    "node": ">=26.13.1 <27",
+    "pnpm": ">=12.21.0 <13"
+  },
+  "scripts": {
+    "check": "turbo run typecheck test",
+    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "build": "turbo run build",
+    "knip": "turbo run knip",
+    "eval": "turbo run eval"
+  },
+  "devDependencies": {
+    "turbo": "2.11.11"
+  }
+}

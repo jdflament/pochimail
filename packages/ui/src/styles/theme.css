@@ -1,0 +1,66 @@
+/* Tailwind CSS v4 entry for packages/ui (shadcn/ui compatible).
+   Import after tokens.css. Fonts are self-hosted from ../fonts/woff2 (do not load Google Fonts at runtime: privacy). */
+
+
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@font-face { font-family: "Newsreader"; font-style: normal; font-display: swap; font-weight: 200 800;
+  src: url("../fonts/woff2/newsreader-latin.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Newsreader"; font-style: normal; font-display: swap; font-weight: 200 800;
+  src: url("../fonts/woff2/newsreader-latin-ext.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Instrument Sans"; font-style: normal; font-display: swap; font-weight: 400 700;
+  src: url("../fonts/woff2/instrument-sans-latin.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Instrument Sans"; font-style: normal; font-display: swap; font-weight: 400 700;
+  src: url("../fonts/woff2/instrument-sans-latin-ext.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-foreground-tertiary: var(--foreground-tertiary);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-frame: var(--frame);
+  --color-category-people: var(--category-people);
+  --color-category-records: var(--category-records);
+  --color-category-purchases: var(--category-purchases);
+  --color-category-signins: var(--category-signins);
+  --color-category-notifications: var(--category-notifications);
+  --color-category-newsletters: var(--category-newsletters);
+  --color-category-promotions: var(--category-promotions);
+
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-control);
+  --radius-lg: var(--radius);
+  --radius-xl: var(--radius-card);
+
+  --ease-out: var(--ease-out);
+}
+
+@layer base {
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground font-sans antialiased; font-feature-settings: "tnum" 0; }
+  h1 { font-family: var(--font-display); font-weight: 450; letter-spacing: -0.02em; }
+  .tabular { font-variant-numeric: tabular-nums; }
+  :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
+}

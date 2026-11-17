@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dark · Motion and transitions</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,450;6..72,500&amp;family=Instrument+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#EEF0F2}a:hover{color:#FFFFFF}
+button:focus-visible{outline:2px solid #EEF0F2;outline-offset:2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes stamp{0%{opacity:0;transform:scale(1.3) rotate(-10deg)}60%{opacity:1;transform:scale(.95) rotate(5deg)}100%{opacity:1;transform:scale(1) rotate(3deg)}}
+@keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.012,1.025)}}
+@keyframes blink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.12)}}
+@keyframes squish{0%{transform:none}20%{transform:scale(1.1,.88)}50%{transform:scale(.95,1.07) translateY(-14px)}75%{transform:scale(1.03,.97)}100%{transform:none}}
+@keyframes toastIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes slideIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+@keyframes draw{from{stroke-dashoffset:24}to{stroke-dashoffset:0}}
+.fadeUp{animation:fadeUp 220ms cubic-bezier(0.22,1,0.36,1) both}
+.fadeUpLate{animation:fadeUp 300ms cubic-bezier(0.22,1,0.36,1) 320ms both}
+.rise{animation:rise 420ms cubic-bezier(0.22,1,0.36,1) both}
+.stamp{animation:stamp 520ms cubic-bezier(0.22,1,0.36,1) 260ms both}
+.breathe{transform-origin:50% 92%;animation:breathe 4.2s ease-in-out infinite}
+.eye{transform-box:fill-box;transform-origin:center;animation:blink 5.3s infinite}
+.squish{transform-origin:50% 95%;animation:squish 620ms cubic-bezier(0.22,1,0.36,1) both}
+.toastIn{animation:toastIn 220ms cubic-bezier(0.22,1,0.36,1) both}
+.slideIn{animation:slideIn 240ms cubic-bezier(0.22,1,0.36,1) both}
+.draw{stroke-dasharray:24;animation:draw 220ms ease-out both}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:1ms!important;animation-iteration-count:1!important;transition-duration:1ms!important}}
+</style>
+</helmet>
+<div style="width: 1440px; min-height: 1100px; box-sizing: border-box; padding: 44px 48px; background: #121315; font-family: 'Instrument Sans', sans-serif; color: #EEF0F2; display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; align-items: baseline; gap: 14px"><h1 style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 450; letter-spacing: -0.02em; font-size: 32px">Motion and transitions</h1><span style="font-size: 14px; color: #A4A9B0">Press Play, then use the buttons. Sample numbers are for motion only.</span></div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px"><section style="display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 16px; background: #1A1C1F; box-shadow: inset 0 0 0 1px #2A2D32; min-height: 300px; box-sizing: border-box">
+<div style="display: flex; align-items: flex-start; gap: 12px"><div style="display: flex; flex-direction: column; gap: 4px; flex: 1"><h2 style="margin: 0; font-size: 17px; font-weight: 600">Live progress</h2><p style="margin: 0; font-size: 13px; line-height: 1.45; color: #A4A9B0">The line glides forward and each new finding slides in, so progress feels alive without demanding attention.</p></div></div>
+<div style="flex: 1; display: flex; flex-direction: column; justify-content: center; border-radius: 12px; background: #121315; padding: 16px; overflow: hidden; position: relative"><div role="status" aria-live="polite" style="display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 12px; background: #1A1C1F; box-shadow: inset 0 0 0 1px #2A2D32">
+<div aria-hidden="true" style="height: 2px; background: #2A2D32"><div style="height: 100%; background: #EEF0F2; width: {{pct}}%; transition: width 600ms cubic-bezier(0.22,1,0.36,1)"></div></div>
+<div style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: #A4A9B0; height: 20px; overflow: hidden"><span style="color: #EEF0F2; font-weight: 500">Sorting privately</span><span style="font-variant-numeric: tabular-nums; width: 34px">{{pct}}%</span>
+<sc-if value="{{flip}}" hint-placeholder-val="{{true}}"><span class="fadeUp">{{msg}}</span></sc-if><sc-if value="{{flop}}" hint-placeholder-val="{{false}}"><span class="fadeUp">{{msg}}</span></sc-if></div></div></div>
+</section><section style="display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 16px; background: #1A1C1F; box-shadow: inset 0 0 0 1px #2A2D32; min-height: 300px; box-sizing: border-box">
+<div style="display: flex; align-items: flex-start; gap: 12px"><div style="display: flex; flex-direction: column; gap: 4px; flex: 1"><h2 style="margin: 0; font-size: 17px; font-weight: 600">Numbers arrive</h2><p style="margin: 0; font-size: 13px; line-height: 1.45; color: #A4A9B0">Counts roll up once when results land, then stay still. It shows the work just happened.</p></div><button onClick="{{rc}}" style="height: 30px; padding: 0 12px; border-radius: 9px; border: none; box-shadow: inset 0 0 0 1px #2A2D32; background: #1A1C1F; font-family: 'Instrument Sans', sans-serif; font-size: 13px; font-weight: 500; color: #EEF0F2; cursor: pointer">Replay</button></div>
+<div style="flex: 1; display: flex; flex-direction: column; justify-content: center; border-radius: 12px; background: #121315; padding: 16px; overflow: hidden; position: relative"><ul style="margin: 0; padding: 0 12px; list-style: none; background: #1A1C1F; border-radius: 12px; box-shadow: inset 0 0 0 1px #2A2D32"><li style="display: grid; grid-template-columns: 56px 1fr; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid #2A2D32"><span style="font-family: 'Newsreader', Georgia, serif; font-weight: 450; letter-spacing: -0.02em; font-size: 32px; line-height: 1; font-variant-numeric: tabular-nums">{{n1}}</span><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 500">people are waiting on you</span><span style="font-size: 12px; color: #A4A9B0">The oldest has waited 9 days</span></span></li><li style="display: grid; grid-template-columns: 56px 1fr; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid #2A2D32"><span style="font-family: 'Newsreader', Georgia, serif; font-weight: 450; letter-spacing: -0.02em; font-size: 32px; line-height: 1; font-variant-numeric: tabular-nums">{{n2}}</span><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 500">deadlines this week</span><span style="font-size: 12px; color: #A4A9B0">Found in conversations</span></span></li><li style="display: grid; grid-template-columns: 56px 1fr; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid #2A2D32"><span style="font-family: 'Newsreader', Georgia, serif; font-weight: 450; letter-spacing: -0.02em; font-size: 32px; line-height: 1; font-variant-numeric: tabular-nums">{{n3}}</span><span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 500">new from important people</span><span style="font-size: 12px; color: #A4A9B0">Senders you often reply to</span></span></li></ul></div>
+</section><section style="display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 16px; background: #1A1C1F; box-shadow: inset 0 0 0 1px #2A2D32; min-height: 300px; box-sizing: border-box">
+<div style="display: flex; align-items: flex-start; gap: 12px"><div style="display: flex; flex-direction: column; gap: 4px; flex: 1"><h2 style="margin: 0; font-size: 17px; font-weight: 600">Storage settles</h2><p style="margin: 0; font-size: 13px; line-height: 1.45; color: #A4A9B0">The bar fills once: what’s worth keeping first, then what can go. After a cleanup, the cleanable part shrinks the same way.</p></div><button onClick="{{rb}}" style="height: 30px; padding: 0 12px; border-radius: 9px; border: none; box-shadow: inset 0 0 0 1px #2A2D32; background: #1A1C1F; font-family: 'Instrument Sans', sans-serif; font-size: 13px; font-weight: 500; color: #EEF0F2; cursor: pointer">Replay</button></div>
+<div style="flex: 1; display: flex; flex-direction: column; justify-content: center; border-radius: 12px; background: #121315; padding: 16px; overflow: hidden; position: relative"><div style="display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 12px; background: #1A1C1F; box-shadow: inset 0 0 0 1px #2A2D32"><div style="display: flex; align-items: baseline; gap: 10px"><span style="font-family: 'Newsreader', Georgia, serif; font-weight: 450; letter-spacing: -0.02em; font-size: 30px; line-height: 1">3.1 GB</span><span style="font-size: 13px; color: #A4A9B0">you can free, out of 6.4 GB</span></div><div style="display: flex; gap: 3px; height: 12px"><span style="width: {{bw0}}%; border-radius: 99px 3px 3px 99px; background: #EEF0F2; transition: width 700ms cubic-bezier(0.22,1,0.36,1)"></span><span style="width: {{bw1}}%; border-radius: 3px 99px 99px 3px; background: repeating-linear-gradient(135deg, #454A51 0 3px, #2A2D32 3px 7px); transition: width 700ms cubic-bezier(0.22,1,0.36,1) 140ms"></span></div><div style="display: flex; gap: 16px; font-size: 12px; color: #A4A9B0"><span>Worth keeping · 3.3 GB</span><span>Can be cleaned · 3.1 GB</span></div></div></div>
+</section><section style="display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 16px; background: #1A1C1F; box-shadow: inset 0 0 0 1px #2A2D32; min-height: 300px; box-sizing: border-box">
+<div style="display: flex; align-items: flex-start; gap: 12px"><div style="display: flex; flex-direction: column; gap: 4px; flex: 1"><h2 style="margin: 0; font-size: 17px; font-weight: 600">Clean up, then undo</h2><p style="margin: 0; font-size: 13px; line-height: 1.45; color: #A4A9B0">The row folds away instead of vanishing, and the undo toast rises from below for a few seconds.</p></div></div>
+<div style="flex: 1; display: flex; flex-direction: column; justify-content: center; border-radius: 12px; background: #121315; padding: 16px; overflow: hidden; position: relative"><div style="display: flex; flex-direction: column; background: #1A1C1F; border-radius: 12px; box-shadow: inset 0 0 0 1px #2A2D32; padding: 0 12px">
+<div style="display: grid; grid-template-columns: 1fr auto; align-items: center; height: 44px; font-size: 13px; font-weight: 500"><span style="display: flex; gap: 8px; align-items: center">Conversations with people</span><span style="color: #A4A9B0; font-weight: 400">Always kept</span></div>
+<div style="overflow: hidden; transition: max-height 260ms cubic-bezier(0.22,1,0.36,1), opacity 200ms ease-out; {{rowStyle}}"><div style="display: grid; grid-template-columns: 1fr auto; align-items: center; height: 44px; border-top: 1px solid #2A2D32; font-size: 13px; font-weight: 500"><span style="display: flex; gap: 8px; align-items: center">Old notifications · 1 GB</span><button onClick="{{archive}}" style="height: 30px; padding: 0 12px; border-radius: 9px; border: none; box-shadow: inset 0 0 0 1px #2A2D32; background: #1A1C1F; font-family: 'Instrument Sans', sans-serif; font-size: 13px; font-weight: 500; color: #EEF0F2; cursor: pointer">Archive 12,940</button></div></div>
+<div style="display: grid; grid-template-columns: 1fr auto; align-items: center; height: 44px; border-top: 1px solid #2A2D32; font-size: 13px; font-weight: 500"><span style="display: flex; gap: 8px; align-items: center">Newsletters · 1.2 GB</span><span style="color: #A4A9B0; font-weight: 400">Review</span></div>
+</div>
+<sc-if value="{{toast}}" hint-placeholder-val="{{false}}"><div class="toastIn" style="position: absolute; left: 16px; right: 16px; bottom: 14px; display: flex; align-items: center; gap: 12px; padding: 10px 12px 10px 14px; border-radius: 12px; background: #EEF0F2; color: #1A1C1F; font-size: 13px"><span style="flex: 1">Archived 12,940 notifications</span><button onClick="{{undo}}" style="height: 28px; padding: 0 10px; border-radius: 8px; border: none; background: rgba(0,0,0,0.08); color: #1A1C1F; font-family: 'Instrument Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer">Undo</button></div></sc-if></div>
+</section><section style="display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 16px; background: #1A1C1F; box-shadow: inset 0 0 0 1px #2A2D32; min-height: 300px; box-sizing: border-box">
+<div style="display: flex; align-items: flex-start; gap: 12px"><div style="display: flex; flex-direction: column; gap: 4px; flex: 1"><h2 style="margin: 0; font-size: 17px; font-weight: 600">Pochi is alive</h2><p style="margin: 0; font-size: 13px; line-height: 1.45; color: #A4A9B0">Slow breathing and random blinks at rest. A squish-and-bounce when it finds something.</p></div><button onClick="{{fd}}" style="height: 30px; padding: 0 12px; border-radius: 9px; border: none; box-shadow: inset 0 0 0 1px #2A2D32; background: #1A1C1F; font-family: 'Instrument Sans', sans-serif; font-size: 13px; font-weight: 500; color: #EEF0F2; cursor: pointer">Found a document</button></div>
+<div style="flex: 1; display: flex; flex-direction: column; justify-content: center; border-radius: 12px; background: #121315; padding: 16px; overflow: hidden; position: relative"><div style="display: flex; justify-content: center; align-items: flex-end; height: 160px">
+<sc-if value="{{sqA}}" hint-placeholder-val="{{true}}"><div class="{{sqClass}}"><div class="breathe"><svg width="170" height="144" viewBox="0 0 400 340" aria-hidden="true"><defs>
+<filter id="fzmo" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="3" seed="11" result="f"></feTurbulence><feDiffuseLighting in="f" surfaceScale="4.5" lighting-color="#FFFFFF" result="lit"><feDistantLight azimuth="235" elevation="50"></feDistantLight></feDiffuseLighting><feComposite in="lit" in2="d" operator="in" result="li"></feComposite><feComposite in="d" in2="li" operator="arithmetic" k1="0.85" k2="0.3" k3="0" k4="0"></feComposite></filter>
+<filter id="frmo" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="5" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<radialGradient id="ltmo" cx="0.32" cy="0.2" r="0.7"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.42"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient>
+<radialGradient id="aomo" cx="0.5" cy="0.42" r="0.62"><stop offset="0.55" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.32"></stop></radialGradient>
+<linearGradient id="dkmo" x1="0" y1="0" x2="0" y2="1"><stop offset="0.6" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.3"></stop></linearGradient>
+<radialGradient id="bbmo" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#4A4744"></stop><stop offset="1" stop-color="#0A0A0A"></stop></radialGradient>
+<radialGradient id="bwmo" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#CFCAC0"></stop></radialGradient>
+<linearGradient id="mtmo" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E6E6E6"></stop><stop offset="0.5" stop-color="#8E8E8E"></stop><stop offset="1" stop-color="#D2D2D2"></stop></linearGradient>
+<filter id="fqmo" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="2.2" numOctaves="2" seed="21" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<filter id="sbmo" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+<filter id="esmo" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
+<filter id="smmo" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+</defs>
+<ellipse cx="200" cy="306" rx="132" ry="13" fill="#000000" opacity="0.35" filter="url(#sbmo)"></ellipse>
+<ellipse cx="200" cy="300" rx="96" ry="6" fill="#000000" opacity="0.35" filter="url(#esmo)"></ellipse>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.28" filter="url(#fqmo)"></path><path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.6" filter="url(#frmo)"></path>
+<g filter="url(#fzmo)">
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#aomo)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#ltmo)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#dkmo)"></path>
+<path d="M84 106 Q200 216 316 106" fill="none" stroke="#000000" stroke-opacity="0.35" stroke-width="12" stroke-linecap="round" filter="url(#smmo)"></path>
+<path d="M84 104 Q200 212 316 104" fill="none" stroke="#B8AA94" stroke-width="5" stroke-linecap="round"></path>
+<path d="M90 118 Q200 224 310 118" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="8" stroke-linecap="round" filter="url(#esmo)"></path>
+</g>
+<g class="eye"><rect x="140" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#esmo)"></rect><rect x="144" y="190" width="20" height="34" rx="10.0" fill="url(#bbmo)"></rect><ellipse cx="150.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="157.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g><g class="eye"><rect x="232" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#esmo)"></rect><rect x="236" y="190" width="20" height="34" rx="10.0" fill="url(#bbmo)"></rect><ellipse cx="242.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="249.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g>
+</svg></div></div></sc-if>
+<sc-if value="{{sqB}}" hint-placeholder-val="{{false}}"><div class="{{sqClass}}"><div class="breathe"><svg width="170" height="144" viewBox="0 0 400 340" aria-hidden="true"><defs>
+<filter id="fzmp" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="3" seed="11" result="f"></feTurbulence><feDiffuseLighting in="f" surfaceScale="4.5" lighting-color="#FFFFFF" result="lit"><feDistantLight azimuth="235" elevation="50"></feDistantLight></feDiffuseLighting><feComposite in="lit" in2="d" operator="in" result="li"></feComposite><feComposite in="d" in2="li" operator="arithmetic" k1="0.85" k2="0.3" k3="0" k4="0"></feComposite></filter>
+<filter id="frmp" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="5" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<radialGradient id="ltmp" cx="0.32" cy="0.2" r="0.7"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.42"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient>
+<radialGradient id="aomp" cx="0.5" cy="0.42" r="0.62"><stop offset="0.55" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.32"></stop></radialGradient>
+<linearGradient id="dkmp" x1="0" y1="0" x2="0" y2="1"><stop offset="0.6" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.3"></stop></linearGradient>
+<radialGradient id="bbmp" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#4A4744"></stop><stop offset="1" stop-color="#0A0A0A"></stop></radialGradient>
+<radialGradient id="bwmp" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#CFCAC0"></stop></radialGradient>
+<linearGradient id="mtmp" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E6E6E6"></stop><stop offset="0.5" stop-color="#8E8E8E"></stop><stop offset="1" stop-color="#D2D2D2"></stop></linearGradient>
+<filter id="fqmp" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="2.2" numOctaves="2" seed="21" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<filter id="sbmp" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+<filter id="esmp" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
+<filter id="smmp" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+</defs>
+<ellipse cx="200" cy="306" rx="132" ry="13" fill="#000000" opacity="0.35" filter="url(#sbmo)"></ellipse>
+<ellipse cx="200" cy="300" rx="96" ry="6" fill="#000000" opacity="0.35" filter="url(#esmo)"></ellipse>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.28" filter="url(#fqmo)"></path><path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.6" filter="url(#frmo)"></path>
+<g filter="url(#fzmp)">
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#aomo)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#ltmo)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#dkmo)"></path>
+<path d="M84 106 Q200 216 316 106" fill="none" stroke="#000000" stroke-opacity="0.35" stroke-width="12" stroke-linecap="round" filter="url(#smmo)"></path>
+<path d="M84 104 Q200 212 316 104" fill="none" stroke="#B8AA94" stroke-width="5" stroke-linecap="round"></path>
+<path d="M90 118 Q200 224 310 118" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="8" stroke-linecap="round" filter="url(#esmo)"></path>
+</g>
+<g class="eye"><rect x="140" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#esmo)"></rect><rect x="144" y="190" width="20" height="34" rx="10.0" fill="url(#bbmo)"></rect><ellipse cx="150.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="157.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g><g class="eye"><rect x="232" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#esmo)"></rect><rect x="236" y="190" width="20" height="34" rx="10.0" fill="url(#bbmo)"></rect><ellipse cx="242.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="249.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g>
+</svg></div></div></sc-if>
+</div></div>
+</section><section style="display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 16px; background: #1A1C1F; box-shadow: inset 0 0 0 1px #2A2D32; min-height: 300px; box-sizing: border-box">
+<div style="display: flex; align-items: flex-start; gap: 12px"><div style="display: flex; flex-direction: column; gap: 4px; flex: 1"><h2 style="margin: 0; font-size: 17px; font-weight: 600">The summary arrives</h2><p style="margin: 0; font-size: 13px; line-height: 1.45; color: #A4A9B0">The app dims behind and the summary sheet slides in over the Overview. The stamp lands with a small settle.</p></div><button onClick="{{rl}}" style="height: 30px; padding: 0 12px; border-radius: 9px; border: none; box-shadow: inset 0 0 0 1px #2A2D32; background: #1A1C1F; font-family: 'Instrument Sans', sans-serif; font-size: 13px; font-weight: 500; color: #EEF0F2; cursor: pointer">Replay</button></div>
+<div style="flex: 1; display: flex; flex-direction: column; justify-content: center; border-radius: 12px; background: #121315; padding: 16px; overflow: hidden; position: relative"><sc-if value="{{lA}}" hint-placeholder-val="{{true}}"><div class="rise" style="margin: 0 auto; width: 270px; padding: 18px 18px 16px; border-radius: 6px; background: #1A1C1F; box-shadow: 0 0 0 1px #2A2D32; display: flex; flex-direction: column; gap: 8px; position: relative">
+<div class="stamp" style="position: absolute; top: 12px; right: 12px; width: 48px; height: 56px; box-sizing: border-box; border: 2px dashed #454A51; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: #1A1C1F"><svg width="40" height="34" viewBox="0 0 400 340" aria-hidden="true"><defs>
+<filter id="fzls" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="3" seed="11" result="f"></feTurbulence><feDiffuseLighting in="f" surfaceScale="4.5" lighting-color="#FFFFFF" result="lit"><feDistantLight azimuth="235" elevation="50"></feDistantLight></feDiffuseLighting><feComposite in="lit" in2="d" operator="in" result="li"></feComposite><feComposite in="d" in2="li" operator="arithmetic" k1="0.85" k2="0.3" k3="0" k4="0"></feComposite></filter>
+<filter id="frls" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="5" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<radialGradient id="ltls" cx="0.32" cy="0.2" r="0.7"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.42"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient>
+<radialGradient id="aols" cx="0.5" cy="0.42" r="0.62"><stop offset="0.55" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.32"></stop></radialGradient>
+<linearGradient id="dkls" x1="0" y1="0" x2="0" y2="1"><stop offset="0.6" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.3"></stop></linearGradient>
+<radialGradient id="bbls" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#4A4744"></stop><stop offset="1" stop-color="#0A0A0A"></stop></radialGradient>
+<radialGradient id="bwls" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#CFCAC0"></stop></radialGradient>
+<linearGradient id="mtls" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E6E6E6"></stop><stop offset="0.5" stop-color="#8E8E8E"></stop><stop offset="1" stop-color="#D2D2D2"></stop></linearGradient>
+<filter id="fqls" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="2.2" numOctaves="2" seed="21" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<filter id="sbls" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+<filter id="esls" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
+<filter id="smls" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+</defs>
+<ellipse cx="200" cy="306" rx="132" ry="13" fill="#000000" opacity="0.35" filter="url(#sbls)"></ellipse>
+<ellipse cx="200" cy="300" rx="96" ry="6" fill="#000000" opacity="0.35" filter="url(#esls)"></ellipse>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.28" filter="url(#fqls)"></path><path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.6" filter="url(#frls)"></path>
+<g filter="url(#fzls)">
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#aols)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#ltls)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#dkls)"></path>
+<path d="M84 106 Q200 216 316 106" fill="none" stroke="#000000" stroke-opacity="0.35" stroke-width="12" stroke-linecap="round" filter="url(#smls)"></path>
+<path d="M84 104 Q200 212 316 104" fill="none" stroke="#B8AA94" stroke-width="5" stroke-linecap="round"></path>
+<path d="M90 118 Q200 224 310 118" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="8" stroke-linecap="round" filter="url(#esls)"></path>
+</g>
+<path d="M140 212 Q155 196 170 212" fill="none" stroke="#000000" stroke-opacity="0.25" stroke-width="10" stroke-linecap="round" filter="url(#esls)"></path><path d="M230 212 Q245 196 260 212" fill="none" stroke="#000000" stroke-opacity="0.25" stroke-width="10" stroke-linecap="round" filter="url(#esls)"></path><path d="M140 210 Q155 194 170 210" fill="none" stroke="#151413" stroke-width="7" stroke-linecap="round"></path><path d="M230 210 Q245 194 260 210" fill="none" stroke="#151413" stroke-width="7" stroke-linecap="round"></path>
+</svg></div>
+<span style="font-size: 11px; color: #A4A9B0">From Pochi · on this Mac</span>
+<span style="font-family: 'Newsreader', Georgia, serif; font-weight: 450; letter-spacing: -0.02em; font-size: 22px; line-height: 1.1; padding-right: 54px">Your mailbox, sorted.</span>
+<span class="fadeUpLate" style="font-size: 12px; line-height: 1.5; color: #D9DCE0">You can free 3.1 GB without losing anything that matters.</span></div></sc-if><sc-if value="{{lB}}" hint-placeholder-val="{{false}}"><div class="rise" style="margin: 0 auto; width: 270px; padding: 18px 18px 16px; border-radius: 6px; background: #1A1C1F; box-shadow: 0 0 0 1px #2A2D32; display: flex; flex-direction: column; gap: 8px; position: relative">
+<div class="stamp" style="position: absolute; top: 12px; right: 12px; width: 48px; height: 56px; box-sizing: border-box; border: 2px dashed #454A51; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: #1A1C1F"><svg width="40" height="34" viewBox="0 0 400 340" aria-hidden="true"><defs>
+<filter id="fzls" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="3" seed="11" result="f"></feTurbulence><feDiffuseLighting in="f" surfaceScale="4.5" lighting-color="#FFFFFF" result="lit"><feDistantLight azimuth="235" elevation="50"></feDistantLight></feDiffuseLighting><feComposite in="lit" in2="d" operator="in" result="li"></feComposite><feComposite in="d" in2="li" operator="arithmetic" k1="0.85" k2="0.3" k3="0" k4="0"></feComposite></filter>
+<filter id="frls" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="5" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<radialGradient id="ltls" cx="0.32" cy="0.2" r="0.7"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.42"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient>
+<radialGradient id="aols" cx="0.5" cy="0.42" r="0.62"><stop offset="0.55" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.32"></stop></radialGradient>
+<linearGradient id="dkls" x1="0" y1="0" x2="0" y2="1"><stop offset="0.6" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.3"></stop></linearGradient>
+<radialGradient id="bbls" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#4A4744"></stop><stop offset="1" stop-color="#0A0A0A"></stop></radialGradient>
+<radialGradient id="bwls" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#CFCAC0"></stop></radialGradient>
+<linearGradient id="mtls" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E6E6E6"></stop><stop offset="0.5" stop-color="#8E8E8E"></stop><stop offset="1" stop-color="#D2D2D2"></stop></linearGradient>
+<filter id="fqls" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="2.2" numOctaves="2" seed="21" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<filter id="sbls" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+<filter id="esls" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
+<filter id="smls" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+</defs>
+<ellipse cx="200" cy="306" rx="132" ry="13" fill="#000000" opacity="0.35" filter="url(#sbls)"></ellipse>
+<ellipse cx="200" cy="300" rx="96" ry="6" fill="#000000" opacity="0.35" filter="url(#esls)"></ellipse>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.28" filter="url(#fqls)"></path><path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.6" filter="url(#frls)"></path>
+<g filter="url(#fzls)">
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#aols)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#ltls)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#dkls)"></path>
+<path d="M84 106 Q200 216 316 106" fill="none" stroke="#000000" stroke-opacity="0.35" stroke-width="12" stroke-linecap="round" filter="url(#smls)"></path>
+<path d="M84 104 Q200 212 316 104" fill="none" stroke="#B8AA94" stroke-width="5" stroke-linecap="round"></path>
+<path d="M90 118 Q200 224 310 118" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="8" stroke-linecap="round" filter="url(#esls)"></path>
+</g>
+<path d="M140 212 Q155 196 170 212" fill="none" stroke="#000000" stroke-opacity="0.25" stroke-width="10" stroke-linecap="round" filter="url(#esls)"></path><path d="M230 212 Q245 196 260 212" fill="none" stroke="#000000" stroke-opacity="0.25" stroke-width="10" stroke-linecap="round" filter="url(#esls)"></path><path d="M140 210 Q155 194 170 210" fill="none" stroke="#151413" stroke-width="7" stroke-linecap="round"></path><path d="M230 210 Q245 194 260 210" fill="none" stroke="#151413" stroke-width="7" stroke-linecap="round"></path>
+</svg></div>
+<span style="font-size: 11px; color: #A4A9B0">From Pochi · on this Mac</span>
+<span style="font-family: 'Newsreader', Georgia, serif; font-weight: 450; letter-spacing: -0.02em; font-size: 22px; line-height: 1.1; padding-right: 54px">Your mailbox, sorted.</span>
+<span class="fadeUpLate" style="font-size: 12px; line-height: 1.5; color: #D9DCE0">You can free 3.1 GB without losing anything that matters.</span></div></sc-if></div>
+</section><section style="display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 16px; background: #1A1C1F; box-shadow: inset 0 0 0 1px #2A2D32; min-height: 300px; box-sizing: border-box">
+<div style="display: flex; align-items: flex-start; gap: 12px"><div style="display: flex; flex-direction: column; gap: 4px; flex: 1"><h2 style="margin: 0; font-size: 17px; font-weight: 600">Choices respond</h2><p style="margin: 0; font-size: 13px; line-height: 1.45; color: #A4A9B0">The check draws itself, the switch thumb glides. Feedback lands under 200ms.</p></div></div>
+<div style="flex: 1; display: flex; flex-direction: column; justify-content: center; border-radius: 12px; background: #121315; padding: 16px; overflow: hidden; position: relative"><div style="display: flex; flex-direction: column; gap: 10px">
+<button onClick="{{tc}}" role="checkbox" aria-checked="{{ck}}" style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; border: none; background: #1A1C1F; box-shadow: {{ckRing}}; transition: box-shadow 150ms ease-out; font-family: 'Instrument Sans', sans-serif; text-align: left; color: #EEF0F2; cursor: pointer">
+<span style="width: 20px; height: 20px; border-radius: 6px; background: {{ckBg}}; transition: background 150ms ease-out; display: flex; align-items: center; justify-content: center"><sc-if value="{{ckOn}}" hint-placeholder-val="{{true}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#121315" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="draw" d="M5 12.5l4.5 4.5L19 7.5"></path></svg></sc-if></span>
+<span style="display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 600">Catch what matters</span><span style="font-size: 12px; color: #A4A9B0">The check draws itself, the ring follows</span></span></button>
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-radius: 12px; background: #1A1C1F; box-shadow: inset 0 0 0 1px #2A2D32"><span id="mswl" style="font-size: 14px">Label new email</span>
+<button role="switch" aria-checked="{{sw}}" aria-labelledby="mswl" onClick="{{tsw}}" style="width: 44px; height: 26px; border-radius: 99px; border: none; padding: 3px; background: {{swBg}}; transition: background 150ms ease-out; cursor: pointer; display: flex"><span style="width: 20px; height: 20px; border-radius: 99px; background: #1A1C1F; box-shadow: 0 1px 2px rgba(0,0,0,0.2); transform: {{swX}}; transition: transform 180ms cubic-bezier(0.22,1,0.36,1)"></span></button></div>
+</div></div>
+</section><section style="display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 16px; background: #1A1C1F; box-shadow: inset 0 0 0 1px #2A2D32; min-height: 300px; box-sizing: border-box">
+<div style="display: flex; align-items: flex-start; gap: 12px"><div style="display: flex; flex-direction: column; gap: 4px; flex: 1"><h2 style="margin: 0; font-size: 17px; font-weight: 600">Screen to screen</h2><p style="margin: 0; font-size: 13px; line-height: 1.45; color: #A4A9B0">Pochi stays in place while the content slides in. The step indicator stretches to the current step.</p></div><button onClick="{{nx}}" style="height: 30px; padding: 0 12px; border-radius: 9px; border: none; box-shadow: inset 0 0 0 1px #2A2D32; background: #1A1C1F; font-family: 'Instrument Sans', sans-serif; font-size: 13px; font-weight: 500; color: #EEF0F2; cursor: pointer">Next step</button></div>
+<div style="flex: 1; display: flex; flex-direction: column; justify-content: center; border-radius: 12px; background: #121315; padding: 16px; overflow: hidden; position: relative"><div style="display: flex; align-items: center; gap: 16px"><svg width="86" height="73" viewBox="0 0 400 340" aria-hidden="true"><defs>
+<filter id="fzst" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="3" seed="11" result="f"></feTurbulence><feDiffuseLighting in="f" surfaceScale="4.5" lighting-color="#FFFFFF" result="lit"><feDistantLight azimuth="235" elevation="50"></feDistantLight></feDiffuseLighting><feComposite in="lit" in2="d" operator="in" result="li"></feComposite><feComposite in="d" in2="li" operator="arithmetic" k1="0.85" k2="0.3" k3="0" k4="0"></feComposite></filter>
+<filter id="frst" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="5" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<radialGradient id="ltst" cx="0.32" cy="0.2" r="0.7"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.42"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient>
+<radialGradient id="aost" cx="0.5" cy="0.42" r="0.62"><stop offset="0.55" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.32"></stop></radialGradient>
+<linearGradient id="dkst" x1="0" y1="0" x2="0" y2="1"><stop offset="0.6" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.3"></stop></linearGradient>
+<radialGradient id="bbst" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#4A4744"></stop><stop offset="1" stop-color="#0A0A0A"></stop></radialGradient>
+<radialGradient id="bwst" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#CFCAC0"></stop></radialGradient>
+<linearGradient id="mtst" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E6E6E6"></stop><stop offset="0.5" stop-color="#8E8E8E"></stop><stop offset="1" stop-color="#D2D2D2"></stop></linearGradient>
+<filter id="fqst" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="2.2" numOctaves="2" seed="21" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<filter id="sbst" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+<filter id="esst" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
+<filter id="smst" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+</defs>
+<ellipse cx="200" cy="306" rx="132" ry="13" fill="#000000" opacity="0.35" filter="url(#sbst)"></ellipse>
+<ellipse cx="200" cy="300" rx="96" ry="6" fill="#000000" opacity="0.35" filter="url(#esst)"></ellipse>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.28" filter="url(#fqst)"></path><path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.6" filter="url(#frst)"></path>
+<g filter="url(#fzst)">
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#aost)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#ltst)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#dkst)"></path>
+<path d="M84 106 Q200 216 316 106" fill="none" stroke="#000000" stroke-opacity="0.35" stroke-width="12" stroke-linecap="round" filter="url(#smst)"></path>
+<path d="M84 104 Q200 212 316 104" fill="none" stroke="#B8AA94" stroke-width="5" stroke-linecap="round"></path>
+<path d="M90 118 Q200 224 310 118" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="8" stroke-linecap="round" filter="url(#esst)"></path>
+</g>
+<g><rect x="140" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#esst)"></rect><rect x="144" y="190" width="20" height="34" rx="10.0" fill="url(#bbst)"></rect><ellipse cx="150.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="157.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g><g><rect x="232" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#esst)"></rect><rect x="236" y="190" width="20" height="34" rx="10.0" fill="url(#bbst)"></rect><ellipse cx="242.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="249.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g>
+</svg>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; gap: 6px"><span style="height: 6px; border-radius: 99px; width: {{d0w}}px; background: {{d0c}}; transition: width 220ms cubic-bezier(0.22,1,0.36,1), background 220ms"></span><span style="height: 6px; border-radius: 99px; width: {{d1w}}px; background: {{d1c}}; transition: width 220ms cubic-bezier(0.22,1,0.36,1), background 220ms"></span><span style="height: 6px; border-radius: 99px; width: {{d2w}}px; background: {{d2c}}; transition: width 220ms cubic-bezier(0.22,1,0.36,1), background 220ms"></span></div><sc-if value="{{s0}}" hint-placeholder-val="{{true}}"><div class="slideIn" style="display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Newsreader', Georgia, serif; font-weight: 450; letter-spacing: -0.02em; font-size: 22px; line-height: 1.15">Connect an email account</span><span style="font-size: 13px; color: #A4A9B0">Pochimail never sees your password.</span></div></sc-if><sc-if value="{{s1}}" hint-placeholder-val="{{false}}"><div class="slideIn" style="display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Newsreader', Georgia, serif; font-weight: 450; letter-spacing: -0.02em; font-size: 22px; line-height: 1.15">How should I help?</span><span style="font-size: 13px; color: #A4A9B0">Choose any, change anytime.</span></div></sc-if><sc-if value="{{s2}}" hint-placeholder-val="{{false}}"><div class="slideIn" style="display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'Newsreader', Georgia, serif; font-weight: 450; letter-spacing: -0.02em; font-size: 22px; line-height: 1.15">Sorting privately</span><span style="font-size: 13px; color: #A4A9B0">Keep browsing, I’m on it.</span></div></sc-if></div></div></div>
+</section><section style="display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 16px; background: #1A1C1F; box-shadow: inset 0 0 0 1px #2A2D32; min-height: 300px; box-sizing: border-box">
+<div style="display: flex; align-items: flex-start; gap: 12px"><div style="display: flex; flex-direction: column; gap: 4px; flex: 1"><h2 style="margin: 0; font-size: 17px; font-weight: 600">Motion rules</h2><p style="margin: 0; font-size: 13px; line-height: 1.45; color: #A4A9B0">Durations, easing and limits used everywhere.</p></div></div>
+<div style="flex: 1; display: flex; flex-direction: column; justify-content: center; border-radius: 12px; background: #121315; padding: 16px; overflow: hidden; position: relative"><div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px; line-height: 1.5; color: #A4A9B0">
+<p style="margin: 0"><strong style="color: #EEF0F2; font-weight: 600">150ms</strong> hover and press · <strong style="color: #EEF0F2; font-weight: 600">220ms</strong> panels, steps, toasts · <strong style="color: #EEF0F2; font-weight: 600">600ms</strong> numbers and bars arriving.</p>
+<p style="margin: 0">One easing everywhere: <span style="font-family: ui-monospace, monospace; color: #EEF0F2">cubic-bezier(0.22, 1, 0.36, 1)</span>, fast start, soft landing.</p>
+<p style="margin: 0">Motion only explains change: something arrived, moved, was removed or can be undone. Nothing loops for attention; the mascot’s breathing is the only idle motion.</p>
+<p style="margin: 0">Reduced motion: everything becomes an instant cross-fade, the mascot holds still.</p></div></div>
+</section></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+componentDidMount() {
+  this.setState({ i: 0, flip: true, pct: 8, n: [0,0,0], bars: false, removed: false, toast: false, sq: true, sqOn: false, l: true, ck: true, sw: true, step: 0 });
+  this.prog = setInterval(() => { const s = this.state; const pct = s.pct >= 100 ? 8 : Math.min(100, s.pct + 13); this.setState({ pct, i: (s.i + 1) % 4, flip: !s.flip }); }, 1600);
+  this.count(); setTimeout(() => this.setState({ bars: true }), 120);
+}
+componentWillUnmount() { clearInterval(this.prog); clearInterval(this.ct); clearTimeout(this.tt); }
+count() {
+  const target = [7, 3, 12]; const t0 = Date.now(); clearInterval(this.ct);
+  this.ct = setInterval(() => { const k = Math.min(1, (Date.now() - t0) / 600); const e = 1 - Math.pow(1 - k, 3);
+    this.setState({ n: target.map(v => Math.round(v * e)) }); if (k >= 1) clearInterval(this.ct); }, 16);
+}
+renderVals() {
+  const s = this.state || {}; const msgs = ['Found 7 people waiting on you', 'Saved 412 documents from Records', 'Labeled 214 emails as Job search', 'Spotted 120 newsletters you never open'];
+  const widths = [51, 48, 0, 0, 0]; const n = s.n || [0,0,0]; const step = s.step || 0; const v = {};
+  widths.forEach((w, i) => { v['bw' + i] = s.bars ? w : 0; });
+  [0,1,2].forEach(i => { v['s' + i] = step === i; v['d' + i + 'w'] = step === i ? 22 : 6; v['d' + i + 'c'] = i <= step ? '#EEF0F2' : '#2A2D32'; });
+  return Object.assign(v, {
+    pct: s.pct || 8, msg: msgs[s.i || 0], flip: s.flip !== false, flop: s.flip === false,
+    n1: n[0], n2: n[1], n3: n[2], rc: () => this.count(),
+    rb: () => { this.setState({ bars: false }); setTimeout(() => this.setState({ bars: true }), 80); },
+    rowStyle: s.removed ? 'max-height: 0px; opacity: 0' : 'max-height: 60px; opacity: 1',
+    toast: !!s.toast,
+    archive: () => { this.setState({ removed: true, toast: true }); clearTimeout(this.tt); this.tt = setTimeout(() => this.setState({ toast: false }), 5000); },
+    undo: () => { clearTimeout(this.tt); this.setState({ removed: false, toast: false }); },
+    sqA: s.sq !== false, sqB: s.sq === false, sqClass: s.sqOn ? 'squish' : '',
+    fd: () => this.setState({ sq: !(s.sq !== false), sqOn: true }),
+    lA: s.l !== false, lB: s.l === false, rl: () => this.setState({ l: !(s.l !== false) }),
+    ck: s.ck ? 'true' : 'false', ckOn: !!s.ck, ckBg: s.ck ? '#EEF0F2' : '#454A51', ckRing: s.ck ? '0 0 0 2px #EEF0F2' : 'inset 0 0 0 1px #2A2D32', tc: () => this.setState({ ck: !s.ck }),
+    sw: s.sw ? 'true' : 'false', swBg: s.sw ? '#EEF0F2' : '#454A51', swX: s.sw ? 'translateX(18px)' : 'translateX(0)', tsw: () => this.setState({ sw: !s.sw }),
+    nx: () => this.setState({ step: (step + 1) % 3 })
+  });
+}
+}
+</script>
+</body>
+</html>

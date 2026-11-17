@@ -1,0 +1,4 @@
+{
+  "extends": "@pochimail/typescript-config/electron.json",
+  "include": ["src", "*.config.ts"]
+}

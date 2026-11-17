@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Phone · Set up Pochimail</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,450;6..72,500&amp;family=Instrument+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#E6E8EB}
+a{color:#15171A}a:hover{color:#000000}
+button:focus-visible,a:focus-visible{outline:2px solid #15171A;outline-offset:2px}
+
+@media (max-width: 960px){.nav{flex:0 0 68px!important;max-width:68px!important;padding:14px 8px!important}.nav .lbl,.nav .cnt,.nav .navh,.nav .acctxt,.nav .acchev{display:none!important}.nav a,.nav span[aria-disabled],.nav button{justify-content:center!important;padding:0!important}.nav button{height:40px!important}.main{padding:18px 24px 28px!important}.pad{padding-left:24px!important;padding-right:24px!important}.cgap{gap:32px!important}}
+@media (max-width: 760px){.frame{padding:0!important}.win{border-radius:0!important;box-shadow:none!important}.lrow{grid-template-columns:minmax(0,1fr) 52px auto!important}.lbar,.hint{display:none!important}.sheetwrap{padding:16px 10px 28px!important}.sheet{padding:28px 22px!important}}
+@media (max-width: 560px){.frame{min-height:100vh!important}.tl{display:none!important}.nav{display:none!important}.mhead,.tabbar{display:flex!important}.main{padding:12px 16px 0!important;gap:20px!important}.pad{padding:8px 16px 24px!important}.bubrow{flex-direction:column!important;text-align:center}.disp{font-size:32px!important}.ttl{font-size:28px!important}.fig{font-size:28px!important}.sigrow{grid-template-columns:44px minmax(0,1fr) auto!important}.stampbox{transform:scale(.78) rotate(3deg)!important;transform-origin:top right}.statusbtns{margin-left:0!important;width:100%}.statusbtns>*{flex:1;justify-content:center}}
+@media (max-width: 960px){.nav .catitem,.nav .topitem,.nav .addtopic{display:none!important}}
+@media (max-width: 560px){.chrome-app{display:none!important}}
+.sechead{flex-wrap:wrap}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.fadeUp{animation:fadeUp 220ms cubic-bezier(0.22,1,0.36,1) both}
+@media (prefers-reduced-motion: reduce){.fadeUp{animation:none}}
+</style>
+</helmet>
+<div class="frame" style="width: 100%; min-height: 760px; box-sizing: border-box; padding: 24px; background: #E6E8EB; font-family: 'Instrument Sans', sans-serif; color: #15171A; display: flex">
+<div class="win" style="flex: 1; min-width: 0; border-radius: 16px; background: #F3F4F5; box-shadow: 0 0 0 1px rgba(0,0,0,0.06), 0 20px 50px rgba(0,0,0,0.08); display: flex; flex-direction: column; overflow: hidden">
+<div style="display: flex; align-items: center; height: 44px; padding: 0 18px; gap: 8px; "><span class="tl" style="width: 12px; height: 12px; border-radius: 99px; background: #FF5F57"></span><span class="tl" style="width: 12px; height: 12px; border-radius: 99px; background: #FEBC2E"></span><span class="tl" style="width: 12px; height: 12px; border-radius: 99px; background: #28C840"></span><div role="img" aria-label="Step 3 of 3" style="margin: 0 auto; display: flex; gap: 6px; align-items: center"><span style="width: 6px; height: 6px; border-radius: 99px; background: #15171A"></span><span style="width: 6px; height: 6px; border-radius: 99px; background: #15171A"></span><span style="width: 20px; height: 6px; border-radius: 99px; background: #15171A"></span></div><span style="width: 52px"></span></div>
+<div class="pad" style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 8px 48px 40px">
+<div style="width: 100%; max-width: 960px; display: flex; flex-direction: column; gap: 26px">
+<sc-if value="{{hb1}}" hint-placeholder-val="{{false}}"><div class="bubrow fadeUp" style="display: flex; align-items: center; justify-content: center; gap: 16px"><svg width="80" height="68" viewBox="0 0 400 340" aria-hidden="true"><defs>
+<filter id="fzsb1" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="3" seed="11" result="f"></feTurbulence><feDiffuseLighting in="f" surfaceScale="4.5" lighting-color="#FFFFFF" result="lit"><feDistantLight azimuth="235" elevation="50"></feDistantLight></feDiffuseLighting><feComposite in="lit" in2="d" operator="in" result="li"></feComposite><feComposite in="d" in2="li" operator="arithmetic" k1="0.85" k2="0.3" k3="0" k4="0"></feComposite></filter>
+<filter id="frsb1" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="5" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<radialGradient id="ltsb1" cx="0.32" cy="0.2" r="0.7"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.42"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient>
+<radialGradient id="aosb1" cx="0.5" cy="0.42" r="0.62"><stop offset="0.55" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.32"></stop></radialGradient>
+<linearGradient id="dksb1" x1="0" y1="0" x2="0" y2="1"><stop offset="0.6" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.3"></stop></linearGradient>
+<radialGradient id="bbsb1" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#4A4744"></stop><stop offset="1" stop-color="#0A0A0A"></stop></radialGradient>
+<radialGradient id="bwsb1" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#CFCAC0"></stop></radialGradient>
+<linearGradient id="mtsb1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E6E6E6"></stop><stop offset="0.5" stop-color="#8E8E8E"></stop><stop offset="1" stop-color="#D2D2D2"></stop></linearGradient>
+<filter id="fqsb1" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="2.2" numOctaves="2" seed="21" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<filter id="sbsb1" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+<filter id="essb1" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
+<filter id="smsb1" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+</defs>
+<ellipse cx="200" cy="306" rx="132" ry="13" fill="#000000" opacity="0.35" filter="url(#sbsb1)"></ellipse>
+<ellipse cx="200" cy="300" rx="96" ry="6" fill="#000000" opacity="0.35" filter="url(#essb1)"></ellipse>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.28" filter="url(#fqsb1)"></path><path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.6" filter="url(#frsb1)"></path>
+<g filter="url(#fzsb1)">
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#aosb1)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#ltsb1)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#dksb1)"></path>
+<path d="M84 106 Q200 216 316 106" fill="none" stroke="#000000" stroke-opacity="0.35" stroke-width="12" stroke-linecap="round" filter="url(#smsb1)"></path>
+<path d="M84 104 Q200 212 316 104" fill="none" stroke="#B8AA94" stroke-width="5" stroke-linecap="round"></path>
+<path d="M90 118 Q200 224 310 118" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="8" stroke-linecap="round" filter="url(#essb1)"></path>
+</g>
+<g><rect x="140" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#essb1)"></rect><rect x="144" y="190" width="20" height="34" rx="10.0" fill="url(#bbsb1)"></rect><ellipse cx="150.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="157.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g><g><rect x="232" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#essb1)"></rect><rect x="236" y="190" width="20" height="34" rx="10.0" fill="url(#bbsb1)"></rect><ellipse cx="242.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="249.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g><g fill="none" stroke="#000000" stroke-opacity="0.3" stroke-width="8" filter="url(#essb1)"><circle cx="155" cy="212" r="31"></circle><circle cx="245" cy="212" r="31"></circle></g><g fill="none" stroke="#141414" stroke-width="6.5" stroke-linecap="round"><circle cx="155" cy="208" r="31"></circle><circle cx="245" cy="208" r="31"></circle><path d="M186 205 Q200 195 214 205"></path><path d="M124 200 L90 190"></path><path d="M276 200 L310 190"></path></g><g fill="none" stroke="#FFFFFF" stroke-opacity="0.45" stroke-width="2" stroke-linecap="round"><path d="M134 190 A26 26 0 0 1 150 182"></path><path d="M224 190 A26 26 0 0 1 240 182"></path></g>
+</svg><div style="position: relative; padding: 12px 16px; border-radius: 16px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #E3E5E8; font-size: 15px; line-height: 1.5; color: #15171A; text-align: left; max-width: 440px"><span aria-hidden="true" style="position: absolute; left: -6px; top: 20px; width: 11px; height: 11px; background: #FFFFFF; transform: rotate(45deg); box-shadow: -1px 1px 0 #E3E5E8"></span>Got it. I’ll only look around and show you what I find. Your mailbox stays exactly as it is.</div></div></sc-if><sc-if value="{{hb2}}" hint-placeholder-val="{{true}}"><div class="bubrow fadeUp" style="display: flex; align-items: center; justify-content: center; gap: 16px"><svg width="80" height="68" viewBox="0 0 400 340" aria-hidden="true"><defs>
+<filter id="fzsb2" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="3" seed="11" result="f"></feTurbulence><feDiffuseLighting in="f" surfaceScale="4.5" lighting-color="#FFFFFF" result="lit"><feDistantLight azimuth="235" elevation="50"></feDistantLight></feDiffuseLighting><feComposite in="lit" in2="d" operator="in" result="li"></feComposite><feComposite in="d" in2="li" operator="arithmetic" k1="0.85" k2="0.3" k3="0" k4="0"></feComposite></filter>
+<filter id="frsb2" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="5" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<radialGradient id="ltsb2" cx="0.32" cy="0.2" r="0.7"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.42"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient>
+<radialGradient id="aosb2" cx="0.5" cy="0.42" r="0.62"><stop offset="0.55" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.32"></stop></radialGradient>
+<linearGradient id="dksb2" x1="0" y1="0" x2="0" y2="1"><stop offset="0.6" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.3"></stop></linearGradient>
+<radialGradient id="bbsb2" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#4A4744"></stop><stop offset="1" stop-color="#0A0A0A"></stop></radialGradient>
+<radialGradient id="bwsb2" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#CFCAC0"></stop></radialGradient>
+<linearGradient id="mtsb2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E6E6E6"></stop><stop offset="0.5" stop-color="#8E8E8E"></stop><stop offset="1" stop-color="#D2D2D2"></stop></linearGradient>
+<filter id="fqsb2" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="2.2" numOctaves="2" seed="21" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<filter id="sbsb2" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+<filter id="essb2" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
+<filter id="smsb2" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+</defs>
+<ellipse cx="200" cy="306" rx="132" ry="13" fill="#000000" opacity="0.35" filter="url(#sbsb2)"></ellipse>
+<ellipse cx="200" cy="300" rx="96" ry="6" fill="#000000" opacity="0.35" filter="url(#essb2)"></ellipse>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.28" filter="url(#fqsb2)"></path><path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.6" filter="url(#frsb2)"></path>
+<g filter="url(#fzsb2)">
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#aosb2)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#ltsb2)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#dksb2)"></path>
+<path d="M84 106 Q200 216 316 106" fill="none" stroke="#000000" stroke-opacity="0.35" stroke-width="12" stroke-linecap="round" filter="url(#smsb2)"></path>
+<path d="M84 104 Q200 212 316 104" fill="none" stroke="#B8AA94" stroke-width="5" stroke-linecap="round"></path>
+<path d="M90 118 Q200 224 310 118" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="8" stroke-linecap="round" filter="url(#essb2)"></path>
+</g>
+<g><rect x="140" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#essb2)"></rect><rect x="144" y="190" width="20" height="34" rx="10.0" fill="url(#bbsb2)"></rect><ellipse cx="150.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="157.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g><g><rect x="232" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#essb2)"></rect><rect x="236" y="190" width="20" height="34" rx="10.0" fill="url(#bbsb2)"></rect><ellipse cx="242.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="249.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g>
+</svg><div style="position: relative; padding: 12px 16px; border-radius: 16px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #E3E5E8; font-size: 15px; line-height: 1.5; color: #15171A; text-align: left; max-width: 440px"><span aria-hidden="true" style="position: absolute; left: -6px; top: 20px; width: 11px; height: 11px; background: #FFFFFF; transform: rotate(45deg); box-shadow: -1px 1px 0 #E3E5E8"></span>Hi, I’m Pochi. Tell me what to help with and how much I’m allowed to do. You can change this anytime in Settings.</div></div></sc-if><sc-if value="{{hb3}}" hint-placeholder-val="{{false}}"><div class="bubrow fadeUp" style="display: flex; align-items: center; justify-content: center; gap: 16px"><svg width="80" height="68" viewBox="0 0 400 340" aria-hidden="true"><defs>
+<filter id="fzsb3" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="3" seed="11" result="f"></feTurbulence><feDiffuseLighting in="f" surfaceScale="4.5" lighting-color="#FFFFFF" result="lit"><feDistantLight azimuth="235" elevation="50"></feDistantLight></feDiffuseLighting><feComposite in="lit" in2="d" operator="in" result="li"></feComposite><feComposite in="d" in2="li" operator="arithmetic" k1="0.85" k2="0.3" k3="0" k4="0"></feComposite></filter>
+<filter id="frsb3" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="5" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<radialGradient id="ltsb3" cx="0.32" cy="0.2" r="0.7"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.42"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient>
+<radialGradient id="aosb3" cx="0.5" cy="0.42" r="0.62"><stop offset="0.55" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.32"></stop></radialGradient>
+<linearGradient id="dksb3" x1="0" y1="0" x2="0" y2="1"><stop offset="0.6" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.3"></stop></linearGradient>
+<radialGradient id="bbsb3" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#4A4744"></stop><stop offset="1" stop-color="#0A0A0A"></stop></radialGradient>
+<radialGradient id="bwsb3" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#CFCAC0"></stop></radialGradient>
+<linearGradient id="mtsb3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E6E6E6"></stop><stop offset="0.5" stop-color="#8E8E8E"></stop><stop offset="1" stop-color="#D2D2D2"></stop></linearGradient>
+<filter id="fqsb3" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="2.2" numOctaves="2" seed="21" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<filter id="sbsb3" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+<filter id="essb3" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
+<filter id="smsb3" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+</defs>
+<ellipse cx="200" cy="306" rx="132" ry="13" fill="#000000" opacity="0.35" filter="url(#sbsb3)"></ellipse>
+<ellipse cx="200" cy="300" rx="96" ry="6" fill="#000000" opacity="0.35" filter="url(#essb3)"></ellipse>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.28" filter="url(#fqsb3)"></path><path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.6" filter="url(#frsb3)"></path>
+<g filter="url(#fzsb3)">
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#aosb3)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#ltsb3)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#dksb3)"></path>
+<path d="M84 106 Q200 216 316 106" fill="none" stroke="#000000" stroke-opacity="0.35" stroke-width="12" stroke-linecap="round" filter="url(#smsb3)"></path>
+<path d="M84 104 Q200 212 316 104" fill="none" stroke="#B8AA94" stroke-width="5" stroke-linecap="round"></path>
+<path d="M90 118 Q200 224 310 118" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="8" stroke-linecap="round" filter="url(#essb3)"></path>
+</g>
+<path d="M140 212 Q155 196 170 212" fill="none" stroke="#000000" stroke-opacity="0.25" stroke-width="10" stroke-linecap="round" filter="url(#essb3)"></path><path d="M230 212 Q245 196 260 212" fill="none" stroke="#000000" stroke-opacity="0.25" stroke-width="10" stroke-linecap="round" filter="url(#essb3)"></path><path d="M140 210 Q155 194 170 210" fill="none" stroke="#151413" stroke-width="7" stroke-linecap="round"></path><path d="M230 210 Q245 194 260 210" fill="none" stroke="#151413" stroke-width="7" stroke-linecap="round"></path>
+</svg><div style="position: relative; padding: 12px 16px; border-radius: 16px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #E3E5E8; font-size: 15px; line-height: 1.5; color: #15171A; text-align: left; max-width: 440px"><span aria-hidden="true" style="position: absolute; left: -6px; top: 20px; width: 11px; height: 11px; background: #FFFFFF; transform: rotate(45deg); box-shadow: -1px 1px 0 #E3E5E8"></span>Nice, I’ll take care of the obvious stuff and tell you what I did. Anything unsure, I’ll ask first.</div></div></sc-if>
+<section style="display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 17px; font-weight: 600">What should I help with? <span style="font-weight: 400; font-size: 14px; color: #686D75">Choose any</span></h2>
+<div role="group" aria-label="What should I help with?" style="display: flex; flex-wrap: wrap; gap: 12px">
+<button onClick="{{tw1}}" role="checkbox" aria-checked="{{w1}}" style="flex: 1 1 200px; display: flex; gap: 12px; align-items: flex-start; padding: 16px; border-radius: 16px; border: none; background: #FFFFFF; text-align: left; font-family: 'Instrument Sans', sans-serif; color: #15171A; cursor: pointer; box-shadow: {{wr1}}">
+<span aria-hidden="true" style="flex-shrink: 0; margin-top: 1px; width: 20px; height: 20px; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: {{wb1}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+<span style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600">Catch what matters</span><span style="font-size: 14px; line-height: 1.45; color: #5C6169">Flag people waiting on you, deadlines and important senders.</span></span>
+</button>
+<button onClick="{{tw2}}" role="checkbox" aria-checked="{{w2}}" style="flex: 1 1 200px; display: flex; gap: 12px; align-items: flex-start; padding: 16px; border-radius: 16px; border: none; background: #FFFFFF; text-align: left; font-family: 'Instrument Sans', sans-serif; color: #15171A; cursor: pointer; box-shadow: {{wr2}}">
+<span aria-hidden="true" style="flex-shrink: 0; margin-top: 1px; width: 20px; height: 20px; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: {{wb2}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+<span style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600">Declutter</span><span style="font-size: 14px; line-height: 1.45; color: #5C6169">Unsubscribe and archive what you don’t need.</span></span>
+</button>
+<button onClick="{{tw3}}" role="checkbox" aria-checked="{{w3}}" style="flex: 1 1 200px; display: flex; gap: 12px; align-items: flex-start; padding: 16px; border-radius: 16px; border: none; background: #FFFFFF; text-align: left; font-family: 'Instrument Sans', sans-serif; color: #15171A; cursor: pointer; box-shadow: {{wr3}}">
+<span aria-hidden="true" style="flex-shrink: 0; margin-top: 1px; width: 20px; height: 20px; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: {{wb3}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+<span style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600">Organize</span><span style="font-size: 14px; line-height: 1.45; color: #5C6169">Sort email into clear categories and topics, as labels.</span></span>
+</button>
+<button onClick="{{tw4}}" role="checkbox" aria-checked="{{w4}}" style="flex: 1 1 200px; display: flex; gap: 12px; align-items: flex-start; padding: 16px; border-radius: 16px; border: none; background: #FFFFFF; text-align: left; font-family: 'Instrument Sans', sans-serif; color: #15171A; cursor: pointer; box-shadow: {{wr4}}">
+<span aria-hidden="true" style="flex-shrink: 0; margin-top: 1px; width: 20px; height: 20px; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: {{wb4}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+<span style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600">Save documents</span><span style="font-size: 14px; line-height: 1.45; color: #5C6169">Find attachments that matter and keep them in a folder.</span></span>
+</button>
+</div>
+</section>
+<section style="display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 17px; font-weight: 600">How much can I do?</h2>
+<div role="radiogroup" aria-label="How much can I do?" style="display: flex; flex-wrap: wrap; gap: 12px">
+<button onClick="{{th1}}" role="radio" aria-checked="{{h1}}" style="flex: 1 1 220px; display: flex; gap: 12px; align-items: center; padding: 12px 16px 12px 10px; border-radius: 16px; border: none; background: #FFFFFF; text-align: left; font-family: 'Instrument Sans', sans-serif; color: #15171A; cursor: pointer; box-shadow: {{hr1}}">
+<svg width="56" height="48" viewBox="0 0 400 340" aria-hidden="true"><defs>
+<filter id="fzm1" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="3" seed="11" result="f"></feTurbulence><feDiffuseLighting in="f" surfaceScale="4.5" lighting-color="#FFFFFF" result="lit"><feDistantLight azimuth="235" elevation="50"></feDistantLight></feDiffuseLighting><feComposite in="lit" in2="d" operator="in" result="li"></feComposite><feComposite in="d" in2="li" operator="arithmetic" k1="0.85" k2="0.3" k3="0" k4="0"></feComposite></filter>
+<filter id="frm1" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="5" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<radialGradient id="ltm1" cx="0.32" cy="0.2" r="0.7"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.42"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient>
+<radialGradient id="aom1" cx="0.5" cy="0.42" r="0.62"><stop offset="0.55" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.32"></stop></radialGradient>
+<linearGradient id="dkm1" x1="0" y1="0" x2="0" y2="1"><stop offset="0.6" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.3"></stop></linearGradient>
+<radialGradient id="bbm1" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#4A4744"></stop><stop offset="1" stop-color="#0A0A0A"></stop></radialGradient>
+<radialGradient id="bwm1" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#CFCAC0"></stop></radialGradient>
+<linearGradient id="mtm1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E6E6E6"></stop><stop offset="0.5" stop-color="#8E8E8E"></stop><stop offset="1" stop-color="#D2D2D2"></stop></linearGradient>
+<filter id="fqm1" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="2.2" numOctaves="2" seed="21" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<filter id="sbm1" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+<filter id="esm1" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
+<filter id="smm1" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+</defs>
+<ellipse cx="200" cy="306" rx="132" ry="13" fill="#000000" opacity="0.35" filter="url(#sbm1)"></ellipse>
+<ellipse cx="200" cy="300" rx="96" ry="6" fill="#000000" opacity="0.35" filter="url(#esm1)"></ellipse>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.28" filter="url(#fqm1)"></path><path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.6" filter="url(#frm1)"></path>
+<g filter="url(#fzm1)">
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#aom1)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#ltm1)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#dkm1)"></path>
+<path d="M84 106 Q200 216 316 106" fill="none" stroke="#000000" stroke-opacity="0.35" stroke-width="12" stroke-linecap="round" filter="url(#smm1)"></path>
+<path d="M84 104 Q200 212 316 104" fill="none" stroke="#B8AA94" stroke-width="5" stroke-linecap="round"></path>
+<path d="M90 118 Q200 224 310 118" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="8" stroke-linecap="round" filter="url(#esm1)"></path>
+</g>
+<g><rect x="140" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#esm1)"></rect><rect x="144" y="190" width="20" height="34" rx="10.0" fill="url(#bbm1)"></rect><ellipse cx="150.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="157.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g><g><rect x="232" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#esm1)"></rect><rect x="236" y="190" width="20" height="34" rx="10.0" fill="url(#bbm1)"></rect><ellipse cx="242.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="249.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g><g fill="none" stroke="#000000" stroke-opacity="0.3" stroke-width="8" filter="url(#esm1)"><circle cx="155" cy="212" r="31"></circle><circle cx="245" cy="212" r="31"></circle></g><g fill="none" stroke="#141414" stroke-width="6.5" stroke-linecap="round"><circle cx="155" cy="208" r="31"></circle><circle cx="245" cy="208" r="31"></circle><path d="M186 205 Q200 195 214 205"></path><path d="M124 200 L90 190"></path><path d="M276 200 L310 190"></path></g><g fill="none" stroke="#FFFFFF" stroke-opacity="0.45" stroke-width="2" stroke-linecap="round"><path d="M134 190 A26 26 0 0 1 150 182"></path><path d="M224 190 A26 26 0 0 1 240 182"></path></g>
+</svg><span style="display: flex; flex-direction: column; gap: 4px"><span style="display: flex; gap: 8px; align-items: center; font-size: 15px; font-weight: 600">Just look</span><span style="font-size: 14px; line-height: 1.45; color: #5C6169">I show you, but never change anything.</span></span>
+</button>
+<button onClick="{{th2}}" role="radio" aria-checked="{{h2}}" style="flex: 1 1 220px; display: flex; gap: 12px; align-items: center; padding: 12px 16px 12px 10px; border-radius: 16px; border: none; background: #FFFFFF; text-align: left; font-family: 'Instrument Sans', sans-serif; color: #15171A; cursor: pointer; box-shadow: {{hr2}}">
+<svg width="56" height="48" viewBox="0 0 400 340" aria-hidden="true"><defs>
+<filter id="fzm2" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="3" seed="11" result="f"></feTurbulence><feDiffuseLighting in="f" surfaceScale="4.5" lighting-color="#FFFFFF" result="lit"><feDistantLight azimuth="235" elevation="50"></feDistantLight></feDiffuseLighting><feComposite in="lit" in2="d" operator="in" result="li"></feComposite><feComposite in="d" in2="li" operator="arithmetic" k1="0.85" k2="0.3" k3="0" k4="0"></feComposite></filter>
+<filter id="frm2" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="5" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<radialGradient id="ltm2" cx="0.32" cy="0.2" r="0.7"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.42"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient>
+<radialGradient id="aom2" cx="0.5" cy="0.42" r="0.62"><stop offset="0.55" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.32"></stop></radialGradient>
+<linearGradient id="dkm2" x1="0" y1="0" x2="0" y2="1"><stop offset="0.6" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.3"></stop></linearGradient>
+<radialGradient id="bbm2" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#4A4744"></stop><stop offset="1" stop-color="#0A0A0A"></stop></radialGradient>
+<radialGradient id="bwm2" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#CFCAC0"></stop></radialGradient>
+<linearGradient id="mtm2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E6E6E6"></stop><stop offset="0.5" stop-color="#8E8E8E"></stop><stop offset="1" stop-color="#D2D2D2"></stop></linearGradient>
+<filter id="fqm2" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="2.2" numOctaves="2" seed="21" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<filter id="sbm2" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+<filter id="esm2" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
+<filter id="smm2" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+</defs>
+<ellipse cx="200" cy="306" rx="132" ry="13" fill="#000000" opacity="0.35" filter="url(#sbm2)"></ellipse>
+<ellipse cx="200" cy="300" rx="96" ry="6" fill="#000000" opacity="0.35" filter="url(#esm2)"></ellipse>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.28" filter="url(#fqm2)"></path><path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.6" filter="url(#frm2)"></path>
+<g filter="url(#fzm2)">
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#aom2)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#ltm2)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#dkm2)"></path>
+<path d="M84 106 Q200 216 316 106" fill="none" stroke="#000000" stroke-opacity="0.35" stroke-width="12" stroke-linecap="round" filter="url(#smm2)"></path>
+<path d="M84 104 Q200 212 316 104" fill="none" stroke="#B8AA94" stroke-width="5" stroke-linecap="round"></path>
+<path d="M90 118 Q200 224 310 118" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="8" stroke-linecap="round" filter="url(#esm2)"></path>
+</g>
+<g><rect x="140" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#esm2)"></rect><rect x="144" y="190" width="20" height="34" rx="10.0" fill="url(#bbm2)"></rect><ellipse cx="150.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="157.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g><g><rect x="232" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#esm2)"></rect><rect x="236" y="190" width="20" height="34" rx="10.0" fill="url(#bbm2)"></rect><ellipse cx="242.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="249.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g>
+</svg><span style="display: flex; flex-direction: column; gap: 4px"><span style="display: flex; gap: 8px; align-items: center; font-size: 15px; font-weight: 600">Suggest<span style="font-size: 12px; font-weight: 500; padding: 2px 8px; border-radius: 99px; background: #EDEFF1; color: #15171A">Recommended</span></span><span style="font-size: 14px; line-height: 1.45; color: #5C6169">I prepare, you approve each step.</span></span>
+</button>
+<button onClick="{{th3}}" role="radio" aria-checked="{{h3}}" style="flex: 1 1 220px; display: flex; gap: 12px; align-items: center; padding: 12px 16px 12px 10px; border-radius: 16px; border: none; background: #FFFFFF; text-align: left; font-family: 'Instrument Sans', sans-serif; color: #15171A; cursor: pointer; box-shadow: {{hr3}}">
+<svg width="56" height="48" viewBox="0 0 400 340" aria-hidden="true"><defs>
+<filter id="fzm3" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="3" seed="11" result="f"></feTurbulence><feDiffuseLighting in="f" surfaceScale="4.5" lighting-color="#FFFFFF" result="lit"><feDistantLight azimuth="235" elevation="50"></feDistantLight></feDiffuseLighting><feComposite in="lit" in2="d" operator="in" result="li"></feComposite><feComposite in="d" in2="li" operator="arithmetic" k1="0.85" k2="0.3" k3="0" k4="0"></feComposite></filter>
+<filter id="frm3" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="5" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<radialGradient id="ltm3" cx="0.32" cy="0.2" r="0.7"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.42"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient>
+<radialGradient id="aom3" cx="0.5" cy="0.42" r="0.62"><stop offset="0.55" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.32"></stop></radialGradient>
+<linearGradient id="dkm3" x1="0" y1="0" x2="0" y2="1"><stop offset="0.6" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.3"></stop></linearGradient>
+<radialGradient id="bbm3" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#4A4744"></stop><stop offset="1" stop-color="#0A0A0A"></stop></radialGradient>
+<radialGradient id="bwm3" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#CFCAC0"></stop></radialGradient>
+<linearGradient id="mtm3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E6E6E6"></stop><stop offset="0.5" stop-color="#8E8E8E"></stop><stop offset="1" stop-color="#D2D2D2"></stop></linearGradient>
+<filter id="fqm3" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="2.2" numOctaves="2" seed="21" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<filter id="sbm3" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+<filter id="esm3" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
+<filter id="smm3" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+</defs>
+<ellipse cx="200" cy="306" rx="132" ry="13" fill="#000000" opacity="0.35" filter="url(#sbm3)"></ellipse>
+<ellipse cx="200" cy="300" rx="96" ry="6" fill="#000000" opacity="0.35" filter="url(#esm3)"></ellipse>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.28" filter="url(#fqm3)"></path><path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.6" filter="url(#frm3)"></path>
+<g filter="url(#fzm3)">
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#aom3)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#ltm3)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#dkm3)"></path>
+<path d="M84 106 Q200 216 316 106" fill="none" stroke="#000000" stroke-opacity="0.35" stroke-width="12" stroke-linecap="round" filter="url(#smm3)"></path>
+<path d="M84 104 Q200 212 316 104" fill="none" stroke="#B8AA94" stroke-width="5" stroke-linecap="round"></path>
+<path d="M90 118 Q200 224 310 118" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="8" stroke-linecap="round" filter="url(#esm3)"></path>
+</g>
+<path d="M140 212 Q155 196 170 212" fill="none" stroke="#000000" stroke-opacity="0.25" stroke-width="10" stroke-linecap="round" filter="url(#esm3)"></path><path d="M230 212 Q245 196 260 212" fill="none" stroke="#000000" stroke-opacity="0.25" stroke-width="10" stroke-linecap="round" filter="url(#esm3)"></path><path d="M140 210 Q155 194 170 210" fill="none" stroke="#151413" stroke-width="7" stroke-linecap="round"></path><path d="M230 210 Q245 194 260 210" fill="none" stroke="#151413" stroke-width="7" stroke-linecap="round"></path>
+</svg><span style="display: flex; flex-direction: column; gap: 4px"><span style="display: flex; gap: 8px; align-items: center; font-size: 15px; font-weight: 600">Autopilot</span><span style="font-size: 14px; line-height: 1.45; color: #5C6169">I handle the obvious, then tell you.</span></span>
+</button>
+</div>
+<p style="margin: 0; display: flex; gap: 8px; align-items: center; font-size: 13px; color: #5C6169"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>In every mode, I never delete anything, never act on email from real people without asking, and everything can be undone.</p>
+</section>
+<div style="display: flex; justify-content: center"><a href="PhoneOverview.dc.html" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 20px; border-radius: 12px; text-decoration: none; font-size: 15px; font-weight: 500; background: #15171A; color: #FFFFFF; min-width: 220px">Start sorting</a></div>
+</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1200,"height":760}}'>
+class Component extends DCLogic {
+
+renderVals() {
+const s = this.state || {};
+const w = s.w || {1:true,2:true,3:true,4:true}; const h = s.h || 2;
+const on = '0 0 0 2px #15171A', off = 'inset 0 0 0 1px #E3E5E8';
+const v = {};
+[1,2,3,4].forEach(n => {
+  v['w'+n] = w[n] ? 'true' : 'false'; v['wr'+n] = w[n] ? on : off; v['wb'+n] = w[n] ? '#15171A' : '#D5D8DC';
+  v['tw'+n] = () => { const nw = Object.assign({}, w); nw[n] = !nw[n]; this.setState({ w: nw }); };
+});
+[1,2,3].forEach(n => { v['hb'+n] = h === n; v['h'+n] = h === n ? 'true' : 'false'; v['hr'+n] = h === n ? on : off; v['th'+n] = () => this.setState({ h: n }); });
+return v;
+}
+}
+</script>
+</body>
+</html>

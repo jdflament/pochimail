@@ -1,0 +1,9 @@
+/* @pochimail/ui global stylesheet: Tailwind v4 + shadcn/ui + Pochimail tokens.
+   tokens.css = CSS variables (light + .dark), source: tokens.json; theme.css = fonts + @theme mapping. */
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "./tokens.css";
+@import "./theme.css";
+
+/* Let Tailwind scan the desktop app too. */
+@source "../../../../apps/desktop/src";

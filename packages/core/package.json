@@ -1,0 +1,19 @@
+{
+  "name": "@pochimail/core",
+  "private": true,
+  "version": "0.0.0",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "exports": {
+    "./package-info": "./src/package-info.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@pochimail/typescript-config": "workspace:*",
+    "typescript": "7.0.2",
+    "vitest": "5.1.0"
+  }
+}

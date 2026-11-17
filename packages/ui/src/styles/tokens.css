@@ -1,0 +1,71 @@
+/* Pochimail design tokens — CSS variables (shadcn/ui naming + Pochimail extras).
+   Light is the default; dark applies with the .dark class (or follow prefers-color-scheme in your theme provider). */
+:root {
+  --background: #F3F4F5;
+  --card: #FFFFFF;
+  --sidebar: #EEF0F2;
+  --muted: #EDEFF1;
+  --border: #E3E5E8;
+  --foreground: #15171A;
+  --muted-foreground: #5C6169;
+  --foreground-tertiary: #686D75;
+  --primary: #15171A;
+  --primary-foreground: #FFFFFF;
+  --ring: #15171A;
+  --destructive: #B3261E;
+  --frame: #E6E8EB;
+  --popover: #FFFFFF;
+  --popover-foreground: #15171A;
+  --card-foreground: #15171A;
+  --secondary: #EDEFF1;
+  --secondary-foreground: #15171A;
+  --accent: #EDEFF1;
+  --accent-foreground: #15171A;
+  --input: #E3E5E8;
+  --sidebar-foreground: #15171A;
+  --category-people: #4E6A8A;
+  --category-records: #8A6A4E;
+  --category-purchases: #B07820;
+  --category-signins: #7C7F86;
+  --category-notifications: #5A817B;
+  --category-newsletters: #C04F72;
+  --category-promotions: #9C6E95;
+}
+:root {
+  --radius-sm: 6px; --radius-control: 10px; --radius: 12px; --radius-card: 16px;
+  --font-display: "Newsreader", Georgia, serif;
+  --font-sans: "Instrument Sans", system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-press: 150ms; --duration-panel: 220ms;
+}
+.dark {
+  --background: #121315;
+  --card: #1A1C1F;
+  --sidebar: #16181A;
+  --muted: #24272B;
+  --border: #2A2D32;
+  --foreground: #EEF0F2;
+  --muted-foreground: #A4A9B0;
+  --foreground-tertiary: #8C9199;
+  --primary: #EEF0F2;
+  --primary-foreground: #121315;
+  --ring: #EEF0F2;
+  --destructive: #F2B8B5;
+  --frame: #0C0D0E;
+  --popover: #1A1C1F;
+  --popover-foreground: #EEF0F2;
+  --card-foreground: #EEF0F2;
+  --secondary: #24272B;
+  --secondary-foreground: #EEF0F2;
+  --accent: #24272B;
+  --accent-foreground: #EEF0F2;
+  --input: #2A2D32;
+  --sidebar-foreground: #EEF0F2;
+  --category-people: #8FA9C9;
+  --category-records: #C2A285;
+  --category-purchases: #E0AD5C;
+  --category-signins: #A3A7AE;
+  --category-notifications: #8DBDB6;
+  --category-newsletters: #E58AA7;
+  --category-promotions: #C9A3C2;
+}
