@@ -1,5 +1,5 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { basename, isAbsolute, join, relative, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 const root = resolve(import.meta.dirname, "../../..");
@@ -63,7 +63,7 @@ describe("workspace rules (ADR 0001)", () => {
 
   it("has no barrel file (index.ts) in any package", () => {
     const barrels = workspaces.flatMap((dir) =>
-      sourceFiles(dir).filter((f) => /\/index\.tsx?$/.test(f)),
+      sourceFiles(dir).filter((f) => /^index\.tsx?$/.test(basename(f))),
     );
     expect(barrels).toEqual([]);
   });
@@ -75,8 +75,8 @@ describe("workspace rules (ADR 0001)", () => {
         for (const [, spec] of readFileSync(file, "utf8").matchAll(
           /(?:from|import)\s*\(?\s*["'](\.\.?\/[^"']*)["']/g,
         )) {
-          if (!resolve(file, "..", spec as string).startsWith(`${dir}/`))
-            offenders.push(`${file} -> ${spec}`);
+          const inside = relative(dir, resolve(file, "..", spec as string));
+          if (inside.startsWith("..") || isAbsolute(inside)) offenders.push(`${file} -> ${spec}`);
         }
       }
     }
@@ -84,7 +84,7 @@ describe("workspace rules (ADR 0001)", () => {
   });
 
   it("makes every package tsconfig extend the shared config", () => {
-    for (const dir of workspaces.filter((d) => !d.endsWith("tooling/typescript"))) {
+    for (const dir of workspaces.filter((d) => d !== join(root, "tooling/typescript"))) {
       const tsconfig = JSON.parse(readFileSync(join(dir, "tsconfig.json"), "utf8"));
       expect(tsconfig.extends, dir).toMatch(/^@pochimail\/typescript-config\//);
     }

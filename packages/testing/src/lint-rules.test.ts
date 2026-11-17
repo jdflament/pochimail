@@ -1,11 +1,13 @@
 import { spawnSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { afterAll, describe, expect, it } from "vitest";
 
 const root = resolve(import.meta.dirname, "../../..");
-const biome = join(root, "node_modules/.bin/biome");
+// Run biome's JS entry through node: `.bin/biome` is a shell shim that spawnSync cannot run on Windows.
+const biome = createRequire(join(root, "package.json")).resolve("@biomejs/biome/bin/biome");
 
 // A sandbox outside the repo holding the real biome.json, so probe files never reach the repo's own gates.
 const sandbox = mkdtempSync(join(tmpdir(), "pochimail-lint-"));
@@ -21,7 +23,10 @@ const lint = (path: string, source: string) => {
   const file = join(sandbox, path);
   mkdirSync(dirname(file), { recursive: true });
   writeFileSync(file, source);
-  const run = spawnSync(biome, ["lint", path], { cwd: sandbox, encoding: "utf8" });
+  const run = spawnSync(process.execPath, [biome, "lint", path], {
+    cwd: sandbox,
+    encoding: "utf8",
+  });
   if (run.status === null) throw new Error(`biome did not run: ${run.error}`);
   return { failed: run.status !== 0 };
 };
