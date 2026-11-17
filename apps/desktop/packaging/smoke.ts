@@ -1,9 +1,10 @@
 import { spawn } from "node:child_process";
-import { existsSync, readdirSync } from "node:fs";
+import { appendFileSync, existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { FuseState, FuseV1Options, getCurrentFuseWire } from "@electron/fuses";
 import { fuses } from "../src/main/fuses.ts";
 import { electronBinaryPath } from "./apply-fuses.ts";
+import { checkStorageOutput, storageSummary } from "./storage-check.ts";
 
 /** Smoke test of a packaged build: fuses are flipped on the binary and the app starts, loads its window and quits. */
 const releaseDir = join(import.meta.dirname, "..", "release");
@@ -64,3 +65,11 @@ if (code !== 0 || !output.includes("smoke:window-loaded")) {
   throw new Error(`App did not start cleanly (exit ${code}). Output: ${output}`);
 }
 console.log("launch: ok");
+
+// M0-12: the packaged app opened an encrypted WAL database with FTS5 in a utility process, with the key from safeStorage.
+const storage = checkStorageOutput(output);
+console.log("storage: ok");
+console.log(storageSummary(process.platform, storage));
+const summary = process.env.GITHUB_STEP_SUMMARY;
+if (summary !== undefined)
+  appendFileSync(summary, `${storageSummary(process.platform, storage)}\n`);

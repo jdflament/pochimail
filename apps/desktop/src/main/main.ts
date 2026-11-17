@@ -1,13 +1,18 @@
+import { randomBytes } from "node:crypto";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   app,
   BrowserWindow,
   MessageChannelMain,
   nativeTheme,
+  safeStorage,
   session,
   utilityProcess,
 } from "electron";
 import { hardenWebContents, isAppUrl, isRequestAllowed, webPreferences } from "./security.ts";
+import { keyProtection, loadOrCreateDatabaseKey } from "./storage-key.ts";
 import { linkWorkerOnEveryLoad } from "./worker-link.ts";
 
 const devServerUrl = process.env.ELECTRON_RENDERER_URL;
@@ -43,6 +48,36 @@ const connectWorker = (window: BrowserWindow): void => {
   window.once("closed", () => worker.kill());
 };
 
+/** Packaging smoke (M0-12): key from safeStorage, then the encrypted-database proof inside a utilityProcess of the packaged app. */
+const smokeStorage = async (): Promise<void> => {
+  const dir = mkdtempSync(join(tmpdir(), "pochimail-smoke-"));
+  const protection = await keyProtection(safeStorage, process.platform);
+  // Without a keychain (Linux basic_text) the real app must ask first; the smoke still proves the driver with a throwaway key.
+  const key =
+    (await loadOrCreateDatabaseKey(safeStorage, join(dir, "db.key"), process.platform)) ??
+    randomBytes(32);
+  const child = utilityProcess.fork(join(import.meta.dirname, "storage-smoke.js"), [], {
+    serviceName: "pochimail-storage-smoke",
+  });
+  try {
+    const result = await new Promise<unknown>((resolve) => {
+      child.once("message", resolve);
+      child.once("exit", (code) =>
+        resolve({ ok: false, error: `storage worker exited with ${code}` }),
+      );
+      child.postMessage({
+        path: join(dir, "smoke.db"),
+        keyHex: key.toString("hex"),
+        rows: 100_000,
+      });
+    });
+    console.log(`smoke:storage ${JSON.stringify({ protection, result })}`);
+  } finally {
+    child.kill();
+    rmSync(dir, { recursive: true, force: true });
+  }
+};
+
 const createWindow = (): void => {
   const window = new BrowserWindow({
     width: 1100,
@@ -64,7 +99,7 @@ const createWindow = (): void => {
   if (process.env.POCHIMAIL_SMOKE === "1")
     window.webContents.once("did-finish-load", () => {
       console.log("smoke:window-loaded");
-      app.quit();
+      void smokeStorage().finally(() => app.quit());
     });
   if (devServerUrl === undefined) void window.loadFile(rendererFile);
   else void window.loadURL(devServerUrl);
