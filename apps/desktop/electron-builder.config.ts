@@ -16,6 +16,9 @@ const linuxExecutableName = "pochimail";
 const config: Configuration = {
   appId: "com.pochimail.desktop",
   productName: "Pochimail",
+  // The package name is scoped (@pochimail/desktop); without this the .deb path contains a slash.
+  // biome-ignore lint/suspicious/noTemplateCurlyInString: electron-builder macros, not a JS template
+  artifactName: "Pochimail-${version}-${os}-${arch}.${ext}",
   directories: { buildResources: "build", output: "release" },
   // Only the electron-vite output ships: renderer deps are bundled by Vite, so node_modules stays out of the asar.
   files: ["out/**", "package.json", "!node_modules/**"],
