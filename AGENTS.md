@@ -53,7 +53,7 @@ Source: [§5.10](docs/brief.md), [§5.4](docs/brief.md), [ADR 0002](docs/adr/000
 - Supply chain: pinned lockfile, minimal dependencies; ask before adding a heavyweight one ([§10](docs/brief.md)). Planned CI: osv-scanner/audit and an SBOM per release ([§5.10](docs/brief.md)).
 - pnpm's `minimumReleaseAge` stays on: we rely on pnpm 12's default, so do not add config for it; never add release-age exclusions without an ADR note.
 - Releases: signed and notarized builds with signed update metadata; SHA-256 checks on model files; keep Electron on a supported version ([§5.10](docs/brief.md)).
-- Threat model: `docs/security/threat-model.md` (not yet present, planned M0-16).
+- Threat model: [docs/security/threat-model.md](docs/security/threat-model.md); outbound hosts: [docs/security/network.md](docs/security/network.md). Update both when you add a boundary, a mitigation or a host.
 
 ## 7. Design rules
 Source: [§6](docs/brief.md); details in `docs/design.md` and `docs/mascot.md`.
