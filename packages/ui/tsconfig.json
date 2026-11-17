@@ -1,7 +1,10 @@
 {
   "extends": "@pochimail/typescript-config/react-library.json",
   "compilerOptions": {
-    "paths": { "@pochimail/ui/*": ["./src/*"] }
+    "paths": {
+      "@pochimail/ui/*": ["./src/*"]
+    },
+    "types": ["node"]
   },
   "include": ["src", "*.config.ts"]
 }
