@@ -1,6 +1,6 @@
 # 0002 — Electron process model and IPC streaming
 
-Status: Proposed (transport choice made, pending acceptance in M0-15) · Brief: §5.3 › Live UI updates, §5.4, §5.10 › Electron hardening · Research: M0-14
+Status: Accepted (2026-11-17, maintainer, M0-15; transport: in-house typed RPC, not tRPC) · Brief: §5.3 › Live UI updates, §5.4, §5.10 › Electron hardening · Research: M0-14
 
 ## Context
 The UI must stay instant while a 100k-message sync and model inference run. Mail data must never reach a context that can be compromised by email content.

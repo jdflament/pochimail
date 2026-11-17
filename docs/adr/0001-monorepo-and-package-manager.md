@@ -1,12 +1,12 @@
 # 0001 — Monorepo layout and package manager
 
-Status: Proposed · Brief: §5.1, §5.8, §8 › Tooling · Research: M0-01 (study current Midday + create-t3-turbo)
+Status: Accepted (2026-11-17, maintainer, M0-15) · Brief: §5.1, §5.8, §8 › Tooling · Research: M0-01 (study current Midday + create-t3-turbo)
 
 ## Context
 One desktop app now, a mobile companion (Expo) later, shared domain code. Midday is the reference for structure; create-t3-turbo for `packages/ui` with shadcn; AFFiNE for desktop + mobile sharing one core.
 
 ## Decision
-- **Turborepo + pnpm workspaces.** pnpm over Bun (Midday's choice) because electron-builder, `@electron/rebuild` and native modules (`node-llama-cpp`, SQLite, `onnxruntime-node`) are best supported with Node + pnpm, and Expo supports pnpm. `node-linker=hoisted` only if electron-builder packaging requires it (verify).
+- **Turborepo + pnpm workspaces.** pnpm over Bun (Midday's choice) because electron-builder, `@electron/rebuild` and native modules (`node-llama-cpp`, SQLite, `onnxruntime-node`) are best supported with Node + pnpm, and Expo supports pnpm. **`node-linker`: keep pnpm's default** (decided 2026-11-17); use `hoisted` only if electron-builder packaging fails without it.
 - Layout:
   ```
   apps/desktop        Electron: src/main, src/preload, src/worker, src/renderer

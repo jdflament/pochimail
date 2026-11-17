@@ -1,11 +1,11 @@
 # 0005 — Local storage and encryption at rest
 
-Status: Accepted for the driver, key management and packaging (M0-12, 2026-11-17); Drizzle still needs a decision · Brief: §5.3 › Storage performance, §5.10 › Data at rest · Research: M0-12
+Status: Accepted (2026-11-17, maintainer, M0-15; driver, key management and packaging researched in M0-12) · Brief: §5.3 › Storage performance, §5.10 › Data at rest · Research: M0-12
 
 ## Decision
 - **SQLite with SQLCipher-compatible encryption** via `better-sqlite3-multiple-ciphers` (synchronous, fast). Pinned `13.1.1`: it ships Node-API prebuilds, so nothing is rebuilt for Electron's ABI (see Results). WAL mode, `foreign_keys=ON`, tuned `cache_size`/`mmap_size`, one writer (the worker).
-- **Key management**: a random 256-bit key generated at first launch, stored encrypted with Electron `safeStorage` (Keychain / DPAPI / libsecret). Use the async `safeStorage` calls (the sync ones are deprecated in Electron 45). On Linux without a secret service (`basic_text` backend) we warn in plain language and ask before continuing; the key is never written in that case (`apps/desktop/src/main/storage-key.ts`).
-- **Schema & migrations**: **recommendation (M0-12): no Drizzle in v1**; hand-written SQL migrations + a tiny migrator + zod-parsed rows behind the storage port. Drizzle stays a later option (see Results). Needs the maintainer's decision, since the earlier text proposed Drizzle.
+- **Key management**: a random 256-bit key generated at first launch, stored encrypted with Electron `safeStorage` (Keychain / DPAPI / libsecret). Use the async `safeStorage` calls (the sync ones are deprecated in Electron 45). On Linux without a secret service (`basic_text` backend) we show a plain-language warning and offer a **passphrase first**; "store without protection" is only a second, explicit choice (decided 2026-11-17). The key is never written silently in that case (`apps/desktop/src/main/storage-key.ts`).
+- **Schema & migrations**: **no Drizzle in v1** (decided 2026-11-17, from the M0-12 recommendation); hand-written SQL migrations (versioned `.sql` files, `PRAGMA user_version`) + a tiny migrator + zod-parsed rows behind the storage port. Drizzle stays a later option, revisited if the schema grows (see Results).
 - **Indexes** for every list/filter query; **FTS5** over sender names and subjects (local only); **sender stats maintained incrementally** in the same transaction as message upserts.
 - **Blob store**: content-addressed (`sha256/ab/cd/…`), files encrypted with AES-256-GCM using a key derived from the DB key; plaintext only when the user exports documents to their chosen folder.
 - **Data locations**: app data dir per OS via the `Platform` port; "Show in Finder" and "Delete all local data" operate on it. Removing an account deletes its rows and blobs not referenced by another account.
@@ -37,7 +37,7 @@ All three: SQLite 3.54.1, cipher `sqlcipher` (raw 256-bit key, `x'…'` form, so
 - Behaviour implemented: `keyProtection()` returns `os-keychain` / `basic-text` / `unavailable`; `loadOrCreateDatabaseKey()` writes the key only for `os-keychain`. For `basic-text` the app must show the plain-language warning and ask before continuing, and then a user choice is needed (for example a passphrase, or an explicit "store without protection"). That UI and the choice belong to the onboarding tickets; the smoke uses a throwaway key there.
 - Not proven: the secure Linux path (libsecret under a real session). Add a CI step with `gnome-keyring` and a D-Bus session if we want it automated.
 
-**Drizzle or not: recommendation, no for v1**
+**Drizzle or not: decided, no for v1**
 - Works: `drizzle-orm@0.45.4` runs against the encrypted database and FTS5 (tested in a scratch project, 2026-11-17).
 - Costs: its `better-sqlite3` driver imports the package name `better-sqlite3`, so it needs an alias (`better-sqlite3: npm:better-sqlite3-multiple-ciphers@13.1.1`), which ties two drivers' names together and confuses scanners; 16 MB unpacked, large peer matrix; and the parts that matter here (FTS5 virtual table, sync triggers, incremental sender stats, key pragmas) are raw SQL anyway. `drizzle-kit` (0.31.11) adds a second heavyweight tool for migrations.
 - Fits better: the hexagonal core (ADR 0003) already hides storage behind ports, so row types are defined once with zod at the adapter. A small migrator (versioned `.sql` files, `PRAGMA user_version`) is under 100 lines. Revisit if the schema grows past what hand-written queries keep readable; the proof shows adoption is possible later without changing the driver.

@@ -10,9 +10,9 @@ There are no GitHub issues yet, so every mitigation links to a **Project "Pochim
 
 ## 1. Scope and assumptions
 
-- Pochimail is a local-only desktop app (no backend, no telemetry, local AI only). The only data leaving the device is traffic to the mail providers the user connected, update checks, model downloads and, if plan P1 stands, one-click unsubscribe POSTs ([network.md](network.md)).
+- Pochimail is a local-only desktop app (no backend, no telemetry, local AI only). The only data leaving the device is traffic to the mail providers the user connected, update checks, model downloads (`huggingface.co`, `us.aws.cdn.hf.co`) and one-click unsubscribe POSTs (plan P1, accepted 2026-11-17) ([network.md](network.md)).
 - **Out of scope for v0**: a compromised OS account or a running keylogger/malware with the user's privileges (it can read the unlocked keychain and memory; we do not claim to defend against it), physical attack on an unlocked machine, compromise of the mail providers themselves, denial of service by a provider.
-- Pending decisions use their proposed defaults (plan P1 to P15).
+- Plan decisions P1 to P15 and ADRs 0001 to 0008 were accepted by the maintainer on 2026-11-17 (M0-15).
 
 ## 2. Assets
 
@@ -75,7 +75,7 @@ There are no GitHub issues yet, so every mitigation links to a **Project "Pochim
 
 ## 5. STRIDE
 
-S spoofing · T tampering · R repudiation · I information disclosure · D denial of service · E elevation of privilege. "Draft" = Project draft (see top). Every mitigation below is **planned**: v0 has no code, so none is implemented yet, and the ADRs they cite are still Proposed.
+S spoofing · T tampering · R repudiation · I information disclosure · D denial of service · E elevation of privilege. "Draft" = Project draft (see top). Every mitigation below is **planned**: v0 has no code, so none is implemented yet, and the ADRs they cite were accepted on 2026-11-17 (M0-15).
 
 ### TB1/TB2 Renderer and IPC
 
@@ -123,7 +123,7 @@ S spoofing · T tampering · R repudiation · I information disclosure · D deni
 | N4 | S | Phishing app or fork uses our client ID, or users cannot tell real from fake | T5 | client IDs from env/config only, never hard-coded; official builds inject verified IDs, forks register their own; provider verification gives the consent screen a verified publisher | E2 · E8 (OAuth verifications) · [ADR 0007](../adr/0007-oauth-credentials-scopes.md) · [OAuth checklist](oauth-verification.md) |
 | N5 | E | Over-broad scope: a token that can do more than the user chose | T7 T5 | least-privilege, incremental scopes: `gmail.readonly` / `Mail.Read` first, modify on autonomy increase, send and IDLE scopes opt-in; never a delete scope; switching autonomy up re-prompts | E2 · [ADR 0007](../adr/0007-oauth-credentials-scopes.md) |
 | N6 | I | IMAP app password gives full account access and is typed into our form | T6 T3 | stored only in the keychain; form says honestly what the password allows (not "Pochimail never sees your password"); only for iCloud, other IMAP and Yahoo until OAuth is approved | E2 · E4 (Connect, design P8) · [ADR 0007](../adr/0007-oauth-credentials-scopes.md) |
-| N7 | I | One-click unsubscribe POST reveals the user is live to the sender and goes outside the allowlist | T1 | **Explicit exception proposed by plan P1, pending the maintainer's decision**, see section 6 | E5 (unsubscribe) · plan P1 |
+| N7 | I | One-click unsubscribe POST reveals the user is live to the sender and goes outside the allowlist | T1 | **Explicit exception, plan P1 (accepted 2026-11-17)**, see section 6 | E5 (unsubscribe) · plan P1 |
 | N8 | T | Poisoned provider response (hostile or compromised provider, MITM past TLS) breaks the parser or the sync | T2 | zod at every provider boundary; expected failures are `Result` values; adapters tested against recorded fixtures | M1-02 · E2 (recorded fixtures) |
 | N9 | D | Provider rate limits or a stale cursor stall sync, or the app hammers the provider and gets blocked | T8 | per-account token bucket in provider units, `Retry-After`, backoff with jitter, `RateLimited{resumeAt}` state; full-resync fallback when a cursor expires | E2 · [ADR 0004](../adr/0004-incremental-sync-and-imap.md) |
 | N10 | D | Provider policy change, failed verification or revoked approval stops sign-in | T8 | verification track and checklist started in M2, closed in M8; Gmail IMAP and Yahoo app-password fallbacks documented; reconnect state when refresh fails | E2 · E8 · [OAuth checklist](oauth-verification.md) · [ADR 0007](../adr/0007-oauth-credentials-scopes.md) |
@@ -150,9 +150,9 @@ S spoofing · T tampering · R repudiation · I information disclosure · D deni
 | L3 | I | Real mail or addresses leak into fixtures, tests, docs or screenshots in a public repo | T6 | mock dataset only; reviewed in every PR ([AGENTS.md](../../AGENTS.md) section 5) | M1-10 (fixture mailbox) · M0-03 |
 | L4 | I | Telemetry or analytics added later, quietly | T4 T6 | none by default; adding an outbound host needs documentation and approval; the network filter would block it | [ADR 0008](../adr/0008-notifications-and-privacy.md) · E2 (network allowlist) |
 
-## 6. Plan P1: one-click unsubscribe path (documented exception)
+## 6. Plan P1: one-click unsubscribe path (accepted exception)
 
-**Status: PENDING the maintainer's decision.** Documented as an explicit, narrow exception, not rejected; this is the proposed default of plan P1, and nothing here is accepted until the maintainer answers. If the maintainer rejects P1, delete this section and the matching row in [network.md](network.md); unsubscribe then falls back to `mailto:` only (plan P2).
+**Status: ACCEPTED by the maintainer on 2026-11-17 (plan P1).** An explicit, narrow exception. If it is ever withdrawn, delete this section and the matching row in [network.md](network.md); unsubscribe then falls back to `mailto:` only (plan P2).
 
 Why accept it: RFC 8058 one-click unsubscribe is by definition an HTTPS POST to the sender's own host. Without it, "unsubscribe" would depend on following links in email bodies, which the brief forbids, or on opening mail in a browser.
 
@@ -170,7 +170,7 @@ Planned tests (E5): the path refuses `http`, redirects, private IPs, URLs differ
 
 ## 7. Open points
 
-1. Plan P1 stays pending until the maintainer answers; this model assumes the proposed default.
+1. ~~Plan P1 pending~~ Resolved 2026-11-17: P1 accepted as written in section 6.
 2. CASA applicability for a local-only app (checklist G3) could add an assessment duty and a verification-time review; see N10.
 3. Whether the model host can be denied network access at the OS level on all three platforms (W4) is not yet checked; the session filter plus the host having no HTTP client is the v0 mitigation. Verify in E3/E4.
 4. Which libraries will parse attachments and PDFs (W2) is undecided, so its mitigation is generic until E6.

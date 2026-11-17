@@ -1,6 +1,6 @@
 # AGENTS.md — rules for every agent working on Pochimail
 
-Pochimail is a privacy-first, local-only desktop assistant that sorts and cleans mailboxes. It is **not** a mail client. Every rule below links to the brief section it comes from (`docs/brief.md`, "§"). **The brief wins over everything**, then `docs/plan.md` (decisions D1–D7; pending P1–P15 use their proposed defaults), then `docs/adr/`. If two sources disagree, follow the higher one and say so in your PR.
+Pochimail is a privacy-first, local-only desktop assistant that sorts and cleans mailboxes. It is **not** a mail client. Every rule below links to the brief section it comes from (`docs/brief.md`, "§"). **The brief wins over everything**, then `docs/plan.md` (decisions D1–D8 and P1–P15, all decided by the maintainer on 2026-11-17), then `docs/adr/`. If two sources disagree, follow the higher one and say so in your PR.
 
 ## 1. Read first
 - Read the brief sections your ticket lists, plus [§1 vision and principles](docs/brief.md) and [§8 standards](docs/brief.md). Skim `docs/plan.md` and the ADRs in `docs/adr/` that touch your area.
@@ -39,7 +39,7 @@ Source: [§8](docs/brief.md). Gates: `pnpm check` runs typecheck, lint (Biome), 
 Source: [§5.10](docs/brief.md), [§8 Backend](docs/brief.md), [ADR 0008](docs/adr/0008-notifications-and-privacy.md).
 - Structured logger with redaction. **Never log subjects, bodies, addresses or attachment names**, and never tokens.
 - No telemetry; no crash reporting in v1. Notifications show counts, not names or subjects, unless the user opts in ([§5.5](docs/brief.md)).
-- Network only to: Google/Microsoft APIs, the IMAP/SMTP hosts of connected accounts, GitHub Releases, the model manifest/hosts, enforced by a session-level request filter. Pending plan P1: one exception, the RFC 8058 one-click unsubscribe POST to the exact `List-Unsubscribe` URL through one dedicated logged path. Do not add an outbound host without documenting it and asking ([§5.10](docs/brief.md)).
+- Network only to: Google/Microsoft APIs, the IMAP/SMTP hosts of connected accounts, GitHub Releases, the model manifest and its hosts (exactly `huggingface.co` and `us.aws.cdn.hf.co`, no wildcard), enforced by a session-level request filter. Plan P1 (accepted): one exception, the RFC 8058 one-click unsubscribe POST to the exact `List-Unsubscribe` URL through one dedicated logged path. Do not add an outbound host without documenting it and asking ([§5.10](docs/brief.md)).
 - Update checks send no identifiers ([§5.7](docs/brief.md)).
 - Never put real mail, addresses or secrets in fixtures, tests, docs or screenshots; use the mock dataset ([§6 Mock data](docs/brief.md)).
 

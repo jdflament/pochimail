@@ -1,22 +1,22 @@
 # 0006 — Local AI runtimes and model selection
 
-Status: Proposed (research M0-11 folded in 2026-11-17; Accepted in M0-15 after maintainer approval) · Brief: §3 (all), §5.8, §9
+Status: Accepted (2026-11-17, maintainer, M0-15; research M0-11 folded in) · Brief: §3 (all), §5.8, §9
 
 ## Decision
 - **Layers**: rules → decision heads (embeddings + calibrated classifiers) → generative LLM, cheapest first; each decision stores reason + confidence; all output zod-validated.
 - **Generative runtime**: `node-llama-cpp` (GGUF; Metal / CUDA / Vulkan / CPU), in the model-host utility process (ADR 0002), with **JSON-schema grammar-constrained decoding**.
 - **Embeddings + heads**: Transformers.js on `onnxruntime-node` (tokenizers included), same process. Heads = logistic regression / small MLP over `[embedding ‖ sender features]`, **temperature-scaled** on a held-out set; shipped as small JSON/ONNX files.
 - **Models** (picked from the M0-11 benchmarks, see "Research results"; all Apache-2.0 or MIT, redistribution allowed):
-  - Generative T2 (≥ 16 GB): **Gemma 4 E4B-it**, Q4_K_M. Fallback: Qwen3.5-4B.
+  - Generative T2 (≥ 16 GB): **Gemma 4 E4B-it**, Q4_K_M. Fallback: Qwen3.5-4B (2.7 GB). Chosen over Qwen3.5-4B for accuracy (0.99) and speed (140 vs 66 emails/min); the cost is a 5 GB download and more RAM. Its licence is accepted as Apache-2.0 per the model card link.
   - Generative T1 (8–16 GB): **Qwen3.5-2B**, Q4_K_M, for extraction/explanations only (classification stays on the heads, see results).
   - Embeddings: **multilingual-e5-small** (MIT) for the decision heads. Granite-97M-r2 and Qwen3-Embedding-0.6B did not beat it on this set and are slower.
-- **Hardware tiers** (detected at first launch: RAM, GPU/VRAM, Apple Silicon):
+- **Hardware tiers** (detected at first launch: RAM, GPU/VRAM, Apple Silicon; thresholds accepted 2026-11-17 and confirmed with x64 CPU numbers before M3 sets its own):
   - T0: < 8 GB RAM or no usable GPU → rules + heads only, LLM features off, explained in plain words.
   - T1: 8–16 GB → small LLM (~1.7B).
   - T2: ≥ 16 GB + GPU/Apple Silicon → ~4B.
 - **Speed**: classify per sender and per template cluster (normalized subject/body hash), minimum input first, content-hash cache, batched inference, bounded concurrency, power awareness (plugged/idle = full speed; battery/thermal = throttle; sleep = pause).
 - **On-device learning**: corrections stored as labeled examples; kNN lookup over them overrides heads above a similarity threshold; heads re-fitted locally on idle. Preserved across model updates (examples are stored as text features + re-embedded on model change).
-- **Distribution**: models downloaded on first launch from the host decided in P3, resumable, SHA-256 verified, listed in a **signed model manifest** (ADR to be extended in M8). Exact files, sizes and hashes: see "Model files and download hosts".
+- **Distribution**: models downloaded on first launch from Hugging Face (plan P3: repos including community GGUF/ONNX conversions, pinned by SHA-256; hosts `huggingface.co` and `us.aws.cdn.hf.co`), resumable, SHA-256 verified, listed in a **signed model manifest** (ADR to be extended in M8). Exact files, sizes and hashes: see "Model files and download hosts".
 - **Eval**: fixture mailbox + labeled multilingual set; precision/recall per category and signal, emails/min per tier; CI fails on regression beyond tolerance.
 
 ## Consequences
@@ -87,12 +87,12 @@ Hashes are SHA-256 of the files downloaded during the benchmark (the e5 hash als
 | granite-embedding-97m-multilingual-r2 | `ibm-granite/granite-embedding-97m-multilingual-r2` | `onnx/model.onnx` | fp32 | 390004608 | `68e592b160673d30250824c1116bc6ab33f70efb22b97c9e1d7ce1e69c1c9d70` |
 | Qwen3-Embedding-0.6B | `onnx-community/Qwen3-Embedding-0.6B-ONNX` | `onnx/model_quantized.onnx` | q8 | 613527631 | `87cd124e0ef1fd1f223ebc283efccbaeac386d0b08344701c46975d0657b591f` |
 
-**Download hosts (proposed, needs maintainer approval, AGENTS §11):** `huggingface.co` (file URL, answers with a 302) and the CDN it redirects every one of these files to, `us.aws.cdn.hf.co` (observed 2026-11-17). Neither is in the network inventory yet; the CDN host may change, so the request filter should allow `*.hf.co` only if the maintainer accepts that, or the app should mirror models from a host it controls (plan P3). Only Granite and Qwen3-Embedding were not selected; the manifest lists just the picked files (Gemma 4 E4B, Qwen3.5-2B, Qwen3.5-4B fallback, e5-small).
+**Download hosts (accepted 2026-11-17, plan P3):** exactly `huggingface.co` (file URL, answers with a 302) and the CDN it redirects these files to, `us.aws.cdn.hf.co` (observed 2026-11-17). Exact names only, **no wildcard** (`*.hf.co` is not allowed): if Hugging Face changes the CDN name, the allow-list needs a release. Both are listed in [network.md](../security/network.md) (H10) and ADR 0008. Only Granite and Qwen3-Embedding were not selected; the manifest lists just the picked files (Gemma 4 E4B, Qwen3.5-2B, Qwen3.5-4B fallback, e5-small).
 
-### Decisions for M0-15
-1. Approve (or replace) the model download hosts above, and add them to `docs/security/network.md` and the request filter.
-2. Confirm the model picks, which change the Qwen3 / Phi-4-mini candidates in the first draft of this ADR.
-3. Decide Gemma 4 E4B (5 GB) vs Qwen3.5-4B (2.7 GB) as the T2 default once x64 numbers exist.
+### Decisions for M0-15 (resolved 2026-11-17)
+1. Download hosts approved: `huggingface.co` and `us.aws.cdn.hf.co`, exact names; added to `docs/security/network.md`, ADR 0008 and the README.
+2. Model picks confirmed: Gemma 4 E4B-it Q4_K_M (T2, fallback Qwen3.5-4B), Qwen3.5-2B (T1, extraction and explanations only), multilingual-e5-small (embeddings, to re-check on the fixture mailbox).
+3. T2 default is Gemma 4 E4B (5 GB), with Qwen3.5-4B as the lighter fallback. x64 numbers are still collected before M3 sets its thresholds (see below).
 
 ### Not measured / open
 - **x64 CPU**: no x64 machine was available. The script runs unchanged on any host (`--cpu-only`); numbers on a typical Intel/AMD laptop must be added (Apple-silicon CPU-only is a poor proxy: its NEON throughput far exceeds an AVX2 laptop). Needed before the T1/T2 RAM and speed thresholds are final.

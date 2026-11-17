@@ -2,7 +2,7 @@
 
 Living document. `docs/brief.md` is the source of truth; this file shows **order, dependencies and decisions**. When a decision changes, update this file, the affected issues and `AGENTS.md` in the same PR.
 
-Status: **draft for review** (2026-11-17). Nothing is created on GitHub yet.
+Status: **plan decisions P1 to P15 and ADRs 0001 to 0008 accepted by the maintainer on 2026-11-17** (M0-15).
 
 ---
 
@@ -20,24 +20,27 @@ Status: **draft for review** (2026-11-17). Nothing is created on GitHub yet.
 | D8 | **Unsubscribe is the one irreversible action**: its ActionLog entry has `inverse: null`, `irreversible: true` and a reason; every other applied action must record its inverse (M1-02, accepted deviation from "undo everything") | 2026-11-17 | brief §2, §5.3, M1-02 |
 | D6 | **Tracker = GitHub Project "Pochimail v1"** with draft items; a draft becomes an issue only when work starts | 2026-11-17 | brief §10 |
 
-### Pending (proposed default in bold — I proceed with it unless you object)
-| # | Question | Proposed default | Blocks |
-|---|---|---|---|
-| P1 | RFC 8058 one-click unsubscribe is an HTTPS POST to the sender's host, outside the network allowlist | **Allow it through one dedicated, logged path**: POST only to the exact `List-Unsubscribe` URL, no cookies, no redirects followed, no body links ever. Listed in the threat model | M5 unsubscribe |
-| P2 | `mailto:` unsubscribe needs a send scope (`gmail.send`, `Mail.Send`, SMTP) | **Opt-in**: ask for the send permission the first time; otherwise open the user's mail app with the draft prefilled | M2 scopes, M5 |
-| P3 | Model hosting | **Hugging Face upstream repos pinned by file SHA-256**, listed in a signed manifest on GitHub Releases. Fallback mirror: our GitHub Releases (2 GiB/asset limit) | M3 downloader |
-| P4 | Keep it tidy labels differ (brief / summary / settings) | **"As it arrives · Once a day · Once a week · Only when I ask"** everywhere; Settings segmented control uses the short forms "As it arrives · Daily · Weekly · Off" (same values) | M4, M7 copy |
-| P5 | Mascot breathing timings differ (mascot.md / design.md / Motion.dc.html) | **`Motion.dc.html` is the source of truth for every timing**; fix design.md/mascot.md to match in M0 | M4 motion |
-| P6 | Order: you commit after setup vs. PR-only protection | **Local initial setup (M0-01, M0-02, M0-03) → you commit + push → protection on → issues created** | M0 |
-| P7 | Design export glitches (dark/phone Overview empty % and blank Pause; phone Setup missing checkboxes; phone Settings crushed segmented labels; dark Setup outline on unselected modes) | **Light desktop screens are canonical**; the others are references for theme/layout only, and the bugs are not reproduced | M4 |
-| P8 | Who designs the undesigned screens (review lists, Documents, Activity & undo, menu-bar popover, Autopilot summary, "Other provider" connect form) | **Agents draft HTML mocks in `docs/design/screens/html/` from the design system; you approve each** before the build issue starts | M4–M7 |
-| P9 | Do final 3D renders + Rive block v1.0? | **No**: v1.0 can ship with placeholder PNGs + CSS motion; Rive lands when renders exist | M8 |
-| P10 | Apple Developer ID, Windows signing (e.g. Azure Trusted Signing), external security review budget | **Needed before M8**; you confirm availability | M8 |
-| P11 | Opt-in crash reporting needs an outbound host | **Defer to v1.x** (no crash reporting in v1; local logs + "export diagnostics" button) | — |
-| P12 | Training data for the decision heads (user mail can't be used) | **Synthetic multilingual corpus generated offline + the fixture mailbox + public corpora with compatible licenses**, kept in `packages/ai/training/`; no maintainer mail in the repo | M3 |
-| P13 | UI language in v1 | **English UI in v1, i18n-ready** (all strings in a catalog, FR/JA layouts tested for expansion); FR/JA translations in v1.x | M4 |
-| P14 | Website getpochimail.com hosting | **Static site on GitHub Pages** from the repo (`apps/web` later) | M8 |
-| P15 | Package manager | **pnpm** (not Bun): electron-builder + native module rebuilds are best supported there (ADR 0001) | M0 |
+### Decided by the maintainer (2026-11-17, M0-15)
+
+JD (maintainer) accepted every proposed default on 2026-11-17 (decision sheet items 1 to 33). Addition to P10 below.
+
+| # | Question | Decision | Date | Decided by | Blocks |
+|---|---|---|---|---|---|
+| P1 | RFC 8058 one-click unsubscribe is an HTTPS POST to the sender's host, outside the network allowlist | **Allow it through one dedicated, logged path**: POST only to the exact `List-Unsubscribe` URL, no cookies, no redirects followed, no body links ever. Listed in the threat model | 2026-11-17 | maintainer | M5 unsubscribe |
+| P2 | `mailto:` unsubscribe needs a send scope (`gmail.send`, `Mail.Send`, SMTP) | **Opt-in**: ask for the send permission the first time; otherwise open the user's mail app with the draft prefilled | 2026-11-17 | maintainer | M2 scopes, M5 |
+| P3 | Model hosting | **Hugging Face repos, including community GGUF/ONNX conversions, pinned by SHA-256**, listed in a signed manifest on GitHub Releases. Fallback mirror: our GitHub Releases (2 GiB/asset limit). Download hosts, exact names only: `huggingface.co` and `us.aws.cdn.hf.co` ([ADR 0006](adr/0006-local-ai-runtimes-and-models.md)) | 2026-11-17 | maintainer | M3 downloader |
+| P4 | Keep it tidy labels differ (brief / summary / settings) | **"As it arrives · Once a day · Once a week · Only when I ask"** everywhere; Settings segmented control uses the short forms "As it arrives · Daily · Weekly · Off" (same values) | 2026-11-17 | maintainer | M4, M7 copy |
+| P5 | Mascot breathing timings differ (mascot.md / design.md / Motion.dc.html) | **`Motion.dc.html` is the source of truth for every timing**; fix design.md/mascot.md to match in M0 | 2026-11-17 | maintainer | M4 motion |
+| P6 | Order: you commit after setup vs. PR-only protection | **Local initial setup (M0-01, M0-02, M0-03) → you commit + push → protection on → issues created** (already done before M0-15) | 2026-11-17 | maintainer | M0 |
+| P7 | Design export glitches (dark/phone Overview empty % and blank Pause; phone Setup missing checkboxes; phone Settings crushed segmented labels; dark Setup outline on unselected modes) | **Light desktop screens are canonical**; the others are references for theme/layout only, and the bugs are not reproduced | 2026-11-17 | maintainer | M4 |
+| P8 | Who designs the undesigned screens (review lists, Documents, Activity & undo, menu-bar popover, Autopilot summary, "Other provider" connect form) | **Agents draft HTML mocks in `docs/design/screens/html/` from the design system; you approve each** before the build issue starts | 2026-11-17 | maintainer | M4–M7 |
+| P9 | Do final 3D renders + Rive block v1.0? | **No**: v1.0 can ship with placeholder PNGs + CSS motion; Rive lands when renders exist | 2026-11-17 | maintainer | M8 |
+| P10 | Apple Developer ID, Windows signing (e.g. Azure Trusted Signing), external security review budget | **Needed before M8; confirm availability, no spend now.** Addition: **no Mac App Store and no Microsoft Store for now**; desktop builds ship as direct downloads from GitHub Releases, linked later from the getpochimail.com landing page (E8, P14). Signing certificates are still decided before M8 | 2026-11-17 | maintainer | M8 |
+| P11 | Opt-in crash reporting needs an outbound host | **Defer to v1.x** (no crash reporting in v1; local logs + "export diagnostics" button) | 2026-11-17 | maintainer | — |
+| P12 | Training data for the decision heads (user mail can't be used) | **Synthetic multilingual corpus generated offline + the fixture mailbox + public corpora with compatible licenses**, kept in `packages/ai/training/`; no maintainer mail in the repo | 2026-11-17 | maintainer | M3 |
+| P13 | UI language in v1 | **English UI in v1, i18n-ready** (all strings in a catalog, FR/JA layouts tested for expansion); FR/JA translations in v1.x | 2026-11-17 | maintainer | M4 |
+| P14 | Website getpochimail.com hosting | **Static site on GitHub Pages** from the repo (`apps/web` later) | 2026-11-17 | maintainer | M8 |
+| P15 | Package manager | **pnpm** (not Bun): electron-builder + native module rebuilds are best supported there (ADR 0001) | 2026-11-17 | maintainer | M0 |
 
 ### Working assumptions (not questions)
 - Sub-agents are Orca workers (Sonnet) running inside the repo; reviewers are separate workers; Haiku for read-only lookups.
@@ -122,4 +125,4 @@ Max parallelism; one issue = one worker = one PR. Issue numbers are draft IDs (`
 - GitHub Project "Pochimail v1": one draft item per ticket; fields Status, Plan milestone (M0–M8; "Milestone" is reserved by GitHub), Priority, Size, Area, Draft ID; views Board (by Status) and Plan (table grouped by Plan milestone). Repo milestones M0–M8 exist for when drafts become issues.
 - Labels: `type:feature|bug|chore|docs`, `area:core|mail|ai|ui|desktop|infra|design`, `p0|p1`, `blocked`.
 - A draft is converted to a repo issue when a worker picks it up (so its PR closes it); no other repo issues before v1.
-- ADRs: `docs/adr/` (drafts 0001–0008, status *Proposed* until you accept them in M0-15).
+- ADRs: `docs/adr/` (drafts 0001–0008, all *Accepted* 2026-11-17 in M0-15).
