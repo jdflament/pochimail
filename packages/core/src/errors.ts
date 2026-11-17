@@ -6,6 +6,11 @@ export const ERROR_CODES = [
   "provider.offline",
   "provider.auth_expired",
   "provider.conflict",
+  "storage.failed",
+  "storage.not_found",
+  "ai.unavailable",
+  "operation.cancelled",
+  "event.invalid",
 ] as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[number];
@@ -63,5 +68,39 @@ export class AuthExpired extends ProviderError {
 export class Conflict extends ProviderError {
   constructor(message = "Provider state changed since it was last read") {
     super("provider.conflict", message);
+  }
+}
+
+/** A repository, blob store, secret store or queue could not complete the operation. */
+export class StorageError extends DomainError {
+  constructor(message = "Storage operation failed", options?: { cause?: unknown }) {
+    super("storage.failed", message, options);
+  }
+}
+
+export class NotFound extends DomainError {
+  constructor(what: string) {
+    super("storage.not_found", `${what} not found`);
+  }
+}
+
+/** The local model is missing, still loading or crashed. */
+export class AiUnavailable extends DomainError {
+  constructor(message = "Local AI is unavailable") {
+    super("ai.unavailable", message);
+  }
+}
+
+/** The caller's `AbortSignal` fired; the operation stopped and changed nothing further. */
+export class Cancelled extends DomainError {
+  constructor() {
+    super("operation.cancelled", "Operation cancelled");
+  }
+}
+
+/** The event failed validation against the catalog, so it was not delivered. */
+export class EventError extends DomainError {
+  constructor(message = "Event is invalid") {
+    super("event.invalid", message);
   }
 }

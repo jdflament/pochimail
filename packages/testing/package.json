@@ -9,7 +9,8 @@
     "./fake-clock": "./src/fake-clock.ts",
     "./logger-contract": "./src/logger-contract.ts",
     "./domain-samples": "./src/domain-samples.ts",
-    "./entity-contract": "./src/entity-contract.ts"
+    "./entity-contract": "./src/entity-contract.ts",
+    "./unit-of-work-contract": "./src/unit-of-work-contract.ts"
   },
   "scripts": {
     "typecheck": "tsc",

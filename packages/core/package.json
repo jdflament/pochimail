@@ -15,7 +15,21 @@
     "./domain/category": "./src/domain/category.ts",
     "./domain/account": "./src/domain/account.ts",
     "./domain/mail": "./src/domain/mail.ts",
-    "./domain/action": "./src/domain/action.ts"
+    "./domain/action": "./src/domain/action.ts",
+    "./ports/ai": "./src/ports/ai.ts",
+    "./ports/blob-store": "./src/ports/blob-store.ts",
+    "./ports/common": "./src/ports/common.ts",
+    "./ports/event-bus": "./src/ports/event-bus.ts",
+    "./ports/exporter": "./src/ports/exporter.ts",
+    "./ports/job-queue": "./src/ports/job-queue.ts",
+    "./ports/mail-provider": "./src/ports/mail-provider.ts",
+    "./ports/notifier": "./src/ports/notifier.ts",
+    "./ports/platform": "./src/ports/platform.ts",
+    "./ports/power-monitor": "./src/ports/power-monitor.ts",
+    "./ports/repositories": "./src/ports/repositories.ts",
+    "./ports/scheduler": "./src/ports/scheduler.ts",
+    "./ports/secret-store": "./src/ports/secret-store.ts",
+    "./ports/unit-of-work": "./src/ports/unit-of-work.ts"
   },
   "scripts": {
     "typecheck": "tsc",
