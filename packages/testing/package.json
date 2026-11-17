@@ -11,7 +11,10 @@
     "./domain-samples": "./src/domain-samples.ts",
     "./entity-contract": "./src/entity-contract.ts",
     "./unit-of-work-contract": "./src/unit-of-work-contract.ts",
-    "./policy-contract": "./src/policy-contract.ts"
+    "./policy-contract": "./src/policy-contract.ts",
+    "./event-bus-contract": "./src/event-bus-contract.ts",
+    "./event-samples": "./src/event-samples.ts",
+    "./fake-timer": "./src/fake-timer.ts"
   },
   "scripts": {
     "typecheck": "tsc",
