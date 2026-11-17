@@ -20,10 +20,11 @@ it("passes a gate that runs at least one task", () => {
   expect(evaluateGate("test", payload(real), new Set()).ok).toBe(true);
 });
 
-// Guards: the temporary `build` exemption must not leak to other gates.
-it("lets only explicitly allowed gates run empty", () => {
-  expect(evaluateGate("build", payload(missing)).ok).toBe(true);
-  expect(evaluateGate("typecheck", payload(missing)).ok).toBe(false);
+// Guards: a gate (e.g. build) silently losing all its tasks must fail CI once nothing is exempt.
+it("lets no gate run empty by default", () => {
+  for (const gate of ["typecheck", "lint", "test", "build", "knip"] as const) {
+    expect(evaluateGate(gate, payload(missing)).ok, gate).toBe(false);
+  }
 });
 
 // Guards: garbage turbo output (e.g. an error banner) must not read as "0 tasks, fine".

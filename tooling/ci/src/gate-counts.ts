@@ -3,10 +3,10 @@
 export type GateName = "typecheck" | "lint" | "test" | "build" | "knip";
 
 /**
- * Gates allowed to run zero tasks, each until the ticket that wires it lands. Remove an entry
- * as soon as a workspace defines the script (`build`: M0-09 Electron skeleton).
+ * Gates allowed to run zero tasks, each until the ticket that wires it lands. Empty now that every
+ * gate has tasks (`build` landed with M0-09); add an entry only with a ticket to remove it.
  */
-export const allowedEmpty: ReadonlySet<GateName> = new Set<GateName>(["build"]);
+export const allowedEmpty: ReadonlySet<GateName> = new Set<GateName>();
 
 export type GateResult = { gate: GateName; count: number; ok: boolean };
 
