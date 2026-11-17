@@ -7,7 +7,6 @@
 
 <p align="center">
   <a href="https://github.com/jdflament/pochimail/actions/workflows/ci.yml"><img src="https://github.com/jdflament/pochimail/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <img src="packages/ui/src/assets/mascot/pochi-default@2x.png" alt="Pochi, the Pochimail assistant" width="96">
 </p>
 
 # Pochimail
