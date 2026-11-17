@@ -1,10 +1,15 @@
 import {
+  AiUnavailable,
   AuthExpired,
+  Cancelled,
   Conflict,
   DomainError,
+  EventError,
+  NotFound,
   Offline,
   ProviderError,
   RateLimited,
+  StorageError,
 } from "@pochimail/core/errors";
 import { expect, it } from "vitest";
 
@@ -22,4 +27,27 @@ it("exposes stable codes and a shared hierarchy for every provider failure", () 
     expect(e).toBeInstanceOf(DomainError);
     expect(e).toBeInstanceOf(Error);
   }
+});
+
+// Guards: port callers branch on these codes, and every one must be catchable as a DomainError.
+it("exposes stable codes for storage, AI, cancellation and event failures", () => {
+  const errors = [
+    new StorageError(),
+    new NotFound("Topic"),
+    new AiUnavailable(),
+    new Cancelled(),
+    new EventError(),
+  ];
+  expect(errors.map((e) => e.code)).toEqual([
+    "storage.failed",
+    "storage.not_found",
+    "ai.unavailable",
+    "operation.cancelled",
+    "event.invalid",
+  ]);
+  for (const e of errors) {
+    expect(e).toBeInstanceOf(DomainError);
+    expect(e).not.toBeInstanceOf(ProviderError);
+  }
+  expect(new EventError()).not.toBeInstanceOf(StorageError);
 });
