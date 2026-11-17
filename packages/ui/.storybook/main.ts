@@ -4,6 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 const config: StorybookConfig = {
   framework: "@storybook/react-vite",
   stories: ["../src/**/*.stories.tsx"],
+  staticDirs: [{ from: "../src/assets/brand", to: "/brand" }],
   addons: ["@storybook/addon-a11y", "@storybook/addon-themes"],
   // Local-only product: Storybook sends no usage telemetry.
   core: { disableTelemetry: true, disableWhatsNewNotifications: true },
