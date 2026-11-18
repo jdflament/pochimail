@@ -4,6 +4,22 @@
 - Read the ticket in [`docs/tickets/`](docs/tickets/) for the task you are doing.
 - Read the brief sections listed by that ticket, plus [§1 vision and principles](docs/brief.md) and [§8 standards](docs/brief.md).
 
+## 0. Non-negotiables (read before anything else)
+
+**Plan first.** Before writing code, post a plan of at most 6 lines: files to touch, each new piece with a one-line reason, what existing code it reuses, what it deletes. No code until the plan is approved. Implement exactly the plan; if the plan turns out wrong, stop and re-plan.
+
+**Match the designs exactly.** `docs/design/screens/` (html/, light/, dark/, phone/, narrow-window/, source/ for motion) is the spec. Layout, placement, proportions, type and spacing scale, sizes and visuals must match. Before opening a PR, render the screen at the reference viewport, screenshot it, compare it side by side with the reference, and fix every difference. Put the screenshot pair in the PR. "Same structure, different pixels" is a bug.
+
+**Code quality.**
+- Composition over configuration: no boolean or "mode" props that switch what a component is. Split into parts or compose.
+- Names say what the thing is, in the component's own terms. A `Mascot` takes no `showPochi`; a provider is named for the setting it holds.
+- Build only what a ticket needs now. No speculative options, wrappers, abstractions or "for later" code. Delete rather than keep unused code.
+- Reuse before creating: check `packages/ui` and the feature folder first. A new `packages/ui` component only if `docs/design.md` names it.
+- One source of truth for every value (tokens, timings, copy, policies). No duplicated lists or literals.
+- Follow the established patterns of the codebase (shadcn conventions, hexagonal core, use cases behind ports). Do not invent a second way.
+
+**Neutral wording.** Never write a personal name in code, docs, commits, PR titles or PR bodies.
+
 # AGENTS.md — rules for every agent working on Pochimail
 
 Pochimail is a privacy-first, local-only desktop assistant that sorts and cleans mailboxes. It is **not** a mail client. Product definition (decided 2026-11-19): an assistant that helps you tidy your mailboxes, keep what matters (newsletters, emails, attachments) and guides you to stay organized by setting things up for you, such as tags/labels in your mail provider. Every rule below links to the brief section it comes from (`docs/brief.md`, "§"). **The brief wins over everything**, then `docs/plan.md` (decisions D1–D8 and P1–P15, all decided by the maintainer on 2026-11-17), then `docs/adr/`. If two sources disagree, follow the higher one and say so in your PR.
@@ -34,6 +50,7 @@ Source: [§5.1](docs/brief.md), [§5.2](docs/brief.md), [ADR 0001](docs/adr/0001
 
 ## 4. Code standards
 Source: [§8](docs/brief.md). Gates: `pnpm check` runs typecheck, lint (Biome), knip, test and manypkg. CI runs it on macOS, Windows and Linux (`.github/workflows/ci.yml`, M0-05); `pnpm gates` fails any gate that runs zero tasks. Renovate (`renovate.json`) and an `osv-scanner` CI job are live (M0-06).
+See §0.
 - TypeScript strict + `noUncheckedIndexedAccess` + `exactOptionalPropertyTypes`. **No `any`.** Biome (lint + format), manypkg, knip (live, M0-04); CI (live, M0-05); Renovate (live, M0-06).
 - zod at every boundary: IPC, provider responses, LLM output. Expected failures are `Result` values; exceptions are for bugs. Branded IDs (`MessageId`, `AccountId`, `WorkspaceId`).
 - Explicit use cases with dependencies injected through ports.
@@ -64,6 +81,7 @@ Source: [§5.10](docs/brief.md), [§5.4](docs/brief.md), [ADR 0002](docs/adr/000
 
 ## 7. Design rules
 Source: [§6](docs/brief.md); details in `docs/design.md` and `docs/mascot.md`.
+See §0.
 - Use the tokens in `packages/ui` as-is; **never hard-code colors**. Two type families only: Newsreader (screen titles, big figures, Pochi) and Instrument Sans (UI); never italic display serif.
 - Style: calm, editorial, hairline rules and typography instead of boxes; ledgers, not stat tiles; radii 16 (cards/panels), 10–12 (buttons/inputs), full (pills).
 - Anti-patterns: no cards inside cards, icon-tile stacks, numbered section labels, eyebrow chips, thin borders with wide shadows, beige "AI" palettes, pulsing dots, generic spinners (use skeletons and real progress), gradients or emoji.
