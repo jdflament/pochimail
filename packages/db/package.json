@@ -5,7 +5,13 @@
   "license": "AGPL-3.0-only",
   "type": "module",
   "exports": {
-    "./package-info": "./src/package-info.ts"
+    "./package-info": "./src/package-info.ts",
+    "./open-storage": "./src/open-storage.ts",
+    "./migrator": "./src/migrator.ts",
+    "./sqlite-unit-of-work": "./src/sqlite-unit-of-work.ts",
+    "./prune": "./src/prune.ts",
+    "./sqlite-job-queue": "./src/sqlite-job-queue.ts",
+    "./sqlite-repositories": "./src/sqlite-repositories.ts"
   },
   "scripts": {
     "typecheck": "tsc",
@@ -19,5 +25,10 @@
     "@types/node": "26.6.6",
     "typescript": "7.0.2",
     "vitest": "5.1.0"
+  },
+  "dependencies": {
+    "@pochimail/core": "workspace:*",
+    "better-sqlite3-multiple-ciphers": "13.1.1",
+    "zod": "4.6.7"
   }
 }
