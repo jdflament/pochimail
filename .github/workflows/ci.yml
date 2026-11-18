@@ -135,7 +135,7 @@ jobs:
       - run: echo "eval-regression is wired in M1-11; passing as a stub."
 
   # Scans the pinned lockfile against OSV; any known vulnerability fails the job (superset of "critical").
-  # Not a required check yet: add "osv-scanner" to branch protection once it has run green on main.
+  # Required check. Accepted risks live in osv-scanner.toml (time-boxed ignores with a reason).
   osv-scanner:
     name: osv-scanner
     runs-on: ubuntu-latest
@@ -147,4 +147,5 @@ jobs:
       - uses: google/osv-scanner-action/osv-scanner-action@32d3cd482bdadfb38b186c0ad1b031902d55d932 # v2.7.1
         with:
           scan-args: |-
+            --config=osv-scanner.toml
             --lockfile=pnpm-lock.yaml
