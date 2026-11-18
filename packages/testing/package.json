@@ -41,7 +41,8 @@
     "./secret-store-contract": "./src/secret-store-contract.ts",
     "./unit-of-work-contract": "./src/unit-of-work-contract.ts",
     "./outbox-contract": "./src/outbox-contract.ts",
-    "./job-queue-lease-contract": "./src/job-queue-lease-contract.ts"
+    "./job-queue-lease-contract": "./src/job-queue-lease-contract.ts",
+    "./pipeline-contract": "./src/pipeline-contract.ts"
   },
   "scripts": {
     "typecheck": "tsc",

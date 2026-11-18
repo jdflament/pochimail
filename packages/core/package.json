@@ -42,7 +42,8 @@
     "./use-cases/action-contract": "./src/use-cases/action-contract.ts",
     "./ports/outbox": "./src/ports/outbox.ts",
     "./jobs/retry": "./src/jobs/retry.ts",
-    "./jobs/outbox-relay": "./src/jobs/outbox-relay.ts"
+    "./jobs/outbox-relay": "./src/jobs/outbox-relay.ts",
+    "./jobs/pipeline": "./src/jobs/pipeline.ts"
   },
   "scripts": {
     "typecheck": "tsc",
