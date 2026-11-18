@@ -20,7 +20,7 @@ concurrency:
 jobs:
   # Required status checks (branch protection), names must stay stable:
   #   check (ubuntu-latest), check (macos-latest), check (windows-latest), eval
-  # Pull requests get fast Linux feedback only. macOS and Windows are skipped on pull_request (GitHub treats a skipped required check as passing) and run for real on merge_group and push to main, so nothing reaches main without the 3-OS gate.
+  # Pull requests get fast Linux feedback only. macOS and Windows are skipped on pull_request (GitHub treats a skipped required check as passing) and run for real on merge_group and push to main, so no PR or merge-queue entry can reach main without the 3-OS gate. Direct pushes by admins are a branch-protection setting (enforce_admins), not covered here.
   # These are explicit jobs, not a matrix: a matrix job skipped by a job-level `if` reports the unexpanded name `check (${{ matrix.os }})`, so the required names would never appear and the PR would block. The steps live once, in .github/actions/check.
   check-linux:
     name: check (ubuntu-latest)
