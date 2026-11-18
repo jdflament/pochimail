@@ -8,6 +8,7 @@ import type { LatestDigest } from "@pochimail/core/use-cases/latest-digest";
 import type { ListAccounts } from "@pochimail/core/use-cases/list-accounts";
 import type { ManageSettings } from "@pochimail/core/use-cases/manage-settings";
 import type { ScanRunner } from "@pochimail/core/use-cases/scan-runner";
+import type { SummarizeMailbox } from "@pochimail/core/use-cases/summarize-mailbox";
 import type { EventOf, OutputOf } from "../shared/ipc/contract.ts";
 import type { Handlers } from "../shared/ipc/server.ts";
 
@@ -19,6 +20,7 @@ export interface HandlerDeps {
   readonly workspaceId: WorkspaceId;
   readonly listAccounts: ListAccounts;
   readonly getOverview: GetOverview;
+  readonly summarize: SummarizeMailbox;
   readonly latestDigest: LatestDigest;
   readonly settings: ManageSettings;
   readonly scans: ScanRunner;
@@ -73,6 +75,15 @@ export function createHandlers(deps: HandlerDeps): Handlers {
           displayName: account.address,
         })),
       "overview.get": async () => unwrapOrThrow(await deps.getOverview.execute(workspaceId)),
+      "mailbox.categories": async ({ accountIds }) => {
+        const summary = unwrapOrThrow(
+          await deps.summarize.execute({
+            workspaceId,
+            accountIds: accountIds.map((id) => unwrapOrThrow(AccountId(id))),
+          }),
+        );
+        return summary.categories;
+      },
       "digest.get": () => deps.latestDigest.get(),
       "settings.get": async () => unwrapOrThrow(await deps.settings.get(workspaceId)),
       "settings.update": async (patch) => {

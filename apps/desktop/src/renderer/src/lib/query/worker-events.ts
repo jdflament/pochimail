@@ -10,6 +10,8 @@ export const subscribeAppEvents = (
   client: RpcClient,
   registry: OptimisticActionRegistry,
   onScanFailed: () => void = () => {},
+  /** Emails were scanned or moved: counts derived from the mailbox are stale. */
+  onMailboxChanged: () => void = () => {},
 ): (() => void) => {
   let closed = false;
   let currentUnsubscribe: (() => void) | undefined;
@@ -24,7 +26,10 @@ export const subscribeAppEvents = (
         undefined,
         (event: EventOf<"app.events">) => {
           backoffMs = INITIAL_BACKOFF_MS;
-          if (event.type === "ActionApplied") registry.apply(event.actionId);
+          if (event.type === "ActionApplied") {
+            registry.apply(event.actionId);
+            onMailboxChanged();
+          } else if (event.type === "ScanCompleted") onMailboxChanged();
           else if (event.type === "ActionFailed") registry.fail(event.actionId);
           else if (event.type === "ScanFailed") onScanFailed();
         },

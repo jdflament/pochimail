@@ -18,6 +18,7 @@ const createFakeAppClient = (hasConnectedAccount: boolean) => {
       "device.name": () => "device" as const,
       "accounts.list": () => [],
       "overview.get": () => ({ scanned: 0, toReview: 0 }),
+      "mailbox.categories": () => ({}) as never,
       "digest.get": () => ({ ready: false, itemCount: 0 }),
       "settings.get": () => ({ autopilot: false, notifications: true }),
     },

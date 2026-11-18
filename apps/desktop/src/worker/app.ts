@@ -18,6 +18,7 @@ import { ListAccounts } from "@pochimail/core/use-cases/list-accounts";
 import { ManageSettings } from "@pochimail/core/use-cases/manage-settings";
 import { RunScan } from "@pochimail/core/use-cases/run-scan";
 import { ScanRunner } from "@pochimail/core/use-cases/scan-runner";
+import { SummarizeMailbox } from "@pochimail/core/use-cases/summarize-mailbox";
 import type { Handlers } from "../shared/ipc/server.ts";
 import { createHandlers } from "./handlers.ts";
 
@@ -91,6 +92,7 @@ export function createWorkerApp(adapters: WorkerAdapters): WorkerApp {
     workspaceId,
     listAccounts: new ListAccounts({ uow }),
     getOverview: new GetOverview({ uow, clock }),
+    summarize: new SummarizeMailbox({ uow, clock }),
     latestDigest,
     settings: new ManageSettings({ store: adapters.settings }),
     scans,
