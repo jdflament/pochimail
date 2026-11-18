@@ -41,6 +41,13 @@ const fakeTransport = (attempts: string[]): Fetch => {
     // A hostile or broken transport that ignores the signal and never settles.
     if (url.endsWith("/ignore")) return new Promise<FetchResponse>(() => {});
     if (url.endsWith("/redirect")) return { status: 302, ok: false, text: async () => "" };
+    if (url.endsWith("/throttled"))
+      return {
+        status: 429,
+        ok: false,
+        headers: { get: (name) => (name === "retry-after" ? "30" : null) },
+        text: async () => "",
+      };
     return { status: 200, ok: true, text: async () => "ok" };
   };
 };
@@ -159,6 +166,18 @@ export const httpClientChecks: readonly Check<HttpClientHarness>[] = [
       });
       expect(result.ok).toBe(false);
       if (!result.ok) expect(result.error).toBeInstanceOf(RequestTimeoutError);
+    },
+  ),
+
+  check(
+    "surfaces a Retry-After header on the response and leaves it absent otherwise",
+    async (h) => {
+      const throttled = await h.client.request({ url: "https://gmail.googleapis.com/throttled" });
+      if (!throttled.ok) throw new Error("expected a response");
+      expect(throttled.value.retryAfter).toBe("30");
+      const plain = await h.client.request({ url: "https://gmail.googleapis.com/v1" });
+      if (!plain.ok) throw new Error("expected a response");
+      expect(plain.value.retryAfter).toBeUndefined();
     },
   ),
 

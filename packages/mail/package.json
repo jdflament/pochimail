@@ -9,6 +9,8 @@
     "./egress/allowlist": "./src/egress/allowlist.ts",
     "./egress/http-client": "./src/egress/http-client.ts",
     "./egress/http-client-contract": "./src/egress/http-client-contract.ts",
+    "./egress/rate-limit": "./src/egress/rate-limit.ts",
+    "./egress/rate-limit-contract": "./src/egress/rate-limit-contract.ts",
     "./oauth/http": "./src/oauth/http.ts",
     "./oauth/loopback": "./src/oauth/loopback.ts",
     "./oauth/providers": "./src/oauth/providers.ts",

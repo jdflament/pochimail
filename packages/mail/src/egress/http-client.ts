@@ -15,6 +15,8 @@ export interface HttpResponse {
   readonly status: number;
   readonly ok: boolean;
   readonly body: string;
+  /** Raw `Retry-After` header, if the provider sent one (seconds or HTTP-date). */
+  readonly retryAfter?: string;
 }
 
 /** Expected failures are `Result` values; each class is a stable, catchable kind. */
@@ -72,6 +74,8 @@ export interface FetchInit {
 export interface FetchResponse {
   readonly status: number;
   readonly ok: boolean;
+  /** The real `Headers` satisfies this; optional so simple fakes need not provide it. */
+  readonly headers?: { get(name: string): string | null };
   text(): Promise<string>;
 }
 
@@ -145,7 +149,13 @@ export const createHttpClient = (options: {
             // Defence in depth: even a transport that follows redirects cannot leave the allow-list.
             if (result.status >= 300 && result.status < 400)
               throw new RequestFailedError("Redirects are not followed");
-            return { status: result.status, ok: result.ok, body: await result.text() };
+            const retryAfter = result.headers?.get("retry-after") ?? undefined;
+            return {
+              status: result.status,
+              ok: result.ok,
+              body: await result.text(),
+              ...(retryAfter === undefined ? {} : { retryAfter }),
+            };
           })(),
           deadline,
         ]);
