@@ -45,7 +45,8 @@ afterEach(() => {
       // already closed by the test
     }
   }
-  for (const d of dirs.splice(0)) rmSync(d, { recursive: true, force: true });
+  for (const d of dirs.splice(0))
+    rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
 });
 
 function sqliteUnitOfWorkHarness() {
@@ -130,7 +131,7 @@ describe("encrypted storage", () => {
       expect(wrong.error.code).toBe("storage.failed");
       expect(wrong.error.message).toBe("Could not open the database (wrong key or damaged file)");
     }
-    expect(openStorage(path, key(1)).ok).toBe(true);
+    expect(open(path, key(1))).toBeDefined();
   });
 
   it("refuses a key that is not 32 bytes (guards silently weak keys)", () => {
