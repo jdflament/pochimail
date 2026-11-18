@@ -3,58 +3,52 @@ import { RecommendationRow } from "@pochimail/ui/components/recommendation-row";
 import { SignalRow } from "@pochimail/ui/components/signal-row";
 import { StatusStrip } from "@pochimail/ui/components/status-strip";
 import { StorageBar } from "@pochimail/ui/components/storage-bar";
-import { isValidElement, type ReactElement, type ReactNode } from "react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { useState } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, it, vi } from "vitest";
 
-type Props = { children?: ReactNode; onClick?: () => void; [k: string]: unknown };
-
-// No DOM in this package's test env: expand the (hook-free) function components and find an element by data-slot.
-function find(node: ReactNode, slot: string): ReactElement<Props> | undefined {
-  if (Array.isArray(node)) return node.map((n) => find(n, slot)).find(Boolean);
-  if (!isValidElement<Props>(node)) return undefined;
-  if (node.props["data-slot"] === slot && typeof node.type === "string") return node;
-  const out =
-    typeof node.type === "function"
-      ? (node.type as (p: Props) => ReactNode)(node.props)
-      : node.props.children;
-  if (typeof node.type === "function" && node.props["data-slot"] === slot && out) {
-    const inner = find(out, slot);
-    if (inner) return inner;
-  }
-  return find(out, slot);
-}
-
 // Guards: a Review button that is not wired (or fires twice) in each row that has one.
 it.each([
-  ["signal-review", <SignalRow key="s" figure={7} title="waiting" onReview={vi.fn()} />],
   [
-    "recommendation-review",
-    <RecommendationRow key="r" sentence="Unsubscribe" onReview={vi.fn()} />,
+    "signal row",
+    (onReview: () => void) => <SignalRow figure={7} title="waiting" onReview={onReview} />,
   ],
-])("%s calls onReview once when clicked", (slot, el) => {
-  const onReview = (el.props as { onReview: () => void }).onReview;
-  const button = find(
-    el.type === SignalRow ? SignalRow(el.props) : RecommendationRow(el.props),
-    slot,
-  );
-  expect(button?.type).toBe("button");
-  button?.props.onClick?.();
+  [
+    "recommendation row",
+    (onReview: () => void) => <RecommendationRow sentence="Unsubscribe" onReview={onReview} />,
+  ],
+])("%s: clicking Review calls onReview once", async (_name, row) => {
+  const onReview = vi.fn();
+  render(<ul>{row(onReview)}</ul>);
+  await userEvent.click(screen.getByRole("button", { name: "Review" }));
   expect(onReview).toHaveBeenCalledTimes(1);
 });
 
 // Guards: Pause/Resume stuck on one label, or reporting the wrong next state.
-it("status strip toggles between Pause and Resume and reports the next state", () => {
+it("status strip toggles between Pause and Resume and reports the next state", async () => {
   const onPausedChange = vi.fn();
-  const running = StatusStrip({ progress: 40, headline: "Sorting", onPausedChange });
-  find(running, "status-toggle")?.props.onClick?.();
+  function Harness() {
+    const [paused, setPaused] = useState(false);
+    return (
+      <StatusStrip
+        progress={40}
+        headline="Sorting"
+        paused={paused}
+        onPausedChange={(next) => {
+          onPausedChange(next);
+          setPaused(next);
+        }}
+      />
+    );
+  }
+  render(<Harness />);
+  await userEvent.click(screen.getByRole("button", { name: "Pause" }));
   expect(onPausedChange).toHaveBeenLastCalledWith(true);
-  expect(renderToStaticMarkup(running)).toContain("Pause");
-
-  const paused = StatusStrip({ progress: 40, headline: "Sorting", paused: true, onPausedChange });
-  find(paused, "status-toggle")?.props.onClick?.();
+  await userEvent.click(screen.getByRole("button", { name: "Resume" }));
   expect(onPausedChange).toHaveBeenLastCalledWith(false);
-  expect(renderToStaticMarkup(paused)).toContain("Resume");
+  expect(screen.getByRole("button", { name: "Pause" })).toBeTruthy();
 });
 
 // Guards: progress announcements lost (brief §6: role=status + aria-live=polite) or a width outside 0-100%.
