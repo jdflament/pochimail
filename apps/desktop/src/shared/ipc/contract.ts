@@ -2,7 +2,7 @@ import { DEVICE_NAMES } from "@pochimail/core/ports/platform";
 import { z } from "zod";
 
 /**
- * The typed contract every screen uses (ADR 0002, M4-01). Names and shapes only: handlers backed by real use cases land in M4-02.
+ * The typed contract every screen uses (ADR 0002, M4-01). Handlers backed by core use cases live in worker/handlers.ts (M4-02).
  * Nothing here carries message bodies (D11): the renderer only ever sees counts, ids, states and progress.
  */
 const accountId = z.string().min(1).max(200);
@@ -56,6 +56,15 @@ const mutations = {
     input: z.object({ accountId }),
     output: z.object({ jobId }),
   },
+  "scan.pause": {
+    input: z.object({ jobId }),
+    output: z.undefined(),
+  },
+  "scan.resume": {
+    input: z.object({ jobId }),
+    output: z.undefined(),
+  },
+  /** Stops the scan for good; starting again continues from where the stored cursor stopped. */
   "scan.cancel": {
     input: z.object({ jobId }),
     output: z.undefined(),
@@ -74,7 +83,8 @@ const subscriptions = {
       accountId,
       phase: z.enum(["listing", "fetching", "classifying", "done"]),
       processed: z.number().int().nonnegative(),
-      total: z.number().int().nonnegative(),
+      /** `null` while the provider cannot say how many emails there are. */
+      total: z.number().int().nonnegative().nullable(),
     }),
     coalesceKey: (event: { accountId: string }) => event.accountId,
   },
@@ -87,6 +97,17 @@ const subscriptions = {
         actionId,
         reason: z.enum(["not-found", "conflict", "provider-error", "cancelled", "unknown"]),
       }),
+      z.object({
+        type: z.literal("ScanCompleted"),
+        accountId,
+        processed: z.number().int().nonnegative(),
+      }),
+      z.object({
+        type: z.literal("ScanFailed"),
+        accountId,
+        reason: z.enum(["offline", "rate-limited", "auth-expired", "unknown"]),
+      }),
+      z.object({ type: z.literal("DigestReady"), itemCount: z.number().int().nonnegative() }),
     ]),
     coalesceKey: undefined,
   },

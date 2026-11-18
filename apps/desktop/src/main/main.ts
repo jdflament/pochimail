@@ -16,6 +16,8 @@ import {
   shell,
   utilityProcess,
 } from "electron";
+import { demoScale } from "../shared/demo.ts";
+import { superviseModelHost } from "./model-host-supervisor.ts";
 import { registerOsCalls } from "./os-calls.ts";
 import { createSecretVault, type SecretVault } from "./secret-vault.ts";
 import {
@@ -84,9 +86,50 @@ const processSecretVault = (): SecretVault => {
   return secretVault;
 };
 
+// Demo mode (fixture mailbox, no real account) is for dev and E2E only: a packaged app never honours it.
+const demo = app.isPackaged ? undefined : demoScale(process.env.POCHIMAIL_DEMO);
+// Hosts get no copy of the parent environment: only what a process needs to start, plus the demo switch.
+const SYSTEM_ENV = [
+  "PATH",
+  "HOME",
+  "TMPDIR",
+  "TMP",
+  "TEMP",
+  "SystemRoot",
+  "LANG",
+  "LC_ALL",
+] as const;
+const demoEnv: Record<string, string> = {
+  ...Object.fromEntries(
+    SYSTEM_ENV.flatMap((name) => {
+      const value = process.env[name];
+      return value === undefined ? [] : [[name, value] as const];
+    }),
+  ),
+  POCHIMAIL_DEMO: demo ?? "",
+};
+
 const connectWorker = (window: BrowserWindow): void => {
   const worker = utilityProcess.fork(join(import.meta.dirname, "worker.js"), [], {
     serviceName: "pochimail-worker",
+    env: demoEnv,
+  });
+  // The model host is its own process so a model crash never takes the worker down; main restarts it.
+  const modelHost = superviseModelHost({
+    fork: () =>
+      utilityProcess.fork(join(import.meta.dirname, "model-host.js"), [], {
+        serviceName: "pochimail-model-host",
+        env: demoEnv,
+      }),
+    worker,
+    createChannel: () => new MessageChannelMain(),
+    timer: {
+      set: (fn, ms) => {
+        const handle = setTimeout(fn, ms);
+        return () => clearTimeout(handle);
+      },
+    },
+    logger,
   });
   linkWorkerOnEveryLoad(window.webContents, worker, () => new MessageChannelMain());
   const userData = app.getPath("userData");
@@ -105,7 +148,10 @@ const connectWorker = (window: BrowserWindow): void => {
     openExternal: (url) => shell.openExternal(url),
     logger,
   });
-  window.once("closed", () => worker.kill());
+  window.once("closed", () => {
+    modelHost.stop();
+    worker.kill();
+  });
 };
 
 /** Packaging smoke (M0-12): key from safeStorage, then the encrypted-database proof inside a utilityProcess of the packaged app. */

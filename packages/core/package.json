@@ -57,7 +57,14 @@
     "./use-cases/build-digest": "./src/use-cases/build-digest.ts",
     "./use-cases/store-messages": "./src/use-cases/store-messages.ts",
     "./use-cases/summarize-mailbox": "./src/use-cases/summarize-mailbox.ts",
-    "./jobs/scan-pipeline": "./src/jobs/scan-pipeline.ts"
+    "./jobs/scan-pipeline": "./src/jobs/scan-pipeline.ts",
+    "./ports/settings-store": "./src/ports/settings-store.ts",
+    "./use-cases/run-scan": "./src/use-cases/run-scan.ts",
+    "./use-cases/scan-runner": "./src/use-cases/scan-runner.ts",
+    "./use-cases/list-accounts": "./src/use-cases/list-accounts.ts",
+    "./use-cases/get-overview": "./src/use-cases/get-overview.ts",
+    "./use-cases/latest-digest": "./src/use-cases/latest-digest.ts",
+    "./use-cases/manage-settings": "./src/use-cases/manage-settings.ts"
   },
   "scripts": {
     "typecheck": "tsc",

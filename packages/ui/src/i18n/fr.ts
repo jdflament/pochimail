@@ -20,6 +20,10 @@ export const fr = {
     "size",
     "total",
   ]),
+  "scan.failed": entry(
+    "Je n'ai pas pu finir le tri. Rien n'a été modifié. Relancez-le et je reprendrai là où je me suis arrêté.",
+    [],
+  ),
   "overview.review": entry("Examiner", []),
   "overview.pause": entry("Pause", []),
   "overview.resume": entry("Reprendre", []),

@@ -39,6 +39,10 @@ export const messages = {
     "size",
     "total",
   ]),
+  "scan.failed": entry(
+    "I could not finish sorting. Nothing was changed. Start again and I will continue where I stopped.",
+    [],
+  ),
   "overview.review": entry("Review", []),
   "overview.pause": entry("Pause", []),
   "overview.resume": entry("Resume", []),

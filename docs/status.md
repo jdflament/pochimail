@@ -15,22 +15,23 @@ Last updated: 2026-11-19
 
 ## In progress
 
-(None.)
+- **M4-02** worker composition root and model host: in review (PR pending merge).
 
 ## Next
 
 Ordered by priority (UI first):
 
-1. **M4 UI**: M4-02, M4-10, M4-14.
+1. **M4 UI**: M4-10, M4-14.
 2. **M2 lane**: M2-05 onward (see [`docs/tickets/m2-m4-lanes.md`](tickets/m2-m4-lanes.md)).
 
 ## Open decisions
 
+- **Demo mode in packaged builds (M4-02)**: demo mode (`POCHIMAIL_DEMO=small|full`, fixture mailbox) is dev/E2E only; a packaged app ignores it. How `@pochimail/testing` ships in a packaged build is for the maintainer to decide.
 - None blocking. Resolved planning questions are recorded in [`docs/tickets/m2-m4-lanes.md`](tickets/m2-m4-lanes.md).
 
 ## Known follow-ups
 
-- **M3**: needs-reply detector has no age window; current precision 0.26.
+- **M3**: needs-reply detector has no age window; current precision 0.26. The Overview's `toReview` over the small fixture is 56, not 7 + 3 + 12 = 22: needs-reply 45 (7 expected: the scan stores no threads, so every inbound people email counts as last in its thread, and there is no age window), time-sensitive 11 (3: the deadline word list also matches ordinary mail), important-sender 0 (12: nothing in the scan records VIP or reply counts per sender). Needs real detector work (M3).
 - **Packaging CI**: macOS packaging job is flaky.
 
 ## How to resume

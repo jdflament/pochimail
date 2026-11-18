@@ -9,6 +9,7 @@ const MAX_BACKOFF_MS = 4000;
 export const subscribeAppEvents = (
   client: RpcClient,
   registry: OptimisticActionRegistry,
+  onScanFailed: () => void = () => {},
 ): (() => void) => {
   let closed = false;
   let currentUnsubscribe: (() => void) | undefined;
@@ -24,7 +25,8 @@ export const subscribeAppEvents = (
         (event: EventOf<"app.events">) => {
           backoffMs = INITIAL_BACKOFF_MS;
           if (event.type === "ActionApplied") registry.apply(event.actionId);
-          else registry.fail(event.actionId);
+          else if (event.type === "ActionFailed") registry.fail(event.actionId);
+          else if (event.type === "ScanFailed") onScanFailed();
         },
         (error) => {
           console.error("[app.events]", error.code);

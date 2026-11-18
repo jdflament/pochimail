@@ -19,6 +19,10 @@ export const ja = {
     "size",
     "total",
   ]),
+  "scan.failed": entry(
+    "仕分けを最後まで終えられませんでした。何も変更していません。もう一度始めると、止まったところから続けます。",
+    [],
+  ),
   "overview.review": entry("確認する", []),
   "overview.pause": entry("一時停止", []),
   "overview.resume": entry("再開", []),
