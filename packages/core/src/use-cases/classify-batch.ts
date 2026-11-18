@@ -1,0 +1,104 @@
+import type { Clock } from "../clock.ts";
+import { categorySchema } from "../domain/category.ts";
+import { confidenceSchema } from "../domain/common.ts";
+import type { Message } from "../domain/mail.ts";
+import type { Cancelled, NotFound, StorageError } from "../errors.ts";
+import type { DomainEventOf } from "../events/catalog.ts";
+import type { MessageId, WorkspaceId } from "../ids.ts";
+import type { AiError, Classification, Classifier } from "../ports/ai.ts";
+import type { AsyncResult, CancelSignal } from "../ports/common.ts";
+import type { UnitOfWork } from "../ports/unit-of-work.ts";
+import { err, ok } from "../result.ts";
+
+export interface ClassifyBatchDeps {
+  readonly uow: UnitOfWork;
+  readonly classifier: Classifier;
+  readonly clock: Clock;
+}
+
+export interface ClassifyBatchRequest {
+  readonly workspaceId: WorkspaceId;
+  readonly messageIds: readonly MessageId[];
+}
+
+export interface ClassifyBatchReport {
+  readonly classified: number;
+  /** Messages the classifier gave no usable answer for; they keep their category. */
+  readonly unclassified: readonly MessageId[];
+}
+
+export type ClassifyBatchError = AiError | StorageError | NotFound | Cancelled;
+
+/**
+ * Classifies stored messages in one batch and records the category.
+ *
+ * Works on stored headers and metadata only: it never fetches or persists a body (follows
+ * proposed D11). The category is set and `MessageClassified` is emitted in ONE transaction, so a
+ * crash never leaves a category without its event. An unavailable classifier changes nothing.
+ * Re-running with the same answers is a no-op in effect (same category, same event ids).
+ */
+export class ClassifyBatch {
+  constructor(private readonly deps: ClassifyBatchDeps) {}
+
+  async execute(
+    request: ClassifyBatchRequest,
+    signal: CancelSignal,
+  ): AsyncResult<ClassifyBatchReport, ClassifyBatchError> {
+    const { uow, classifier, clock } = this.deps;
+    const messages: Message[] = [];
+    for (const id of request.messageIds) {
+      const found = await uow.reads.messages.get(request.workspaceId, id);
+      if (!found.ok) return found;
+      messages.push(found.value);
+    }
+    if (messages.length === 0) return ok({ classified: 0, unclassified: [] });
+
+    const answered = await classifier.classify(messages, signal);
+    if (!answered.ok) return answered;
+
+    const byId = new Map(messages.map((m) => [m.id, m]));
+    const usable = new Map<MessageId, Classification & { accountId: Message["accountId"] }>();
+    for (const c of answered.value) {
+      const message = byId.get(c.messageId);
+      const category = categorySchema.safeParse(c.category);
+      if (!message || !category.success || !confidenceSchema.safeParse(c.confidence).success) {
+        continue;
+      }
+      usable.set(c.messageId, { ...c, accountId: message.accountId });
+    }
+
+    const at = clock.now().toISOString();
+    const committed = await uow.run(async (tx) => {
+      for (const c of usable.values()) {
+        const set = await tx.repositories.messages.setCategory(
+          request.workspaceId,
+          c.messageId,
+          c.category,
+        );
+        if (!set.ok) return set;
+        const event = {
+          id: `classified:${c.messageId}:${c.category}`,
+          type: "MessageClassified",
+          version: 1,
+          workspaceId: request.workspaceId,
+          occurredAt: at,
+          payload: {
+            accountId: c.accountId,
+            messageId: c.messageId,
+            category: c.category,
+            confidence: c.confidence,
+          },
+        } satisfies DomainEventOf<"MessageClassified">;
+        const appended = await tx.outbox.append({ kind: "event", event });
+        if (!appended.ok) return appended;
+      }
+      return ok(undefined);
+    }, signal);
+    if (!committed.ok) return committed;
+
+    return ok({
+      classified: usable.size,
+      unclassified: messages.map((m) => m.id).filter((id) => !usable.has(id)),
+    });
+  }
+}

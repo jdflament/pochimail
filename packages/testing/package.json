@@ -22,6 +22,7 @@
     "./fake-timer": "./src/fake-timer.ts",
     "./faults": "./src/faults.ts",
     "./fixtures": "./src/fixtures.ts",
+    "./ground-truth-classifier": "./src/ground-truth-classifier.ts",
     "./in-memory-blob-store": "./src/in-memory-blob-store.ts",
     "./in-memory-job-queue": "./src/in-memory-job-queue.ts",
     "./in-memory-notifier": "./src/in-memory-notifier.ts",
@@ -42,7 +43,8 @@
     "./unit-of-work-contract": "./src/unit-of-work-contract.ts",
     "./outbox-contract": "./src/outbox-contract.ts",
     "./job-queue-lease-contract": "./src/job-queue-lease-contract.ts",
-    "./pipeline-contract": "./src/pipeline-contract.ts"
+    "./pipeline-contract": "./src/pipeline-contract.ts",
+    "./sync-contract": "./src/sync-contract.ts"
   },
   "scripts": {
     "typecheck": "tsc",

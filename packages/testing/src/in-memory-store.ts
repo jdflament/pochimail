@@ -64,6 +64,8 @@ export interface InMemoryUnitOfWork {
   committedOutbox(): Promise<readonly OutboxEntry[]>;
   /** The relay's view of the committed outbox: undelivered rows, and marking them delivered. */
   readonly outboxStore: OutboxStore;
+  /** Everything committed, every repository and the outbox, as plain data (for leak checks). */
+  snapshot(): Promise<unknown>;
   /** Force repository and outbox calls to fail with a `StorageError`. */
   readonly faults: Faults<StorageError>;
 }
@@ -298,6 +300,15 @@ export function createInMemoryUnitOfWork(): InMemoryUnitOfWork {
   return {
     uow: { reads: readers(() => committed), run },
     committedOutbox: async () => copy(committed.outbox),
+    snapshot: async () =>
+      copy(
+        Object.fromEntries(
+          Object.entries(committed).map(([name, rows]) => [
+            name,
+            rows instanceof Map ? [...rows.values()] : rows,
+          ]),
+        ),
+      ),
     outboxStore,
     faults,
   };
