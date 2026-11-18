@@ -29,6 +29,7 @@ Official builds use the project's verified Google and Microsoft client IDs. **Fo
 - Work comes from the GitHub Project "Pochimail v1" (converted to issues when started). One issue → one branch (`<type>/<issue-number>-<slug>`) → one PR that closes it.
 - **Conventional Commits**: `feat(core): add suggestion policy`, `fix(mail): handle expired history id`, `docs: …`, `chore: …`.
 - Add tests that guard a real failure, keep CI green (typecheck, lint, test, build, knip, eval), and update docs or ADRs when behavior or architecture changes.
+- **Branch protection applies to admins too**: no direct pushes to `main`. Every change lands through a PR and the merge queue (`gh pr merge --squash --auto`), which runs the full gate on macOS, Windows and Linux; never bypass it with `--admin`.
 - Squash merge only.
 - Never include real email content, addresses or secrets in issues, fixtures or screenshots.
 

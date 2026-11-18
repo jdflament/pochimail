@@ -6,9 +6,9 @@ Source of truth for visual and interaction decisions. Tokens live in `packages/u
 Modern, calm and sober, with an **editorial signature**: screens read like a well-typeset document written by someone, not a dashboard of cards. Typography, hairline rules and open space do the structuring. The mascot is the only warm, playful element.
 
 - Data is shown as **ledgers** (rows with dotted leaders, tabular numbers), not stat tiles.
-- **Clean up = recommendations** (macOS Storage pattern): headline figure, one monochrome storage bar (solid = keep, hatched = can be cleaned), then sentences ordered by impact with reason, size and one "Review" button. No color coding in content.
+- **Clean up = recommendations**: figures are emails archived (and those that could be archived), attachments saved (count and size) and newsletters unsubscribed — archiving does not free mailbox space, so there is no "GB you can free" headline. Sentences are actions ("Save 412 attachments (1.2 GB)", "Unsubscribe from 120 newsletters", "Archive 9,206 promotions"), ordered by impact, each with a one-line reason and one "Review" button. The storage bar is **OPEN for JD** (what it shows, or drop it); do not invent a meaning. No color coding in content.
 - Containers only where content needs one (the summary sheet, list blocks). No cards inside cards.
-- Summaries are a **plain sheet from Pochi over the current screen** (never a separate page), built on the existing Dialog/Sheet primitives: small Pochi icon + "From Pochi · date", title, one sentence, three figures, one next step, Keep it tidy choices. Show only what is new; the Overview holds the details. Bottom sheet on phones.
+- Summaries are a **plain sheet from Pochi over the current screen** (never a separate page), built on the existing Dialog/Sheet primitives: small Pochi icon + "From Pochi · date", title, one sentence, three figures (emails archived, attachments saved, newsletters unsubscribed), one next step, Keep it tidy choices. Show only what is new; the Overview holds the details. Bottom sheet on phones.
 
 ## Typography
 | Role | Font | Size / weight | Use |
@@ -45,7 +45,7 @@ Category colors (reserved for rare charts; screens use monochrome icons, never c
 Radius: 6 (small), 10 (controls), 12 (buttons), 16 (cards/panels), pill. Spacing on a 4px grid (8, 12, 16, 20, 24, 32, 40, 48). Targets: 32px minimum, 36px sidebar items, 44px primary buttons.
 
 ## Components (shadcn/ui in `packages/ui`)
-Button (primary charcoal, secondary outline, ghost), Switch, Checkbox card, Radio card, Pill radio group, Recommendation row (sentence, reason, size, Review), Storage bar (solid/hatched), Ledger row (label, leader, count, size), Signal row (big figure + text + Review), Status strip (2px progress + status line), Speech bubble (mascot), Account switcher, Sidebar item, Empty/error state, sonner toast + action. Follow shadcn conventions (CVA variants, `data-slot`, `asChild`, focus-visible) and composition over boolean props.
+Button (primary charcoal, secondary outline, ghost), Switch, Checkbox card, Radio card, Pill radio group, Recommendation row (action, reason, Review), Storage bar (OPEN for JD — see above), Ledger row (label, leader, count, size), Signal row (big figure + text + Review), Status strip (2px progress + status line), Speech bubble (mascot), Account switcher, Sidebar item, Empty/error state, sonner toast + action. Follow shadcn conventions (CVA variants, `data-slot`, `asChild`, focus-visible) and composition over boolean props.
 
 ## Motion
 150ms press/hover, 220ms panels and toasts, ease-out `cubic-bezier(0.22, 1, 0.36, 1)`. Pressed buttons scale to 0.98. Numbers count up when results arrive (600ms). No looping or pulsing UI animation. Everything respects `prefers-reduced-motion`.
@@ -55,7 +55,7 @@ Button (primary charcoal, secondary outline, ghost), Switch, Checkbox card, Radi
 |---|---|---|
 | Live progress | Progress line glides; each new finding slides up 8px and fades in, replacing the previous one | 600ms width, 220ms text |
 | Numbers arrive | Counts roll up once from 0 when results land, then stay still | 600ms, ease-out cubic |
-| Storage settles | Bar fills once: keep segment, then the hatched cleanable segment; after a cleanup the hatched part shrinks | 700ms, +140ms |
+| Storage settles | **OPEN for JD** (tied to the storage bar: what it shows, or drop it) — do not implement an invented meaning | 700ms, +140ms |
 | Clean up, then undo | Row folds away (height + fade) instead of vanishing; dark undo toast rises from below for 5s; Undo unfolds the row | 260ms fold, 220ms toast |
 | Pochi at rest | Slow breathing (scale 1 → 1.012 wide / 1.025 tall, from the base) and blinks | 4.2s breathing loop, 5.3s blink loop |
 | Pochi finds something | Squish, bounce up 14px, settle | 620ms |
