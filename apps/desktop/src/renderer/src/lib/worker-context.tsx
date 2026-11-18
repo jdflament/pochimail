@@ -16,8 +16,6 @@ export const useWorkerClient = (): RpcClient => {
   return client;
 };
 
-export const useWorkerClientOptional = (): RpcClient | null => useContext(WorkerClientContext);
-
 export function WorkerClientProvider({
   children,
   client: provided,
