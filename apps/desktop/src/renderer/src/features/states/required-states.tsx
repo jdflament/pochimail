@@ -96,7 +96,7 @@ function EmptyCategoryState({ onAction }: Handler) {
   );
 }
 
-/** No mockup (JD 2026-11-18): copy and pose derived from the empty category state. */
+/** No mockup (decided 2026-11-18): copy and pose derived from the empty category state. */
 function NothingToDoState({ onAction }: Handler) {
   return (
     <EmptyState

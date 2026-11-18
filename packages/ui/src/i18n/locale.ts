@@ -13,7 +13,7 @@ export const localeFromLanguages = (languages: readonly string[] | undefined): U
   return "en";
 };
 
-/** Generic fallback word, never a guessed machine: the host is not always a computer (JD, 2026-11-19). */
+/** Generic fallback word, never a guessed machine: the host is not always a computer (decided 2026-11-19). */
 const DEVICE_LABEL: Readonly<Record<UserLocale, string>> = {
   en: "device",
   fr: "appareil",

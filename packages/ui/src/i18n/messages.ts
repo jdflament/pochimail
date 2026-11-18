@@ -1,5 +1,5 @@
 /**
- * English is the default and the fallback. French and Japanese ship in v1 (P13, JD 2026-11-19);
+ * English is the default and the fallback. French and Japanese ship in v1 (P13, decided 2026-11-19);
  * every user-facing string lives in a catalog so more languages need no code changes.
  */
 const USER_LOCALES = ["en", "fr", "ja"] as const;
