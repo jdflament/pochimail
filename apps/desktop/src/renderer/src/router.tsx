@@ -1,27 +1,123 @@
 import {
   createMemoryHistory,
-  createRootRoute,
+  createRootRouteWithContext,
   createRoute,
   createRouter,
   Outlet,
+  redirect,
 } from "@tanstack/react-router";
+import type { RpcClient } from "../../shared/ipc/client.ts";
+import { ActivityPage } from "./features/activity/activity-page.tsx";
+import { CategoryPage } from "./features/category/category-page.tsx";
+import { ConnectPage } from "./features/connect/connect-page.tsx";
+import { DevGalleryPage } from "./features/dev-gallery/dev-gallery-page.tsx";
+import { DocumentsPage } from "./features/documents/documents-page.tsx";
 import { OverviewPage } from "./features/overview/overview-page.tsx";
+import { SettingsPage } from "./features/settings/settings-page.tsx";
+import { SetupPage } from "./features/setup/setup-page.tsx";
+import { WelcomePage } from "./features/welcome/welcome-page.tsx";
 
-const rootRoute = createRootRoute({ component: Outlet });
-const overviewRoute = createRoute({
+export type RouterContext = {
+  getWorkerClient(): Promise<RpcClient>;
+};
+
+const rootRoute = createRootRouteWithContext<RouterContext>()({
+  component: Outlet,
+});
+
+const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
+  beforeLoad: async ({ context }) => {
+    const client = await context.getWorkerClient();
+    const state = await client.call("app.state");
+    throw redirect({ to: state.hasConnectedAccount ? "/overview" : "/welcome" });
+  },
+  component: () => null,
+});
+
+const welcomeRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/welcome",
+  component: WelcomePage,
+});
+
+const connectRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/connect",
+  component: ConnectPage,
+});
+
+const setupRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/setup",
+  component: SetupPage,
+});
+
+const overviewRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/overview",
   component: OverviewPage,
 });
 
-// File-based loading (file://) has no server to resolve paths, so the router uses in-memory history.
-export const router = createRouter({
-  routeTree: rootRoute.addChildren([overviewRoute]),
-  history: createMemoryHistory({ initialEntries: ["/"] }),
+const categoryRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/category/$categoryId",
+  component: CategoryPage,
 });
+
+const documentsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/documents",
+  component: DocumentsPage,
+});
+
+const activityRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/activity",
+  component: ActivityPage,
+});
+
+const settingsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/settings",
+  component: SettingsPage,
+});
+
+const devGalleryRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/dev/gallery",
+  component: DevGalleryPage,
+});
+
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  welcomeRoute,
+  connectRoute,
+  setupRoute,
+  overviewRoute,
+  categoryRoute,
+  documentsRoute,
+  activityRoute,
+  settingsRoute,
+  devGalleryRoute,
+]);
+
+export type AppRouter = ReturnType<typeof createAppRouter>;
+
+/** Creates the renderer router. File-based loading (file://) has no server, so it uses in-memory history. */
+export const createAppRouter = (
+  context: RouterContext,
+  options: { initialEntries?: string[] } = {},
+) =>
+  createRouter({
+    routeTree,
+    context,
+    history: createMemoryHistory({ initialEntries: options.initialEntries ?? ["/"] }),
+  });
 
 declare module "@tanstack/react-router" {
   interface Register {
-    router: typeof router;
+    router: AppRouter;
   }
 }

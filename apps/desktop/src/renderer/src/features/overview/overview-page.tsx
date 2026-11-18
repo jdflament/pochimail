@@ -3,16 +3,20 @@ import { getLocale, t } from "@pochimail/ui/i18n/format.ts";
 import { deviceLabel } from "@pochimail/ui/i18n/locale.ts";
 import { useEffect, useState } from "react";
 import { connectWorker } from "../../lib/worker.ts";
+import { useWorkerClientOptional } from "../../lib/worker-context.tsx";
 
 type WorkerState = "connecting" | "connected" | "unavailable";
 type State = { readonly worker: WorkerState; readonly device: DeviceName };
 
 export function OverviewPage() {
+  const clientFromContext = useWorkerClientOptional();
   const [state, setState] = useState<State>({ worker: "connecting", device: "device" });
 
   useEffect(() => {
     let cancelled = false;
-    void connectWorker()
+    const resolveClient =
+      clientFromContext !== null ? Promise.resolve(clientFromContext) : connectWorker();
+    void resolveClient
       .then(async (client) => {
         const [reply, device] = await Promise.all([
           client.call("app.state"),
@@ -27,7 +31,7 @@ export function OverviewPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [clientFromContext]);
 
   const status =
     state.worker === "connecting"

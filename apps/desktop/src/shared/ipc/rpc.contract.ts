@@ -241,13 +241,18 @@ export const describeRpcContract = (name: string, connect: () => Link): void => 
     // Guards: a malformed envelope without an id crashing the worker or getting an answer; it must keep serving.
     it("drops id-less malformed messages and keeps serving", async () => {
       const { link, client } = setup({
-        procedures: { "app.state": () => ({ status: "ready" as const }) },
+        procedures: {
+          "app.state": () => ({ status: "ready" as const, hasConnectedAccount: false }),
+        },
         subscriptions: {},
       });
       link.client.post("garbage");
       link.client.post({ kind: "call" });
       link.client.post(null);
-      await expect(client.call("app.state")).resolves.toEqual({ status: "ready" });
+      await expect(client.call("app.state")).resolves.toEqual({
+        status: "ready",
+        hasConnectedAccount: false,
+      });
       link.close();
     });
 

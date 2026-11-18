@@ -27,4 +27,37 @@ export const fr = {
   "overview.catch.title": entry("Ce qui compte vraiment", []),
   "overview.clean.title": entry("Faire le tri", []),
   "summary.from": entry("De Pochi · {date, date, long} · sur votre {device}", ["date", "device"]),
+
+  "shell.loading": entry("Démarrage…", []),
+  "shell.error.title": entry("Un problème est survenu", []),
+  "shell.error.body": entry(
+    "Pochimail a rencontré un problème. Fermez et rouvrez l’application pour réessayer.",
+    [],
+  ),
+
+  "welcome.title": entry("Bienvenue", []),
+  "welcome.headline": entry("Faites le tri dans vos emails. Gardez l’essentiel.", []),
+
+  "connect.title": entry("Connexion", []),
+  "connect.description": entry("Connectez un compte email pour commencer.", []),
+
+  "setup.title": entry("Configuration", []),
+  "setup.description": entry("Choisissez comment Pochi peut vous aider.", []),
+
+  "documents.title": entry("Documents", []),
+  "documents.description": entry("Les documents enregistrés apparaîtront ici.", []),
+
+  "activity.title": entry("Activité", []),
+  "activity.description": entry(
+    "Les actions récentes et l’historique d’annulation apparaîtront ici.",
+    [],
+  ),
+
+  "settings.title": entry("Réglages", []),
+  "settings.description": entry("Les préférences et les réglages du compte apparaîtront ici.", []),
+
+  "category.placeholder": entry("Les emails de cette catégorie apparaîtront ici.", []),
+
+  "devGallery.title": entry("Galerie de développement", []),
+  "devGallery.description": entry("Aperçus des états et des animations pour le développement.", []),
 } satisfies Catalog;

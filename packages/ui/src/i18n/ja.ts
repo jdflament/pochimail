@@ -26,4 +26,34 @@ export const ja = {
   "overview.catch.title": entry("大切なこと", []),
   "overview.clean.title": entry("整理", []),
   "summary.from": entry("Pochiより · {date, date, long} · この{device}で", ["date", "device"]),
+
+  "shell.loading": entry("起動しています…", []),
+  "shell.error.title": entry("問題が発生しました", []),
+  "shell.error.body": entry(
+    "Pochimailで問題が発生しました。アプリを閉じてもう一度開いてください。",
+    [],
+  ),
+
+  "welcome.title": entry("ようこそ", []),
+  "welcome.headline": entry("メールを整理して、大切なものを残しましょう。", []),
+
+  "connect.title": entry("接続", []),
+  "connect.description": entry("始めるにはメールアカウントを接続してください。", []),
+
+  "setup.title": entry("設定", []),
+  "setup.description": entry("Pochiにどのように手伝ってほしいか選んでください。", []),
+
+  "documents.title": entry("ドキュメント", []),
+  "documents.description": entry("保存したドキュメントがここに表示されます。", []),
+
+  "activity.title": entry("アクティビティ", []),
+  "activity.description": entry("最近の操作と取り消し履歴がここに表示されます。", []),
+
+  "settings.title": entry("設定", []),
+  "settings.description": entry("環境設定とアカウント設定がここに表示されます。", []),
+
+  "category.placeholder": entry("このカテゴリのメールがここに表示されます。", []),
+
+  "devGallery.title": entry("開発ギャラリー", []),
+  "devGallery.description": entry("開発用の状態とモーションのプレビューです。", []),
 } satisfies Catalog;

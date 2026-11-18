@@ -32,7 +32,9 @@ describe("worker connection across page loads", () => {
       workerPorts.push(port);
       port.start();
       return serveRpc(fromDomPort(port), {
-        procedures: { "app.state": () => ({ status: "ready" as const }) },
+        procedures: {
+          "app.state": () => ({ status: "ready" as const, hasConnectedAccount: false }),
+        },
         subscriptions: {},
       });
     });
@@ -50,6 +52,7 @@ describe("worker connection across page loads", () => {
     secondPage.start();
     await expect(createRpcClient(fromDomPort(secondPage)).call("app.state")).resolves.toEqual({
       status: "ready",
+      hasConnectedAccount: false,
     });
 
     await staleOutcome;

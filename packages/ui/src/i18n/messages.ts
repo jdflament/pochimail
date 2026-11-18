@@ -44,6 +44,33 @@ export const messages = {
   "overview.catch.title": entry("Catch what matters", []),
   "overview.clean.title": entry("Clean up", []),
   "summary.from": entry("From Pochi · {date, date, long} · on this {device}", ["date", "device"]),
+
+  "shell.loading": entry("Starting…", []),
+  "shell.error.title": entry("Something went wrong", []),
+  "shell.error.body": entry("Pochimail hit a problem. Close and reopen the app to try again.", []),
+
+  "welcome.title": entry("Welcome", []),
+  "welcome.headline": entry("Clean up your email. Keep what matters.", []),
+
+  "connect.title": entry("Connect", []),
+  "connect.description": entry("Connect an email account to get started.", []),
+
+  "setup.title": entry("Set up", []),
+  "setup.description": entry("Choose how Pochi can help.", []),
+
+  "documents.title": entry("Documents", []),
+  "documents.description": entry("Saved documents will appear here.", []),
+
+  "activity.title": entry("Activity", []),
+  "activity.description": entry("Recent actions and undo history will appear here.", []),
+
+  "settings.title": entry("Settings", []),
+  "settings.description": entry("Preferences and account settings will appear here.", []),
+
+  "category.placeholder": entry("Emails in this category will appear here.", []),
+
+  "devGallery.title": entry("Dev gallery", []),
+  "devGallery.description": entry("States and motion previews for development.", []),
 } as const;
 
 export type MessageKey = keyof typeof messages;
