@@ -107,7 +107,7 @@ Pochimail runs **only local models**. No cloud providers, no API keys, no "bring
 
 **Making it fast**:
 - Decide **per sender and per template**, not per message: newsletters and notifications reuse templates, so cluster by normalized subject/body template hash and classify each cluster once.
-- Feed models the minimum: headers, sender stats and a trimmed snippet first; full bodies only when a signal needs them (deadlines, documents).
+- Feed models the minimum: headers, sender stats and a trimmed snippet first; full bodies only when a signal needs them (deadlines, documents), fetched on demand and processed in memory only.
 - Cache every result by content hash; never re-run a model on unchanged input.
 - Batch inference, bounded concurrency, and **power awareness**: heavy jobs run when plugged in or idle (Electron `powerMonitor`), throttle on battery and high thermal pressure, pause on sleep.
 - Latency budgets in CI (e.g. emails per minute per hardware tier) next to the accuracy metrics.
@@ -179,7 +179,7 @@ The app must feel instant on mailboxes with 100k+ messages. Use these patterns w
 - **Pipeline as staged async workers**: sync → parse → classify → detect signals → build suggestions. Each stage consumes events from the previous one, processes in **batches**, with **bounded concurrency**, **backpressure** and **AbortController** cancellation (pause/resume from the UI).
 - **CPU-heavy work** (parsing, hashing, model inference) runs off the main worker thread (worker threads / a dedicated utility process for the model).
 - **Incremental sync with real-time wake-ups, no server**:
-  - Data always comes from the official delta APIs: Gmail `history.list` with stored history IDs, Microsoft Graph delta queries with delta tokens (IMAP `CONDSTORE/QRESYNC` for IMAP accounts, with a UID-range fallback when the server lacks them). Headers first, bodies and attachments lazily on demand.
+  - Data always comes from the official delta APIs: Gmail `history.list` with stored history IDs, Microsoft Graph delta queries with delta tokens (IMAP `CONDSTORE/QRESYNC` for IMAP accounts, with a UID-range fallback when the server lacks them). Headers first; bodies and attachments are fetched on demand, processed in memory and never persisted (D11).
   - **Wake-up signal: IMAP `IDLE`** over OAuth (XOAUTH2), a standard persistent connection from the device to the provider. It only tells the app "something changed"; the app then runs a delta sync. Re-issue IDLE before the server timeout (~29 min), reconnect with backoff, and pause on sleep/offline. Check whether the IMAP OAuth scope is acceptable for Google verification and whether M365 tenants have IMAP disabled; fall back gracefully.
   - **Fallback: adaptive polling** of the delta APIs (frequent while the app is active, slower in the background), used when IDLE isn't available.
   - **Optional later (v1.x): a privacy-preserving relay** for Gmail Pub/Sub and Graph change notifications. Open source and self-hostable; it receives only "account changed" pings (no mail content, hashed account IDs) and forwards them to the app over an authenticated WebSocket. Off by default.
@@ -187,7 +187,7 @@ The app must feel instant on mailboxes with 100k+ messages. Use these patterns w
 - **Provider efficiency**: batch endpoints (Gmail batch modify, Graph `$batch`), rate-limit handling with exponential backoff + jitter, per-account quotas.
 - **Idempotent, reversible actions** (Command pattern): each action has an idempotency key and an inverse stored in the ActionLog, so retries are safe and undo works across restarts.
 - **Live UI updates**: the worker streams progress and domain events to the renderer over typed IPC subscriptions (tRPC subscriptions over Electron IPC or MessagePorts). The renderer updates TanStack Query caches from events instead of polling. Optimistic updates for user actions, reconciled on `ActionApplied`/`ActionFailed`.
-- **Storage performance**: SQLite in WAL mode, proper indexes, FTS5 for search, aggregated sender stats maintained incrementally, content-addressed blob store for attachments.
+- **Storage performance**: SQLite in WAL mode, proper indexes, FTS5 over metadata and derived data (never bodies), aggregated sender stats maintained incrementally, content-addressed blob store only for documents the user saved.
 
 ### 5.4 Electron process model
 - `main`: windows, lifecycle, tray/menu-bar icon, login item (for Keep it tidy), native notifications, OS integration.
@@ -233,7 +233,7 @@ The app must feel instant on mailboxes with 100k+ messages. Use these patterns w
 Pochimail handles people's entire mailbox; treat security as a feature with its own milestone tasks and a written threat model (`docs/security/threat-model.md`).
 - **Data at rest is encrypted**: the SQLite database uses SQLCipher (or an equivalent encrypted SQLite build); the key lives in the OS keychain via Electron `safeStorage`. OAuth refresh tokens are stored only in the keychain, never in files or logs.
 - **Least-privilege scopes**: request the narrowest Gmail/Graph scopes each capability needs (e.g. `gmail.modify`, never delete scopes). If IMAP IDLE requires a broader scope, make it an opt-in "real-time updates" setting, otherwise rely on delta polling.
-- **Untrusted email content**: never execute or render remote content; previews are text or sanitized HTML in a sandboxed iframe with a strict CSP and remote images blocked. Never follow links in email bodies (unsubscribe only via RFC 8058 one-click or mailto). Attachments are hashed and stored, never opened automatically.
+- **Untrusted email content**: never execute or render remote content; previews are text or sanitized HTML in a sandboxed iframe with a strict CSP and remote images blocked. Never follow links in email bodies (unsubscribe only via RFC 8058 one-click or mailto). Attachments are hashed and stored only when the user saves them (D11), never opened automatically.
 - **Electron hardening**: contextIsolation, sandbox, no nodeIntegration, narrow preload API, strict CSP, navigation and new-window blocking, `webSecurity` on, Electron Fuses set (disable RunAsNode, enable cookie encryption, ASAR integrity), keep Electron on a supported version.
 - **No network except**: Google/Microsoft APIs, the IMAP/SMTP hosts of accounts the user connected, GitHub Releases (updates) and the model manifest. *(Pending plan P1: one exception, the RFC 8058 one-click unsubscribe POST to the exact `List-Unsubscribe` URL, through one dedicated logged path, no cookies, no redirects.)* Enforce with a session-level request filter that blocks everything else, and document every outbound host.
 - **Supply chain**: pinned lockfile, minimal dependencies, Renovate with review, `osv-scanner`/`npm audit` in CI, npm provenance for published packages, SBOM attached to each release, reproducible builds where possible.
@@ -354,6 +354,7 @@ First launch → Welcome → Connect → Set up → Overview while sorting (rule
 **Offline behavior (never disruptive)**
 Everything Pochimail knows is stored locally, so offline is a normal state, not an error:
 - Overview, categories, Documents, Activity and the summary stay fully usable with the last synced data, marked "Updated [time]".
+- Full message text is not stored (D11): reading a mail in full needs the mail app (and a connection).
 - Sync and model downloads pause and resume on their own when the connection returns.
 - Actions the user approves while offline (archive, labels, unsubscribe) are queued, shown as "Will apply when you're back online", applied automatically on reconnect, and undoable as usual.
 - The only signal is the status line ("Offline · I'll continue when you're back"); no modal, no repeated notification.

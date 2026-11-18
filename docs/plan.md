@@ -20,6 +20,7 @@ Status: **plan decisions P1 to P15 and ADRs 0001 to 0008 accepted by the maintai
 | D8 | **Unsubscribe is the one irreversible action**: its ActionLog entry has `inverse: null`, `irreversible: true` and a reason; every other applied action must record its inverse (M1-02, accepted deviation from "undo everything") | 2026-11-17 | brief §2, §5.3, M1-02 |
 | D9 | **Autopilot confidence threshold defaults to 0.9** (`AUTOPILOT_CONFIDENCE_THRESHOLD`), tuned later against the eval set; Autopilot may auto-apply only archive and unsubscribe (M1-05, default pending calibration) | 2026-11-17 | brief §2, M1-05 |
 | D10 | Autopilot may unsubscribe (brief §2) although unsubscribe is irreversible (D8); it is logged and reported after, decided by the maintainer 2026-11-17 | 2026-11-17 | brief §2, M1-05 |
+| D11 | **Store metadata, not mail**: persist headers, metadata and derived data only; full bodies and attachments are never persisted (a saved document is the one exception); FTS5 indexes metadata + derived data only. JD approved ([ADR 0009](adr/0009-store-metadata-not-mail.md)) | 2026-11-18 | brief §5.3, §5.10, ADR 0009 |
 | D6 | **Tracker = GitHub Project "Pochimail v1"** with draft items; a draft becomes an issue only when work starts | 2026-11-17 | brief §10 |
 
 ### Decided by the maintainer (2026-11-17, M0-15)

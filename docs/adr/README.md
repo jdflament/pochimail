@@ -12,5 +12,6 @@ One file per decision, numbered. Status: Proposed → Accepted (all of 0001 to 0
 | 0006 | Local AI runtimes and model selection | Accepted (2026-11-17) |
 | 0007 | OAuth, credentials and scopes | Accepted (2026-11-17) |
 | 0008 | Notifications and privacy | Accepted (2026-11-17) |
+| 0009 | Store metadata, not mail | Accepted (2026-11-18) |
 
 Template: Context · Decision · Consequences · Alternatives considered · To verify (items a research issue must confirm before acceptance).
