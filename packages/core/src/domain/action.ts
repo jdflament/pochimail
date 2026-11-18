@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ERROR_CODES, InvalidStateError } from "../errors.ts";
+import { ERROR_CODES, InvalidStateError, POLICY_DENIAL_REASONS } from "../errors.ts";
 import { err, ok, type Result } from "../result.ts";
 import {
   accountIdSchema,
@@ -55,6 +55,23 @@ export function createSuggestion(input: unknown): Result<Suggestion, InvalidStat
     : err(new InvalidStateError("Suggestion needs reasons and a confidence between 0 and 1"));
 }
 
+/**
+ * The command that reverses `command`, or `null` when nothing can (unsubscribe). Pure fallback:
+ * providers report the inverse of what they actually did (`AppliedCommand`), which wins.
+ */
+export function inverseOf(command: Command): Command | null {
+  const swap = {
+    archive: "unarchive",
+    unarchive: "archive",
+    "apply-label": "remove-label",
+    "remove-label": "apply-label",
+    "mark-handled": "unmark-handled",
+    "unmark-handled": "mark-handled",
+  } as const;
+  if (command.kind === "unsubscribe") return null;
+  return { ...command, kind: swap[command.kind] };
+}
+
 /** The intent: what to do. What was actually done, and how to undo it, lives on the ActionLog. */
 export const actionSchema = z.object({
   schemaVersion,
@@ -71,7 +88,7 @@ export type Action = z.infer<typeof actionSchema>;
  * Brief §5.3: the log records what was actually done plus its inverse, so undo never guesses.
  * The one explicit exception is unsubscribe: it cannot be reversed, so the entry says so
  * (`inverse: null`, `irreversible: true`, with a reason). Any other applied entry needs an inverse.
- * A failed entry changed nothing, so it has nothing to undo.
+ * A failed or refused entry changed nothing, so it has nothing to undo.
  */
 export const actionLogSchema = z
   .object({
@@ -79,18 +96,24 @@ export const actionLogSchema = z
     id: actionLogIdSchema,
     workspaceId: workspaceIdSchema,
     actionId: actionIdSchema,
-    outcome: z.enum(["applied", "failed", "undone"]),
+    /** Entries sharing the key are attempts at one intent; any `applied` one makes a replay a no-op. */
+    idempotencyKey: z.string().min(1),
+    /** Groups the actions of one batch so the whole batch can be undone. */
+    batchId: z.string().min(1).optional(),
+    outcome: z.enum(["applied", "failed", "undone", "refused"]),
     command: commandSchema,
     inverse: commandSchema.nullable(),
     irreversible: z.boolean(),
     irreversibleReason: z.string().min(1).optional(),
     errorCode: z.enum(ERROR_CODES).optional(),
+    /** Set on `refused` entries: which policy rule stopped the action. */
+    denialReason: z.enum(POLICY_DENIAL_REASONS).optional(),
     at: timestampSchema,
   })
   .superRefine((log, ctx) => {
     const fail = (message: string, path: string) =>
       ctx.addIssue({ code: "custom", message, path: [path] });
-    const noUndoNeeded = log.outcome === "failed";
+    const noUndoNeeded = log.outcome === "failed" || log.outcome === "refused";
     if (log.irreversible) {
       if (log.command.kind !== "unsubscribe")
         fail("only unsubscribe may be irreversible", "irreversible");
