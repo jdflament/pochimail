@@ -5,7 +5,10 @@
   "license": "AGPL-3.0-only",
   "type": "module",
   "exports": {
-    "./package-info": "./src/package-info.ts"
+    "./package-info": "./src/package-info.ts",
+    "./shared/i18n/screen-copy": "./src/shared/i18n/screen-copy.ts",
+    "./shared/ipc/device-name": "./src/shared/ipc/device-name.ts",
+    "./shared/platform": "./src/shared/platform.ts"
   },
   "scripts": {
     "postinstall": "install-electron",

@@ -1,7 +1,11 @@
+import { createDeviceNameClient } from "../../../shared/ipc/device-name.ts";
 import { createEchoClient, type Transport } from "../../../shared/ipc/echo.ts";
 
-/** Asks the preload for the worker MessagePort and wraps it in the typed echo client. */
-export const connectWorker = (): Promise<ReturnType<typeof createEchoClient>> =>
+export type WorkerClient = ReturnType<typeof createEchoClient> &
+  ReturnType<typeof createDeviceNameClient>;
+
+/** Asks the preload for the worker MessagePort and wraps it in the typed RPC clients. */
+export const connectWorker = (): Promise<WorkerClient> =>
   new Promise((resolve) => {
     const onMessage = (event: MessageEvent) => {
       if (event.source !== window || event.data !== "pochimail:worker-port") return;
@@ -14,7 +18,7 @@ export const connectWorker = (): Promise<ReturnType<typeof createEchoClient>> =>
           port.addEventListener("message", (portEvent) => handler(portEvent.data)),
       };
       port.start();
-      resolve(createEchoClient(transport));
+      resolve(Object.assign(createEchoClient(transport), createDeviceNameClient(transport)));
     };
     window.addEventListener("message", onMessage);
     window.pochimail.requestWorkerPort();
