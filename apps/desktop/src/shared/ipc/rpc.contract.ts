@@ -136,7 +136,7 @@ export const describeRpcContract = (name: string, connect: () => Link): void => 
         procedures: { "overview.get": (() => ({ scanned: -1, toReview: 0 })) as never },
         subscriptions: {},
       });
-      expect((await rejection(client.call("overview.get")))?.code).toBe("BAD_OUTPUT");
+      expect((await rejection(client.call("overview.get", {})))?.code).toBe("BAD_OUTPUT");
       link.close();
 
       const rogue = connect();
@@ -159,7 +159,7 @@ export const describeRpcContract = (name: string, connect: () => Link): void => 
         },
         subscriptions: {},
       });
-      const error = await rejection(client.call("overview.get"));
+      const error = await rejection(client.call("overview.get", {}));
       expect(error?.code).toBe("HANDLER_FAILED");
       expect(error?.message).not.toContain("secret");
       link.close();

@@ -109,6 +109,10 @@ describe("worker app over the real IPC layer", () => {
       expect(progress.at(-1)).toMatchObject({ phase: "classifying", processed: 100 }),
     );
     await client.call("scan.pause", { jobId });
+    // The worker, not the screen, knows the scan is paused (a reloaded screen asks this).
+    expect(await client.call("scan.status", { accountIds: [FIRST_ACCOUNT] })).toMatchObject([
+      { jobId, status: "paused" },
+    ]);
     release();
     await app.idle();
     expect(appEvents.map((e) => e.type)).not.toContain("ScanCompleted");
@@ -119,7 +123,8 @@ describe("worker app over the real IPC layer", () => {
     expect(appEvents.filter((e) => e.type === "ScanCompleted")).toEqual([
       { type: "ScanCompleted", accountId: FIRST_ACCOUNT, processed: accountSize(FIRST_ACCOUNT) },
     ]);
-    expect((await client.call("overview.get")).scanned).toBe(accountSize(FIRST_ACCOUNT));
+    expect((await client.call("overview.get", {})).scanned).toBe(accountSize(FIRST_ACCOUNT));
+    expect(await client.call("scan.status", { accountIds: [FIRST_ACCOUNT] })).toEqual([]);
     close();
   });
 
@@ -128,11 +133,34 @@ describe("worker app over the real IPC layer", () => {
     for (const account of mailbox.accounts)
       await client.call("scan.start", { accountId: account.id });
     await app.idle();
-    const overview = await client.call("overview.get");
+    const overview = await client.call("overview.get", {});
     // The small fixture is the brief §6 mock dataset at about 1 %; `full` is exactly MOCK_DATASET.totalMessages.
     expect(overview.scanned).toBe(mailbox.labels.totals.messages);
     expect(mailbox.labels.totals.messages).toBe(MAILBOX_SCALES.small);
     expect(await client.call("accounts.list")).toHaveLength(2);
+    close();
+  });
+
+  it("the overview of one account counts only that account and the structure adds up (guards an Overview that ignores the account switcher)", async () => {
+    const { client, app, close } = await connect();
+    for (const account of mailbox.accounts)
+      await client.call("scan.start", { accountId: account.id });
+    await app.idle();
+    const all = await client.call("overview.get", {});
+    const [first, second] = await Promise.all(
+      mailbox.accounts.map((a) => client.call("overview.get", { accountId: a.id })),
+    );
+    expect(first?.scanned).toBe(accountSize(FIRST_ACCOUNT));
+    expect((first?.scanned ?? 0) + (second?.scanned ?? 0)).toBe(all.scanned);
+    expect(all.toReview).toBe(all.waiting + all.deadlines + all.important);
+    // Numbers come from the real detectors: assert the shape, never the brief's 22 (known M3 gap).
+    const counts = await client.call("mailbox.categories", {
+      accountIds: mailbox.accounts.map((a) => a.id),
+    });
+    for (const { category, count } of all.cleanable) expect(count).toBe(counts[category]);
+    expect(all.cleanable.map((c) => c.count)).toEqual(
+      [...all.cleanable.map((c) => c.count)].sort((a, b) => b - a),
+    );
     close();
   });
 
@@ -166,7 +194,7 @@ describe("worker app over the real IPC layer", () => {
     ]);
     await client.call("scan.start", { accountId: ACCOUNT_1 });
     await app.idle();
-    expect((await client.call("overview.get")).scanned).toBe(3);
+    expect((await client.call("overview.get", {})).scanned).toBe(3);
     close();
   });
 

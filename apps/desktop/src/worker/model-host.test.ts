@@ -124,7 +124,7 @@ describe("model host process", () => {
     await vi.waitFor(() => expect(events).toContain("ScanCompleted"));
     await app.idle();
     expect(wired.hosts).toHaveLength(2);
-    expect((await rpc.call("overview.get")).scanned).toBe(FIRST_ACCOUNT_SIZE);
+    expect((await rpc.call("overview.get", {})).scanned).toBe(FIRST_ACCOUNT_SIZE);
     wired.supervisor.stop();
     port1.close();
     port2.close();

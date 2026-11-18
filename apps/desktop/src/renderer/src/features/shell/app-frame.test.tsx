@@ -50,7 +50,16 @@ const setup = (initialPath = "/overview") => {
             sum[key as keyof Counts] += n;
         return sum;
       },
-      "overview.get": () => ({ scanned: 0, toReview: 0 }),
+      "overview.get": () => ({
+        scanned: 0,
+        toReview: 0,
+        waiting: 0,
+        deadlines: 0,
+        important: 0,
+        oldestWaitingDays: 0,
+        cleanable: [],
+      }),
+      "scan.status": () => [],
       "digest.get": () => ({ ready: false, itemCount: 0 }),
       "settings.get": () => ({
         autonomy: "suggest" as const,
