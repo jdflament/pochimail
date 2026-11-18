@@ -10,6 +10,7 @@ const meta = {
     sentence: "Unsubscribe from 120 newsletters",
     reason: "You haven’t opened any of them in 6 months. 10,410 emails.",
     size: "1.2 GB",
+    reviewLabel: "Review",
   },
   render: (args) => (
     <ul className="m-0 border-y border-border p-0">

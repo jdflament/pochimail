@@ -10,7 +10,7 @@ type SignalRowProps = Omit<React.ComponentProps<"li">, "children"> & {
   title: React.ReactNode;
   detail?: React.ReactNode;
   onReview?: () => void;
-  reviewLabel?: string;
+  reviewLabel: string;
 };
 
 function SignalRow({
@@ -20,7 +20,7 @@ function SignalRow({
   title,
   detail,
   onReview,
-  reviewLabel = "Review",
+  reviewLabel,
   ...props
 }: SignalRowProps) {
   const Comp = asChild ? Slot.Root : "li";

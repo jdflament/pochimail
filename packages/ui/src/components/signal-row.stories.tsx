@@ -6,7 +6,12 @@ const meta = {
   title: "Components/SignalRow",
   component: SignalRow,
   decorators: [lightDecorator],
-  args: { figure: 7, title: "people are waiting on you", detail: "The oldest has waited 9 days" },
+  args: {
+    figure: 7,
+    title: "people are waiting on you",
+    detail: "The oldest has waited 9 days",
+    reviewLabel: "Review",
+  },
   render: (args) => (
     <ul className="m-0 border-y border-border p-0">
       <SignalRow {...args} />

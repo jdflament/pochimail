@@ -23,6 +23,8 @@ export const entry = <const Params extends readonly string[]>(text: string, para
  * Voice: "email"/"emails", "Pochi"/"I", functional titles, `{device}` for the host.
  */
 export const messages = {
+  "action.close": entry("Close", []),
+  "action.undo": entry("Undo", []),
   "overview.title": entry("Overview", []),
   "overview.privacy": entry("Everything stays on this device. Nothing is sent anywhere.", []),
   "overview.promise.device": entry("Your email never leaves this {device}.", ["device"]),
@@ -71,6 +73,10 @@ export const messages = {
 
   "devGallery.title": entry("Dev gallery", []),
   "devGallery.description": entry("States and motion previews for development.", []),
+  "storageBar.description": entry("{summary}: {items}", ["summary", "items"]),
+  "storageBar.descriptionItem": entry("{size} {label}", ["size", "label"]),
+  "storageBar.itemSeparator": entry(", ", []),
+  "storageBar.legendItem": entry("{label} · {size}", ["label", "size"]),
 } as const;
 
 export type MessageKey = keyof typeof messages;

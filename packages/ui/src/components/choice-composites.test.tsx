@@ -4,14 +4,12 @@ import { MascotProvider } from "@pochimail/ui/components/mascot";
 import { PillRadioGroup, PillRadioGroupItem } from "@pochimail/ui/components/pill-radio-group";
 import { RadioCard } from "@pochimail/ui/components/radio-card";
 import { RadioGroup } from "@pochimail/ui/components/radio-group";
+import { Toaster } from "@pochimail/ui/components/sonner";
 import { SpeechBubble } from "@pochimail/ui/components/speech-bubble";
-import {
-  showUndoToast,
-  UNDO_TOAST_DURATION_MS,
-  UndoToaster,
-} from "@pochimail/ui/components/undo-toast";
+import { useRunOnce } from "@pochimail/ui/hooks/use-run-once";
 import { act, configure, getConfig, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { toast } from "sonner";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("checkbox card", () => {
@@ -175,9 +173,20 @@ describe("undo toast", () => {
     vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime, delay: null });
     const onUndo = vi.fn();
-    render(<UndoToaster />);
+    let show = (_message: string, _onUndo: () => void) => {};
+    function Harness() {
+      const once = useRunOnce();
+      show = (message, undo) => {
+        toast(message, {
+          duration: 5000,
+          action: { label: "Undo", onClick: once(undo) },
+        });
+      };
+      return <Toaster theme="dark" />;
+    }
+    render(<Harness />);
     act(() => {
-      showUndoToast({ message: "24 emails archived", onUndo });
+      show("24 emails archived", onUndo);
     });
     await flush();
     expect(screen.getByText("24 emails archived")).toBeTruthy();
@@ -188,12 +197,12 @@ describe("undo toast", () => {
     // Sonner pauses its timers while the pointer is over the toasts.
     await user.unhover(screen.getByRole("button", { name: "Undo" }));
     act(() => {
-      showUndoToast({ message: "Left alone", onUndo: vi.fn() });
+      show("Left alone", vi.fn());
     });
     await flush();
     expect(screen.getByText("Left alone")).toBeTruthy();
     act(() => {
-      vi.advanceTimersByTime(UNDO_TOAST_DURATION_MS - 100);
+      vi.advanceTimersByTime(5000 - 100);
     });
     expect(screen.queryByText("Left alone")).not.toBeNull();
     act(() => {

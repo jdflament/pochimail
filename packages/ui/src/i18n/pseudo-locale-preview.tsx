@@ -1,8 +1,10 @@
+import { Button } from "@pochimail/ui/components/button";
 import { RecommendationRow } from "@pochimail/ui/components/recommendation-row";
 import { StatusStrip } from "@pochimail/ui/components/status-strip";
 import { t } from "@pochimail/ui/i18n/format.ts";
 import { deviceLabel } from "@pochimail/ui/i18n/locale.ts";
 import type { Locale } from "@pochimail/ui/i18n/messages.ts";
+import { useState } from "react";
 
 /**
  * Dev-only layout probe: the same catalog strings in the given locale. Stories render English,
@@ -11,18 +13,19 @@ import type { Locale } from "@pochimail/ui/i18n/messages.ts";
 export function PseudoLocalePreview({ locale = "pseudo" }: { readonly locale?: Locale }) {
   const options = { locale };
   const device = deviceLabel("Mac", locale);
+  const [paused, setPaused] = useState(false);
   return (
     <div className="flex w-full min-w-0 flex-col gap-3">
       <StatusStrip
         progress={62}
         headline={t("overview.sorting", { device }, options)}
         status={t("overview.email.count", { count: 1240 }, options)}
-        labels={{
-          pause: t("overview.pause", {}, options),
-          resume: t("overview.resume", {}, options),
-          viewSummary: t("overview.viewSummary", {}, options),
-        }}
-      />
+      >
+        <Button variant="secondary" size="sm" onClick={() => setPaused((p) => !p)}>
+          {paused ? t("overview.resume", {}, options) : t("overview.pause", {}, options)}
+        </Button>
+        <Button size="sm">{t("overview.viewSummary", {}, options)}</Button>
+      </StatusStrip>
       <ul className="m-0 min-w-0 p-0">
         <RecommendationRow
           sentence={t("overview.size.free", { size: 3100, total: 6400 }, options)}
