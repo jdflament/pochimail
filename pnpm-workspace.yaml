@@ -3,6 +3,7 @@ packages:
   - packages/*
   - tooling/*
 # node-llama-cpp / onnxruntime-node / protobufjs: prebuilt binaries ship in the packages (ADR 0006); their install scripts stay off.
+# electron: no install hook in 45 (apps/desktop's postinstall runs install-electron); kept allowed for versions that restore one.
 allowBuilds:
   electron: true
   electron-winstaller: false
