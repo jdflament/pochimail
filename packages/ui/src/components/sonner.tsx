@@ -1,7 +1,7 @@
 import { cn } from "@pochimail/ui/lib/utils";
 import { CircleCheckIcon, InfoIcon, OctagonXIcon, TriangleAlertIcon } from "lucide-react";
 import type * as React from "react";
-import { Toaster as Sonner, type ToasterProps } from "sonner";
+import { Toaster as Sonner, type ToasterProps, toast } from "sonner";
 
 // Defaults to dark so `.dark` tokens resolve (e.g. undo toasts); pass `theme`/`className` to override.
 function Toaster({ theme = "dark", className, ...props }: ToasterProps) {
@@ -29,4 +29,4 @@ function Toaster({ theme = "dark", className, ...props }: ToasterProps) {
   );
 }
 
-export { Toaster };
+export { Toaster, toast };

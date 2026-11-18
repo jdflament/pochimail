@@ -1,4 +1,4 @@
-import type { DomainError } from "../errors.ts";
+import { type DomainError, StorageError } from "../errors.ts";
 import type { DomainEventOf } from "../events/catalog.ts";
 import { createScanPipeline, type ScanPipelineDeps } from "../jobs/scan-pipeline.ts";
 import type { AsyncResult, CancelSignal } from "../ports/common.ts";
@@ -33,7 +33,36 @@ export interface RunScanOutcome {
 export class RunScan {
   constructor(private readonly deps: RunScanDeps) {}
 
+  /** A failed run announces `ScanFailed` (code only) so the screen can say so, then returns the error. */
   async execute(
+    request: RunScanRequest,
+    signal: CancelSignal,
+  ): AsyncResult<RunScanOutcome, DomainError> {
+    const { uow, clock, workspaceId, accountId, flush } = this.deps;
+    let failure: DomainError;
+    try {
+      const outcome = await this.run(request, signal);
+      if (outcome.ok) return outcome;
+      failure = outcome.error;
+    } catch {
+      failure = new StorageError();
+    }
+    if (failure.code !== "operation.cancelled") {
+      const event = {
+        id: `scan:${request.jobId}:failed:${clock.now().getTime()}`,
+        type: "ScanFailed",
+        version: 1,
+        workspaceId,
+        occurredAt: clock.now().toISOString(),
+        payload: { accountId, errorCode: failure.code },
+      } satisfies DomainEventOf<"ScanFailed">;
+      await uow.run(async (tx) => tx.outbox.append({ kind: "event", event }));
+      await flush();
+    }
+    return err(failure);
+  }
+
+  private async run(
     request: RunScanRequest,
     signal: CancelSignal,
   ): AsyncResult<RunScanOutcome, DomainError> {

@@ -24,6 +24,8 @@ export interface ModelHostSupervisorOptions {
   initialBackoffMs?: number;
   maxBackoffMs?: number;
   stableMs?: number;
+  /** After this many hosts in a row that died before `stableMs`, stop restarting and tell the worker the model is unavailable. */
+  maxConsecutiveFailures?: number;
 }
 
 export interface ModelHostSupervisor {
@@ -41,8 +43,11 @@ export const superviseModelHost = (options: ModelHostSupervisorOptions): ModelHo
   const initialBackoffMs = options.initialBackoffMs ?? 500;
   const maxBackoffMs = options.maxBackoffMs ?? 15_000;
   const stableMs = options.stableMs ?? 30_000;
+  const maxFailures = options.maxConsecutiveFailures ?? 5;
+  let failures = 0;
   let stopped = false;
   let backoffMs = initialBackoffMs;
+  let cancelRestart: (() => void) | undefined;
   let current: { host: HostProcess; cancelTimers: () => void } | undefined;
 
   const start = (): void => {
@@ -70,10 +75,16 @@ export const superviseModelHost = (options: ModelHostSupervisorOptions): ModelHo
       if (current === entry) current = undefined;
       if (reason === "unresponsive") host.kill();
       if (stopped) return;
+      failures += 1;
+      if (failures >= maxFailures) {
+        options.logger.error("model host keeps failing, giving up", { operation: "model-host" });
+        options.worker.postMessage({ type: "model-host-unavailable" }, []);
+        return;
+      }
       options.logger.warn(`model host ${reason}, restarting`, { operation: "model-host" });
       const delay = backoffMs;
       backoffMs = Math.min(backoffMs * 2, maxBackoffMs);
-      options.timer.set(start, delay);
+      cancelRestart = options.timer.set(start, delay);
     };
     host.on("exit", () => lost("exited"));
     host.on("message", (message) => {
@@ -94,6 +105,7 @@ export const superviseModelHost = (options: ModelHostSupervisorOptions): ModelHo
     cancels.add(
       options.timer.set(() => {
         backoffMs = initialBackoffMs;
+        failures = 0;
       }, stableMs),
     );
   };
@@ -102,6 +114,7 @@ export const superviseModelHost = (options: ModelHostSupervisorOptions): ModelHo
   return {
     stop() {
       stopped = true;
+      cancelRestart?.();
       current?.cancelTimers();
       current?.host.kill();
       current = undefined;

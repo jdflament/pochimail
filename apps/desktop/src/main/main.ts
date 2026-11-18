@@ -88,7 +88,26 @@ const processSecretVault = (): SecretVault => {
 
 // Demo mode (fixture mailbox, no real account) is for dev and E2E only: a packaged app never honours it.
 const demo = app.isPackaged ? undefined : demoScale(process.env.POCHIMAIL_DEMO);
-const demoEnv = { ...process.env, POCHIMAIL_DEMO: demo ?? "" };
+// Hosts get no copy of the parent environment: only what a process needs to start, plus the demo switch.
+const SYSTEM_ENV = [
+  "PATH",
+  "HOME",
+  "TMPDIR",
+  "TMP",
+  "TEMP",
+  "SystemRoot",
+  "LANG",
+  "LC_ALL",
+] as const;
+const demoEnv: Record<string, string> = {
+  ...Object.fromEntries(
+    SYSTEM_ENV.flatMap((name) => {
+      const value = process.env[name];
+      return value === undefined ? [] : [[name, value] as const];
+    }),
+  ),
+  POCHIMAIL_DEMO: demo ?? "",
+};
 
 const connectWorker = (window: BrowserWindow): void => {
   const worker = utilityProcess.fork(join(import.meta.dirname, "worker.js"), [], {

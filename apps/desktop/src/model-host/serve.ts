@@ -26,6 +26,14 @@ export const serveModelHost = (transport: Transport, engine: ModelHostEngine | u
     const message = request.data;
     const unavailable = { id: message.id, ok: false, error: "unavailable" } as const;
     void (async () => {
+      try {
+        await answer();
+      } catch {
+        // An engine that throws instead of returning an error must not take the host down.
+        respond(unavailable);
+      }
+    })();
+    async function answer(): Promise<void> {
       if (engine === undefined) return respond(unavailable);
       if (message.method === "classify") {
         const done = await engine.classifier.classify(message.messages, NEVER);
@@ -46,6 +54,6 @@ export const serveModelHost = (transport: Transport, engine: ModelHostEngine | u
       respond(
         done.ok ? { id: message.id, ok: true, result: done.value.map((v) => [...v]) } : unavailable,
       );
-    })();
+    }
   });
 };

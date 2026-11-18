@@ -138,4 +138,30 @@ describe("query-from-events", () => {
     unsubscribe();
     close();
   });
+
+  it("tells the person when a scan fails and ignores it for optimistic actions (guards a silent failed scan or a rollback of unrelated actions)", async () => {
+    let emitEvent: ((event: EventOf<"app.events">) => void) | undefined;
+    const { client, server, close } = createFakeIpc();
+    serveRpc(server, {
+      procedures: {},
+      subscriptions: {
+        "app.events": (_input, push) => {
+          emitEvent = push;
+          return undefined;
+        },
+      },
+    });
+    const registry = createOptimisticActionRegistry();
+    const fail = vi.spyOn(registry, "fail");
+    const onScanFailed = vi.fn();
+    const unsubscribe = subscribeAppEvents(client, registry, onScanFailed);
+
+    await vi.waitFor(() => expect(emitEvent).toBeTypeOf("function"));
+    emitEvent?.({ type: "ScanFailed", accountId: "acc-1", reason: "offline" });
+
+    await vi.waitFor(() => expect(onScanFailed).toHaveBeenCalledTimes(1));
+    expect(fail).not.toHaveBeenCalled();
+    unsubscribe();
+    close();
+  });
 });

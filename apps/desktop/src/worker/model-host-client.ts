@@ -42,6 +42,8 @@ export interface ModelHostClient {
    * previous port are sent again on this one, so a host crash is invisible to the scan (ADR 0002).
    */
   attach(transport: Transport): void;
+  /** Main stopped restarting the host: fail what waits, and every request until a new port arrives. */
+  markUnavailable(): void;
 }
 
 /**
@@ -56,6 +58,7 @@ export const createModelHostClient = (options: {
   const waitMs = options.waitMs ?? 30_000;
   const pending = new Map<number, Pending>();
   let transport: Transport | undefined;
+  let unavailable = false;
   let nextId = 0;
 
   const send = (entry: Pending): void => {
@@ -81,6 +84,7 @@ export const createModelHostClient = (options: {
   ): Promise<ReturnType<typeof parse> | { ok: false; error: AiError }> =>
     new Promise((resolve) => {
       if (signal.aborted) return resolve({ ok: false, error: new Cancelled() });
+      if (unavailable && !transport) return resolve({ ok: false, error: new AiUnavailable() });
       const id = nextId++;
       const entry: Pending = {
         request: { id, method, ...body } as unknown as HostRequest,
@@ -113,7 +117,16 @@ export const createModelHostClient = (options: {
   };
 
   return {
+    markUnavailable() {
+      unavailable = true;
+      for (const [id, entry] of pending) {
+        entry.cancelDeadline?.();
+        pending.delete(id);
+        entry.settle({ ok: false, error: new AiUnavailable() });
+      }
+    },
     attach(next) {
+      unavailable = false;
       transport = next;
       next.onMessage((data) => {
         if (transport !== next) return;

@@ -13,7 +13,13 @@ interface Job {
   readonly accountId: AccountId;
   status: ScanJobStatus;
   processed: number;
+  /** Set once a run reached the end of the mailbox, even if a pause was requested at the same moment. */
+  finished: boolean;
+  /** Bumped by every run; only the newest run may change `status`. */
+  generation: number;
   stop: (() => void) | undefined;
+  /** The latest run. A new run waits for it, so two runs never advance one cursor. */
+  run: Promise<void>;
 }
 
 export interface ScanRunnerDeps {
@@ -45,34 +51,34 @@ function createStop() {
 
 /**
  * Starts, pauses, resumes and cancels background scans, one running job per account. Starting while the
- * account's scan is already running returns that job. Pausing stops at a batch boundary; resuming continues
- * from the stored cursor, so nothing is read twice and nothing is skipped (brief §5.3).
+ * account's scan is already running returns that job, also for two calls that arrive together. Pausing stops
+ * at a batch boundary; resuming waits for that boundary and then continues from the stored cursor, so nothing
+ * is read twice and nothing is skipped (brief §5.3).
  */
 export class ScanRunner {
   private readonly jobs = new Map<string, Job>();
+  private readonly starting = new Map<
+    AccountId,
+    Promise<Result<{ jobId: string }, StorageError | NotFound>>
+  >();
+  private readonly running = new Set<Promise<void>>();
 
   constructor(private readonly deps: ScanRunnerDeps) {}
 
-  async start(accountId: AccountId): AsyncResult<{ jobId: string }, StorageError | NotFound> {
-    const existing = [...this.jobs.values()].find(
+  start(accountId: AccountId): AsyncResult<{ jobId: string }, StorageError | NotFound> {
+    const live = [...this.jobs.values()].find(
       (j) => j.accountId === accountId && (j.status === "running" || j.status === "paused"),
     );
-    if (existing) {
-      if (existing.status === "paused") this.drive(existing);
-      return ok({ jobId: existing.id });
+    if (live) {
+      if (live.status === "paused") this.drive(live);
+      return Promise.resolve(ok({ jobId: live.id }));
     }
-    const account = await this.deps.uow.reads.accounts.get(this.deps.workspaceId, accountId);
-    if (!account.ok) return account;
-    const job: Job = {
-      id: this.deps.newJobId(),
-      accountId,
-      status: "running",
-      processed: 0,
-      stop: undefined,
-    };
-    this.jobs.set(job.id, job);
-    this.drive(job);
-    return ok({ jobId: job.id });
+    // The account lookup is asynchronous: callers that arrive meanwhile share this one start.
+    const pending = this.starting.get(accountId);
+    if (pending) return pending;
+    const created = this.create(accountId).finally(() => this.starting.delete(accountId));
+    this.starting.set(accountId, created);
+    return created;
   }
 
   pause(jobId: string): Result<void, NotFound> {
@@ -110,30 +116,61 @@ export class ScanRunner {
     await Promise.all(this.running);
   }
 
-  private readonly running = new Set<Promise<void>>();
+  private async create(
+    accountId: AccountId,
+  ): AsyncResult<{ jobId: string }, StorageError | NotFound> {
+    const account = await this.deps.uow.reads.accounts.get(this.deps.workspaceId, accountId);
+    if (!account.ok) return account;
+    const job: Job = {
+      id: this.deps.newJobId(),
+      accountId,
+      status: "running",
+      processed: 0,
+      finished: false,
+      generation: 0,
+      stop: undefined,
+      run: Promise.resolve(),
+    };
+    this.jobs.set(job.id, job);
+    this.drive(job);
+    return ok({ jobId: job.id });
+  }
 
   private drive(job: Job): void {
     const stop = createStop();
+    const generation = job.generation + 1;
+    job.generation = generation;
     job.status = "running";
     job.stop = stop.abort;
-    const run = (async () => {
+    const previous = job.run;
+    const current = (async () => {
+      // A paused run may still be finishing its batch: wait, so only one run is ever in flight.
+      await previous;
+      if (job.finished) {
+        if (job.generation === generation) job.status = "completed";
+        return;
+      }
+      if (stop.signal.aborted) return;
       const found = await this.deps.uow.reads.accounts.get(this.deps.workspaceId, job.accountId);
-      if (!found.ok) {
-        job.status = "failed";
+      const outcome = found.ok
+        ? await this.deps
+            .scanFor(found.value)
+            .execute({ jobId: job.id, processedBefore: job.processed }, stop.signal)
+            .catch(() => undefined)
+        : undefined;
+      if (outcome?.ok) {
+        job.processed = outcome.value.processed;
+        if (outcome.value.status === "completed") job.finished = true;
+      }
+      if (job.generation !== generation || job.status !== "running") {
+        if (job.finished && job.generation === generation && job.status === "paused")
+          job.status = "completed";
         return;
       }
-      const outcome = await this.deps
-        .scanFor(found.value)
-        .execute({ jobId: job.id, processedBefore: job.processed }, stop.signal)
-        .catch(() => undefined);
-      if (!outcome?.ok) {
-        if (job.status === "running") job.status = "failed";
-        return;
-      }
-      job.processed = outcome.value.processed;
-      if (outcome.value.status === "completed") job.status = "completed";
+      job.status = outcome?.ok ? (job.finished ? "completed" : "paused") : "failed";
     })();
-    this.running.add(run);
-    void run.finally(() => this.running.delete(run));
+    job.run = current;
+    this.running.add(current);
+    void current.finally(() => this.running.delete(current));
   }
 }

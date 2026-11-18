@@ -188,4 +188,68 @@ describe("model host process", () => {
     port1.close();
     port2.close();
   });
+
+  it("after repeated start failures the supervisor gives up and the worker sees the model as unavailable (guards an endless fork loop and a scan waiting forever)", async () => {
+    const timer = createFakeTimer();
+    const client = createModelHostClient({ timer });
+    const factory = createFakeHostFactory(() => createGroundTruthClassifier(labels));
+    const toWorker: unknown[] = [];
+    const supervisor = superviseModelHost({
+      fork: factory.fork,
+      worker: {
+        postMessage: (message) => {
+          toWorker.push(message);
+          if ((message as { type: string }).type === "model-host-unavailable")
+            client.markUnavailable();
+        },
+      },
+      createChannel: () => new MessageChannel() as never,
+      timer,
+      logger: silent,
+      maxConsecutiveFailures: 3,
+    });
+    const waiting = client.classifier.classify([], {
+      aborted: false,
+      addEventListener() {},
+      removeEventListener() {},
+    });
+    for (let i = 0; i < 3; i++) {
+      factory.hosts[i]?.kill();
+      timer.advance(15_000);
+    }
+    expect(factory.hosts).toHaveLength(3); // no fourth fork
+    expect(toWorker).toContainEqual({ type: "model-host-unavailable" });
+    expect(await waiting).toEqual({ ok: false, error: expect.any(AiUnavailable) });
+    supervisor.stop();
+  });
+
+  it("an engine that throws gets an unavailable answer and the host keeps serving (guards one bad request killing the model host)", async () => {
+    const { port1, port2 } = new MessageChannel();
+    port1.start();
+    port2.start();
+    let calls = 0;
+    serveModelHost(fromDomPort(port2), {
+      classifier: {
+        classify: async () => {
+          calls += 1;
+          if (calls === 1) throw new Error("boom");
+          return { ok: true, value: [] };
+        },
+      },
+      llm: createFakeLlmProvider(),
+      embedder: createFakeEmbedder(),
+    });
+    const replies: unknown[] = [];
+    port1.onmessage = (event) => replies.push(event.data);
+    port1.postMessage({ id: 1, method: "classify", messages: [] });
+    port1.postMessage({ id: 2, method: "classify", messages: [] });
+    await vi.waitFor(() =>
+      expect(replies).toEqual([
+        { id: 1, ok: false, error: "unavailable" },
+        { id: 2, ok: true, result: [] },
+      ]),
+    );
+    port1.close();
+    port2.close();
+  });
 });

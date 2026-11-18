@@ -170,6 +170,47 @@ describe("worker app over the real IPC layer", () => {
     close();
   });
 
+  it("a scan that cannot reach the provider announces ScanFailed and can be started again (guards a silent failed scan)", async () => {
+    const clock = createFakeClock(new Date("2026-01-02T00:00:00.000Z"));
+    const store = createInMemoryUnitOfWork();
+    const provider = createFakeMailProvider();
+    provider.deliver(makeIncomingMessage(1));
+    provider.simulateOffline();
+    await store.uow.run((tx) => tx.repositories.accounts.save(makeAccount()));
+    let jobs = 0;
+    const { client, app, appEvents, close } = await connect({
+      adapters: {
+        workspaceId: WS_A,
+        clock,
+        random: () => 0.5,
+        timer: createFakeTimer(),
+        logger: silent,
+        newJobId: () => `job-${++jobs}`,
+        uow: store.uow,
+        outboxStore: store.outboxStore,
+        queue: createInMemoryJobQueue(clock),
+        settings: createInMemorySettingsStore(),
+        classifier: createFakeClassifier(),
+        providerFor: () => provider,
+        deviceName: () => "Mac",
+      },
+    });
+    await client.call("scan.start", { accountId: ACCOUNT_1 });
+    await vi.waitFor(() =>
+      expect(appEvents).toContainEqual({
+        type: "ScanFailed",
+        accountId: ACCOUNT_1,
+        reason: "offline",
+      }),
+    );
+    await app.idle();
+    provider.faults.clear();
+    const again = await client.call("scan.start", { accountId: ACCOUNT_1 });
+    expect(again.jobId).toBe("job-2");
+    await vi.waitFor(() => expect(appEvents.map((e) => e.type)).toContain("ScanCompleted"));
+    close();
+  });
+
   it("settings changes keep the fields the patch did not name (guards a toggle silently resetting Autopilot)", async () => {
     const { client, close } = await connect();
     await client.call("settings.update", { notifications: false });

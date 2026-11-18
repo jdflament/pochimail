@@ -22,6 +22,8 @@ export interface FixtureAdapterOptions {
   /** Answers classification; in the app this is the model host link. */
   readonly classifier: Classifier;
   readonly newJobId: () => string;
+  /** Messages per provider page. Default 100. */
+  readonly pageSize?: number;
 }
 
 /**
@@ -61,7 +63,7 @@ export async function createFixtureAdapters(
         mbox: account.mbox,
         accountId: account.id,
         workspaceId: mailbox.workspaceId,
-        pageSize: 100,
+        pageSize: options.pageSize ?? 100,
       }),
     ]),
   );

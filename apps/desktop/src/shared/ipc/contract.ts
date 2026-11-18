@@ -102,6 +102,11 @@ const subscriptions = {
         accountId,
         processed: z.number().int().nonnegative(),
       }),
+      z.object({
+        type: z.literal("ScanFailed"),
+        accountId,
+        reason: z.enum(["offline", "rate-limited", "auth-expired", "unknown"]),
+      }),
       z.object({ type: z.literal("DigestReady"), itemCount: z.number().int().nonnegative() }),
     ]),
     coalesceKey: undefined,

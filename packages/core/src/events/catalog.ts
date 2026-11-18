@@ -101,6 +101,10 @@ export const domainEventSchema = z.discriminatedUnion("type", [
     z.object({ accountId: accountIdSchema, processed: count, total: count.optional() }),
   ),
   defineEvent("ScanCompleted", z.object({ accountId: accountIdSchema, processed: count })),
+  defineEvent(
+    "ScanFailed",
+    z.object({ accountId: accountIdSchema, errorCode: z.enum(ERROR_CODES) }),
+  ),
   defineEvent("DigestReady", z.object({ itemCount: count })),
 ]);
 

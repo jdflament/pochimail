@@ -34,6 +34,15 @@ const PROVIDERS: Record<Account["provider"], OutputOf<"accounts.list">[number]["
 
 type FailureReason = Extract<EventOf<"app.events">, { type: "ActionFailed" }>["reason"];
 
+type ScanFailureReason = Extract<EventOf<"app.events">, { type: "ScanFailed" }>["reason"];
+
+const scanFailureReason = (code: string): ScanFailureReason => {
+  if (code === "provider.offline") return "offline";
+  if (code === "provider.rate_limited") return "rate-limited";
+  if (code === "provider.auth_expired") return "auth-expired";
+  return "unknown";
+};
+
 const failureReason = (code: string): FailureReason => {
   if (code === "storage.not_found") return "not-found";
   if (code === "provider.conflict") return "conflict";
@@ -122,6 +131,13 @@ export function createHandlers(deps: HandlerDeps): Handlers {
               type: "ScanCompleted",
               accountId: event.payload.accountId,
               processed: event.payload.processed,
+            }),
+          ),
+          deps.events.subscribe("ScanFailed", (event) =>
+            emit({
+              type: "ScanFailed",
+              accountId: event.payload.accountId,
+              reason: scanFailureReason(event.payload.errorCode),
             }),
           ),
           deps.events.subscribe("DigestReady", (event) =>

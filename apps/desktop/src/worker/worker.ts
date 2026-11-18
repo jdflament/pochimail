@@ -29,7 +29,9 @@ const logger = createLogger({
 // Models run in their own process; main hands this worker a new port every time that process (re)starts.
 const modelHost = createModelHostClient({ timer });
 process.parentPort.on("message", (event) => {
-  if ((event.data as { type?: unknown } | null | undefined)?.type !== "model-port") return;
+  const type = (event.data as { type?: unknown } | null | undefined)?.type;
+  if (type === "model-host-unavailable") modelHost.markUnavailable();
+  if (type !== "model-port") return;
   const port = event.ports[0];
   if (port === undefined) return;
   modelHost.attach({
