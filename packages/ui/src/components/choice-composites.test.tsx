@@ -193,11 +193,11 @@ describe("undo toast", () => {
     await flush();
     expect(screen.getByText("24 emails archived")).toBeTruthy();
 
-    await user.dblClick(screen.getByRole("button", { name: "Undo" }));
+    await user.dblClick(screen.getByRole("button", { name: t("action.undo") }));
     expect(onUndo).toHaveBeenCalledTimes(1);
 
     // Sonner pauses its timers while the pointer is over the toasts.
-    await user.unhover(screen.getByRole("button", { name: "Undo" }));
+    await user.unhover(screen.getByRole("button", { name: t("action.undo") }));
     act(() => {
       showRef.current("Left alone", vi.fn());
     });
