@@ -14,6 +14,7 @@
     "test": "vitest run"
   },
   "devDependencies": {
+    "@pochimail/testing": "workspace:*",
     "@pochimail/typescript-config": "workspace:*",
     "@types/node": "26.6.6",
     "typescript": "7.0.2",
