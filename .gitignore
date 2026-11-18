@@ -12,3 +12,4 @@ coverage/
 !.env.example
 *.local
 release/
+packages/testing/eval/report.json

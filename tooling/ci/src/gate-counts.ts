@@ -1,6 +1,6 @@
 /** A gate that runs zero tasks must not pass: a vacuous green hides a broken or unwired gate. */
 
-export type GateName = "typecheck" | "lint" | "test" | "build" | "knip";
+export type GateName = "typecheck" | "lint" | "test" | "build" | "knip" | "eval";
 
 /**
  * Gates allowed to run zero tasks, each until the ticket that wires it lands. Empty now that every

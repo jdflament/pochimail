@@ -6,6 +6,10 @@
     "test": { "dependsOn": ["^build"] },
     "build": { "dependsOn": ["^build"], "outputs": ["dist/**", "out/**"] },
     "knip": {},
-    "eval": { "dependsOn": ["^build"], "cache": false }
+    "eval": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "passThroughEnv": ["EVAL_DEGRADE", "EVAL_SCALE", "EVAL_TOLERANCE"]
+    }
   }
 }

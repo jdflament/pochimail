@@ -1,0 +1,204 @@
+import {
+  CATEGORIES,
+  type Category,
+  SIGNAL_KINDS,
+  type SignalKind,
+} from "@pochimail/core/domain/category";
+import type { Message, SenderStats, Thread } from "@pochimail/core/domain/mail";
+import { AccountId, MessageId, ThreadId, WorkspaceId } from "@pochimail/core/ids";
+import type { Classifier } from "@pochimail/core/ports/ai";
+import { unwrap } from "@pochimail/core/result";
+import { ClassifyBatch } from "@pochimail/core/use-cases/classify-batch";
+import { DetectSignals } from "@pochimail/core/use-cases/detect-signals";
+import { RunIncrementalSync } from "@pochimail/core/use-cases/run-incremental-sync";
+import { createFakeClock } from "../fake-clock.ts";
+import { CORRESPONDENTS, VIP_COUNT } from "../fixture-mailbox/content.ts";
+import { createFixtureMailProvider } from "../fixture-mailbox/fixture-mail-provider.ts";
+import { FIXTURE_NOW, type GeneratedMailbox } from "../fixture-mailbox/generator.ts";
+import { createInMemoryUnitOfWork } from "../in-memory-store.ts";
+import { scoreMultiLabel, scoreSingleLabel } from "./metrics.ts";
+import { type EvalReport, evalReportSchema } from "./report.ts";
+
+const BATCH = 100;
+const live = () => new AbortController().signal;
+const VIP_ADDRESSES: ReadonlySet<string> = new Set(
+  CORRESPONDENTS.slice(0, VIP_COUNT).map((c) => c.address),
+);
+
+export interface RunEvalOptions {
+  /** Any `Classifier`: the ground-truth stub today, the real one in M3. */
+  readonly classifier: Classifier;
+  readonly mailbox: GeneratedMailbox;
+}
+
+/**
+ * Runs the real pipeline over a fixture mailbox (sync, then ClassifyBatch with `classifier`, then
+ * DetectSignals) in memory and scores the result against the fixture's ground-truth labels.
+ * Metadata only: bodies are never read or stored (D11), and the report holds counts and ratios,
+ * never a subject, address or snippet.
+ */
+export async function runEval({ classifier, mailbox }: RunEvalOptions): Promise<EvalReport> {
+  const workspaceId = unwrap(WorkspaceId(mailbox.workspaceId));
+  const clock = createFakeClock(new Date(FIXTURE_NOW));
+  const { uow } = createInMemoryUnitOfWork();
+  const classify = new ClassifyBatch({ uow, classifier, clock });
+  const detect = new DetectSignals({ uow, clock });
+
+  const expected = new Map(mailbox.labels.messages.map((l) => [l.messageId, l]));
+  const predictedCategory = new Map<string, Category>();
+  const predictedSignals = new Map<string, SignalKind[]>();
+  let unclassified = 0;
+
+  for (const account of mailbox.accounts) {
+    const accountId = unwrap(AccountId(account.id));
+    unwrap(
+      await uow.run(
+        (tx) =>
+          tx.repositories.accounts.save({
+            schemaVersion: 1,
+            id: accountId,
+            workspaceId,
+            provider: account.provider,
+            address: account.address,
+            connectedAt: clock.now().toISOString(),
+          }),
+        live(),
+      ),
+    );
+    const provider = createFixtureMailProvider({
+      mbox: account.mbox,
+      accountId: account.id,
+      workspaceId: mailbox.workspaceId,
+    });
+    unwrap(
+      await new RunIncrementalSync({ uow, provider, clock }).execute(
+        { workspaceId, accountId },
+        live(),
+      ),
+    );
+
+    const messages = await readAll(uow.reads.messages, workspaceId, accountId);
+    await seedContext(uow, messages, account.address);
+
+    const ids = messages.map((m) => m.id).sort();
+    for (let i = 0; i < ids.length; i += BATCH) {
+      const report = unwrap(
+        await classify.execute({ workspaceId, messageIds: ids.slice(i, i + BATCH) }, live()),
+      );
+      unclassified += report.unclassified.length;
+      for (const id of report.unclassified) predictedCategory.delete(id);
+      const unanswered = new Set<string>(report.unclassified);
+      for (const id of ids.slice(i, i + BATCH)) {
+        if (unanswered.has(id)) continue;
+        const stored = unwrap(await uow.reads.messages.get(workspaceId, unwrap(MessageId(id))));
+        predictedCategory.set(id, stored.category);
+      }
+    }
+    const signals = unwrap(
+      await detect.execute(
+        { workspaceId, accountId, messageIds: messages.map((m) => m.id) },
+        live(),
+      ),
+    );
+    for (const s of signals) {
+      predictedSignals.set(s.messageId, [...(predictedSignals.get(s.messageId) ?? []), s.kind]);
+    }
+  }
+
+  const labelled = [...expected.values()];
+  const categories = scoreSingleLabel(
+    CATEGORIES,
+    labelled.map((l) => ({ expected: l.category, predicted: predictedCategory.get(l.messageId) })),
+  );
+  const signals = scoreMultiLabel(
+    SIGNAL_KINDS,
+    labelled.map((l) => ({
+      expected: l.signals,
+      predicted: predictedSignals.get(l.messageId) ?? [],
+    })),
+  );
+  return evalReportSchema.parse({
+    schemaVersion: 1,
+    fixture: { seed: mailbox.labels.seed, scale: mailbox.labels.scale, messages: labelled.length },
+    unclassified,
+    categoryAccuracy: categories.accuracy,
+    categories: categories.perClass,
+    signals,
+  });
+}
+
+type Reads = ReturnType<typeof createInMemoryUnitOfWork>["uow"]["reads"]["messages"];
+
+async function readAll(
+  reads: Reads,
+  workspaceId: WorkspaceId,
+  accountId: AccountId,
+): Promise<Message[]> {
+  const out: Message[] = [];
+  let cursor: string | undefined;
+  do {
+    const page = unwrap(
+      await reads.query(workspaceId, { accountId, limit: 500, ...(cursor ? { cursor } : {}) }),
+    );
+    out.push(...page.items);
+    cursor = page.nextCursor ?? undefined;
+  } while (cursor);
+  return out;
+}
+
+/**
+ * What sync does not provide yet: threads (from the thread ids the fixture stamps on each
+ * message) and per-sender stats (the fixture's important senders are marked VIP).
+ */
+async function seedContext(
+  uow: ReturnType<typeof createInMemoryUnitOfWork>["uow"],
+  messages: readonly Message[],
+  owner: string,
+) {
+  const byThread = new Map<string, Message[]>();
+  const bySender = new Map<string, Message[]>();
+  for (const m of messages) {
+    byThread.set(m.threadId, [...(byThread.get(m.threadId) ?? []), m]);
+    if (m.from.toLowerCase() !== owner.toLowerCase())
+      bySender.set(m.from, [...(bySender.get(m.from) ?? []), m]);
+  }
+  const newest = (list: readonly Message[]) =>
+    list
+      .map((m) => m.receivedAt)
+      .sort()
+      .at(-1) ?? "";
+  const first = messages[0];
+  if (!first) return;
+  const threads: Thread[] = [...byThread.entries()].map(([id, list]) => {
+    const ordered = [...list].sort(
+      (a, b) => a.receivedAt.localeCompare(b.receivedAt) || a.id.localeCompare(b.id),
+    );
+    return {
+      schemaVersion: 1,
+      id: unwrap(ThreadId(id)),
+      workspaceId: first.workspaceId,
+      accountId: first.accountId,
+      subject: ordered[0]?.subject ?? "",
+      messageIds: ordered.map((m) => m.id),
+      lastMessageAt: newest(ordered),
+    };
+  });
+  const senders: SenderStats[] = [...bySender.entries()].map(([address, list]) => ({
+    schemaVersion: 1,
+    workspaceId: first.workspaceId,
+    accountId: first.accountId,
+    address,
+    messageCount: list.length,
+    openedCount: list.filter((m) => m.opened).length,
+    repliedCount: 0,
+    lastMessageAt: newest(list),
+    vip: VIP_ADDRESSES.has(address),
+  }));
+  unwrap(
+    await uow.run(async (tx) => {
+      for (const t of threads) unwrap(await tx.repositories.threads.upsert(t));
+      for (const s of senders) unwrap(await tx.repositories.senders.upsert(s));
+      return { ok: true as const, value: undefined };
+    }, live()),
+  );
+}

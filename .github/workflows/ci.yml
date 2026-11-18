@@ -128,13 +128,40 @@ jobs:
           retention-days: 7
           if-no-files-found: error
 
-  # Stub until M1-11 wires the eval-regression run; keep the job name stable for branch protection.
+  # Eval regression gate (M1-11): runs the pipeline over the small seeded fixture, scores precision and
+  # recall per category and per signal, and fails when any class drops more than the tolerance below
+  # eval/baseline.small.json. Refresh the baseline on purpose with `pnpm --filter @pochimail/testing eval:update-baseline`.
+  # Required check: keep the job name stable for branch protection.
   eval:
     name: eval
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
-      - run: echo "eval-regression is wired in M1-11; passing as a stub."
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Eval against the committed baseline
+        run: pnpm eval
+      - name: The gate must trip on a degraded classifier
+        run: |
+          if EVAL_DEGRADE=1 pnpm eval; then
+            echo "::error::A deliberately degraded classifier passed the eval gate"
+            exit 1
+          fi
+      - name: Upload eval report
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: eval-report
+          path: packages/testing/eval/report.json
+          retention-days: 14
+          if-no-files-found: error
 
   # Scans the pinned lockfile against OSV; any known vulnerability fails the job (superset of "critical").
   # Required check. Accepted risks live in osv-scanner.toml (time-boxed ignores with a reason).
