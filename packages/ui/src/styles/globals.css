@@ -8,16 +8,32 @@
 /* Let Tailwind scan the desktop app too. */
 @source "../../../../apps/desktop/src";
 
-/* Pochi at rest: slow breathing from the base, 4.2s (docs/design.md motion catalog). Gated by motion-safe at the use site. */
+/* Pochi motion (docs/design/screens/source/Motion.dc.html = source of truth): breathing 4.2s, blink 5.3s, found 620ms. */
 @theme {
   --animate-pochi-breathe: pochi-breathe 4.2s ease-in-out infinite;
+  --animate-pochi-blink: pochi-blink 5.3s infinite;
+  --animate-pochi-found: pochi-found 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+
   @keyframes pochi-breathe {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.012); }
+    0%, 100% { transform: scale(1, 1); }
+    50% { transform: scale(1.012, 1.025); }
+  }
+
+  @keyframes pochi-blink {
+    0%, 93%, 100% { transform: scaleY(1); }
+    96% { transform: scaleY(0.97); }
+  }
+
+  @keyframes pochi-found {
+    0% { transform: none; }
+    20% { transform: scale(1.1, 0.88); }
+    50% { transform: scale(0.95, 1.07) translateY(-14px); }
+    75% { transform: scale(1.03, 0.97); }
+    100% { transform: none; }
   }
 }
 
-/* Reduced motion: also stop loops, not just shorten them. */
+/* Reduced motion: stop mascot loops and reactions (components also gate in JS), and keep global motion minimal. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-iteration-count: 1 !important; }
 }

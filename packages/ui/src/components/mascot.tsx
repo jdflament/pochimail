@@ -22,21 +22,54 @@ const poses = {
 
 export type MascotPose = keyof typeof poses;
 
-// Settings › Appearance › "Show Pochi": one provider near the app root hides every Mascot below it.
-const ShowPochiContext = React.createContext(true);
+/** Timings from docs/design/screens/source/Motion.dc.html (source of truth). */
+export const MASCOT_BREATHING_DURATION_MS = 4200;
+export const MASCOT_BLINK_DURATION_MS = 5300;
+export const MASCOT_FOUND_DURATION_MS = 620;
 
-function MascotProvider({
-  showPochi,
-  children,
-}: {
-  showPochi: boolean;
-  children: React.ReactNode;
-}) {
-  return <ShowPochiContext value={showPochi}>{children}</ShowPochiContext>;
+// Settings › Appearance: "Show Pochi" hides every mascot; "Animations" holds Pochi still.
+const ShowPochiContext = React.createContext(true);
+const AnimationsContext = React.createContext(true);
+
+function usePrefersReducedMotion(): boolean {
+  const subscribe = React.useCallback((onStoreChange: () => void) => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return () => {};
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    media.addEventListener("change", onStoreChange);
+    return () => media.removeEventListener("change", onStoreChange);
+  }, []);
+  const getSnapshot = React.useCallback(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return false;
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }, []);
+  const getServerSnapshot = React.useCallback(() => false, []);
+  return React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
-// Idle breathing (`pochi-breathe`, globals.css) is the only looping animation; it never runs under reduced motion.
-const mascotVariants = cva("block h-auto select-none motion-safe:animate-pochi-breathe", {
+const ReducedMotionContext = React.createContext<boolean | undefined>(undefined);
+
+function MascotProvider({
+  showPochi = true,
+  animations = true,
+  reducedMotion,
+  children,
+}: {
+  showPochi?: boolean;
+  animations?: boolean;
+  /** Override system prefers-reduced-motion detection (useful for tests). */
+  reducedMotion?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <ShowPochiContext value={showPochi}>
+      <AnimationsContext value={animations}>
+        <ReducedMotionContext value={reducedMotion}>{children}</ReducedMotionContext>
+      </AnimationsContext>
+    </ShowPochiContext>
+  );
+}
+
+const mascotVariants = cva("block h-auto select-none", {
   variants: {
     size: { sm: "w-16", md: "w-32", lg: "w-48" },
   },
@@ -46,32 +79,80 @@ const mascotVariants = cva("block h-auto select-none motion-safe:animate-pochi-b
 type MascotProps = Omit<React.ComponentProps<"img">, "src" | "srcSet"> &
   VariantProps<typeof mascotVariants> & {
     pose?: MascotPose;
-    /** Local override; the mascot is hidden when this or the provider's `showPochi` is false. */
+    /** Local override; hidden when this or the provider's `showPochi` is false. */
     show?: boolean;
+    /** Local override for the Animations preference (context default). */
+    animations?: boolean;
+    /** One-shot "finds something" reaction (squish-bounce). */
+    reaction?: "found";
   };
 
 function Mascot({
   pose = "default",
   size,
   show = true,
+  animations,
+  reaction,
   alt = "",
   className,
   ...props
 }: MascotProps) {
   const showPochi = React.use(ShowPochiContext);
-  if (!show || !showPochi) return null;
+  const animationsPref = React.use(AnimationsContext);
+  const reducedMotionOverride = React.use(ReducedMotionContext);
+  const systemReducedMotion = usePrefersReducedMotion();
+  const prefersReducedMotion = reducedMotionOverride ?? systemReducedMotion;
+  const animationsEnabled = (animations ?? animationsPref) && !prefersReducedMotion;
+
+  if (!show || !showPochi) {
+    return (
+      <span
+        data-slot="mascot-placeholder"
+        aria-hidden="true"
+        className={cn(mascotVariants({ size }), "invisible aspect-[512/435]", className)}
+      />
+    );
+  }
 
   const [x1, x2] = poses[pose];
+  const found = reaction === "found" && animationsEnabled;
+  const idle = animationsEnabled;
+
   return (
-    <img
+    <span
       data-slot="mascot"
       data-pose={pose}
-      src={x1}
-      srcSet={`${x1} 1x, ${x2} 2x`}
-      alt={alt}
-      className={cn(mascotVariants({ size }), className)}
-      {...props}
-    />
+      data-animated={idle ? "true" : "false"}
+      data-reaction={found ? "found" : undefined}
+      className={cn(
+        mascotVariants({ size }),
+        "relative inline-flex origin-bottom",
+        found && "animate-pochi-found",
+        className,
+      )}
+      style={found ? { transformOrigin: "50% 95%" } : { transformOrigin: "50% 92%" }}
+    >
+      <span
+        data-slot="mascot-breathe"
+        className={cn("block", idle && "animate-pochi-breathe")}
+        style={{ transformOrigin: "50% 92%" }}
+      >
+        <span
+          data-slot="mascot-blink"
+          className={cn("block", idle && "animate-pochi-blink")}
+          style={{ transformOrigin: "center" }}
+        >
+          <img
+            data-slot="mascot-image"
+            src={x1}
+            srcSet={`${x1} 1x, ${x2} 2x`}
+            alt={alt}
+            className="block h-auto w-full"
+            {...props}
+          />
+        </span>
+      </span>
+    </span>
   );
 }
 

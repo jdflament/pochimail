@@ -1,32 +1,46 @@
-import { Mascot, MascotProvider } from "@pochimail/ui/components/mascot";
 import { renderToStaticMarkup } from "react-dom/server";
-import { expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
+import { Mascot, MascotProvider } from "./mascot";
+import { mascotBehaviorContract } from "./mascot-contract";
 
-// Guards: a pose renders its own 1x/2x assets (a missing/mixed-up pose silently shows the wrong Pochi).
-it("renders the requested pose with 1x and 2x sources", () => {
-  const html = renderToStaticMarkup(<Mascot pose="reading" />);
-  expect(html).toContain('data-pose="reading"');
-  expect(html).toMatch(
-    /srcSet="[^"]*pochi-reading\.png[^"]* 1x, [^"]*pochi-reading@2x\.png[^"]* 2x"/,
-  );
+describe("Mascot behavior contract", () => {
+  mascotBehaviorContract((element) => renderToStaticMarkup(element));
 });
 
-// Guards: "Show Pochi" off must hide every mascot, whatever the pose.
-it("renders nothing when Show Pochi is off", () => {
-  const html = renderToStaticMarkup(
-    <MascotProvider showPochi={false}>
-      <Mascot pose="happy" />
-    </MascotProvider>,
-  );
-  expect(html).toBe("");
-});
+describe("Mascot public behavior", () => {
+  it("guards wrong pose assets by rendering the requested pose with 1x and 2x sources", () => {
+    const html = renderToStaticMarkup(<Mascot pose="reading" />);
+    expect(html).toContain('data-pose="reading"');
+    expect(html).toMatch(
+      /srcSet="[^"]*pochi-reading\.png[^"]* 1x, [^"]*pochi-reading@2x\.png[^"]* 2x"/,
+    );
+  });
 
-// Guards: the breathing loop must stay behind the motion-safe variant so reduced-motion users get a still Pochi.
-it("only animates under motion-safe", () => {
-  const html = renderToStaticMarkup(<Mascot />);
-  const animated = html
-    .match(/class="([^"]*)"/)?.[1]
-    ?.split(" ")
-    .filter((c) => c.includes("animate-"));
-  expect(animated).toEqual(["motion-safe:animate-pochi-breathe"]);
+  it("guards idle loops missing when animations are enabled by running breathing and blink loops", () => {
+    const html = renderToStaticMarkup(
+      <MascotProvider animations>
+        <Mascot pose="default" />
+      </MascotProvider>,
+    );
+    expect(html).toContain("animate-pochi-breathe");
+    expect(html).toContain("animate-pochi-blink");
+    expect(html).not.toContain("animate-pochi-found");
+  });
+
+  it("guards missing found reaction by playing the squish-bounce when Pochi finds something", () => {
+    const html = renderToStaticMarkup(<Mascot reaction="found" />);
+    expect(html).toContain("animate-pochi-found");
+    expect(html).toContain('data-reaction="found"');
+  });
+
+  it("guards found reaction animating when Animations are off", () => {
+    const html = renderToStaticMarkup(
+      <MascotProvider animations={false}>
+        <Mascot reaction="found" />
+      </MascotProvider>,
+    );
+    expect(html).not.toContain("animate-pochi-found");
+    expect(html).not.toContain("animate-pochi-breathe");
+    expect(html).not.toContain("animate-pochi-blink");
+  });
 });
