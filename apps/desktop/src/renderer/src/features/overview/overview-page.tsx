@@ -13,9 +13,12 @@ export function OverviewPage() {
     let cancelled = false;
     void connectWorker()
       .then(async (client) => {
-        const [reply, device] = await Promise.all([client.echo("ping"), client.deviceName()]);
+        const [reply, device] = await Promise.all([
+          client.call("app.state"),
+          client.call("device.name"),
+        ]);
         if (!cancelled)
-          setState({ worker: reply === "ping" ? "connected" : "unavailable", device });
+          setState({ worker: reply.status === "ready" ? "connected" : "unavailable", device });
       })
       .catch(() => {
         if (!cancelled) setState((current) => ({ ...current, worker: "unavailable" }));

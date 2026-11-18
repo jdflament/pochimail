@@ -3,7 +3,7 @@ import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { serveEcho } from "../shared/ipc/echo.ts";
+import { serveRpc } from "../shared/ipc/server.ts";
 import { acceptPorts } from "../worker/ports.ts";
 import { acceptStart } from "../worker/start.ts";
 import { createSecretVault } from "./secret-vault.ts";
@@ -43,10 +43,15 @@ describe("renderer isolation", () => {
     acceptPorts({ on: (_e: "message", l: never) => parent.on("message", l) } as never, (port) => {
       rendererPorts.push(port);
       const p = port as ReturnType<typeof asWorkerPort>;
-      serveEcho({
-        post: (m) => p.postMessage(m),
-        onMessage: (h) => p.on("message", (e) => h(e.data)),
-      });
+      serveRpc(
+        {
+          post: (m) => p.postMessage(m),
+          onMessage: (h) => p.on("message", (e) => h(e.data)),
+          onClose: () => undefined,
+          close: () => p.close(),
+        },
+        { procedures: {}, subscriptions: {} },
+      );
       p.start();
     });
     acceptStart({ on: (_e: "message", l: never) => parent.on("message", l) } as never, (start) =>
@@ -86,7 +91,11 @@ describe("renderer isolation", () => {
         port.postMessage({ id: i, op, key: "refresh-token", value: "x" });
     }
     await new Promise((r) => setTimeout(r, 50));
-    expect(replies).toEqual([]);
+    // The real RPC server rejects secret-shaped messages as malformed: no secret procedure is reachable from the page.
+    expect(replies).toHaveLength(4);
+    for (const reply of replies)
+      expect(reply).toMatchObject({ kind: "failure", error: { code: "BAD_INPUT" } });
+    expect(JSON.stringify(replies)).not.toContain(SECRET);
     expect(readFileSync(path, "utf8")).toBe(before);
     for (const port of pagePorts) port.close();
   });

@@ -1,0 +1,118 @@
+import { DEVICE_NAMES } from "@pochimail/core/ports/platform";
+import { z } from "zod";
+
+/**
+ * The typed contract every screen uses (ADR 0002, M4-01). Names and shapes only: handlers backed by real use cases land in M4-02.
+ * Nothing here carries message bodies (D11): the renderer only ever sees counts, ids, states and progress.
+ */
+const accountId = z.string().min(1).max(200);
+const jobId = z.string().min(1).max(200);
+const actionId = z.string().min(1).max(200);
+
+const queries = {
+  "accounts.list": {
+    input: z.undefined(),
+    output: z
+      .array(
+        z.object({
+          id: accountId,
+          provider: z.enum(["google", "microsoft", "imap"]),
+          displayName: z.string().max(200),
+        }),
+      )
+      .max(100),
+  },
+  "overview.get": {
+    input: z.undefined(),
+    output: z.object({
+      scanned: z.number().int().nonnegative(),
+      toReview: z.number().int().nonnegative(),
+    }),
+  },
+  "digest.get": {
+    input: z.undefined(),
+    output: z.object({ ready: z.boolean(), itemCount: z.number().int().nonnegative() }),
+  },
+  "settings.get": {
+    input: z.undefined(),
+    output: z.object({ autopilot: z.boolean(), notifications: z.boolean() }),
+  },
+  "app.state": {
+    input: z.undefined(),
+    output: z.object({ status: z.enum(["starting", "ready", "locked"]) }),
+  },
+  /** M4-07: copy uses deviceName(), never a hard-coded OS name (brief §5.9). */
+  "device.name": {
+    input: z.undefined(),
+    output: z.enum(DEVICE_NAMES),
+  },
+} as const;
+
+const mutations = {
+  "scan.start": {
+    input: z.object({ accountId }),
+    output: z.object({ jobId }),
+  },
+  "scan.cancel": {
+    input: z.object({ jobId }),
+    output: z.undefined(),
+  },
+  "settings.update": {
+    input: z.object({ autopilot: z.boolean().optional(), notifications: z.boolean().optional() }),
+    output: z.undefined(),
+  },
+} as const;
+
+/** `coalesceKey` names the field whose value identifies "the same state": only the latest event per key is kept in a buffer. */
+const subscriptions = {
+  "scan.progress": {
+    input: z.object({ accountId }),
+    event: z.object({
+      accountId,
+      phase: z.enum(["listing", "fetching", "classifying", "done"]),
+      processed: z.number().int().nonnegative(),
+      total: z.number().int().nonnegative(),
+    }),
+    coalesceKey: (event: { accountId: string }) => event.accountId,
+  },
+  "app.events": {
+    input: z.undefined(),
+    event: z.discriminatedUnion("type", [
+      z.object({ type: z.literal("ActionApplied"), actionId }),
+      z.object({
+        type: z.literal("ActionFailed"),
+        actionId,
+        reason: z.enum(["not-found", "conflict", "provider-error", "cancelled", "unknown"]),
+      }),
+    ]),
+    coalesceKey: undefined,
+  },
+} as const;
+
+type Queries = typeof queries;
+type Mutations = typeof mutations;
+type Subscriptions = typeof subscriptions;
+export type ProcedureName = keyof Queries | keyof Mutations;
+export type SubscriptionName = keyof Subscriptions;
+
+export type InputOf<N extends ProcedureName> = N extends keyof Queries
+  ? z.input<Queries[N]["input"]>
+  : N extends keyof Mutations
+    ? z.input<Mutations[N]["input"]>
+    : never;
+export type OutputOf<N extends ProcedureName> = N extends keyof Queries
+  ? z.output<Queries[N]["output"]>
+  : N extends keyof Mutations
+    ? z.output<Mutations[N]["output"]>
+    : never;
+export type SubInputOf<N extends SubscriptionName> = z.input<Subscriptions[N]["input"]>;
+export type EventOf<N extends SubscriptionName> = z.output<Subscriptions[N]["event"]>;
+
+/** Looks a procedure up by name; queries and mutations share one namespace. */
+export const procedureSchemas = (name: string) => {
+  if (Object.hasOwn(queries, name)) return queries[name as keyof Queries];
+  if (Object.hasOwn(mutations, name)) return mutations[name as keyof Mutations];
+  return undefined;
+};
+export const subscriptionSchemas = (name: string) =>
+  Object.hasOwn(subscriptions, name) ? subscriptions[name as SubscriptionName] : undefined;
