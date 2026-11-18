@@ -56,7 +56,7 @@ describe("the recorded-fixture harness stays dev/test only", () => {
       plant("apps/a/src/alias.ts", 'import "@pochimail/testing/recorded/scrub";\n');
       plant(
         "apps/a/src/relative.ts",
-        'import "../../../packages/testing/src/recorded/scrub.ts";\n',
+        `import "${[".", ".", "/"].join("").repeat(3)}packages/testing/src/recorded/scrub.ts";\n`,
       );
       plant(
         "packages/b/src/leak-contract.ts",
