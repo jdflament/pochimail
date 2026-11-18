@@ -1,5 +1,6 @@
 import type { Account } from "@pochimail/core/domain/account";
 import type { ActionLog, Suggestion } from "@pochimail/core/domain/action";
+import type { DerivedMessage } from "@pochimail/core/domain/derived";
 import type { Message, SenderStats, Thread, Topic } from "@pochimail/core/domain/mail";
 import { Cancelled, NotFound, StorageError } from "@pochimail/core/errors";
 import type { WorkspaceId } from "@pochimail/core/ids";
@@ -15,6 +16,7 @@ interface Data {
   accounts: Map<string, Account>;
   messages: Map<string, Message>;
   threads: Map<string, Thread>;
+  derived: Map<string, DerivedMessage>;
   senders: Map<string, SenderStats>;
   suggestions: Map<string, Suggestion>;
   actionLog: Map<string, ActionLog>;
@@ -27,6 +29,7 @@ const emptyData = (): Data => ({
   accounts: new Map(),
   messages: new Map(),
   threads: new Map(),
+  derived: new Map(),
   senders: new Map(),
   suggestions: new Map(),
   actionLog: new Map(),
@@ -115,6 +118,16 @@ export function createInMemoryUnitOfWork(): InMemoryUnitOfWork {
           }) as never,
       },
       threads: { get: (ws, id) => found(data().threads, key(ws, id), "Thread") },
+      derived: {
+        get: (ws, id) => found(data().derived, key(ws, id), "Derived data"),
+        list: (ws, acc, page) =>
+          guarded(() => {
+            const rows = [...data().derived.values()]
+              .filter((d) => d.workspaceId === ws && d.accountId === acc)
+              .sort((a, b) => byText(a.messageId, b.messageId));
+            return ok(paginate(rows, page));
+          }) as never,
+      },
       senders: {
         get: (ws, acc, address) => found(data().senders, key(ws, acc, address), "Sender"),
         list: (ws, acc, page) =>
@@ -213,6 +226,10 @@ export function createInMemoryUnitOfWork(): InMemoryUnitOfWork {
           data().messages.set(key(ws, id), { ...existing, category });
           return ok(undefined);
         },
+      },
+      derived: {
+        ...r.derived,
+        save: (d) => put(() => data().derived, key(d.workspaceId, d.messageId), d),
       },
       threads: {
         ...r.threads,

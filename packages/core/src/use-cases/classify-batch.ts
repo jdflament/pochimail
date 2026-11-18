@@ -1,6 +1,7 @@
 import type { Clock } from "../clock.ts";
 import { categorySchema } from "../domain/category.ts";
 import { confidenceSchema } from "../domain/common.ts";
+import { DERIVED_SNIPPET_MAX_CHARS, type DerivedMessage } from "../domain/derived.ts";
 import type { Message } from "../domain/mail.ts";
 import type { Cancelled, NotFound, StorageError } from "../errors.ts";
 import type { DomainEventOf } from "../events/catalog.ts";
@@ -30,7 +31,7 @@ export interface ClassifyBatchReport {
 export type ClassifyBatchError = AiError | StorageError | NotFound | Cancelled;
 
 /**
- * Classifies stored messages in one batch and records the category.
+ * Classifies stored messages in one batch and records the category plus its derived data (reason, confidence, version, short snippet).
  *
  * Works on stored headers and metadata only: it never fetches or persists a body (follows
  * proposed D11). The category is set and `MessageClassified` is emitted in ONE transaction, so a
@@ -76,6 +77,23 @@ export class ClassifyBatch {
           c.category,
         );
         if (!set.ok) return set;
+        const message = byId.get(c.messageId);
+        const derived: DerivedMessage = {
+          schemaVersion: 1,
+          workspaceId: request.workspaceId,
+          accountId: c.accountId,
+          messageId: c.messageId,
+          category: c.category,
+          reason: c.reasons.filter((r) => r.length > 0).join("; ") || "No reason given",
+          confidence: c.confidence,
+          modelVersion: c.modelVersion ?? "unknown",
+          ...(c.templateHash ? { templateHash: c.templateHash } : {}),
+          ...(c.embeddingRef ? { embeddingRef: c.embeddingRef } : {}),
+          snippet: (message?.snippet ?? "").slice(0, DERIVED_SNIPPET_MAX_CHARS),
+          derivedAt: at,
+        };
+        const saved = await tx.repositories.derived.save(derived);
+        if (!saved.ok) return saved;
         const event = {
           id: `classified:${c.messageId}:${c.category}`,
           type: "MessageClassified",

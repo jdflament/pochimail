@@ -11,6 +11,10 @@ export interface Classification {
   readonly category: Category;
   readonly confidence: number;
   readonly reasons: readonly string[];
+  /** Rules or model version that decided; recorded with the decision. */
+  readonly modelVersion?: string;
+  readonly templateHash?: string;
+  readonly embeddingRef?: string;
 }
 
 export interface Classifier {
