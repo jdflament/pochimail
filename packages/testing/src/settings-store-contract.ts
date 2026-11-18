@@ -1,5 +1,9 @@
 import type { WorkspaceId } from "@pochimail/core/ids";
-import { DEFAULT_APP_SETTINGS, type SettingsStore } from "@pochimail/core/ports/settings-store";
+import {
+  type AppSettings,
+  DEFAULT_APP_SETTINGS,
+  type SettingsStore,
+} from "@pochimail/core/ports/settings-store";
 import { unwrap } from "@pochimail/core/result";
 import { expect } from "vitest";
 import { type Check, check, registerContract } from "./contract.ts";
@@ -12,14 +16,20 @@ export const settingsStoreChecks: readonly Check<SettingsStore>[] = [
     "a workspace that never saved gets the safe defaults (guards Autopilot being on after first run)",
     async (s) => {
       expect(unwrap(await s.get(WS_1))).toEqual(DEFAULT_APP_SETTINGS);
-      expect(DEFAULT_APP_SETTINGS.autopilot).toBe(false);
+      expect(DEFAULT_APP_SETTINGS.autonomy).toBe("suggest");
+      expect(Object.values(DEFAULT_APP_SETTINGS.capabilities).every(Boolean)).toBe(true);
     },
   ),
   check(
     "saved settings are read back and stay inside their workspace (guards one workspace changing another's Autopilot)",
     async (s) => {
-      await s.save(WS_1, { autopilot: true, notifications: false });
-      expect(unwrap(await s.get(WS_1))).toEqual({ autopilot: true, notifications: false });
+      const chosen: AppSettings = {
+        autonomy: "autopilot",
+        capabilities: { ...DEFAULT_APP_SETTINGS.capabilities, declutter: false },
+        notifications: false,
+      };
+      await s.save(WS_1, chosen);
+      expect(unwrap(await s.get(WS_1))).toEqual(chosen);
       expect(unwrap(await s.get(WS_2))).toEqual(DEFAULT_APP_SETTINGS);
     },
   ),

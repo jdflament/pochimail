@@ -19,7 +19,8 @@ export class ManageSettings {
     const current = await this.deps.store.get(workspaceId);
     if (!current.ok) return current;
     const next: AppSettings = {
-      autopilot: patch.autopilot ?? current.value.autopilot,
+      autonomy: patch.autonomy ?? current.value.autonomy,
+      capabilities: patch.capabilities ?? current.value.capabilities,
       notifications: patch.notifications ?? current.value.notifications,
     };
     const saved = await this.deps.store.save(workspaceId, next);

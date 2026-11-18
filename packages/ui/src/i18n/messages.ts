@@ -69,6 +69,50 @@ export const messages = {
 
   "setup.title": entry("Set up", []),
   "setup.description": entry("Choose how Pochi can help.", []),
+  "setup.bubble": entry(
+    "Hi, I'm Pochi. Tell me what to help with and how much I'm allowed to do. You can change this anytime in Settings.",
+    [],
+  ),
+  "setup.capabilities.heading": entry("What should I help with?", []),
+  "setup.capabilities.hint": entry("Choose any", []),
+  "setup.capability.catch-what-matters.title": entry("Catch what matters", []),
+  "setup.capability.catch-what-matters.description": entry(
+    "Flag people waiting on you, deadlines and important senders.",
+    [],
+  ),
+  "setup.capability.declutter.title": entry("Declutter", []),
+  "setup.capability.declutter.description": entry(
+    "Unsubscribe and archive what you don't need.",
+    [],
+  ),
+  "setup.capability.organize.title": entry("Organize", []),
+  "setup.capability.organize.description": entry(
+    "Sort email into clear categories and topics, as labels.",
+    [],
+  ),
+  "setup.capability.save-documents.title": entry("Save documents", []),
+  "setup.capability.save-documents.description": entry(
+    "Find attachments that matter and keep them in a folder.",
+    [],
+  ),
+  "setup.autonomy.heading": entry("How much can I do?", []),
+  "setup.autonomy.recommended": entry("Recommended", []),
+  "setup.autonomy.just-look.title": entry("Just look", []),
+  "setup.autonomy.just-look.description": entry("I show you, but never change anything.", []),
+  "setup.autonomy.suggest.title": entry("Suggest", []),
+  "setup.autonomy.suggest.description": entry("I prepare, you approve each step.", []),
+  "setup.autonomy.autopilot.title": entry("Autopilot", []),
+  "setup.autonomy.autopilot.description": entry("I handle the obvious, then tell you.", []),
+  "setup.autonomy.autopilot.reminder": entry(
+    "With Autopilot I only archive or unsubscribe when I'm at least {percent}% sure, and I never touch email from real people. I report what I did and you can undo it, except an unsubscribe, which can't be undone.",
+    ["percent"],
+  ),
+  "setup.invariants": entry(
+    "In every mode, I never delete anything, never act on email from real people without asking, and everything can be undone.",
+    [],
+  ),
+  "setup.start": entry("Start sorting", []),
+  "setup.error": entry("I couldn't start sorting. Please try again.", []),
 
   "documents.title": entry("Documents", []),
   "documents.description": entry("Saved documents will appear here.", []),

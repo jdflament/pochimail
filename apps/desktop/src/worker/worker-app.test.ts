@@ -214,13 +214,13 @@ describe("worker app over the real IPC layer", () => {
   it("settings changes keep the fields the patch did not name (guards a toggle silently resetting Autopilot)", async () => {
     const { client, close } = await connect();
     await client.call("settings.update", { notifications: false });
-    expect(await client.call("settings.get")).toEqual({
-      autopilot: false,
+    expect(await client.call("settings.get")).toMatchObject({
+      autonomy: "suggest",
       notifications: false,
     });
-    await client.call("settings.update", { autopilot: true });
-    expect(await client.call("settings.get")).toEqual({
-      autopilot: true,
+    await client.call("settings.update", { autonomy: "autopilot" });
+    expect(await client.call("settings.get")).toMatchObject({
+      autonomy: "autopilot",
       notifications: false,
     });
     close();

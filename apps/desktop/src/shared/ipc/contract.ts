@@ -1,5 +1,7 @@
 import { categorySchema } from "@pochimail/core/domain/category";
+import { AUTONOMY_LEVELS } from "@pochimail/core/policies/autonomy";
 import { DEVICE_NAMES } from "@pochimail/core/ports/platform";
+import { CAPABILITIES } from "@pochimail/core/ports/settings-store";
 import { z } from "zod";
 
 /**
@@ -9,6 +11,14 @@ import { z } from "zod";
 const accountId = z.string().min(1).max(200);
 const jobId = z.string().min(1).max(200);
 const actionId = z.string().min(1).max(200);
+
+const autonomySchema = z.enum(AUTONOMY_LEVELS);
+const capabilitiesSchema = z.object(
+  Object.fromEntries(CAPABILITIES.map((name) => [name, z.boolean()])) as Record<
+    (typeof CAPABILITIES)[number],
+    z.ZodBoolean
+  >,
+);
 
 const queries = {
   "accounts.list": {
@@ -41,7 +51,11 @@ const queries = {
   },
   "settings.get": {
     input: z.undefined(),
-    output: z.object({ autopilot: z.boolean(), notifications: z.boolean() }),
+    output: z.object({
+      autonomy: autonomySchema,
+      capabilities: capabilitiesSchema,
+      notifications: z.boolean(),
+    }),
   },
   "app.state": {
     input: z.undefined(),
@@ -76,7 +90,11 @@ const mutations = {
     output: z.undefined(),
   },
   "settings.update": {
-    input: z.object({ autopilot: z.boolean().optional(), notifications: z.boolean().optional() }),
+    input: z.object({
+      autonomy: autonomySchema.optional(),
+      capabilities: capabilitiesSchema.optional(),
+      notifications: z.boolean().optional(),
+    }),
     output: z.undefined(),
   },
 } as const;

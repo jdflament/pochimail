@@ -13,6 +13,18 @@ const fakeWorker = () => {
     procedures: {
       "app.state": () => ({ status: "ready" as const, hasConnectedAccount: false }),
       "device.name": () => "Mac" as const,
+      "accounts.list": () => [],
+      "settings.get": () => ({
+        autonomy: "suggest" as const,
+        capabilities: {
+          "catch-what-matters": true,
+          declutter: true,
+          organize: true,
+          "save-documents": true,
+        },
+        notifications: true,
+      }),
+      "settings.update": () => undefined,
     },
     subscriptions: { "app.events": () => undefined, "scan.progress": () => undefined },
   });
@@ -32,3 +44,4 @@ export default { title: "Screens/Onboarding", parameters: { layout: "fullscreen"
 
 export const Welcome = { render: () => <Onboarding path="/welcome" /> };
 export const Connect = { render: () => <Onboarding path="/connect" /> };
+export const Setup = { render: () => <Onboarding path="/setup" /> };

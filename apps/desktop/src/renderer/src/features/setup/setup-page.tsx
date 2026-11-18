@@ -1,10 +1,136 @@
+import { AUTONOMY_LEVELS, AUTOPILOT_CONFIDENCE_THRESHOLD } from "@pochimail/core/policies/autonomy";
+import {
+  type AppSettings,
+  CAPABILITIES,
+  type Capability,
+} from "@pochimail/core/ports/settings-store";
+import { Button } from "@pochimail/ui/components/button";
+import { CheckboxCard } from "@pochimail/ui/components/checkbox-card";
+import { RadioCard } from "@pochimail/ui/components/radio-card";
+import { RadioGroup } from "@pochimail/ui/components/radio-group";
+import { SpeechBubble } from "@pochimail/ui/components/speech-bubble";
 import { t } from "@pochimail/ui/i18n/format.ts";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { LockIcon } from "lucide-react";
+import { useState } from "react";
+import { queryKeys } from "../../lib/query/keys.ts";
+import { useWorkerClient } from "../../lib/worker-context.tsx";
 
+type Choice = Pick<AppSettings, "autonomy" | "capabilities">;
+
+/** Setup: two plain questions and one button (brief §2, §7 item 3). The answers are saved, then the first scan starts. */
 export function SetupPage() {
+  const client = useWorkerClient();
+  const settings = useQuery({
+    queryKey: queryKeys.settings(),
+    queryFn: () => client.call("settings.get"),
+  });
+  // The form starts from the saved answers, so it waits for them; the title stays put so focus is not lost.
   return (
-    <div className="text-center">
-      <h1 className="text-4xl text-balance">{t("setup.title")}</h1>
-      <p className="mt-4 text-muted-foreground">{t("setup.description")}</p>
+    <div className="flex w-full flex-col gap-8">
+      <h1 className="sr-only">{t("setup.title")}</h1>
+      {settings.data ? <SetupForm initial={settings.data} /> : null}
     </div>
+  );
+}
+
+function SetupForm({ initial }: { initial: Choice }) {
+  const client = useWorkerClient();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const [capabilities, setCapabilities] = useState(initial.capabilities);
+  const [autonomy, setAutonomy] = useState(initial.autonomy);
+
+  const start = useMutation({
+    mutationFn: async () => {
+      await client.call("settings.update", { autonomy, capabilities });
+      const accounts = await client.call("accounts.list");
+      // The scan runs in the background; progress arrives on the Overview.
+      await Promise.all(accounts.map(({ id }) => client.call("scan.start", { accountId: id })));
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.settings() });
+      await navigate({ to: "/overview" });
+    },
+  });
+
+  const toggle = (capability: Capability, checked: boolean) =>
+    setCapabilities((current) => ({ ...current, [capability]: checked }));
+
+  return (
+    <form
+      className="flex w-full flex-col gap-8 text-left"
+      onSubmit={(event) => {
+        event.preventDefault();
+        start.mutate();
+      }}
+    >
+      <SpeechBubble>{t("setup.bubble")}</SpeechBubble>
+
+      <section aria-labelledby="setup-capabilities" className="flex flex-col gap-3">
+        <h2 id="setup-capabilities" className="text-xl">
+          {t("setup.capabilities.heading")}{" "}
+          <span className="font-sans text-sm font-normal text-muted-foreground">
+            {t("setup.capabilities.hint")}
+          </span>
+        </h2>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {CAPABILITIES.map((capability) => (
+            <CheckboxCard
+              key={capability}
+              checked={capabilities[capability]}
+              onCheckedChange={(checked) => toggle(capability, checked === true)}
+              title={t(`setup.capability.${capability}.title`)}
+              description={t(`setup.capability.${capability}.description`)}
+            />
+          ))}
+        </div>
+      </section>
+
+      <section aria-labelledby="setup-autonomy" className="flex flex-col gap-3">
+        <h2 id="setup-autonomy" className="text-xl">
+          {t("setup.autonomy.heading")}
+        </h2>
+        <RadioGroup
+          value={autonomy}
+          onValueChange={(value) => setAutonomy(value as Choice["autonomy"])}
+          aria-labelledby="setup-autonomy"
+          className="grid-cols-1 md:grid-cols-3"
+        >
+          {AUTONOMY_LEVELS.map((level) => (
+            <RadioCard
+              key={level}
+              value={level}
+              title={t(`setup.autonomy.${level}.title`)}
+              description={t(`setup.autonomy.${level}.description`)}
+              badge={level === "suggest" ? t("setup.autonomy.recommended") : undefined}
+            />
+          ))}
+        </RadioGroup>
+        {autonomy === "autopilot" ? (
+          <p className="text-sm leading-snug text-foreground">
+            {t("setup.autonomy.autopilot.reminder", {
+              percent: Math.round(AUTOPILOT_CONFIDENCE_THRESHOLD * 100),
+            })}
+          </p>
+        ) : null}
+        <p className="flex items-start gap-2 text-sm text-muted-foreground">
+          <LockIcon aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+          {t("setup.invariants")}
+        </p>
+      </section>
+
+      <div className="flex flex-col items-center gap-3">
+        <Button type="submit" size="lg" className="w-full max-w-[26rem]" disabled={start.isPending}>
+          {t("setup.start")}
+        </Button>
+        {start.isError ? (
+          <p role="alert" className="text-sm text-destructive">
+            {t("setup.error")}
+          </p>
+        ) : null}
+      </div>
+    </form>
   );
 }

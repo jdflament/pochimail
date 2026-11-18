@@ -52,6 +52,50 @@ export const ja = {
 
   "setup.title": entry("設定", []),
   "setup.description": entry("Pochiにどのように手伝ってほしいか選んでください。", []),
+  "setup.bubble": entry(
+    "こんにちは、Pochiです。手伝ってほしいことと、どこまで任せるかを教えてください。設定でいつでも変更できます。",
+    [],
+  ),
+  "setup.capabilities.heading": entry("何をお手伝いしましょうか？", []),
+  "setup.capabilities.hint": entry("複数選べます", []),
+  "setup.capability.catch-what-matters.title": entry("大事なメールを見つける", []),
+  "setup.capability.catch-what-matters.description": entry(
+    "返信を待っている人、期限、重要な送信者をお知らせします。",
+    [],
+  ),
+  "setup.capability.declutter.title": entry("整理して減らす", []),
+  "setup.capability.declutter.description": entry(
+    "不要なメールの配信停止とアーカイブを行います。",
+    [],
+  ),
+  "setup.capability.organize.title": entry("分類する", []),
+  "setup.capability.organize.description": entry(
+    "メールをカテゴリやトピックに分けて、ラベルとして付けます。",
+    [],
+  ),
+  "setup.capability.save-documents.title": entry("書類を保存する", []),
+  "setup.capability.save-documents.description": entry(
+    "大切な添付ファイルを見つけて、フォルダーに保存します。",
+    [],
+  ),
+  "setup.autonomy.heading": entry("どこまで任せますか？", []),
+  "setup.autonomy.recommended": entry("おすすめ", []),
+  "setup.autonomy.just-look.title": entry("見るだけ", []),
+  "setup.autonomy.just-look.description": entry("内容をお見せしますが、何も変更しません。", []),
+  "setup.autonomy.suggest.title": entry("提案する", []),
+  "setup.autonomy.suggest.description": entry("私が準備し、各ステップはあなたが承認します。", []),
+  "setup.autonomy.autopilot.title": entry("オートパイロット", []),
+  "setup.autonomy.autopilot.description": entry("明らかなものは私が処理し、あとで報告します。", []),
+  "setup.autonomy.autopilot.reminder": entry(
+    "オートパイロットでは、{percent}％以上確実なときだけアーカイブや配信停止を行い、個人からのメールには一切触れません。行った内容は報告され、元に戻せます。ただし配信停止は元に戻せません。",
+    ["percent"],
+  ),
+  "setup.invariants": entry(
+    "どのモードでも、何も削除せず、個人からのメールは確認なしに操作せず、すべて元に戻せます。",
+    [],
+  ),
+  "setup.start": entry("整理を始める", []),
+  "setup.error": entry("整理を開始できませんでした。もう一度お試しください。", []),
 
   "documents.title": entry("ドキュメント", []),
   "documents.description": entry("保存したドキュメントがここに表示されます。", []),

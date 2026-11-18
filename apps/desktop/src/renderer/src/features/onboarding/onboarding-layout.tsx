@@ -17,6 +17,8 @@ export function OnboardingLayout() {
   const current = Math.max(index, 0) + 1;
   const total = ONBOARDING_PATHS.length;
   const router = useRouter();
+  // Setup shows Pochi inside its speech bubble and needs room for the card rows.
+  const isSetup = pathname === "/setup";
   const content = useRef<HTMLDivElement>(null);
 
   // The previous screen's focused control unmounts on navigation: once the new screen has rendered,
@@ -51,12 +53,20 @@ export function OnboardingLayout() {
           ))}
         </ol>
       </header>
-      <main className="mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center px-8 pb-16">
-        <Mascot size="lg" />
+      <main
+        className={cn(
+          "mx-auto flex w-full flex-1 flex-col items-center justify-center px-8 pb-16",
+          isSetup ? "max-w-5xl" : "max-w-xl",
+        )}
+      >
+        {isSetup ? null : <Mascot size="lg" />}
         <div
           key={pathname}
           ref={content}
-          className="animate-screen-in motion-reduce:animate-none mt-8 flex w-full flex-col items-center text-center [&_h1]:outline-none"
+          className={cn(
+            "animate-screen-in motion-reduce:animate-none flex w-full flex-col items-center text-center [&_h1]:outline-none",
+            !isSetup && "mt-8",
+          )}
         >
           <Outlet />
         </div>
