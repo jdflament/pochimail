@@ -1,3 +1,4 @@
+import { categorySchema } from "@pochimail/core/domain/category";
 import { DEVICE_NAMES } from "@pochimail/core/ports/platform";
 import { z } from "zod";
 
@@ -28,6 +29,11 @@ const queries = {
       scanned: z.number().int().nonnegative(),
       toReview: z.number().int().nonnegative(),
     }),
+  },
+  /** Email counts per category over the given accounts (the switcher's selection); counts only, never content. */
+  "mailbox.categories": {
+    input: z.object({ accountIds: z.array(accountId).max(100) }),
+    output: z.record(categorySchema, z.number().int().nonnegative()),
   },
   "digest.get": {
     input: z.undefined(),

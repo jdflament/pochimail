@@ -1,5 +1,6 @@
 import type { Account } from "@pochimail/core/domain/account";
 import type { ActionLog, Suggestion } from "@pochimail/core/domain/action";
+import { CATEGORIES, type Category } from "@pochimail/core/domain/category";
 import type { DerivedMessage } from "@pochimail/core/domain/derived";
 import type {
   Message,
@@ -187,6 +188,16 @@ export function createInMemoryUnitOfWork(): InMemoryUnitOfWork {
               )
               .sort((a, b) => byText(b.receivedAt, a.receivedAt) || byText(a.id, b.id));
             return ok(paginate(rows, q));
+          }) as never,
+        countByCategory: (ws, accountIds) =>
+          guarded(() => {
+            const counts = Object.fromEntries(CATEGORIES.map((c) => [c, 0])) as Record<
+              Category,
+              number
+            >;
+            for (const m of data().messages.values())
+              if (m.workspaceId === ws && accountIds.includes(m.accountId)) counts[m.category] += 1;
+            return ok(counts);
           }) as never,
         latestSequence: (ws, acc) =>
           guarded(() => {

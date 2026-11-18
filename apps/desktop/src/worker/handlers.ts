@@ -3,6 +3,7 @@ import type { DomainEvent } from "@pochimail/core/events/catalog";
 import { AccountId, type WorkspaceId } from "@pochimail/core/ids";
 import type { EventBus } from "@pochimail/core/ports/event-bus";
 import type { DeviceName } from "@pochimail/core/ports/platform";
+import type { CountCategories } from "@pochimail/core/use-cases/count-categories";
 import type { GetOverview } from "@pochimail/core/use-cases/get-overview";
 import type { LatestDigest } from "@pochimail/core/use-cases/latest-digest";
 import type { ListAccounts } from "@pochimail/core/use-cases/list-accounts";
@@ -19,6 +20,7 @@ export interface HandlerDeps {
   readonly workspaceId: WorkspaceId;
   readonly listAccounts: ListAccounts;
   readonly getOverview: GetOverview;
+  readonly categories: CountCategories;
   readonly latestDigest: LatestDigest;
   readonly settings: ManageSettings;
   readonly scans: ScanRunner;
@@ -73,6 +75,14 @@ export function createHandlers(deps: HandlerDeps): Handlers {
           displayName: account.address,
         })),
       "overview.get": async () => unwrapOrThrow(await deps.getOverview.execute(workspaceId)),
+      "mailbox.categories": async ({ accountIds }) => {
+        return unwrapOrThrow(
+          await deps.categories.execute(
+            workspaceId,
+            accountIds.map((id) => unwrapOrThrow(AccountId(id))),
+          ),
+        );
+      },
       "digest.get": () => deps.latestDigest.get(),
       "settings.get": async () => unwrapOrThrow(await deps.settings.get(workspaceId)),
       "settings.update": async (patch) => {

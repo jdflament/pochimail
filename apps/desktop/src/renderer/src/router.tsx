@@ -15,6 +15,7 @@ import { DocumentsPage } from "./features/documents/documents-page.tsx";
 import { OverviewPage } from "./features/overview/overview-page.tsx";
 import { SettingsPage } from "./features/settings/settings-page.tsx";
 import { SetupPage } from "./features/setup/setup-page.tsx";
+import { AppFrame } from "./features/shell/app-frame.tsx";
 import { WelcomePage } from "./features/welcome/welcome-page.tsx";
 
 export type RouterContext = {
@@ -23,6 +24,16 @@ export type RouterContext = {
 
 const rootRoute = createRootRouteWithContext<RouterContext>()({
   component: Outlet,
+  // The account selection (switcher) lives in the URL so every screen filters by it.
+  validateSearch: (search: Record<string, unknown>): { account?: string } =>
+    typeof search.account === "string" && search.account !== "" ? { account: search.account } : {},
+});
+
+// Every screen after onboarding shares one frame (sidebar / rail / tabs); it never remounts between them.
+const shellRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  id: "shell",
+  component: AppFrame,
 });
 
 const indexRoute = createRoute({
@@ -55,31 +66,31 @@ const setupRoute = createRoute({
 });
 
 const overviewRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: "/overview",
   component: OverviewPage,
 });
 
 const categoryRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: "/category/$categoryId",
   component: CategoryPage,
 });
 
 const documentsRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: "/documents",
   component: DocumentsPage,
 });
 
 const activityRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: "/activity",
   component: ActivityPage,
 });
 
 const settingsRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => shellRoute,
   path: "/settings",
   component: SettingsPage,
 });
@@ -95,11 +106,13 @@ const routeTree = rootRoute.addChildren([
   welcomeRoute,
   connectRoute,
   setupRoute,
-  overviewRoute,
-  categoryRoute,
-  documentsRoute,
-  activityRoute,
-  settingsRoute,
+  shellRoute.addChildren([
+    overviewRoute,
+    categoryRoute,
+    documentsRoute,
+    activityRoute,
+    settingsRoute,
+  ]),
   devGalleryRoute,
 ]);
 

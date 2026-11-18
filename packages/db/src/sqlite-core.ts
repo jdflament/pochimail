@@ -1,6 +1,6 @@
 import { accountSchema } from "@pochimail/core/domain/account";
 import { actionLogSchema, suggestionSchema } from "@pochimail/core/domain/action";
-import type { Category } from "@pochimail/core/domain/category";
+import { CATEGORIES, type Category, categorySchema } from "@pochimail/core/domain/category";
 import { derivedMessageSchema } from "@pochimail/core/domain/derived";
 import type { IncomingMessage, Message, StoredSignal } from "@pochimail/core/domain/mail";
 import {
@@ -225,6 +225,7 @@ const topicData = z.object({ data: z.string() });
 const cursorToken = z.object({ token: z.string() });
 const digestRow = z.object({ last_digest_at: z.iso.datetime() });
 const countRow = z.object({ value: z.number() });
+const categoryCountRow = z.object({ category: categorySchema, value: z.number() });
 
 /** Statements and logic of every repository, bound to one connection. */
 export function createSqliteCore(db: Database) {
@@ -471,6 +472,25 @@ export function createSqliteCore(db: Database) {
           account,
         );
         return countRow.parse(r).value;
+      }),
+    countByCategory: (ws: string, accountIds: readonly string[]) =>
+      guard(() => {
+        const counts = Object.fromEntries(CATEGORIES.map((c) => [c, 0])) as Record<
+          Category,
+          number
+        >;
+        if (accountIds.length === 0) return counts;
+        const marks = accountIds.map(() => "?").join(", ");
+        const rows = all(
+          `SELECT category, count(*) AS value FROM message WHERE workspace_id = ? AND account_id IN (${marks}) GROUP BY category`,
+          ws,
+          ...accountIds,
+        );
+        for (const r of rows) {
+          const { category, value } = categoryCountRow.parse(r);
+          counts[category] = value;
+        }
+        return counts;
       }),
     upsertMany: (batch: readonly IncomingMessage[], signal?: { readonly aborted: boolean }) =>
       guard(() => {

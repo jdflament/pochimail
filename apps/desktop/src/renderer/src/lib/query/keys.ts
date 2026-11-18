@@ -2,6 +2,7 @@
 export const queryKeys = {
   appState: () => ["app", "state"] as const,
   accounts: () => ["accounts", "list"] as const,
+  categoryCounts: (accountIds: readonly string[]) => ["mailbox", "categories", accountIds] as const,
   overview: () => ["overview"] as const,
   digest: () => ["digest"] as const,
   settings: () => ["settings"] as const,

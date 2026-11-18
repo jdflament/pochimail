@@ -12,6 +12,7 @@ import type { OutboxStore } from "@pochimail/core/ports/outbox";
 import type { DeviceName } from "@pochimail/core/ports/platform";
 import type { SettingsStore } from "@pochimail/core/ports/settings-store";
 import type { UnitOfWork } from "@pochimail/core/ports/unit-of-work";
+import { CountCategories } from "@pochimail/core/use-cases/count-categories";
 import { GetOverview } from "@pochimail/core/use-cases/get-overview";
 import { LatestDigest } from "@pochimail/core/use-cases/latest-digest";
 import { ListAccounts } from "@pochimail/core/use-cases/list-accounts";
@@ -91,6 +92,7 @@ export function createWorkerApp(adapters: WorkerAdapters): WorkerApp {
     workspaceId,
     listAccounts: new ListAccounts({ uow }),
     getOverview: new GetOverview({ uow, clock }),
+    categories: new CountCategories({ uow }),
     latestDigest,
     settings: new ManageSettings({ store: adapters.settings }),
     scans,

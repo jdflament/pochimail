@@ -62,6 +62,11 @@ export interface MessageReader {
    * every first insert, whatever the message's own date, so "stored since" never misses late mail.
    */
   latestSequence(ws: WorkspaceId, accountId: AccountId): AsyncResult<number, StorageError>;
+  /** Emails per category over the given accounts, one aggregate read (every category present, 0 when empty). */
+  countByCategory(
+    ws: WorkspaceId,
+    accountIds: readonly AccountId[],
+  ): AsyncResult<Readonly<Record<Category, number>>, StorageError>;
 }
 export interface MessageWriter {
   /** Inserts or updates by id; a re-run with the same input changes nothing (idempotent). */
