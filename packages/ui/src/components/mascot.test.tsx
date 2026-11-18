@@ -1,23 +1,28 @@
-import { renderToStaticMarkup } from "react-dom/server";
+import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+import { mascotBehaviorContract } from "../test-support/mascot-contract";
 import { Mascot, MascotProvider } from "./mascot";
-import { mascotBehaviorContract } from "./mascot-contract";
+
+function renderMarkup(element: React.ReactElement): string {
+  const { container } = render(element);
+  return container.innerHTML;
+}
 
 describe("Mascot behavior contract", () => {
-  mascotBehaviorContract((element) => renderToStaticMarkup(element));
+  mascotBehaviorContract(renderMarkup);
 });
 
 describe("Mascot public behavior", () => {
   it("guards wrong pose assets by rendering the requested pose with 1x and 2x sources", () => {
-    const html = renderToStaticMarkup(<Mascot pose="reading" />);
+    const html = renderMarkup(<Mascot pose="reading" />);
     expect(html).toContain('data-pose="reading"');
     expect(html).toMatch(
-      /srcSet="[^"]*pochi-reading\.png[^"]* 1x, [^"]*pochi-reading@2x\.png[^"]* 2x"/,
+      /srcset="[^"]*pochi-reading\.png[^"]* 1x, [^"]*pochi-reading@2x\.png[^"]* 2x"/i,
     );
   });
 
   it("guards idle loops missing when animations are enabled by running breathing and blink loops", () => {
-    const html = renderToStaticMarkup(
+    const html = renderMarkup(
       <MascotProvider animations>
         <Mascot pose="default" />
       </MascotProvider>,
@@ -28,13 +33,13 @@ describe("Mascot public behavior", () => {
   });
 
   it("guards missing found reaction by playing the squish-bounce when Pochi finds something", () => {
-    const html = renderToStaticMarkup(<Mascot reaction="found" />);
+    const html = renderMarkup(<Mascot reaction="found" />);
     expect(html).toContain("animate-pochi-found");
     expect(html).toContain('data-reaction="found"');
   });
 
   it("guards found reaction animating when Animations are off", () => {
-    const html = renderToStaticMarkup(
+    const html = renderMarkup(
       <MascotProvider animations={false}>
         <Mascot reaction="found" />
       </MascotProvider>,
@@ -42,5 +47,26 @@ describe("Mascot public behavior", () => {
     expect(html).not.toContain("animate-pochi-found");
     expect(html).not.toContain("animate-pochi-breathe");
     expect(html).not.toContain("animate-pochi-blink");
+  });
+
+  it("guards still mascot when the real prefers-reduced-motion media query is active", () => {
+    const original = window.matchMedia;
+    window.matchMedia = ((query: string) => ({
+      matches: true,
+      media: query,
+      onchange: null,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      addListener: () => {},
+      removeListener: () => {},
+      dispatchEvent: () => false,
+    })) as typeof window.matchMedia;
+    try {
+      const html = renderMarkup(<Mascot pose="default" />);
+      expect(html).not.toMatch(/animate-pochi-(breathe|blink|found)/);
+      expect(html).toContain('data-animated="false"');
+    } finally {
+      window.matchMedia = original;
+    }
   });
 });

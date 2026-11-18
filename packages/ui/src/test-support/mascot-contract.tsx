@@ -7,11 +7,29 @@ import {
   Mascot,
   type MascotPose,
   MascotProvider,
-} from "./mascot";
+} from "../components/mascot";
 
 export type MascotRender = (element: React.ReactElement) => string;
 
 const POSES: readonly MascotPose[] = ["default", "happy", "reading", "saving", "night"];
+
+function stubReducedMotion(matches: boolean): () => void {
+  if (typeof window === "undefined") return () => {};
+  const original = window.matchMedia;
+  window.matchMedia = ((query: string) => ({
+    matches,
+    media: query,
+    onchange: null,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    dispatchEvent: () => false,
+  })) as typeof window.matchMedia;
+  return () => {
+    window.matchMedia = original;
+  };
+}
 
 export function mascotBehaviorContract(render: MascotRender): void {
   it("guards still mascot when Animations preference is off", () => {
@@ -24,12 +42,17 @@ export function mascotBehaviorContract(render: MascotRender): void {
   });
 
   it("guards still mascot when prefers-reduced-motion is active", () => {
-    const html = render(
-      <MascotProvider reducedMotion>
-        <Mascot pose="default" />
-      </MascotProvider>,
-    );
-    expect(html).not.toMatch(/animate-pochi-(breathe|blink|found)/);
+    const restore = stubReducedMotion(true);
+    try {
+      const html = render(
+        <MascotProvider>
+          <Mascot pose="default" />
+        </MascotProvider>,
+      );
+      expect(html).not.toMatch(/animate-pochi-(breathe|blink|found)/);
+    } finally {
+      restore();
+    }
   });
 
   it("guards layout shift when Show Pochi is off by rendering no mascot but keeping layout intact", () => {
@@ -63,5 +86,3 @@ export function mascotBehaviorContract(render: MascotRender): void {
     }
   });
 }
-
-export { POSES };

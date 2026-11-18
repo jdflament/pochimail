@@ -46,25 +46,18 @@ function usePrefersReducedMotion(): boolean {
   return React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
-const ReducedMotionContext = React.createContext<boolean | undefined>(undefined);
-
 function MascotProvider({
   showPochi = true,
   animations = true,
-  reducedMotion,
   children,
 }: {
   showPochi?: boolean;
   animations?: boolean;
-  /** Override system prefers-reduced-motion detection (useful for tests). */
-  reducedMotion?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <ShowPochiContext value={showPochi}>
-      <AnimationsContext value={animations}>
-        <ReducedMotionContext value={reducedMotion}>{children}</ReducedMotionContext>
-      </AnimationsContext>
+      <AnimationsContext value={animations}>{children}</AnimationsContext>
     </ShowPochiContext>
   );
 }
@@ -76,7 +69,7 @@ const mascotVariants = cva("block h-auto select-none", {
   defaultVariants: { size: "md" },
 });
 
-type MascotProps = Omit<React.ComponentProps<"img">, "src" | "srcSet"> &
+type MascotProps = Omit<React.ComponentProps<"span">, "children"> &
   VariantProps<typeof mascotVariants> & {
     pose?: MascotPose;
     /** Local override; hidden when this or the provider's `showPochi` is false. */
@@ -85,6 +78,8 @@ type MascotProps = Omit<React.ComponentProps<"img">, "src" | "srcSet"> &
     animations?: boolean;
     /** One-shot "finds something" reaction (squish-bounce). */
     reaction?: "found";
+    /** Decorative by default; set when Pochi carries meaning. */
+    alt?: string;
   };
 
 function Mascot({
@@ -95,13 +90,12 @@ function Mascot({
   reaction,
   alt = "",
   className,
+  style,
   ...props
 }: MascotProps) {
   const showPochi = React.use(ShowPochiContext);
   const animationsPref = React.use(AnimationsContext);
-  const reducedMotionOverride = React.use(ReducedMotionContext);
-  const systemReducedMotion = usePrefersReducedMotion();
-  const prefersReducedMotion = reducedMotionOverride ?? systemReducedMotion;
+  const prefersReducedMotion = usePrefersReducedMotion();
   const animationsEnabled = (animations ?? animationsPref) && !prefersReducedMotion;
 
   if (!show || !showPochi) {
@@ -110,6 +104,8 @@ function Mascot({
         data-slot="mascot-placeholder"
         aria-hidden="true"
         className={cn(mascotVariants({ size }), "invisible aspect-[512/435]", className)}
+        style={style}
+        {...props}
       />
     );
   }
@@ -130,7 +126,8 @@ function Mascot({
         found && "animate-pochi-found",
         className,
       )}
-      style={found ? { transformOrigin: "50% 95%" } : { transformOrigin: "50% 92%" }}
+      style={{ transformOrigin: found ? "50% 95%" : "50% 92%", ...style }}
+      {...props}
     >
       <span
         data-slot="mascot-breathe"
@@ -148,7 +145,6 @@ function Mascot({
             srcSet={`${x1} 1x, ${x2} 2x`}
             alt={alt}
             className="block h-auto w-full"
-            {...props}
           />
         </span>
       </span>

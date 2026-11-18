@@ -21,7 +21,7 @@
 
   @keyframes pochi-blink {
     0%, 93%, 100% { transform: scaleY(1); }
-    96% { transform: scaleY(0.97); }
+    96% { transform: scaleY(0.12); }
   }
 
   @keyframes pochi-found {

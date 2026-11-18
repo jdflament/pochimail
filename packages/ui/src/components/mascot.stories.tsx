@@ -16,6 +16,9 @@ export const Reading: Story = { args: { pose: "reading" } };
 export const Saving: Story = { args: { pose: "saving" } };
 export const Night: Story = { args: { pose: "night" } };
 
+export const Small: Story = { args: { size: "sm" } };
+export const Large: Story = { args: { size: "lg" } };
+
 export const FoundReaction: Story = {
   args: { pose: "reading", reaction: "found" },
 };
@@ -45,10 +48,23 @@ export const ShowPochiOff: Story = {
 
 export const ReducedMotion: Story = {
   decorators: [
-    (Story) => (
-      <MascotProvider reducedMotion>
-        <Story />
-      </MascotProvider>
-    ),
+    (Story) => {
+      const original = window.matchMedia;
+      window.matchMedia = ((query: string) => ({
+        matches: query === "(prefers-reduced-motion: reduce)",
+        media: query,
+        onchange: null,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        addListener: () => {},
+        removeListener: () => {},
+        dispatchEvent: () => false,
+      })) as typeof window.matchMedia;
+      try {
+        return <Story />;
+      } finally {
+        window.matchMedia = original;
+      }
+    },
   ],
 };
