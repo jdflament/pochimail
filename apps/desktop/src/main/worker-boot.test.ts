@@ -1,0 +1,71 @@
+import { createLogger, type LogRecord } from "@pochimail/core/logger";
+import { err, ok } from "@pochimail/core/result";
+import { describe, expect, it } from "vitest";
+import { DatabaseKeyError } from "./storage-key.ts";
+import { bootWorker } from "./worker-start.ts";
+
+const setup = () => {
+  const records: LogRecord[] = [];
+  const posted: unknown[] = [];
+  let killed = false;
+  return {
+    records,
+    posted,
+    killed: () => killed,
+    options: {
+      worker: {
+        postMessage: (m: unknown) => void posted.push(m),
+        kill: () => {
+          killed = true;
+        },
+      },
+      secrets: {} as never,
+      createChannel: () => new MessageChannel() as never,
+      logger: createLogger({ sink: { write: (r) => records.push(r) } }),
+    },
+  };
+};
+
+describe("worker boot", () => {
+  // Guards: the worker silently starting without (or with a fresh) database key after the key file failed to load.
+  it.each([
+    [
+      "an invalid key file",
+      async () => err(new DatabaseKeyError("key-file-invalid")),
+      "key-file-invalid",
+    ],
+    [
+      "a missing key with an existing database",
+      async () => err(new DatabaseKeyError("key-missing-database-exists")),
+      "key-missing-database-exists",
+    ],
+    [
+      "an unexpected throw",
+      async () => {
+        throw new Error("EACCES /secret/path");
+      },
+      "unexpected",
+    ],
+  ])(
+    "does not start the worker and logs a redacted error on %s",
+    async (_name, loadKey, reason) => {
+      const t = setup();
+      expect(await bootWorker({ ...t.options, loadKey })).toBe(false);
+      expect(t.killed()).toBe(true);
+      expect(t.posted).toEqual([]);
+      expect(t.records).toHaveLength(1);
+      expect(t.records[0]?.level).toBe("error");
+      expect(JSON.stringify(t.records)).toContain(reason.replaceAll("-", " "));
+      expect(JSON.stringify(t.records)).not.toContain("/secret/path");
+    },
+  );
+
+  // Guards: the happy path regressing into a refusal to start.
+  it("starts the worker with the key when it loads", async () => {
+    const t = setup();
+    expect(await bootWorker({ ...t.options, loadKey: async () => ok(Buffer.alloc(32, 1)) })).toBe(
+      true,
+    );
+    expect(t.posted).toEqual([{ type: "start", databaseKeyHex: "01".repeat(32) }]);
+  });
+});

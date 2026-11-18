@@ -2,6 +2,7 @@ import { randomBytes } from "node:crypto";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { createLogger } from "@pochimail/core/logger";
 import {
   app,
   BrowserWindow,
@@ -12,9 +13,11 @@ import {
   session,
   utilityProcess,
 } from "electron";
+import { createSecretVault, type SecretVault } from "./secret-vault.ts";
 import { hardenWebContents, isAppUrl, isRequestAllowed, webPreferences } from "./security.ts";
 import { keyProtection, loadOrCreateDatabaseKey } from "./storage-key.ts";
 import { linkWorkerOnEveryLoad } from "./worker-link.ts";
+import { bootWorker } from "./worker-start.ts";
 
 const devServerUrl = process.env.ELECTRON_RENDERER_URL;
 const devServerOrigin = devServerUrl === undefined ? undefined : new URL(devServerUrl).origin;
@@ -43,11 +46,48 @@ const lockDownSession = (): void => {
   });
 };
 
+// Redacted records only (core logger allow-list); structured JSON, same shape as the request-blocked warning.
+const logger = createLogger({
+  sink: {
+    write: (record) =>
+      console.warn(
+        JSON.stringify({ level: record.level, message: record.message, ...record.fields }),
+      ),
+  },
+});
+const DATABASE_FILE = "pochimail.db";
+
+// One vault per process: every window's worker shares its write queue, so concurrent updates never lose an entry.
+let secretVault: SecretVault | undefined;
+const processSecretVault = (): SecretVault => {
+  secretVault ??= createSecretVault({
+    vault: safeStorage,
+    file: join(app.getPath("userData"), "secrets.json"),
+    platform: process.platform,
+    logger,
+  });
+  return secretVault;
+};
+
 const connectWorker = (window: BrowserWindow): void => {
   const worker = utilityProcess.fork(join(import.meta.dirname, "worker.js"), [], {
     serviceName: "pochimail-worker",
   });
   linkWorkerOnEveryLoad(window.webContents, worker, () => new MessageChannelMain());
+  const userData = app.getPath("userData");
+  void bootWorker({
+    worker,
+    secrets: processSecretVault(),
+    loadKey: () =>
+      loadOrCreateDatabaseKey(
+        safeStorage,
+        join(userData, "db.key"),
+        process.platform,
+        join(userData, DATABASE_FILE),
+      ),
+    createChannel: () => new MessageChannelMain(),
+    logger,
+  });
   window.once("closed", () => worker.kill());
 };
 
@@ -56,9 +96,13 @@ const smokeStorage = async (): Promise<void> => {
   const dir = mkdtempSync(join(tmpdir(), "pochimail-smoke-"));
   const protection = await keyProtection(safeStorage, process.platform);
   // Without a keychain (Linux basic_text) the real app must ask first; the smoke still proves the driver with a throwaway key.
-  const key =
-    (await loadOrCreateDatabaseKey(safeStorage, join(dir, "db.key"), process.platform)) ??
-    randomBytes(32);
+  const loaded = await loadOrCreateDatabaseKey(
+    safeStorage,
+    join(dir, "db.key"),
+    process.platform,
+    join(dir, "smoke.db"),
+  );
+  const key = (loaded.ok ? loaded.value : undefined) ?? randomBytes(32);
   const child = utilityProcess.fork(join(import.meta.dirname, "storage-smoke.js"), [], {
     serviceName: "pochimail-storage-smoke",
   });

@@ -23,7 +23,10 @@ describe("worker connection across page loads", () => {
         postMessage: (_channel: string, _msg: unknown, ports: unknown[]) =>
           void toRenderer.push(ports[0] as MessagePort),
       } as never,
-      { postMessage: (_msg: unknown, ports: unknown[]) => void parent.emit("message", { ports }) },
+      {
+        postMessage: (data: unknown, ports: unknown[]) =>
+          void parent.emit("message", { data, ports }),
+      },
       () => new MessageChannel() as never,
     );
     // Worker side: real port-accepting code serving echo.
