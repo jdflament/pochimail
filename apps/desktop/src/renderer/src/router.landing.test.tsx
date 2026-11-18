@@ -15,7 +15,7 @@ const createFakeAppClient = (hasConnectedAccount: boolean) => {
   serveRpc(fromDomPort(port2), {
     procedures: {
       "app.state": () => ({ status: "ready" as const, hasConnectedAccount }),
-      "device.name": () => "device" as const,
+      "device.name": () => "Mac" as const,
       "accounts.list": () => [],
       "overview.get": () => ({ scanned: 0, toReview: 0 }),
       "mailbox.categories": () => ({
@@ -79,12 +79,24 @@ describe("first-run redirect from app.state", () => {
     fake.close();
   });
 
-  // Guards: the privacy promise shipping with an unresolved {device} placeholder.
-  it("Welcome shows the device in the privacy promise with no placeholder left", async () => {
+  // Guards: the privacy promise ignoring the OS name (showing "device" or a raw placeholder).
+  it("Welcome names the OS in the privacy promise", async () => {
     const fake = createFakeAppClient(false);
     render(<App workerClient={fake.client} />);
-    await waitFor(() => expect(screen.getByText(/never leaves this device\./)).toBeTruthy());
+    await waitFor(() =>
+      expect(screen.getByText(/Your email never leaves this Mac\./)).toBeTruthy(),
+    );
     expect(document.body.textContent).not.toMatch(/[{}[\]]/);
+    fake.close();
+  });
+
+  // Guards: focus dropping to <body> when Get started unmounts (keyboard users lose their place).
+  it("moves focus to the Connect heading after Get started", async () => {
+    const fake = createFakeAppClient(false);
+    render(<App workerClient={fake.client} />);
+    fireEvent.click(await screen.findByRole("link", { name: "Get started" }));
+    const heading = await screen.findByRole("heading", { name: "Connect" });
+    await waitFor(() => expect(document.activeElement).toBe(heading));
     fake.close();
   });
 });
