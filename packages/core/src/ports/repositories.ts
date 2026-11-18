@@ -2,7 +2,14 @@ import type { Account } from "../domain/account.ts";
 import type { ActionLog, Suggestion } from "../domain/action.ts";
 import type { Category } from "../domain/category.ts";
 import type { DerivedMessage } from "../domain/derived.ts";
-import type { IncomingMessage, Message, SenderStats, Thread, Topic } from "../domain/mail.ts";
+import type {
+  IncomingMessage,
+  Message,
+  SenderStats,
+  StoredSignal,
+  Thread,
+  Topic,
+} from "../domain/mail.ts";
 import type { NotFound, StorageError } from "../errors.ts";
 import type {
   AccountId,
@@ -138,6 +145,33 @@ export interface CursorWriter {
   set(ws: WorkspaceId, accountId: AccountId, cursor: SyncCursor): AsyncResult<void, StorageError>;
 }
 
+export interface SignalReader {
+  /** Stored signals of the given messages, sorted by message id then kind. */
+  listForMessages(
+    ws: WorkspaceId,
+    messageIds: readonly MessageId[],
+  ): AsyncResult<readonly StoredSignal[], StorageError>;
+}
+export interface SignalWriter {
+  /**
+   * One row per message and signal kind. Replaces every stored signal of `messageIds` with
+   * `signals`, so a signal that no longer applies disappears and a re-run changes nothing.
+   */
+  replaceForMessages(
+    ws: WorkspaceId,
+    messageIds: readonly MessageId[],
+    signals: readonly StoredSignal[],
+  ): AsyncResult<void, StorageError>;
+}
+
+export interface DigestStateReader {
+  /** When the last digest of the account was generated; `null` before the first one. */
+  get(ws: WorkspaceId, accountId: AccountId): AsyncResult<string | null, StorageError>;
+}
+export interface DigestStateWriter {
+  set(ws: WorkspaceId, accountId: AccountId, lastDigestAt: string): AsyncResult<void, StorageError>;
+}
+
 export type AccountRepository = AccountReader & AccountWriter;
 export type MessageRepository = MessageReader & MessageWriter;
 export type DerivedRepository = DerivedReader & DerivedWriter;
@@ -147,6 +181,8 @@ export type SuggestionRepository = SuggestionReader & SuggestionWriter;
 export type ActionLogRepository = ActionLogReader & ActionLogWriter;
 export type TopicRepository = TopicReader & TopicWriter;
 export type CursorRepository = CursorReader & CursorWriter;
+export type SignalRepository = SignalReader & SignalWriter;
+export type DigestStateRepository = DigestStateReader & DigestStateWriter;
 
 export interface ReadRepositories {
   readonly accounts: AccountReader;
@@ -158,6 +194,8 @@ export interface ReadRepositories {
   readonly actionLog: ActionLogReader;
   readonly topics: TopicReader;
   readonly cursors: CursorReader;
+  readonly signals: SignalReader;
+  readonly digestState: DigestStateReader;
 }
 
 export interface WriteRepositories {
@@ -170,4 +208,6 @@ export interface WriteRepositories {
   readonly actionLog: ActionLogRepository;
   readonly topics: TopicRepository;
   readonly cursors: CursorRepository;
+  readonly signals: SignalRepository;
+  readonly digestState: DigestStateRepository;
 }

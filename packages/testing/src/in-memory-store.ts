@@ -1,7 +1,13 @@
 import type { Account } from "@pochimail/core/domain/account";
 import type { ActionLog, Suggestion } from "@pochimail/core/domain/action";
 import type { DerivedMessage } from "@pochimail/core/domain/derived";
-import type { Message, SenderStats, Thread, Topic } from "@pochimail/core/domain/mail";
+import type {
+  Message,
+  SenderStats,
+  StoredSignal,
+  Thread,
+  Topic,
+} from "@pochimail/core/domain/mail";
 import { Cancelled, NotFound, StorageError } from "@pochimail/core/errors";
 import type { WorkspaceId } from "@pochimail/core/ids";
 import type { AsyncResult, CancelSignal, Page, PageRequest } from "@pochimail/core/ports/common";
@@ -22,6 +28,8 @@ interface Data {
   actionLog: Map<string, ActionLog>;
   topics: Map<string, Topic>;
   cursors: Map<string, SyncCursor>;
+  signals: Map<string, StoredSignal>;
+  digestState: Map<string, string>;
   outbox: OutboxEntry[];
 }
 
@@ -35,6 +43,8 @@ const emptyData = (): Data => ({
   actionLog: new Map(),
   topics: new Map(),
   cursors: new Map(),
+  signals: new Map(),
+  digestState: new Map(),
   outbox: [],
 });
 
@@ -186,6 +196,19 @@ export function createInMemoryUnitOfWork(): InMemoryUnitOfWork {
             return ok(c === undefined ? null : copy(c));
           }) as never,
       },
+      signals: {
+        listForMessages: (ws, ids) =>
+          guarded(() => {
+            const wanted = new Set<string>(ids);
+            const rows = [...data().signals.values()]
+              .filter((s) => s.workspaceId === ws && wanted.has(s.messageId))
+              .sort((a, b) => byText(a.messageId, b.messageId) || byText(a.kind, b.kind));
+            return ok(rows.map(copy));
+          }) as never,
+      },
+      digestState: {
+        get: (ws, acc) => guarded(() => ok(data().digestState.get(key(ws, acc)) ?? null)) as never,
+      },
     };
   }
 
@@ -260,6 +283,23 @@ export function createInMemoryUnitOfWork(): InMemoryUnitOfWork {
       cursors: {
         ...r.cursors,
         set: (ws, acc, cursor) => put(() => data().cursors, key(ws, acc, cursor.scope), cursor),
+      },
+      signals: {
+        ...r.signals,
+        replaceForMessages: async (ws, ids, signals) => {
+          const failure = fail();
+          if (failure) return err(failure);
+          const scope = new Set<string>(ids);
+          for (const [k, s] of data().signals)
+            if (s.workspaceId === ws && scope.has(s.messageId)) data().signals.delete(k);
+          for (const s of signals)
+            data().signals.set(key(s.workspaceId, s.messageId, s.kind), copy(s));
+          return ok(undefined);
+        },
+      },
+      digestState: {
+        ...r.digestState,
+        set: (ws, acc, at) => put(() => data().digestState, key(ws, acc), at),
       },
     };
   }

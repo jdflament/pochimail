@@ -91,3 +91,6 @@ export const signalSchema = z.object({
   detectedAt: timestampSchema,
 });
 export type Signal = z.infer<typeof signalSchema>;
+
+/** A signal as stored: the rule's fixed reason text (never mail content) travels with it. */
+export type StoredSignal = Signal & { readonly reason: string };

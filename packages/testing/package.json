@@ -51,6 +51,8 @@
     "./pipeline-contract": "./src/pipeline-contract.ts",
     "./sync-contract": "./src/sync-contract.ts",
     "./derived-contract": "./src/derived-contract.ts",
+    "./signal-repository-contract": "./src/signal-repository-contract.ts",
+    "./digest-state-contract": "./src/digest-state-contract.ts",
     "./insight-contract": "./src/insight-contract.ts",
     "./eval/compare": "./src/eval/compare.ts",
     "./eval/degraded-classifier": "./src/eval/degraded-classifier.ts",

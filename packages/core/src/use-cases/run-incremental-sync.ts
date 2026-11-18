@@ -1,5 +1,5 @@
 import type { Clock } from "../clock.ts";
-import { type IncomingMessage, incomingMessageSchema } from "../domain/mail.ts";
+import { type IncomingMessage, incomingMessageSchema, type Thread } from "../domain/mail.ts";
 import {
   AuthExpired,
   Cancelled,
@@ -13,7 +13,7 @@ import type { AccountId, WorkspaceId } from "../ids.ts";
 import type { AsyncResult, CancelSignal } from "../ports/common.ts";
 import type { JobRequest } from "../ports/job-queue.ts";
 import type { MailProvider, SyncCursor } from "../ports/mail-provider.ts";
-import type { UnitOfWork } from "../ports/unit-of-work.ts";
+import type { Transaction, UnitOfWork } from "../ports/unit-of-work.ts";
 import { ok } from "../result.ts";
 
 /** Job type enqueued to resume a rate-limited sync; a worker maps it back to this use case. */
@@ -161,6 +161,8 @@ export class RunIncrementalSync {
       const committed = await uow.run(async (tx) => {
         const rows = await tx.repositories.messages.upsertMany(keep);
         if (!rows.ok) return rows;
+        const threads = await upsertThreads(tx, keep);
+        if (!threads.ok) return threads;
         const saved = await tx.repositories.cursors.set(workspaceId, accountId, nextCursor);
         if (!saved.ok) return saved;
         const events = [
@@ -214,4 +216,56 @@ function sanitize(message: IncomingMessage, request: RunIncrementalSyncRequest):
   const m = parsed.data;
   if (m.workspaceId !== request.workspaceId || m.accountId !== request.accountId) return [];
   return [{ ...m, snippet: m.snippet.slice(0, MAX_SNIPPET_CHARS) }];
+}
+
+/**
+ * Keeps one `Thread` per stored message's thread, in the same transaction as the batch. Message
+ * ids stay in arrival order (the last one is the newest), so a replay or an out-of-order
+ * batch never duplicates or reorders. Subject and ids only: no body (D11).
+ */
+async function upsertThreads(
+  tx: Transaction,
+  messages: readonly IncomingMessage[],
+): AsyncResult<void, StorageError> {
+  const byThread = new Map<string, IncomingMessage[]>();
+  for (const m of messages) byThread.set(m.threadId, [...(byThread.get(m.threadId) ?? []), m]);
+
+  for (const added of byThread.values()) {
+    const first = added[0];
+    if (!first) continue;
+    const found = await tx.repositories.threads.get(first.workspaceId, first.threadId);
+    if (!found.ok && found.error.code !== "storage.not_found") return found;
+    const existing = found.ok ? found.value : null;
+
+    // Receipt time of every message in the thread, for ordering: known ones from the store.
+    const times = new Map<string, string>(added.map((m) => [m.id, m.receivedAt]));
+    for (const id of existing?.messageIds ?? []) {
+      if (times.has(id)) continue;
+      const row = await tx.repositories.messages.get(first.workspaceId, id);
+      if (!row.ok) {
+        if (row.error.code === "storage.not_found") continue;
+        return row;
+      }
+      times.set(id, row.value.receivedAt);
+    }
+    const ids = [...new Set([...(existing?.messageIds ?? []), ...added.map((m) => m.id)])];
+    ids.sort((a, b) => {
+      const ta = times.get(a) ?? "";
+      const tb = times.get(b) ?? "";
+      return ta < tb ? -1 : ta > tb ? 1 : a < b ? -1 : a > b ? 1 : 0;
+    });
+    const earliest = ids[0] === undefined ? undefined : added.find((m) => m.id === ids[0]);
+    const thread: Thread = {
+      schemaVersion: 1,
+      id: first.threadId,
+      workspaceId: first.workspaceId,
+      accountId: first.accountId,
+      subject: existing?.subject ?? (earliest ?? first).subject,
+      messageIds: ids as [Thread["messageIds"][number], ...Thread["messageIds"]],
+      lastMessageAt: times.get(ids.at(-1) ?? "") ?? first.receivedAt,
+    };
+    const saved = await tx.repositories.threads.upsert(thread);
+    if (!saved.ok) return saved;
+  }
+  return ok(undefined);
 }

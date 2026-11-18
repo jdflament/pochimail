@@ -5,6 +5,7 @@ import type { IncomingMessage } from "@pochimail/core/domain/mail";
 import type { ProviderError } from "@pochimail/core/errors";
 import { AiUnavailable, AuthExpired, RateLimited } from "@pochimail/core/errors";
 import type { DomainEvent } from "@pochimail/core/events/catalog";
+import type { ThreadId } from "@pochimail/core/ids";
 import type { Classifier } from "@pochimail/core/ports/ai";
 import type { IdGenerator } from "@pochimail/core/ports/id-generator";
 import type { MailProvider } from "@pochimail/core/ports/mail-provider";
@@ -141,6 +142,29 @@ export const syncChecks: readonly Check<SyncHarness>[] = [
       expect([first.status, first.fetched]).toEqual(["completed", 3]);
       expect([second.status, second.fetched]).toEqual(["completed", 2]);
       expect(await storedIds(h, account)).toEqual([1, 2, 3, 4, 5].map((n) => `msg-${n}`));
+    },
+  ),
+  check(
+    "every synced message has its thread with matching counts, and replaying a batch adds no duplicate (guards orphan messages and double-counted threads)",
+    async (h) => {
+      const account = await connected(h);
+      const { sync } = useCases(h);
+      const shared = { threadId: "thr-shared" as ThreadId };
+      const batch = [mail(account, 1, shared), mail(account, 2), mail(account, 3, shared)];
+      await h.deliver(...batch);
+      unwrap(await sync.execute({ workspaceId: WS_A, accountId: account.id }, live()));
+      // Replay the same batch from the start (cursor lost): nothing may double up.
+      await h.deliver(...batch);
+      unwrap(await sync.execute({ workspaceId: WS_A, accountId: account.id }, live()));
+
+      const thread = unwrap(await h.uow.reads.threads.get(WS_A, "thr-shared" as ThreadId));
+      expect(thread.messageIds).toEqual(["msg-1", "msg-3"]);
+      expect(thread.lastMessageAt).toBe(mail(account, 3).receivedAt);
+      expect(unwrap(await h.uow.reads.threads.get(WS_A, "thr-2" as ThreadId)).messageIds).toEqual([
+        "msg-2",
+      ]);
+      const rows = (await h.snapshot()) as { threads: unknown[] };
+      expect(rows.threads).toHaveLength(2);
     },
   ),
   check(

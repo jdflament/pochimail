@@ -10,6 +10,8 @@ import { ok } from "../result.ts";
 import { evaluateSignals } from "./detect-signals.ts";
 
 const PAGE = 200;
+/** Before any digest exists, all stored mail counts as new. */
+export const FIRST_DIGEST_SINCE = "1970-01-01T00:00:00.000Z";
 
 export interface BuildDigestDeps {
   readonly uow: UnitOfWork;
@@ -19,8 +21,11 @@ export interface BuildDigestDeps {
 export interface BuildDigestRequest {
   readonly workspaceId: WorkspaceId;
   readonly accountId: AccountId;
-  /** The previous digest's `generatedAt` (or the first sync): older mail is not summarized. */
-  readonly since: string;
+  /**
+   * Older mail is not summarized. Default: when the account's previous digest was generated
+   * (stored state), or everything before the first digest. An explicit value is for tests.
+   */
+  readonly since?: string;
 }
 
 export type BuildDigestError = StorageError | NotFound | Cancelled;
@@ -41,6 +46,12 @@ export class BuildDigest {
     signal: CancelSignal,
   ): AsyncResult<Digest, BuildDigestError> {
     const { uow, clock } = this.deps;
+    let since = request.since;
+    if (since === undefined) {
+      const last = await uow.reads.digestState.get(request.workspaceId, request.accountId);
+      if (!last.ok) return last;
+      since = last.value ?? FIRST_DIGEST_SINCE;
+    }
     const fresh: { id: MessageId; category: Category }[] = [];
     let cursor: string | undefined;
     do {
@@ -51,7 +62,7 @@ export class BuildDigest {
       });
       if (!page.ok) return page;
       for (const m of page.value.items)
-        if (m.receivedAt > request.since) fresh.push({ id: m.id, category: m.category });
+        if (m.receivedAt > since) fresh.push({ id: m.id, category: m.category });
       cursor = page.value.nextCursor ?? undefined;
     } while (cursor !== undefined);
 
@@ -74,17 +85,24 @@ export class BuildDigest {
       schemaVersion: 1,
       workspaceId: request.workspaceId,
       accountId: request.accountId,
-      since: request.since,
+      since,
       generatedAt,
       newMessageCount: fresh.length,
       byCategory,
       attention,
     };
-    if (fresh.length === 0) return ok(digest);
 
+    // The state advances only once the digest is complete, in the same commit as its event.
     const committed = await uow.run(async (tx) => {
+      const advanced = await tx.repositories.digestState.set(
+        request.workspaceId,
+        request.accountId,
+        generatedAt,
+      );
+      if (!advanced.ok) return advanced;
+      if (fresh.length === 0) return ok(undefined);
       const event = {
-        id: `digest:${request.accountId}:${request.since}`,
+        id: `digest:${request.accountId}:${since}`,
         type: "DigestReady",
         version: 1,
         workspaceId: request.workspaceId,
