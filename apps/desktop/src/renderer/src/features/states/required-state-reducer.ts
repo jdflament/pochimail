@@ -1,19 +1,10 @@
-/**
- * Which required states are active, derived from worker events (M4-16). M2/M3/M8 only emit these
- * events; the UI never polls. Empty category and "Nothing to do" come from counts, not events.
- */
+import type { EventOf } from "../../../../shared/ipc/contract.ts";
+
+/** Worker events (parsed by the IPC contract) plus the two sign-in events the renderer raises itself. */
 export type RequiredStateEvent =
-  | { type: "Offline" }
-  | { type: "Online" }
-  | { type: "RateLimited"; provider: string; resumeAt: number }
-  | { type: "SyncResumed" }
-  | { type: "NeedsReauth"; accountId: string; provider: string }
-  | { type: "Reconnected"; accountId: string }
+  | EventOf<"app.events">
   | { type: "SignInCancelled" }
-  | { type: "SignInStarted" }
-  | { type: "ModelDownloadFailed" }
-  | { type: "ModelDownloadStarted" }
-  | { type: "UpdateReady"; version: string };
+  | { type: "SignInStarted" };
 
 export type RequiredStates = {
   readonly offline: boolean;
@@ -44,9 +35,9 @@ export function reduceRequiredStates(
       return { ...state, offline: false };
     case "RateLimited":
       return { ...state, rateLimit: { provider: event.provider, resumeAt: event.resumeAt } };
-    // The event stream is flowing again: the rate-limit notice clears itself.
+    // Sync flowing again proves we are online and the limit is over: both notices clear themselves.
     case "SyncResumed":
-      return { ...state, rateLimit: null };
+      return { ...state, offline: false, rateLimit: null };
     case "NeedsReauth":
       return {
         ...state,
@@ -70,6 +61,18 @@ export function reduceRequiredStates(
       return { ...state, modelDownloadFailed: false };
     case "UpdateReady":
       return { ...state, updateVersion: event.version };
+    case "ActionApplied":
+    case "ActionFailed":
+    case "ScanCompleted":
+    case "ScanFailed":
+    case "DigestReady":
+      return state;
+    default: {
+      // A newer worker may emit an event this build does not know: ignore it, never crash.
+      const unreachable: never = event;
+      void unreachable;
+      return state;
+    }
   }
 }
 

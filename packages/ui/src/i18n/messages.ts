@@ -157,9 +157,9 @@ export const messages = {
     [],
   ),
   "state.emptyCategory.action": entry("Back to overview", []),
-  "state.nothingToDo.title": entry("Nothing to do", []),
+  "state.nothingToDo.title": entry("All caught up", []),
   "state.nothingToDo.body": entry(
-    "Everything is sorted and nobody is waiting on you. I’ll tell you when that changes.",
+    "Nothing needs you right now. I’ll tell you when that changes.",
     [],
   ),
   "state.nothingToDo.action": entry("Back to overview", []),

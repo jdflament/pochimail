@@ -147,9 +147,9 @@ export const fr = {
     [],
   ),
   "state.emptyCategory.action": entry("Retour à la vue d’ensemble", []),
-  "state.nothingToDo.title": entry("Rien à faire", []),
+  "state.nothingToDo.title": entry("Tout est à jour", []),
   "state.nothingToDo.body": entry(
-    "Tout est trié et personne n’attend rien de vous. Je vous préviendrai si cela change.",
+    "Rien ne demande votre attention. Je vous préviendrai si cela change.",
     [],
   ),
   "state.nothingToDo.action": entry("Retour à la vue d’ensemble", []),

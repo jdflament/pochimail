@@ -1,3 +1,18 @@
+// @vitest-environment jsdom
+
+import { setLocale } from "@pochimail/ui/i18n/format.ts";
+import { cleanup, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import type * as React from "react";
+import { act } from "react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import type { EventOf } from "../../../../shared/ipc/contract.ts";
+import {
+  minutesUntil,
+  noRequiredStates,
+  type RequiredStateEvent,
+  reduceRequiredStates,
+} from "./required-state-reducer.ts";
 import {
   EmptyCategoryState,
   ModelDownloadFailedState,
@@ -7,18 +22,8 @@ import {
   RateLimitState,
   SignInCancelledState,
   UpdateReadyState,
-} from "@pochimail/ui/components/required-states";
-import { setLocale } from "@pochimail/ui/i18n/format.ts";
-import {
-  minutesUntil,
-  noRequiredStates,
-  type RequiredStateEvent,
-  reduceRequiredStates,
-} from "@pochimail/ui/lib/required-states";
-import { cleanup, render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import type * as React from "react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+} from "./required-states.tsx";
+import { useRequiredStates } from "./use-required-states.ts";
 
 afterEach(() => {
   cleanup();
@@ -54,7 +59,7 @@ const cases: Case[] = [
   {
     name: "model download failed",
     ui: (a, s) => <ModelDownloadFailedState onAction={a} onSecondary={s} />,
-    role: "alert",
+    role: "status",
     title: "The assistant model didn’t download",
     primary: "Retry download",
     secondary: "Continue with rules",
@@ -77,7 +82,7 @@ const cases: Case[] = [
     name: "nothing to do",
     ui: (a) => <NothingToDoState onAction={a} />,
     role: "status",
-    title: "Nothing to do",
+    title: "All caught up",
     primary: "Back to overview",
   },
   {
@@ -118,11 +123,20 @@ describe("required states (brief §6)", () => {
   }
 
   it("offline is a polite status line, never a dialog (guards a blocking offline pop-up)", () => {
-    render(<OfflineStatusLine onAction={() => {}} />);
+    render(<OfflineStatusLine offline onAction={() => {}} />);
     expect(screen.getByRole("status").textContent).toContain("You’re offline");
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(screen.queryByRole("alertdialog")).toBeNull();
     expect(screen.getAllByRole("button")).toHaveLength(1);
+  });
+
+  it("the offline live region stays mounted while online and fills on change (guards an unannounced offline line)", () => {
+    const { rerender } = render(<OfflineStatusLine offline={false} onAction={() => {}} />);
+    const region = screen.getByRole("status");
+    expect(region.textContent).toBe("");
+    rerender(<OfflineStatusLine offline onAction={() => {}} />);
+    expect(screen.getByRole("status")).toBe(region);
+    expect(region.textContent).toContain("You’re offline");
   });
 
   it("rate limit shows the resume estimate in minutes (guards a missing time estimate)", () => {
@@ -179,5 +193,47 @@ describe("required states from worker events", () => {
   it("the resume estimate rounds up and never reads 0 (guards '0 minutes')", () => {
     expect(minutesUntil(61_000, 0)).toBe(2);
     expect(minutesUntil(1_000, 5_000)).toBe(1);
+  });
+
+  it("SyncResumed implies online (guards a stale offline line after sync restarts)", () => {
+    const state = run({ type: "Offline" }, { type: "SyncResumed" });
+    expect(state.offline).toBe(false);
+  });
+
+  it("an unknown event leaves state unchanged (guards a crash on a newer worker event)", () => {
+    const before = run({ type: "Offline" });
+    const unknown = { type: "FromTheFuture" } as unknown as RequiredStateEvent;
+    expect(reduceRequiredStates(before, unknown)).toBe(before);
+  });
+});
+
+describe("required states fed by the worker event stream", () => {
+  function Harness({ client }: { client: Parameters<typeof useRequiredStates>[0] }) {
+    const [states] = useRequiredStates(client);
+    return (
+      <>
+        <OfflineStatusLine offline={states.offline} onAction={() => {}} />
+        {states.rateLimit ? (
+          <RateLimitState provider={states.rateLimit.provider} minutes={4} onAction={() => {}} />
+        ) : null}
+      </>
+    );
+  }
+
+  it("the rendered rate-limit state goes away after SyncResumed (guards a stuck rate-limit notice)", () => {
+    let emit: (event: EventOf<"app.events">) => void = () => {};
+    const client = {
+      subscribe: (_topic: string, _input: unknown, onEvent: typeof emit) => {
+        emit = onEvent;
+        return () => {};
+      },
+    } as unknown as Parameters<typeof useRequiredStates>[0];
+    render(<Harness client={client} />);
+    act(() => emit({ type: "RateLimited", provider: "Google", resumeAt: 240_000 }));
+    expect(screen.getByRole("status", { name: "Google is slowing me down" })).toBeTruthy();
+    act(() => emit({ type: "Offline" }));
+    act(() => emit({ type: "SyncResumed" }));
+    expect(screen.queryByRole("status", { name: "Google is slowing me down" })).toBeNull();
+    expect(screen.getByRole("status").textContent).toBe("");
   });
 });

@@ -102,7 +102,7 @@ export const ja = {
   "storageBar.legendItem": entry("{label} · {size}", ["label", "size"]),
   "state.signInCancelled.title": entry("サインインをキャンセルしました", []),
   "state.signInCancelled.body": entry(
-    "大丈夫です。何にもアクセスしていません。準備ができたら、いつでもやり直せます。",
+    "大丈夫です。どのアカウントにもアクセスしていません。準備ができたら、いつでもやり直せます。",
     [],
   ),
   "state.signInCancelled.retry": entry("もう一度試す", []),
@@ -139,15 +139,15 @@ export const ja = {
     [],
   ),
   "state.emptyCategory.action": entry("概要に戻る", []),
-  "state.nothingToDo.title": entry("することはありません", []),
+  "state.nothingToDo.title": entry("確認が必要なものはありません", []),
   "state.nothingToDo.body": entry(
-    "すべて整理済みで、お返事を待っている人もいません。変わったらお知らせします。",
+    "すべて整理済みで、返信を待っている人もいません。変わったらお知らせします。",
     [],
   ),
   "state.nothingToDo.action": entry("概要に戻る", []),
   "state.updateReady.title": entry("新しいバージョンの準備ができました", []),
   "state.updateReady.body": entry(
-    "Pochimail {version}の準備ができました。再起動するとインストールされ、メールはそのままです。",
+    "Pochimail {version} の準備ができました。再起動するとインストールされ、メールはそのままです。",
     ["version"],
   ),
   "state.updateReady.restart": entry("今すぐ再起動", []),

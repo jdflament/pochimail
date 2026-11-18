@@ -1,11 +1,10 @@
 import { Button } from "@pochimail/ui/components/button";
 import { EmptyState } from "@pochimail/ui/components/empty-state";
+import { StatusLine } from "@pochimail/ui/components/status-line";
 import { t } from "@pochimail/ui/i18n/format.ts";
-import { cn } from "@pochimail/ui/lib/utils";
-import type * as React from "react";
 
 // The required states (brief §6): each composes the one EmptyState with its pose, copy and exactly
-// one primary action. Failures announce assertively (alert); calm notices announce politely (status).
+// one primary action. Only a state that needs the user to act now (reconnect) is an alert; the rest announce politely.
 type Handler = { onAction: () => void };
 type WithSecondary = Handler & { onSecondary: () => void };
 
@@ -22,29 +21,20 @@ function SignInCancelledState({ onAction, onSecondary }: WithSecondary) {
   );
 }
 
-/** A status line, never a pop-up or modal: it sits in the page flow and announces politely. */
-function OfflineStatusLine({
-  onAction,
-  className,
-  ...props
-}: Handler & Omit<React.ComponentProps<"div">, "children" | "title">) {
+/** Always mounted so assistive tech announces the change; empty (hidden) while online. */
+function OfflineStatusLine({ offline, onAction }: Handler & { offline: boolean }) {
   return (
-    <div
-      data-slot="offline-status-line"
-      role="status"
-      aria-live="polite"
-      className={cn(
-        "flex flex-wrap items-center gap-x-4 gap-y-2 border-y border-border py-2.5 text-[13px] text-muted-foreground",
-        className,
-      )}
-      {...props}
-    >
-      <span className="font-medium text-foreground">{t("state.offline.title")}</span>
-      <span className="min-w-0 flex-1 break-words">{t("state.offline.body")}</span>
-      <Button variant="ghost" onClick={onAction}>
-        {t("state.offline.dismiss")}
-      </Button>
-    </div>
+    <StatusLine>
+      {offline ? (
+        <>
+          <span className="font-medium text-foreground">{t("state.offline.title")}</span>
+          <span className="min-w-0 flex-1 break-words">{t("state.offline.body")}</span>
+          <Button variant="ghost" onClick={onAction}>
+            {t("state.offline.dismiss")}
+          </Button>
+        </>
+      ) : null}
+    </StatusLine>
   );
 }
 
@@ -68,7 +58,7 @@ function NeedsReconnectState({
 function ModelDownloadFailedState({ onAction, onSecondary }: WithSecondary) {
   return (
     <EmptyState
-      role="alert"
+      role="status"
       pose="night"
       title={t("state.modelFailed.title")}
       description={t("state.modelFailed.body")}

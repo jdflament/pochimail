@@ -114,6 +114,21 @@ const subscriptions = {
         reason: z.enum(["offline", "rate-limited", "auth-expired", "unknown"]),
       }),
       z.object({ type: z.literal("DigestReady"), itemCount: z.number().int().nonnegative() }),
+      // Required-state triggers (M4-16). M2/M3/M8 emit the real events; fixtures emit them until then.
+      z.object({ type: z.literal("Offline") }),
+      z.object({ type: z.literal("Online") }),
+      z.object({
+        type: z.literal("RateLimited"),
+        provider: z.string().min(1),
+        /** Epoch milliseconds when sync resumes by itself. */
+        resumeAt: z.number().int().nonnegative(),
+      }),
+      z.object({ type: z.literal("SyncResumed") }),
+      z.object({ type: z.literal("NeedsReauth"), accountId, provider: z.string().min(1) }),
+      z.object({ type: z.literal("Reconnected"), accountId }),
+      z.object({ type: z.literal("ModelDownloadFailed") }),
+      z.object({ type: z.literal("ModelDownloadStarted") }),
+      z.object({ type: z.literal("UpdateReady"), version: z.string().min(1) }),
     ]),
     coalesceKey: undefined,
   },
