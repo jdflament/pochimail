@@ -44,7 +44,9 @@
     "./outbox-contract": "./src/outbox-contract.ts",
     "./job-queue-lease-contract": "./src/job-queue-lease-contract.ts",
     "./pipeline-contract": "./src/pipeline-contract.ts",
-    "./sync-contract": "./src/sync-contract.ts"
+    "./sync-contract": "./src/sync-contract.ts",
+    "./derived-contract": "./src/derived-contract.ts",
+    "./insight-contract": "./src/insight-contract.ts"
   },
   "scripts": {
     "typecheck": "tsc",

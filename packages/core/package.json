@@ -46,7 +46,12 @@
     "./jobs/pipeline": "./src/jobs/pipeline.ts",
     "./use-cases/connect-account": "./src/use-cases/connect-account.ts",
     "./use-cases/run-incremental-sync": "./src/use-cases/run-incremental-sync.ts",
-    "./use-cases/classify-batch": "./src/use-cases/classify-batch.ts"
+    "./use-cases/classify-batch": "./src/use-cases/classify-batch.ts",
+    "./domain/derived": "./src/domain/derived.ts",
+    "./domain/digest": "./src/domain/digest.ts",
+    "./use-cases/detect-signals": "./src/use-cases/detect-signals.ts",
+    "./use-cases/propose-suggestions": "./src/use-cases/propose-suggestions.ts",
+    "./use-cases/build-digest": "./src/use-cases/build-digest.ts"
   },
   "scripts": {
     "typecheck": "tsc",

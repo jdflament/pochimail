@@ -1,6 +1,7 @@
 import type { Account } from "../domain/account.ts";
 import type { ActionLog, Suggestion } from "../domain/action.ts";
 import type { Category } from "../domain/category.ts";
+import type { DerivedMessage } from "../domain/derived.ts";
 import type { IncomingMessage, Message, SenderStats, Thread, Topic } from "../domain/mail.ts";
 import type { NotFound, StorageError } from "../errors.ts";
 import type {
@@ -51,6 +52,19 @@ export interface MessageWriter {
     id: MessageId,
     category: Category,
   ): AsyncResult<void, StorageError | NotFound>;
+}
+
+export interface DerivedReader {
+  get(ws: WorkspaceId, id: MessageId): AsyncResult<DerivedMessage, StorageError | NotFound>;
+  list(
+    ws: WorkspaceId,
+    accountId: AccountId,
+    page: PageRequest,
+  ): AsyncResult<Page<DerivedMessage>, StorageError>;
+}
+export interface DerivedWriter {
+  /** One row per message: saving again replaces it, so a re-run changes nothing. */
+  save(derived: DerivedMessage): AsyncResult<void, StorageError>;
 }
 
 export interface ThreadReader {
@@ -126,6 +140,7 @@ export interface CursorWriter {
 
 export type AccountRepository = AccountReader & AccountWriter;
 export type MessageRepository = MessageReader & MessageWriter;
+export type DerivedRepository = DerivedReader & DerivedWriter;
 export type ThreadRepository = ThreadReader & ThreadWriter;
 export type SenderRepository = SenderReader & SenderWriter;
 export type SuggestionRepository = SuggestionReader & SuggestionWriter;
@@ -137,6 +152,7 @@ export interface ReadRepositories {
   readonly accounts: AccountReader;
   readonly messages: MessageReader;
   readonly threads: ThreadReader;
+  readonly derived: DerivedReader;
   readonly senders: SenderReader;
   readonly suggestions: SuggestionReader;
   readonly actionLog: ActionLogReader;
@@ -148,6 +164,7 @@ export interface WriteRepositories {
   readonly accounts: AccountRepository;
   readonly messages: MessageRepository;
   readonly threads: ThreadRepository;
+  readonly derived: DerivedRepository;
   readonly senders: SenderRepository;
   readonly suggestions: SuggestionRepository;
   readonly actionLog: ActionLogRepository;

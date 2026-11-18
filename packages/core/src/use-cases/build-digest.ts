@@ -1,0 +1,99 @@
+import type { Clock } from "../clock.ts";
+import type { Category } from "../domain/category.ts";
+import type { Digest } from "../domain/digest.ts";
+import type { Cancelled, NotFound, StorageError } from "../errors.ts";
+import type { DomainEventOf } from "../events/catalog.ts";
+import type { AccountId, MessageId, WorkspaceId } from "../ids.ts";
+import type { AsyncResult, CancelSignal } from "../ports/common.ts";
+import type { UnitOfWork } from "../ports/unit-of-work.ts";
+import { ok } from "../result.ts";
+import { evaluateSignals } from "./detect-signals.ts";
+
+const PAGE = 200;
+
+export interface BuildDigestDeps {
+  readonly uow: UnitOfWork;
+  readonly clock: Clock;
+}
+
+export interface BuildDigestRequest {
+  readonly workspaceId: WorkspaceId;
+  readonly accountId: AccountId;
+  /** The previous digest's `generatedAt` (or the first sync): older mail is not summarized. */
+  readonly since: string;
+}
+
+export type BuildDigestError = StorageError | NotFound | Cancelled;
+
+/** Signals worth interrupting someone for; the rest stay in the Overview (brief §7). */
+const ATTENTION = ["needs-reply", "time-sensitive", "important-sender", "has-document"] as const;
+
+/**
+ * Builds the "what's new" summary: only mail received after `since`, never totals of old mail
+ * (brief §7). Counts by category plus the new messages that need attention. A digest with
+ * nothing new is returned but announces nothing (`DigestReady` only when there are items).
+ */
+export class BuildDigest {
+  constructor(private readonly deps: BuildDigestDeps) {}
+
+  async execute(
+    request: BuildDigestRequest,
+    signal: CancelSignal,
+  ): AsyncResult<Digest, BuildDigestError> {
+    const { uow, clock } = this.deps;
+    const fresh: { id: MessageId; category: Category }[] = [];
+    let cursor: string | undefined;
+    do {
+      const page = await uow.reads.messages.query(request.workspaceId, {
+        accountId: request.accountId,
+        limit: PAGE,
+        ...(cursor === undefined ? {} : { cursor }),
+      });
+      if (!page.ok) return page;
+      for (const m of page.value.items)
+        if (m.receivedAt > request.since) fresh.push({ id: m.id, category: m.category });
+      cursor = page.value.nextCursor ?? undefined;
+    } while (cursor !== undefined);
+
+    const signals = await evaluateSignals(uow.reads, clock, {
+      workspaceId: request.workspaceId,
+      accountId: request.accountId,
+      messageIds: fresh.map((f) => f.id),
+    });
+    if (!signals.ok) return signals;
+
+    const byCategory: Digest["byCategory"] = {};
+    for (const f of fresh) byCategory[f.category] = (byCategory[f.category] ?? 0) + 1;
+    const attention = signals.value
+      .filter((s) => (ATTENTION as readonly string[]).includes(s.kind))
+      .map((s) => ({ messageId: s.messageId, kind: s.kind }))
+      .sort((a, b) => (a.messageId + a.kind < b.messageId + b.kind ? -1 : 1));
+
+    const generatedAt = clock.now().toISOString();
+    const digest: Digest = {
+      schemaVersion: 1,
+      workspaceId: request.workspaceId,
+      accountId: request.accountId,
+      since: request.since,
+      generatedAt,
+      newMessageCount: fresh.length,
+      byCategory,
+      attention,
+    };
+    if (fresh.length === 0) return ok(digest);
+
+    const committed = await uow.run(async (tx) => {
+      const event = {
+        id: `digest:${request.accountId}:${request.since}`,
+        type: "DigestReady",
+        version: 1,
+        workspaceId: request.workspaceId,
+        occurredAt: generatedAt,
+        payload: { itemCount: fresh.length },
+      } satisfies DomainEventOf<"DigestReady">;
+      return tx.outbox.append({ kind: "event", event });
+    }, signal);
+    if (!committed.ok) return committed;
+    return ok(digest);
+  }
+}
