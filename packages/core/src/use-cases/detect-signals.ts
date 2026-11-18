@@ -1,7 +1,7 @@
 import type { Clock } from "../clock.ts";
 import type { Account } from "../domain/account.ts";
 import type { Category, SignalKind } from "../domain/category.ts";
-import type { Message, Signal } from "../domain/mail.ts";
+import type { Message, StoredSignal } from "../domain/mail.ts";
 import type { Cancelled, NotFound, StorageError } from "../errors.ts";
 import type { DomainEventOf } from "../events/catalog.ts";
 import type { AccountId, MessageId, WorkspaceId } from "../ids.ts";
@@ -37,9 +37,7 @@ export interface DetectSignalsRequest {
 
 export type DetectSignalsError = StorageError | NotFound | Cancelled;
 
-export interface MessageSignal extends Signal {
-  readonly reason: string;
-}
+export type MessageSignal = StoredSignal;
 
 /**
  * Evaluates the six signals for stored messages (brief §3). Reads headers, metadata and the
@@ -57,10 +55,25 @@ export class DetectSignals {
     const { uow, clock } = this.deps;
     const detected = await evaluateSignals(uow.reads, clock, request);
     if (!detected.ok) return detected;
-    if (detected.value.length === 0) return ok([]);
+
+    // Re-detection keeps the first `detectedAt` of a signal that still applies, so rows are stable.
+    const ids = [...request.messageIds];
+    const before = await uow.reads.signals.listForMessages(request.workspaceId, ids);
+    if (!before.ok) return before;
+    const firstSeen = new Map(before.value.map((s) => [`${s.messageId}:${s.kind}`, s.detectedAt]));
+    const rows = detected.value.map((s) => ({
+      ...s,
+      detectedAt: firstSeen.get(`${s.messageId}:${s.kind}`) ?? s.detectedAt,
+    }));
 
     const committed = await uow.run(async (tx) => {
-      for (const s of detected.value) {
+      const saved = await tx.repositories.signals.replaceForMessages(
+        request.workspaceId,
+        ids,
+        rows,
+      );
+      if (!saved.ok) return saved;
+      for (const s of rows) {
         const event = {
           id: `signal:${s.messageId}:${s.kind}`,
           type: "SignalDetected",
@@ -75,7 +88,12 @@ export class DetectSignals {
       return ok(undefined);
     }, signal);
     if (!committed.ok) return committed;
-    return detected;
+    return ok(rows);
+  }
+
+  /** What an earlier `execute` stored, read back without evaluating anything again. */
+  async stored(request: DetectSignalsRequest): AsyncResult<readonly MessageSignal[], StorageError> {
+    return this.deps.uow.reads.signals.listForMessages(request.workspaceId, request.messageIds);
   }
 }
 

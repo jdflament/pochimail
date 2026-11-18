@@ -4,6 +4,7 @@ import { ok } from "@pochimail/core/result";
 import { describe, expect, it } from "vitest";
 import { classifierContract, embedderContract, llmProviderContract } from "./ai-contract.ts";
 import { blobStoreContract } from "./blob-store-contract.ts";
+import { digestStateContract } from "./digest-state-contract.ts";
 import { exporterContract } from "./exporter-contract.ts";
 import { createFakeClassifier, createFakeEmbedder, createFakeLlmProvider } from "./fake-ai.ts";
 import { createFakeClock } from "./fake-clock.ts";
@@ -25,11 +26,14 @@ import { powerMonitorContract } from "./power-monitor-contract.ts";
 import { repositoriesContract } from "./repositories-contract.ts";
 import { schedulerContract } from "./scheduler-contract.ts";
 import { secretStoreContract } from "./secret-store-contract.ts";
+import { signalRepositoryContract } from "./signal-repository-contract.ts";
 import { unitOfWorkContract } from "./unit-of-work-contract.ts";
 
 // Every in-memory adapter must pass its own contract suite.
 unitOfWorkContract(createInMemoryUnitOfWork);
 repositoriesContract(createInMemoryUnitOfWork);
+signalRepositoryContract(createInMemoryUnitOfWork);
+digestStateContract(createInMemoryUnitOfWork);
 blobStoreContract(createInMemoryBlobStore);
 secretStoreContract(createInMemorySecretStore);
 jobQueueContract(() => {

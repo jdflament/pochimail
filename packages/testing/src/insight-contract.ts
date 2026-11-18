@@ -312,6 +312,54 @@ export const insightChecks: readonly Check<InsightHarness>[] = [
     },
   ),
   check(
+    "signals survive a fresh DetectSignals read without re-detecting, and re-running detection yields identical rows (guards lost or churning signals)",
+    async (h) => {
+      await seed(h, {
+        1: { category: "people" },
+        2: { message: { subject: "Invoice due tomorrow" } },
+      });
+      const request = { workspaceId: WS_A, accountId: ACCOUNT_1, messageIds: [idOf(1), idOf(2)] };
+      const first = unwrap(
+        await new DetectSignals({ uow: h.uow, clock: h.clock }).execute(request, live()),
+      );
+      expect(first.length).toBeGreaterThan(0);
+      const rowsAfterFirst = JSON.stringify(
+        ((await h.snapshot()) as Record<string, unknown>).signals,
+      );
+
+      h.clock.advance(DAY);
+      const fresh = new DetectSignals({ uow: h.uow, clock: h.clock });
+      expect(unwrap(await fresh.stored(request))).toEqual(first);
+
+      unwrap(await fresh.execute(request, live()));
+      expect(JSON.stringify(((await h.snapshot()) as Record<string, unknown>).signals)).toBe(
+        rowsAfterFirst,
+      );
+    },
+  ),
+  check(
+    "two consecutive digests with a sync between them: the second holds only mail new since the first, with no caller-supplied since (guards re-reporting old mail)",
+    async (h) => {
+      const base = h.clock.now().getTime();
+      const at = (ms: number) => new Date(base + ms).toISOString();
+      await seed(h, {
+        1: { message: { receivedAt: at(-3_000_000) }, category: "newsletters" },
+        2: { message: { receivedAt: at(-2_000_000) }, category: "promotions" },
+      });
+      const build = new BuildDigest({ uow: h.uow, clock: h.clock });
+      const request = { workspaceId: WS_A, accountId: ACCOUNT_1 };
+      const first = unwrap(await build.execute(request, live()));
+      expect(first.newMessageCount).toBe(2);
+
+      h.clock.advance(3_600_000);
+      await seed(h, { 3: { message: { receivedAt: at(1_800_000) }, category: "promotions" } });
+      const second = unwrap(await build.execute(request, live()));
+      expect(second.since).toBe(first.generatedAt);
+      expect(second.newMessageCount).toBe(1);
+      expect(second.byCategory).toEqual({ promotions: 1 });
+    },
+  ),
+  check(
     "classifying records reason, confidence and a capped snippet, and signals, suggestions and digest leave no body behind (follows proposed D11)",
     async (h) => {
       const BODY = "SECRET-BODY-TEXT-0003";
