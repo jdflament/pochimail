@@ -39,7 +39,10 @@ const queries = {
   },
   "app.state": {
     input: z.undefined(),
-    output: z.object({ status: z.enum(["starting", "ready", "locked"]) }),
+    output: z.object({
+      status: z.enum(["starting", "ready", "locked"]),
+      hasConnectedAccount: z.boolean(),
+    }),
   },
   /** M4-07: copy uses deviceName(), never a hard-coded OS name (brief §5.9). */
   "device.name": {

@@ -17,10 +17,17 @@ acceptPorts(process.parentPort, (port) => {
     },
     {
       procedures: {
-        "app.state": () => ({ status: "ready" }),
+        "app.state": () => ({ status: "ready", hasConnectedAccount: false }),
         "device.name": () => platform.deviceName(),
+        "accounts.list": () => [],
+        "overview.get": () => ({ scanned: 0, toReview: 0 }),
+        "digest.get": () => ({ ready: false, itemCount: 0 }),
+        "settings.get": () => ({ autopilot: false, notifications: true }),
       },
-      subscriptions: {},
+      subscriptions: {
+        "app.events": () => undefined,
+        "scan.progress": () => undefined,
+      },
     },
   );
   port.start();

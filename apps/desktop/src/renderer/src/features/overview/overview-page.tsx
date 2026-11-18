@@ -1,41 +1,29 @@
-import type { DeviceName } from "@pochimail/core/ports/platform";
 import { getLocale, t } from "@pochimail/ui/i18n/format.ts";
 import { deviceLabel } from "@pochimail/ui/i18n/locale.ts";
-import { useEffect, useState } from "react";
-import { connectWorker } from "../../lib/worker.ts";
-
-type WorkerState = "connecting" | "connected" | "unavailable";
-type State = { readonly worker: WorkerState; readonly device: DeviceName };
+import { useQuery } from "@tanstack/react-query";
+import { queryKeys } from "../../lib/query/keys.ts";
+import { useWorkerClient } from "../../lib/worker-context.tsx";
 
 export function OverviewPage() {
-  const [state, setState] = useState<State>({ worker: "connecting", device: "device" });
+  const client = useWorkerClient();
+  const appState = useQuery({
+    queryKey: queryKeys.appState(),
+    queryFn: () => client.call("app.state"),
+  });
+  const deviceName = useQuery({
+    queryKey: queryKeys.deviceName(),
+    queryFn: () => client.call("device.name"),
+  });
 
-  useEffect(() => {
-    let cancelled = false;
-    void connectWorker()
-      .then(async (client) => {
-        const [reply, device] = await Promise.all([
-          client.call("app.state"),
-          client.call("device.name"),
-        ]);
-        if (!cancelled)
-          setState({ worker: reply.status === "ready" ? "connected" : "unavailable", device });
-      })
-      .catch(() => {
-        if (!cancelled) setState((current) => ({ ...current, worker: "unavailable" }));
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
+  const device = deviceLabel(deviceName.data ?? "device", getLocale());
   const status =
-    state.worker === "connecting"
+    appState.isPending || deviceName.isPending
       ? t("overview.worker.connecting")
-      : state.worker === "connected"
-        ? t("overview.worker.ready")
-        : t("overview.worker.unavailable");
-  const device = deviceLabel(state.device, getLocale());
+      : appState.isError || deviceName.isError
+        ? t("overview.worker.unavailable")
+        : appState.data.status === "ready"
+          ? t("overview.worker.ready")
+          : t("overview.worker.unavailable");
 
   return (
     <main className="mx-auto max-w-2xl px-8 pt-16">
