@@ -58,6 +58,7 @@ export async function runEval({ classifier, mailbox }: RunEvalOptions): Promise<
             provider: account.provider,
             address: account.address,
             connectedAt: clock.now().toISOString(),
+            grantedScopes: [],
           }),
         live(),
       ),

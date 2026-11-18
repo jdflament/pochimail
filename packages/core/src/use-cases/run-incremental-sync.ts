@@ -15,6 +15,7 @@ import type { JobRequest } from "../ports/job-queue.ts";
 import type { MailProvider, SyncCursor } from "../ports/mail-provider.ts";
 import type { Transaction, UnitOfWork } from "../ports/unit-of-work.ts";
 import { ok } from "../result.ts";
+import { type AccountState, accountStateEvent } from "./account-state.ts";
 
 /** Job type enqueued to resume a rate-limited sync; a worker maps it back to this use case. */
 export const INCREMENTAL_SYNC_JOB = "sync.incremental";
@@ -99,14 +100,12 @@ export class RunIncrementalSync {
         payload,
       }) as DomainEvent;
     const state = (s: AccountState) =>
-      event(
-        "AccountStateChanged",
-        `account-state:${accountId}:${s}:${this.deps.clock.now().getTime()}`,
-        {
-          accountId,
-          state: s,
-        },
-      );
+      accountStateEvent({
+        workspaceId,
+        accountId,
+        state: s,
+        occurredAt: this.deps.clock.now().toISOString(),
+      });
     const emit = (events: readonly DomainEvent[], job?: JobRequest) =>
       uow.run(async (tx) => {
         for (const e of events) {
@@ -202,8 +201,6 @@ export class RunIncrementalSync {
     return done.ok ? ok({ status: "completed", restarted, ...progress }) : done;
   }
 }
-
-type AccountState = DomainEventOf<"AccountStateChanged">["payload"]["state"];
 
 /**
  * The provider is an untrusted boundary (zod): `parse` drops any field the schema does not know

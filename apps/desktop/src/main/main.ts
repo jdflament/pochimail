@@ -101,6 +101,8 @@ const connectWorker = (window: BrowserWindow): void => {
         join(userData, DATABASE_FILE),
       ),
     createChannel: () => new MessageChannelMain(),
+    // Sign-in consent opens in the user's browser, never in an app window (ADR 0007).
+    openExternal: (url) => shell.openExternal(url),
     logger,
   });
   window.once("closed", () => worker.kill());

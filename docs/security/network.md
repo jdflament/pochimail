@@ -6,7 +6,7 @@ Rule: **the app contacts only the hosts below.** A session-level request filter 
 
 Mitigation links point to Project "Pochimail v1" Draft IDs (`E2` = "Epic: M2 Accounts & sync", etc.; see the [threat model](threat-model.md)) or ADRs.
 
-Status: **v0; H1–H5 are enforced since M2-06** (shared host registry, worker HTTP client and main session filter). H6/H7 endpoints are registered on connect and checked by the socket guard that IMAP/SMTP clients must use. Hosts marked *to confirm* come from a provider page that was summarised, not read verbatim, or from a decision still open; each names where it gets confirmed.
+Status: **v0; H1–H5 are enforced since M2-06** (shared host registry, worker HTTP client and main session filter). M2-05's OAuth token and revocation calls (H2, H3, H5) go through that client; the loopback redirect (L1) is implemented too. H6/H7 endpoints are registered on connect and checked by the socket guard that IMAP/SMTP clients must use. Hosts marked *to confirm* come from a provider page that was summarised, not read verbatim, or from a decision still open; each names where it gets confirmed.
 
 ## 1. Always-on, by feature
 
@@ -16,7 +16,7 @@ Status: **v0; H1–H5 are enforced since M2-06** (shared host registry, worker H
 | H2 | `oauth2.googleapis.com` | worker | Gmail sign-in, token refresh | Exchange code (PKCE) and refresh tokens | client ID, code and verifier, refresh token | E2 · [ADR 0007](../adr/0007-oauth-credentials-scopes.md) · *to confirm* G5 |
 | H3 | `oauth2.googleapis.com` (`/revoke`) | worker | Remove account | Revoke the token at the provider | the token | E2 · [ADR 0007](../adr/0007-oauth-credentials-scopes.md) |
 | H4 | `graph.microsoft.com` | worker | Microsoft account connected | Graph mail: delta, `$batch`, move to Archive, categories | access token; message ids | E2 · [ADR 0004](../adr/0004-incremental-sync-and-imap.md) |
-| H5 | `login.microsoftonline.com` | worker | Microsoft sign-in, refresh, revoke | Authorization-code + PKCE token endpoint (`/common` or `/consumers` / tenant) | client ID, code and verifier, refresh token | E2 · [ADR 0007](../adr/0007-oauth-credentials-scopes.md) · *to confirm* M4 |
+| H5 | `login.microsoftonline.com` | worker | Microsoft sign-in, refresh | Authorization-code + PKCE token endpoint (`/common` or `/consumers` / tenant); **no revocation call** (see note) | client ID, code and verifier, refresh token | E2 · [ADR 0007](../adr/0007-oauth-credentials-scopes.md) · *to confirm* M4 |
 | H6 | IMAP host of each connected account (e.g. `imap.mail.me.com:993`, Yahoo, Fastmail, GMX...) | worker | IMAP account connected | Sync, move to `\Archive`, keywords, IDLE | password or XOAUTH2 token over TLS | E2 · [ADR 0004](../adr/0004-incremental-sync-and-imap.md) |
 | H7 | SMTP host of each connected account (e.g. `smtp.mail.me.com:587`) | worker | Only if the user opts in to `mailto:` unsubscribe by send (P2) | Send the unsubscribe message | the prepared message | E2 · E5 · [ADR 0007](../adr/0007-oauth-credentials-scopes.md) |
 | H8 | `github.com` and `release-assets.githubusercontent.com` (GitHub Releases; exact hosts, no wildcard) | main (updater) | Update check, update download | `electron-updater` metadata and installers, signed | none (no identifiers, no account) | E8 (*to confirm in M8: exact host list electron-updater uses; on 2026-11-17 a release download redirected to `release-assets.githubusercontent.com`, formerly `objects.githubusercontent.com`; add the legacy host only if still observed*) · [brief §5.7](../brief.md) |
@@ -27,8 +27,8 @@ Notes:
 - H1, H4 and H6 are the only places mail content crosses the network, and only between the device and the provider the user connected. Pochimail never sends mail content anywhere else.
 - Yahoo OAuth hosts are not listed: they are added as new rows **only if** Yahoo approves OAuth (checklist Y1 to Y3). Until then Yahoo is an app password to its IMAP host (H6).
 - **ISPDB presets are bundled** ([ADR 0004](../adr/0004-incremental-sync-and-imap.md)): there is no runtime autoconfig lookup, no MX lookup and no host in this table for it.
-- The OAuth sign-in page itself opens in the **system browser**, so the provider's login and consent pages (`accounts.google.com`, and `login.microsoftonline.com` for the sign-in page) are loaded by the user's browser, not by Pochimail's sessions, so `accounts.google.com` is not in the app's allowlist. `login.microsoftonline.com` is allowlisted only for the token and revocation calls the worker makes (H5), not for the sign-in page. The loopback redirect is local (section 3).
-- Revocation (H3) for Microsoft and Yahoo uses their respective endpoints, to be confirmed with the OAuth implementation (checklist X3 asks this file to list token and revocation hosts per provider).
+- The OAuth sign-in page itself opens in the **system browser**, so the provider's login and consent pages (`accounts.google.com`, and `login.microsoftonline.com` for the sign-in page) are loaded by the user's browser, not by Pochimail's sessions, so `accounts.google.com` is not in the app's allowlist. `login.microsoftonline.com` is allowlisted only for the token calls the worker makes (H5), not for the sign-in page. The loopback redirect is local (section 3).
+- Revocation: Google revokes at H3 (implemented in M2-05). Microsoft identity platform v2.0 documents **no per-app user-token revocation endpoint** (confirmed in M2-05), so removing a Microsoft account deletes its credentials locally only; there is no H5 revocation call to add. Yahoo revocation is settled only if Yahoo OAuth is approved (Y1–Y3). Checklist X3 asks this file to list token and revocation hosts per provider.
 
 ## 2. The single exception (plan P1)
 
@@ -44,7 +44,7 @@ Conditions (full reasoning in [threat model section 6](threat-model.md#6-plan-p1
 
 | # | Endpoint | Process | Why |
 |---|---|---|---|
-| L1 | `http://127.0.0.1:<random port>` | worker (or main) | OAuth loopback redirect; bound to `127.0.0.1` only, `state` checked, closes after one request ([ADR 0007](../adr/0007-oauth-credentials-scopes.md)) |
+| L1 | `http://127.0.0.1:<random port>` | worker (or main) | OAuth loopback redirect; bound to `127.0.0.1` only, `state` checked, closes after one request ([ADR 0007](../adr/0007-oauth-credentials-scopes.md)). Implemented (M2-05): a fresh random port per sign-in, one request only, closed on the callback, on cancel and on timeout |
 | L2 | `MessageChannelMain` ports | main, renderer, worker, model host | IPC; in-process, not sockets ([ADR 0002](../adr/0002-electron-process-model-and-ipc.md)) |
 
 In development only, the Vite dev server on `localhost` serves the renderer; it is not part of a packaged build and is not in the allowlist there.

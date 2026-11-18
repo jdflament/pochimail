@@ -4,6 +4,7 @@ Status: Accepted (2026-11-17, maintainer, M0-15) · Brief: §4, §5.10 › Least
 
 ## Decision
 - **Flow**: OAuth 2.0 authorization code + **PKCE** in the **system browser**, redirect to a **loopback** `http://127.0.0.1:<random port>` listener that closes after one request; `state` checked; cancel/timeout → "sign-in cancelled" state.
+  No `id_token` is read (M2-05): `openid`/`email` are requested only to identify the account address, so there is no nonce to check; `state` plus PKCE protect the code.
 - **Client IDs** come from build-time config / env (`POCHIMAIL_GOOGLE_CLIENT_ID`…), never hard-coded. Official builds inject the verified IDs; forks and dev builds register their own (CONTRIBUTING.md).
 - **Tokens**: refresh tokens and IMAP app passwords only in the OS keychain via the `SecretStore` port (safeStorage-encrypted); access tokens in memory only; never logged.
 - **Scopes (least privilege, incremental)**:

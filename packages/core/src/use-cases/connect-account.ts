@@ -8,6 +8,7 @@ import type { IdGenerator } from "../ports/id-generator.ts";
 import type { SecretStore } from "../ports/secret-store.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
 import { err, ok } from "../result.ts";
+import { accountStateEvent } from "./account-state.ts";
 
 export interface ConnectAccountDeps {
   readonly uow: UnitOfWork;
@@ -22,6 +23,8 @@ export interface ConnectAccountRequest {
   readonly address: string;
   /** OAuth refresh token or app password. Goes to the secret store only, never to a row or event. */
   readonly credentials: string;
+  /** Scopes the provider granted during sign-in; stored with the account, never with the token. */
+  readonly grantedScopes?: readonly string[];
 }
 
 export interface ConnectAccountOutcome {
@@ -82,7 +85,18 @@ export class ConnectAccount {
 
     if (known) {
       const stored = await secrets.set(accountSecretKey(known), request.credentials);
-      return stored.ok ? ok({ status: "already-connected", account: known }) : stored;
+      if (!stored.ok) return stored;
+      if (request.grantedScopes === undefined) {
+        return ok({ status: "already-connected", account: known });
+      }
+      // A re-auth can grant more (autonomy raised), so the stored scopes follow the newest grant.
+      const updated = accountSchema.safeParse({
+        ...known,
+        grantedScopes: [...request.grantedScopes],
+      });
+      if (!updated.success) return err(new InvalidStateError("Invalid account scopes"));
+      const saved = await uow.run((tx) => tx.repositories.accounts.save(updated.data), signal);
+      return saved.ok ? ok({ status: "already-connected", account: updated.data }) : saved;
     }
 
     const id = AccountId(ids.next("acc"));
@@ -94,6 +108,7 @@ export class ConnectAccount {
       provider: request.provider,
       address,
       connectedAt: clock.now().toISOString(),
+      grantedScopes: request.grantedScopes === undefined ? [] : [...request.grantedScopes],
     });
     if (!parsed.success) return err(new InvalidStateError("Invalid account details"));
     const account = parsed.data;
@@ -112,12 +127,12 @@ export class ConnectAccount {
       type: "AccountConnected",
       payload: { accountId: account.id, provider: account.provider },
     } satisfies DomainEventOf<"AccountConnected">;
-    const state = {
-      ...base,
-      id: `account-state:${account.id}:connected`,
-      type: "AccountStateChanged",
-      payload: { accountId: account.id, state: "connected" },
-    } satisfies DomainEventOf<"AccountStateChanged">;
+    const state = accountStateEvent({
+      workspaceId: account.workspaceId,
+      accountId: account.id,
+      state: "connected",
+      occurredAt: account.connectedAt,
+    });
 
     const saved = await uow.run(async (tx) => {
       const row = await tx.repositories.accounts.save(account);

@@ -297,7 +297,7 @@ describe("migrator", () => {
         "INSERT INTO digest_state (workspace_id, account_id, last_digest_at) VALUES ('w', 'a', '2026-01-01T00:00:00.000Z')",
       )
       .run();
-    expect(unwrap(migrate(first.writer))).toEqual({ from: 2, to: 2 });
+    expect(unwrap(migrate(first.writer))).toEqual({ from: 3, to: 3 });
     first.close();
     const again = open(path);
     expect(again.writer.prepare("SELECT count(*) AS n FROM digest_state").get()).toEqual({ n: 1 });
