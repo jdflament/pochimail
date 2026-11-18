@@ -6,7 +6,10 @@ Source of truth for visual and interaction decisions. Tokens live in `packages/u
 Modern, calm and sober, with an **editorial signature**: screens read like a well-typeset document written by someone, not a dashboard of cards. Typography, hairline rules and open space do the structuring. The mascot is the only warm, playful element.
 
 - Data is shown as **ledgers** (rows with dotted leaders, tabular numbers), not stat tiles.
-- **Clean up = recommendations**: figures are emails archived (and those that could be archived), attachments saved (count and size) and newsletters unsubscribed — archiving does not free mailbox space, so there is no "GB you can free" headline. Sentences are actions ("Save 412 attachments (1.2 GB)", "Unsubscribe from 120 newsletters", "Archive 9,206 promotions"), ordered by impact, each with a one-line reason and one "Review" button. The storage bar is **OPEN for JD** (what it shows, or drop it); do not invent a meaning. No color coding in content.
+- **Catch what matters** covers things to do and things to remember (reminders), not only replies: people waiting on you, deadlines, tasks/commitments and things to keep in mind (decided 2026-11-19). Signals weigh email dates: old conversations never count as "waiting on you" (D15; only recent threads whose last message is from a real person to you, with a configurable age window set in M3).
+- **Clean up = recommendations**: figures are emails archived (and those that could be archived), attachments saved (count and size) and newsletters unsubscribed — archiving does not free mailbox space, so there is no "GB you can free" headline. Sentences are actions ("Save 412 attachments (1.2 GB)", "Unsubscribe from 120 newsletters", "Archive 9,206 promotions"), ordered by impact, each with a one-line reason and one "Review" button. The storage bar is **OPEN for the maintainer** (what it shows, or drop it); do not invent a meaning. No color coding in content.
+- **Saved attachments** are written to the user's own storage, not kept inside Pochimail (decided 2026-11-19). The user chooses **local or drive**; Pochimail picks a starting folder in it and tidies everything there. File naming is one setting with a sensible default: keep original names, or let Pochimail name files smartly / organize by date ([ADR 0010](adr/0010-saved-attachments-go-to-user-storage.md), Accepted).
+- **Review lists (proposed, maintainer to confirm):** alongside the in-app metadata list, Pochimail can flag/label the concerned emails in the provider (e.g. "Pochimail/Waiting", "Pochimail/To do") and "Review" opens that filtered list in the user's mail app; this needs label/category write scopes and is reversible.
 - Containers only where content needs one (the summary sheet, list blocks). No cards inside cards.
 - Summaries are a **plain sheet from Pochi over the current screen** (never a separate page), built on the existing Dialog/Sheet primitives: small Pochi icon + "From Pochi · date", title, one sentence, three figures (emails archived, attachments saved, newsletters unsubscribed), one next step, Keep it tidy choices. Show only what is new; the Overview holds the details. Bottom sheet on phones.
 
@@ -45,7 +48,7 @@ Category colors (reserved for rare charts; screens use monochrome icons, never c
 Radius: 6 (small), 10 (controls), 12 (buttons), 16 (cards/panels), pill. Spacing on a 4px grid (8, 12, 16, 20, 24, 32, 40, 48). Targets: 32px minimum, 36px sidebar items, 44px primary buttons.
 
 ## Components (shadcn/ui in `packages/ui`)
-Button (primary charcoal, secondary outline, ghost), Switch, Checkbox card, Radio card, Pill radio group, Recommendation row (action, reason, Review), Storage bar (OPEN for JD — see above), Ledger row (label, leader, count, size), Signal row (big figure + text + Review), Status strip (2px progress + status line), Speech bubble (mascot), Account switcher, Sidebar item, Empty/error state, sonner toast + action. Follow shadcn conventions (CVA variants, `data-slot`, `asChild`, focus-visible) and composition over boolean props.
+Button (primary charcoal, secondary outline, ghost), Switch, Checkbox card, Radio card, Pill radio group, Recommendation row (action, reason, Review), Storage bar (OPEN for the maintainer — see above), Ledger row (label, leader, count, size), Signal row (big figure + text + Review), Status strip (2px progress + status line), Speech bubble (mascot), Account switcher, Sidebar item, Empty/error state, sonner toast + action. Follow shadcn conventions (CVA variants, `data-slot`, `asChild`, focus-visible) and composition over boolean props.
 
 ## Motion
 150ms press/hover, 220ms panels and toasts, ease-out `cubic-bezier(0.22, 1, 0.36, 1)`. Pressed buttons scale to 0.98. Numbers count up when results arrive (600ms). No looping or pulsing UI animation. Everything respects `prefers-reduced-motion`.
@@ -55,7 +58,7 @@ Button (primary charcoal, secondary outline, ghost), Switch, Checkbox card, Radi
 |---|---|---|
 | Live progress | Progress line glides; each new finding slides up 8px and fades in, replacing the previous one | 600ms width, 220ms text |
 | Numbers arrive | Counts roll up once from 0 when results land, then stay still | 600ms, ease-out cubic |
-| Storage settles | **OPEN for JD** (tied to the storage bar: what it shows, or drop it) — do not implement an invented meaning | 700ms, +140ms |
+| Storage settles | **OPEN for the maintainer** (tied to the storage bar: what it shows, or drop it) — do not implement an invented meaning | 700ms, +140ms |
 | Clean up, then undo | Row folds away (height + fade) instead of vanishing; dark undo toast rises from below for 5s; Undo unfolds the row | 260ms fold, 220ms toast |
 | Pochi at rest | Slow breathing (scale 1 → 1.012 wide / 1.025 tall, from the base) and blinks | 4.2s breathing loop, 5.3s blink loop |
 | Pochi finds something | Squish, bounce up 14px, settle | 620ms |

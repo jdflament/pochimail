@@ -19,7 +19,7 @@ There are no GitHub issues yet, so every mitigation links to a **Project "Pochim
 | # | Asset | Where it lives | Why it matters |
 |---|---|---|---|
 | A1 | Mail content and metadata (headers, metadata, derived data, short snippets; bodies are never persisted, D11) | Encrypted SQLite, worker process ([ADR 0005](../adr/0005-local-storage.md)) | The user's whole private life; the product's reason to exist |
-| A2 | Attachments and extracted documents | Encrypted content-addressed blob store, AES-256-GCM ([ADR 0005](../adr/0005-local-storage.md)); plaintext only on user export | IDs, contracts, payslips |
+| A2 | Attachments and extracted documents | Saved attachments go to the user's own storage (local or drive, chosen by the user; Pochimail tidies a starting folder): [ADR 0010](../adr/0010-saved-attachments-go-to-user-storage.md), Accepted 2026-11-19, supersedes the blob-store exception in [ADR 0009](../adr/0009-store-metadata-not-mail.md). Other extracted metadata stays as before: encrypted SQLite | IDs, contracts, payslips |
 | A3 | OAuth refresh tokens, IMAP app passwords | OS keychain via `SecretStore` / `safeStorage` ([ADR 0007](../adr/0007-oauth-credentials-scopes.md)) | Full mailbox access at the provider, outside the device |
 | A4 | Access tokens | Worker memory only | Short-lived mailbox access |
 | A5 | Database key | `safeStorage`-encrypted ([ADR 0005](../adr/0005-local-storage.md)) | Unlocks A1, A2 |
@@ -29,6 +29,8 @@ There are no GitHub issues yet, so every mitigation links to a **Project "Pochim
 | A9 | The app binary and its update channel | Signed builds, GitHub Releases | Whoever controls updates controls A1 to A5 |
 | A10 | OAuth client IDs and the verified-app status | Build config, provider consoles | Losing verification breaks sign-in for every user |
 | A11 | Logs and diagnostics export | Local files | Easy place to leak A1 by accident |
+
+ADR 0010 (Accepted 2026-11-19) changes the saved-attachment mitigations below: files live in the user's own storage and are not deleted with Pochimail data (S2, S5); other ADR 0009 rules stand.
 
 ## 3. Actors
 
@@ -69,7 +71,7 @@ There are no GitHub issues yet, so every mitigation links to a **Project "Pochim
 | TB3 | worker to model host | `LlmProvider` / `Embedder` ports | Email text is untrusted prompt input; the host has no network and no database |
 | TB4 | worker to OS keychain | `SecretStore` port | Secrets only here, never files or logs |
 | TB5 | app to internet | session-level request filter + worker HTTP client | Everything outside the allowlist is blocked ([network.md](network.md)) |
-| TB6 | worker to disk | SQLCipher DB, encrypted blobs, model files, logs | Encrypted at rest except models and redacted logs |
+| TB6 | worker to disk | SQLCipher DB, model files, logs; saved files in user-chosen storage | App-owned data encrypted at rest except models and redacted logs; saved files are the user's files (ADR 0010) |
 | TB7 | app to system browser | loopback `127.0.0.1:<random>` redirect | PKCE + `state`, listener closes after one request |
 | TB8 | build/release to user | electron-builder, signed update metadata, model manifest | Signed and verified end to end |
 
@@ -94,7 +96,7 @@ S spoofing · T tampering · R repudiation · I information disclosure · D deni
 | ID | Cat | Threat | Actor | Mitigation | Draft / ADR |
 |---|---|---|---|---|---|
 | W1 | E | Prompt injection: email text steers the LLM into an action ("archive everything", "mark all important") | T1 | LLM only classifies and explains; it never calls tools or actions; output is JSON-schema constrained and zod-validated; actions come from policies and user confirmation, never from model text | E3 (LLM host) · M1-05 · M1-06 · [ADR 0006](../adr/0006-local-ai-runtimes-and-models.md) |
-| W2 | E | Malicious attachment or email parser exploit (mailparser, PDF text extraction) | T1 | attachments are hashed and stored only when the user saves them (D11), never opened automatically; parsing in the worker with size and time limits; documents only extracted by libraries kept minimal and updated | E2 · E6 · M0-06 |
+| W2 | E | Malicious attachment or email parser exploit (mailparser, PDF text extraction) | T1 | attachments are hashed and written to the user's chosen storage only when the user saves them (D11, ADR 0010), never opened automatically; parsing in the worker with size and time limits; documents only extracted by libraries kept minimal and updated | E2 · E6 · M0-06 · [ADR 0010](../adr/0010-saved-attachments-go-to-user-storage.md) |
 | W3 | D | Crafted email or model input crashes or exhausts the model host | T1 | model host is a separate `utilityProcess`; a crash or OOM never takes the worker down; main pings it and restarts it with a growing delay (M4-02), each generation on its own private port, and the worker re-sends waiting requests | E4 (worker + model host) · [ADR 0002](../adr/0002-electron-process-model-and-ipc.md) |
 | W4 | I | Model host or a model leaks mail over the network | T4 | model host has no network permission and no DB access; the session filter and the worker's HTTP client allow only the hosts in [network.md](network.md); local AI only, no inference over the network | E3 · E4 · [ADR 0006](../adr/0006-local-ai-runtimes-and-models.md) · [ADR 0008](../adr/0008-notifications-and-privacy.md) |
 | W5 | T | Model poisoning of the learning state by hostile senders ("train" Pochi to trust a sender) | T1 | learning only from explicit user corrections; People mail never auto-actioned; Autopilot limited by strict, per-category policy; everything previewed and undoable | E3 (on-device learning) · E5 (Autopilot) · M1-05 |
@@ -106,10 +108,10 @@ S spoofing · T tampering · R repudiation · I information disclosure · D deni
 | ID | Cat | Threat | Actor | Mitigation | Draft / ADR |
 |---|---|---|---|---|---|
 | S1 | I | Database file copied from disk | T3 | SQLCipher-compatible encryption (`better-sqlite3-multiple-ciphers`); random 256-bit key in `safeStorage`; on Linux `basic_text` the key is refused, not written (see S4) | E2 (SQLite adapters) · M0-12 · [ADR 0005](../adr/0005-local-storage.md) |
-| S2 | I | Blob store read from disk | T3 | AES-256-GCM per blob with a key derived from the DB key; plaintext only on user export to a chosen folder | E6 · [ADR 0005](../adr/0005-local-storage.md) |
+| S2 | I | Saved document folder read by another local process | T3 | Pochimail keeps only metadata/references and no plaintext cache; files live in the user's chosen local or cloud-drive folder and use that folder's OS permissions (ADR 0010) | E6 · [ADR 0010](../adr/0010-saved-attachments-go-to-user-storage.md) |
 | S3 | I | Refresh token or app password in a file, log, crash dump or the renderer | T3 T6 | tokens only in the keychain via `SecretStore`; access tokens in memory; logger redaction; tokens never cross to renderer. Implemented (M2-04): main wraps each value with async `safeStorage` into `secrets.json`; the worker reaches it over a private main↔worker port that is never given to a WebContents; typed errors carry no key, value or cause; `basic-text` stores nothing until the user opts in (M4-20). Implemented (M2-05): refresh tokens are written only through `SecretStore` (including a rotated one), access tokens stay in the worker's memory, and sign-in/refresh errors carry no token | E2 (SecretStore) · M2-04 · M2-05 · [ADR 0007](../adr/0007-oauth-credentials-scopes.md) |
 | S4 | I | Linux without a secret service stores the key with the `basic_text` backend, which is weak | T3 | detect the backend; warn in plain language and ask before continuing; **Accepted risk** if the user continues | E2 · [ADR 0005](../adr/0005-local-storage.md) |
-| S5 | I | Data survives after "remove account" or "delete all" | T3 T6 | removing an account revokes the token at the provider, deletes keychain entries, rows and unreferenced blobs; "Delete all local data". Implemented (M2-05): the revoker deletes the Google token at H3; Microsoft has no public revocation endpoint, so a removed Microsoft account is cleaned locally only ([network.md](network.md) H5); the account/credential rows follow in the account flow | E7 (Settings, Privacy & data) · E2 · M2-05 · [ADR 0005](../adr/0005-local-storage.md) · [ADR 0007](../adr/0007-oauth-credentials-scopes.md) |
+| S5 | I | Data survives after "remove account" or "delete all" | T3 T6 | removing an account revokes the token at the provider and deletes keychain entries and rows; saved files in the user's chosen storage are kept by design (ADR 0010), while "Delete all local data" clears app-owned local data. Implemented (M2-05): the revoker deletes the Google token at H3; Microsoft has no public revocation endpoint, so a removed Microsoft account is cleaned locally only ([network.md](network.md) H5); the account/credential rows follow in the account flow | E7 (Settings, Privacy & data) · E2 · M2-05 · [ADR 0005](../adr/0005-local-storage.md) · [ADR 0007](../adr/0007-oauth-credentials-scopes.md) · [ADR 0010](../adr/0010-saved-attachments-go-to-user-storage.md) |
 | S6 | T | Database tampered by a local process (A6, action log) | T3 | **Accepted risk**: a same-user process that can write the file can also read the keychain entry the app can read; encryption gives confidentiality, not integrity against the user's own account. Revisit in the M8 review | M8 review: E8 |
 | S7 | I | Swap, hibernation or backups copy decrypted memory or plaintext exports | T3 | **Accepted risk** in v1 (no custom memory locking); exports are explicit, user-chosen, and the UI says so | E7 |
 

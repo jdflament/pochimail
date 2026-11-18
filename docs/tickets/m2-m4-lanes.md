@@ -15,7 +15,7 @@ M2 = 19 tickets, M4 = 20 tickets. SENSITIVE: M2-01, 03, 04, 05, 06, 09, 10, 11, 
 - B ui components: M4-03 ∥ M4-04 ∥ M4-06 (no deps) → M4-05 (needs M4-04) → M4-17 motion (needs 03, 04, 05, 06)
 - C shell: M4-07 (i18n) ∥ M4-01 → M4-08 → M4-09 (needs M4-03)
 - D screens: M4-10 Welcome (04, 06, 08) → M4-12 Connect (10, 11, 02) → M4-13 Setup (04, 10, 02) → M4-14 Overview (02, 03, 08, 09) → M4-15 Summary (05, 14)
-- E design: M4-11 (P8 draft, JD approves) → M4-12, M4-20
+- E design: M4-11 (P8 draft, the maintainer approves) → M4-12, M4-20
 - F states/test: M4-16 (04, 08) → M4-18 gallery (16, 17) → M4-19 Playwright (15, 18); M4-20 (M2-04, M4-01, M4-11)
 
 ## First wave (can start at once)
@@ -29,23 +29,27 @@ M2-01, M2-02, M2-04, M2-06, M2-19 · M4-01, M4-03, M4-04, M4-06, M4-07, M4-11
 - E2 "offline queued actions" and E5 "offline action queue" overlap (M2-17 owns queue+replay, M5 only UI).
 - Plan numbering (M4-01 = IPC, M4-03 = ui) differs from E4's child order; tickets follow the plan.
 - Responsive <560px layout is unreachable in a desktop window (min 720×560); it is tested via Storybook/containers only.
-- Brief §7 summary now shows attachments saved (JD 2026-11-19); real attachment metadata is M2-20, not M6 documents (M4 uses a fixture value).
+- Brief §7 summary now shows attachments saved (decided 2026-11-19); real attachment metadata is M2-20, not M6 documents (M4 uses a fixture value).
 - E2 says pipeline wiring was unmentioned; assigned to M1-14, so no M2 ticket for it.
 
-## Open questions for JD
+## Open questions for the maintainer
 1. How does packages/testing (fixtures) ship for M4 demo mode in a packaged build, or is it dev/E2E only?
 2. Required states: design.md set (update ready) or brief §6 set (nothing to do), or both (8)?
 3. Gmail/Graph IDLE opt-in (M2-16): build the flag now or drop it until Google answers G6?
 
-## JD answers (2026-11-18)
+## Maintainer answers (2026-11-18)
 1. Demo mode / fixtures: development and tests only; never shipped in the packaged app.
 3. Gmail/Graph instant (IDLE-style) wake-ups: later. M2-16 builds IMAP IDLE only; no Gmail/Graph flag now.
-2. Required states: BOTH = 8 (JD 2026-11-18). M4-16 builds 8; "Nothing to do" has no design: derive copy + pose from "Empty category" style, show it in the gallery for JD review.
+2. Required states: BOTH = 8 (decided 2026-11-18). M4-16 builds 8; "Nothing to do" has no design: derive copy + pose from "Empty category" style, show it in the gallery for maintainer review.
 
-## JD answers (2026-11-19)
+## Maintainer answers (2026-11-19)
 1. Fixtures/demo data refine the 2026-11-18 answer: for **developers and contributors only**, excluded from production builds **at build time**, not gated at runtime, so the shipped app stays light (D13, AGENTS.md §5).
 2. Overview/Summary figures are emails archived (and could-be-archived), attachments saved (count + size), newsletters unsubscribed; archiving does not free mailbox space, so no "GB you can free"/"freeable" copy (D12, M2-20).
-3. OPEN for JD: what the Overview storage bar shows, or drop it; do not invent a meaning. Demo Overview counts (7/3/12 vs 56) are an accepted gap until M3 detectors — do not change the numbers.
+3. OPEN for the maintainer: what the Overview storage bar shows, or drop it; do not invent a meaning. Demo Overview counts (7/3/12 vs 56) are an accepted gap until M3 detectors — do not change the numbers.
 4. Product priority (addendum 2026-11-19): the four jobs (save/export attachments, unsubscribe, archive, categorize) are core; "Catch what matters" signals are secondary (D14, brief §1-2).
 5. Date-aware signals (addendum 2026-11-19): old conversations never count as "waiting on you"; only recent threads whose last message is from a real person to you, with a configurable age window (default set in M3; D15, E3).
-6. Review lists (addendum 2026-11-19, proposed/JD to confirm): metadata-only lists (sender, subject, date, snippet), "Open in Gmail/Outlook/mail app", body preview fetched on demand in memory only (brief §7, ADR 0009).
+6. Review lists (addendum 2026-11-19, proposed / maintainer to confirm): metadata-only lists (sender, subject, date, snippet), "Open in Gmail/Outlook/mail app", body preview fetched on demand in memory only (brief §7, ADR 0009).
+7. "Catch what matters" scope (addendum 2026-11-19): things to do and things to remember (reminders) — people waiting on you, deadlines, tasks/commitments, things to keep in mind; not only replies. Signals weigh email dates (old conversations never count as "waiting on you", D15; full rule in E3).
+8. Guide to organize (2026-11-19): a goal — Pochimail proposes and, on approval, sets up tags/labels/folders in the provider, reversible and logged (D16, brief §2).
+9. Saved attachments (2026-11-19, decided by the maintainer): written to the user's own storage, not kept inside Pochimail; the user chooses local or drive, Pochimail picks a starting folder there and tidies it. File naming is one setting with a sensible default: keep original names or let Pochimail name smartly / organize by date (ADR 0010, Accepted).
+10. Provider labels for Review lists (addendum 2026-11-19, proposed / maintainer to confirm): flag/label emails in the provider (e.g. "Pochimail/Waiting", "Pochimail/To do"); "Review" opens that filtered list in the user's mail app alongside the in-app metadata list. Needs label/category write scopes; reversible (plan.md Open for the maintainer).

@@ -14,9 +14,11 @@ Pochimail is an open-source, privacy-first **desktop assistant** that gives peop
 
 **Pochimail is not a mail client.** It never becomes the place where people read or write mail. It sorts, summarizes, cleans and rescues; any individual mail opens in the user's usual mail app (Gmail web, Outlook, Apple Mail).
 
-**Product purpose (JD 2026-11-19):** Pochimail helps you save/export attachments, unsubscribe from useless newsletters, archive mail you don't need, and keep only relevant mail. Archiving does not free mailbox space, so mailbox size is not the goal of the Overview or Summary.
+**Product definition (decided 2026-11-19):** Pochimail is an assistant that helps you tidy your mailboxes, keep what matters (newsletters, emails, attachments) and guides you to stay organized by setting things up for you, such as tags/labels in your mail provider.
 
-**Product priority (JD 2026-11-19):** the four jobs — save/export attachments, unsubscribe from useless newsletters, archive unneeded mail, and categorize to keep only relevant mail — are the core of Pochimail. "Catch what matters" (people waiting on you, deadlines, important people) is secondary.
+**Product purpose (decided 2026-11-19):** Pochimail helps you save/export attachments, unsubscribe from useless newsletters, archive mail you don't need, and keep only relevant mail. Archiving does not free mailbox space, so mailbox size is not the goal of the Overview or Summary.
+
+**Product priority (decided 2026-11-19):** the four jobs — save/export attachments, unsubscribe from useless newsletters, archive unneeded mail, and categorize to keep only relevant mail — are the core of Pochimail. "Catch what matters" (people waiting on you, deadlines, important people) is secondary.
 
 - People have several accounts with years of mail: conversations, documents, receipts, notifications, newsletters, promotions, spam.
 - Pochimail analyzes everything **on the user's device**, shows the big picture, flags what matters, proposes cleanups and builds a **documents library**.
@@ -39,14 +41,14 @@ The assistant is **Pochi**, a character: a soft plush envelope that speaks in th
 
 Onboarding asks two questions. Both can be changed anytime in Settings.
 
-**Priority (JD 2026-11-19):** the four jobs — save/export attachments, unsubscribe from useless newsletters, archive unneeded mail, and categorize to keep only relevant mail — are the core; "Catch what matters" (people waiting on you, deadlines, important people) is secondary.
+**Priority (decided 2026-11-19):** the four jobs — save/export attachments, unsubscribe from useless newsletters, archive unneeded mail, and categorize to keep only relevant mail — are the core; "Catch what matters" (people waiting on you, deadlines, important people) is secondary.
 
 ### Question 1: "What should I help with?" (multi-select, all on by default)
 | Capability | Covers |
 |---|---|
-| **Catch what matters** | People waiting on you, threads waiting on others, deadlines, important senders. Digest of what needs attention. |
+| **Catch what matters** | Things to do and things to remember (reminders), not only replies: people waiting on you, threads waiting on others, deadlines, tasks/commitments, important senders. Digest of what needs attention. Signals weigh email dates; old conversations never count as "waiting on you" (D15). |
 | **Declutter** | Unsubscribe (newsletters, promotions), archive old notifications, codes and shipping updates. |
-| **Organize** | Apply categories and topics as real labels (Gmail labels, Outlook categories). |
+| **Organize** | Apply categories and topics as real labels (Gmail labels, Outlook categories). **Guide to organize (decided 2026-11-19):** Pochimail proposes and, on approval, sets up tags/labels/folders in the provider; reversible and logged. |
 | **Save documents** | Detect important documents and save/export them. |
 
 ### Question 2: "How much can I do?" (single choice)
@@ -84,6 +86,8 @@ Life areas such as Job search, Work, Finance, Home, Health, Travel, Family, Proj
 
 ### Signals (computed, never managed by hand)
 Needs a reply · Waiting on them · Important sender (frequently replied to, or marked VIP) · Has a document (invoice, contract, ID, payslip…) · Time-sensitive (deadline, event, expiry) · Old and never opened.
+
+Signals weigh email dates: old conversations never count as "waiting on you" (decided 2026-11-19, D15; full rule in E3).
 
 ### The assistant's brain: three layers, cheapest first
 1. **Rules (deterministic, instant):** headers (`List-Unsubscribe`, `Precedence: bulk`), known sender domains, the user's own reply history, sender-level aggregation. Covers the bulk of the mailbox.
@@ -193,7 +197,7 @@ The app must feel instant on mailboxes with 100k+ messages. Use these patterns w
 - **Provider efficiency**: batch endpoints (Gmail batch modify, Graph `$batch`), rate-limit handling with exponential backoff + jitter, per-account quotas.
 - **Idempotent, reversible actions** (Command pattern): each action has an idempotency key and an inverse stored in the ActionLog, so retries are safe and undo works across restarts.
 - **Live UI updates**: the worker streams progress and domain events to the renderer over typed IPC subscriptions (tRPC subscriptions over Electron IPC or MessagePorts). The renderer updates TanStack Query caches from events instead of polling. Optimistic updates for user actions, reconciled on `ActionApplied`/`ActionFailed`.
-- **Storage performance**: SQLite in WAL mode, proper indexes, FTS5 over metadata and derived data (never bodies), aggregated sender stats maintained incrementally, content-addressed blob store only for documents the user saved.
+- **Storage performance**: SQLite in WAL mode, proper indexes, FTS5 over metadata and derived data (never bodies), aggregated sender stats maintained incrementally. Saved documents go to the user's own storage instead of a Pochimail blob store ([ADR 0010](adr/0010-saved-attachments-go-to-user-storage.md), Accepted).
 
 ### 5.4 Electron process model
 - `main`: windows, lifecycle, tray/menu-bar icon, login item (for Keep it tidy), native notifications, OS integration.
@@ -335,10 +339,16 @@ First person, short, warm, plain language. Always reassure about privacy and rev
 1. **Welcome**: mascot, "Clean up your email. Keep what matters.", "Pochimail is a private assistant for the email accounts you already have… Your email never leaves this Mac." One button. "Free and open source". Step indicator (3 steps) only on onboarding screens.
 2. **Connect**: Google / Microsoft buttons plus "Other email provider" (Yahoo, iCloud, any IMAP account; needs a design issue: provider picker + app-password form), "you can add more accounts later". Next to it, "My promises" as a plain list: your email stays on this Mac, you decide what I can do, nothing is ever deleted.
 3. **Setup**: mascot speech bubble, then the two questions from section 2 as plain headings, no numbering (capabilities as checkboxes with Catch what matters first; autonomy as radios with Suggest recommended), a one-line reminder of the invariants, and a "Start sorting" button.
-4. **Overview (home), usable while sorting**: the user lands in the app immediately. Sidebar: account switcher (All accounts / per account / add another), Overview, the 7 categories with counts, Topics, Tools (Documents, Activity & undo, Settings), disabled Teams · Soon. Main, in this order: a 2px progress line with one status line underneath ("Sorting privately on this Mac", percentage, latest action, Pause/Resume, View summary); a serif "Overview" title; **Catch what matters** as three lines led by large serif numbers (people waiting on you, deadlines, important people; "I never clean these"; each with Review); **Clean up** as recommendations ordered by impact: figures are emails archived (and emails that could be archived), attachments saved (count and size) and newsletters unsubscribed — archiving does not free mailbox space, so there is no "GB you can free" headline. Each recommendation is an action ("Save 412 attachments (1.2 GB)", "Unsubscribe from 120 newsletters", "Archive 9,206 promotions") with a one-line reason and a single "Review" button. The storage bar from the reference is **OPEN for JD** (what it shows, or drop it); do not invent a meaning. A closing line says people, records and receipts are never cleaned. Nothing runs from this screen: Review opens the detail with checkboxes and the final confirm. No per-category colors in content. Numbers update live from events.
+4. **Overview (home), usable while sorting**: the user lands in the app immediately. Sidebar: account switcher (All accounts / per account / add another), Overview, the 7 categories with counts, Topics, Tools (Documents, Activity & undo, Settings), disabled Teams · Soon. Main, in this order: a 2px progress line with one status line underneath ("Sorting privately on this Mac", percentage, latest action, Pause/Resume, View summary); a serif "Overview" title; **Catch what matters** as three lines led by large serif numbers (people waiting on you, deadlines, important people; "I never clean these"; each with Review; covers things to do and things to remember, not only replies — see note below); **Clean up** as recommendations ordered by impact: figures are emails archived (and emails that could be archived), attachments saved (count and size) and newsletters unsubscribed — archiving does not free mailbox space, so there is no "GB you can free" headline. Each recommendation is an action ("Save 412 attachments (1.2 GB)", "Unsubscribe from 120 newsletters", "Archive 9,206 promotions") with a one-line reason and a single "Review" button. The storage bar from the reference is **OPEN for the maintainer** (what it shows, or drop it); do not invent a meaning. A closing line says people, records and receipts are never cleaned. Nothing runs from this screen: Review opens the detail with checkboxes and the final confirm. No per-category colors in content. Numbers update live from events.
 5. **Summary: a plain sheet over the Overview, not a separate page.** When the first scan finishes (and from "View summary"), a sheet built on the existing Dialog/Sheet primitives enters over the Overview with a standard scrim fade + slide (~250ms, one easing); the sidebar and the Overview stay visible behind a dim scrim, so the user never loses their place. It shows only what is new, never a copy of the Overview: header with a small Pochi icon + "From Pochi · date" and a close button; serif title "Your mailbox, sorted." and one sentence (emails sorted, accounts, nothing changed yet); three figures (emails archived, attachments saved with count and size, newsletters unsubscribed); one next step with a primary action ("Show the 7 people") and "Later"; "Keep it tidy" cadence as pill choices with "Change this anytime in Settings". Closing (×, Later, Esc) returns to the Overview, which already holds categories and clean-up recommendations. On phones it is a bottom sheet. Weekly and Autopilot summaries reuse the same sheet (Autopilot adds what was done + Undo).
 
-**Review lists (proposed, JD to confirm — 2026-11-19):** mails are not stored (ADR 0009, metadata only). Every "Review" list shows the concerned emails from stored metadata — sender, subject, date and snippet — with an "Open in Gmail/Outlook/mail app" link. A body preview is fetched on demand and held in memory only; no message body is persisted.
+**Catch what matters (decided 2026-11-19):** it covers things to do and things to remember (reminders), not only replies: people waiting on you, deadlines, tasks/commitments and things to keep in mind. Signals weigh email dates: old conversations never count as "waiting on you"; only recent threads whose last message is from a real person to you, with a configurable age window (default set in M3; D15, E3).
+
+**Review lists (proposed, maintainer to confirm — 2026-11-19):** mails are not stored (ADR 0009, metadata only). Every "Review" list shows the concerned emails from stored metadata — sender, subject, date and snippet — with an "Open in Gmail/Outlook/mail app" link. A body preview is fetched on demand and held in memory only; no message body is persisted.
+
+**Provider labels for Review lists (proposed, maintainer to confirm — 2026-11-19):** instead of Pochimail holding its own lists of emails, it can flag/label the concerned emails in the provider (e.g. a Gmail label or Outlook category such as "Pochimail/Waiting", "Pochimail/To do") and "Review" opens that filtered list in the user's mail app, alongside the in-app metadata list. This needs provider write scopes (labels/categories) and is reversible like other label actions.
+
+**Saved attachments (decided 2026-11-19):** saved attachments are not kept inside Pochimail; they are written to the user's own storage. The user chooses **local or drive**; Pochimail then picks a starting folder in it and tidies everything there. File naming is the user's choice: keep original names, or let Pochimail name files smartly / organize by date. One setting, sensible default ([ADR 0010](adr/0010-saved-attachments-go-to-user-storage.md), Accepted).
 
 ### 7b. Full screen inventory and flows
 Designed so far (reference screens): Welcome, Connect, Set up, Overview (usable while sorting), Summary sheet, empty/error/update states, mascot sheet, motion catalog, dark mode. Still to design before building them (create design issues for each):

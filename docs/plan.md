@@ -2,7 +2,7 @@
 
 Living document. `docs/brief.md` is the source of truth; this file shows **order, dependencies and decisions**. When a decision changes, update this file, the affected issues and `AGENTS.md` in the same PR.
 
-Status: **plan decisions P1 to P15 and ADRs 0001 to 0008 accepted by the maintainer on 2026-11-17** (M0-15).
+Status: **plan decisions P1 to P15 and ADRs 0001 to 0010 accepted by the maintainer** (P1–P15 and ADRs 0001–0008 on 2026-11-17, M0-15; later decisions on their dates).
 
 ---
 
@@ -20,16 +20,18 @@ Status: **plan decisions P1 to P15 and ADRs 0001 to 0008 accepted by the maintai
 | D8 | **Unsubscribe is the one irreversible action**: its ActionLog entry has `inverse: null`, `irreversible: true` and a reason; every other applied action must record its inverse (M1-02, accepted deviation from "undo everything") | 2026-11-17 | brief §2, §5.3, M1-02 |
 | D9 | **Autopilot confidence threshold defaults to 0.9** (`AUTOPILOT_CONFIDENCE_THRESHOLD`), tuned later against the eval set; Autopilot may auto-apply only archive and unsubscribe (M1-05, default pending calibration) | 2026-11-17 | brief §2, M1-05 |
 | D10 | Autopilot may unsubscribe (brief §2) although unsubscribe is irreversible (D8); it is logged and reported after, decided by the maintainer 2026-11-17 | 2026-11-17 | brief §2, M1-05 |
-| D11 | **Store metadata, not mail**: persist headers, metadata and derived data only; full bodies and attachments are never persisted (a saved document is the one exception); FTS5 indexes metadata + derived data only. JD approved ([ADR 0009](adr/0009-store-metadata-not-mail.md)) | 2026-11-18 | brief §5.3, §5.10, ADR 0009 |
-| D12 | **Overview/Summary figures (JD 2026-11-19)**: emails archived (and those that could be archived), attachments saved (count + size) and newsletters unsubscribed. Archiving does not free mailbox space, so drop "GB you can free"/"freeable"; recommendations are action sentences (M2-20) | 2026-11-19 | JD answer 2026-11-19: brief §6, §7.4–5, docs/design.md, M2-20 |
-| D13 | **Fixtures and demo data are for developers and contributors only**: excluded from production builds at build time (not just gated at runtime), so the shipped app stays light | 2026-11-19 | JD answer 2026-11-19: AGENTS.md §5, this file |
-| D14 | **Product priority (JD 2026-11-19)**: the four jobs (save/export attachments, unsubscribe from useless newsletters, archive unneeded mail, categorize to keep only relevant mail) are core; "Catch what matters" signals are secondary | 2026-11-19 | JD answer 2026-11-19: brief §1-2 |
-| D15 | **Date-aware signals (JD 2026-11-19)**: old conversations never count as "waiting on you"; only recent threads whose last message is from a real person to you. Configurable age window; default set in M3 | 2026-11-19 | JD answer 2026-11-19: E3, M3 signals |
+| D11 | **Store metadata, not mail**: persist headers, metadata and derived data only; full bodies and attachments are never persisted (the saved-document exception was superseded by D17); FTS5 indexes metadata + derived data only. Approved by the maintainer ([ADR 0009](adr/0009-store-metadata-not-mail.md)) | 2026-11-18 | brief §5.3, §5.10, ADR 0009, ADR 0010 |
+| D12 | **Overview/Summary figures (decided 2026-11-19)**: emails archived (and those that could be archived), attachments saved (count + size) and newsletters unsubscribed. Archiving does not free mailbox space, so drop "GB you can free"/"freeable"; recommendations are action sentences (M2-20) | 2026-11-19 | 2026-11-19 decision: brief §6, §7.4–5, docs/design.md, M2-20 |
+| D13 | **Fixtures and demo data are for developers and contributors only**: excluded from production builds at build time (not just gated at runtime), so the shipped app stays light | 2026-11-19 | 2026-11-19 decision: AGENTS.md §5, this file |
+| D14 | **Product priority (decided 2026-11-19)**: the four jobs (save/export attachments, unsubscribe from useless newsletters, archive unneeded mail, categorize to keep only relevant mail) are core; "Catch what matters" signals are secondary | 2026-11-19 | 2026-11-19 decision: brief §1-2 |
+| D15 | **Date-aware signals (decided 2026-11-19)**: old conversations never count as "waiting on you"; only recent threads whose last message is from a real person to you. Configurable age window; default set in M3 | 2026-11-19 | 2026-11-19 decision: E3, M3 signals |
 | D6 | **Tracker = GitHub Project "Pochimail v1"** with draft items; a draft becomes an issue only when work starts | 2026-11-17 | brief §10 |
+| D16 | **Guide to organize is a goal (decided 2026-11-19)**: Pochimail proposes and, on approval, sets up tags/labels/folders in the provider; reversible and logged | 2026-11-19 | 2026-11-19 decision: brief §2, docs/product.md |
+| D17 | **Saved attachments go to the user's own storage (decided 2026-11-19)**: the user chooses local or drive; Pochimail picks a starting folder there and tidies everything in it; file naming is one setting (keep original names, or smart naming / organize by date) with a sensible default. Not kept inside Pochimail ([ADR 0010](adr/0010-saved-attachments-go-to-user-storage.md), Accepted, supersedes the blob-store exception in [ADR 0009](adr/0009-store-metadata-not-mail.md)) | 2026-11-19 | 2026-11-19 decision/confirmation: brief §7, E6 |
 
 ### Decided by the maintainer (2026-11-17, M0-15)
 
-JD (maintainer) accepted every proposed default on 2026-11-17 (decision sheet items 1 to 33). Addition to P10 below.
+The maintainer accepted every proposed default on 2026-11-17 (decision sheet items 1 to 33). Addition to P10 below.
 
 | # | Question | Decision | Date | Decided by | Blocks |
 |---|---|---|---|---|---|
@@ -49,12 +51,13 @@ JD (maintainer) accepted every proposed default on 2026-11-17 (decision sheet it
 | P14 | Website getpochimail.com hosting | **Static site on GitHub Pages** from the repo (`apps/web` later) | 2026-11-17 | maintainer | M8 |
 | P15 | Package manager | **pnpm** (not Bun): electron-builder + native module rebuilds are best supported there (ADR 0001) | 2026-11-17 | maintainer | M0 |
 
-### Open for JD (2026-11-19)
-- **Overview storage bar**: after the figures change, what does it show — or is it dropped? **OPEN for JD**; do not invent a meaning (brief §7.4, docs/design.md).
-- **Review lists**: brief §7 proposes metadata-only lists (sender, subject, date, snippet; "Open in Gmail/Outlook/mail app"; body preview on demand in memory, never persisted) — **proposed, JD to confirm**.
+### Open for the maintainer (2026-11-19)
+- **Overview storage bar**: after the figures change, what does it show — or is it dropped? **OPEN for the maintainer**; do not invent a meaning (brief §7.4, docs/design.md).
+- **Review lists**: brief §7 proposes metadata-only lists (sender, subject, date, snippet; "Open in Gmail/Outlook/mail app"; body preview on demand in memory, never persisted) — **proposed, maintainer to confirm**.
+- **Provider labels for Review lists (proposed, maintainer to confirm)**: instead of Pochimail holding its own lists of emails, flag/label the concerned emails in the provider (e.g. a Gmail label or Outlook category such as "Pochimail/Waiting", "Pochimail/To do") and have "Review" open that filtered list in the user's mail app, alongside the in-app metadata list. Needs provider write scopes (labels/categories); reversible like other label actions (brief §7).
 
 ### Accepted gaps (2026-11-19)
-- **Demo Overview counts (7 people waiting / 3 deadlines / 12 important)**: accepted by JD until the M3 detectors land; do not change the numbers.
+- **Demo Overview counts (7 people waiting / 3 deadlines / 12 important)**: accepted by the maintainer until the M3 detectors land; do not change the numbers.
 
 ### Working assumptions (not questions)
 - Sub-agents are Orca workers (Sonnet) running inside the repo; reviewers are separate workers; Haiku for read-only lookups.

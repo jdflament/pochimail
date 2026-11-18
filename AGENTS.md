@@ -6,7 +6,7 @@
 
 # AGENTS.md — rules for every agent working on Pochimail
 
-Pochimail is a privacy-first, local-only desktop assistant that sorts and cleans mailboxes. It is **not** a mail client. Every rule below links to the brief section it comes from (`docs/brief.md`, "§"). **The brief wins over everything**, then `docs/plan.md` (decisions D1–D8 and P1–P15, all decided by the maintainer on 2026-11-17), then `docs/adr/`. If two sources disagree, follow the higher one and say so in your PR.
+Pochimail is a privacy-first, local-only desktop assistant that sorts and cleans mailboxes. It is **not** a mail client. Product definition (decided 2026-11-19): an assistant that helps you tidy your mailboxes, keep what matters (newsletters, emails, attachments) and guides you to stay organized by setting things up for you, such as tags/labels in your mail provider. Every rule below links to the brief section it comes from (`docs/brief.md`, "§"). **The brief wins over everything**, then `docs/plan.md` (decisions D1–D8 and P1–P15, all decided by the maintainer on 2026-11-17), then `docs/adr/`. If two sources disagree, follow the higher one and say so in your PR.
 
 ## 1. Read first
 - Read the brief sections your ticket lists, plus [§1 vision and principles](docs/brief.md) and [§8 standards](docs/brief.md). Skim `docs/plan.md` and the ADRs in `docs/adr/` that touch your area.
