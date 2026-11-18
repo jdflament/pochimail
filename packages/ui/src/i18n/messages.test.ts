@@ -1,24 +1,36 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { fr } from "./fr.ts";
+import { ja } from "./ja.ts";
 import { messages } from "./messages.ts";
 
-const source = readFileSync(join(import.meta.dirname, "messages.ts"), "utf8");
+const catalogs = [messages, fr, ja];
 
 describe("catalog copy (brief §6 › Voice, design › Writing)", () => {
-  it("never writes 'mails' in the catalog (guards the old word creeping back)", () => {
-    expect(source).not.toMatch(/\bmails\b/iu);
-    expect(source).toMatch(/\bemails\b/);
+  it("never writes 'mails' in any catalog (guards the old word creeping back)", () => {
+    for (const catalog of catalogs)
+      for (const message of Object.values(catalog)) expect(message.text).not.toMatch(/\bmails\b/iu);
+    expect(messages["overview.email.count"].text).toMatch(/\bemails\b/);
   });
 
   it("uses {device} for the host instead of a literal Mac (guards copy that breaks on Windows)", () => {
-    expect(source).toMatch(/\{device\}/);
-    expect(source).not.toMatch(/this Mac/u);
-    expect(messages["overview.promise.device"].params).toContain("device");
+    for (const catalog of catalogs)
+      expect(catalog["overview.promise.device"].params).toContain("device");
+    for (const message of Object.values(messages)) expect(message.text).not.toMatch(/\bMac\b/u);
+  });
+
+  it("covers every English key with the same placeholders (guards an untranslated string)", () => {
+    for (const catalog of catalogs)
+      for (const key of Object.keys(messages) as (keyof typeof messages)[]) {
+        expect(catalog[key].params).toEqual(messages[key].params);
+        for (const param of messages[key].params)
+          expect(catalog[key].text, `${key} dropped {${param}}`).toContain(`{${param}`);
+      }
   });
 
   it("keeps screen titles functional and never ships placeholder tokens (guards greeting titles)", () => {
+    for (const catalog of catalogs) expect(catalog["overview.title"].params).toEqual([]);
     expect(messages["overview.title"].text).toBe("Overview");
-    for (const message of Object.values(messages)) expect(message.text).not.toMatch(/\[[A-Z]\]/u);
+    for (const catalog of catalogs)
+      for (const message of Object.values(catalog)) expect(message.text).not.toMatch(/\[[A-Z]\]/u);
   });
 });

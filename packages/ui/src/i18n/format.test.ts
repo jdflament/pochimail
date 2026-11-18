@@ -1,5 +1,8 @@
-import { describe, expect, it } from "vitest";
-import { t } from "./format.ts";
+import { afterEach, describe, expect, it } from "vitest";
+import { getLocale, setLocale, t, translate } from "./format.ts";
+import { entry } from "./messages.ts";
+
+afterEach(() => setLocale("en"));
 
 describe("t() (design › Writing, P13)", () => {
   it("formats zero, one and many emails with the right English plural (guards '1 emails')", () => {
@@ -19,6 +22,65 @@ describe("t() (design › Writing, P13)", () => {
     expect(t("overview.promise.device", { device: "computer" })).toBe(
       "Your email never leaves this computer.",
     );
+  });
+
+  it("uses French plural and number rules (guards English rules and grouping in French)", () => {
+    expect(t("overview.email.count", { count: 0 }, { locale: "fr" })).toBe("Aucun email");
+    expect(t("overview.email.count", { count: 1 }, { locale: "fr" })).toBe("1 email");
+    expect(t("overview.email.count", { count: 1240 }, { locale: "fr" })).toBe("1\u202f240 emails");
+    expect(t("overview.size.free", { size: 3100, total: 6400 }, { locale: "fr" })).toBe(
+      "3\u202f100 Go à libérer, sur 6\u202f400 Go",
+    );
+  });
+
+  it("follows French 'one' for 0 and 1 (guards the English plural category being hard-coded)", () => {
+    const singular = {
+      "overview.email.count": entry("{count, plural, one {# email} other {# emails}}", ["count"]),
+    };
+    expect(translate(singular, "overview.email.count", { count: 0 }, "fr")).toBe("0 email");
+    expect(translate(singular, "overview.email.count", { count: 1 }, "fr")).toBe("1 email");
+    expect(translate(singular, "overview.email.count", { count: 2 }, "fr")).toBe("2 emails");
+  });
+
+  it("uses Japanese counts with no plural distinction (guards '# emails' English forms in Japanese)", () => {
+    expect(t("overview.email.count", { count: 0 }, { locale: "ja" })).toBe("メールはありません");
+    expect(t("overview.email.count", { count: 1 }, { locale: "ja" })).toBe("1件のメール");
+    expect(t("overview.email.count", { count: 1240 }, { locale: "ja" })).toBe("1,240件のメール");
+    const bare = {
+      "overview.email.count": entry("{count, plural, one {# email} other {# emails}}", ["count"]),
+    };
+    expect(translate(bare, "overview.email.count", { count: 5 }, "ja")).toBe("5 emails");
+  });
+
+  it("formats dates with the active locale's order and month names (guards US dates in French)", () => {
+    const date = "2026-11-19T12:00:00Z";
+    expect(t("summary.from", { date, device: "Mac" })).toBe(
+      "From Pochi · November 19, 2026 · on this Mac",
+    );
+    expect(t("summary.from", { date, device: "Mac" }, { locale: "fr" })).toBe(
+      "De Pochi · 19 novembre 2026 · sur votre Mac",
+    );
+    expect(t("summary.from", { date, device: "Mac" }, { locale: "ja" })).toBe(
+      "Pochiより · 2026年11月19日 · このMacで",
+    );
+  });
+
+  it("uses the app-wide locale set at startup (guards t() ignoring the resolved OS language)", () => {
+    expect(getLocale()).toBe("en");
+    setLocale("ja");
+    expect(t("overview.title")).toBe("概要");
+  });
+
+  it("rejects the dev-only pseudo locale as an app language (guards pseudo shipping as a choice)", () => {
+    const setPseudo = (): void => {
+      // @ts-expect-error `pseudo` is a layout probe, never user-selectable; this must not compile.
+      setLocale("pseudo");
+    };
+    expect(setPseudo).toBeTypeOf("function");
+  });
+
+  it("falls back to English when a catalog lacks a key (guards a blank line on a new string)", () => {
+    expect(translate({}, "overview.title", undefined, "fr")).toBe("Overview");
   });
 
   it("produces long accented pseudo-locale copy for expansion stories (guards untested FR/JA layout)", () => {

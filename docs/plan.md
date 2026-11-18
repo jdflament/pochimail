@@ -41,7 +41,7 @@ JD (maintainer) accepted every proposed default on 2026-11-17 (decision sheet it
 | P10 | Apple Developer ID, Windows signing (e.g. Azure Trusted Signing), external security review budget | **Needed before M8; confirm availability, no spend now.** Addition: **no Mac App Store and no Microsoft Store for now**; desktop builds ship as direct downloads from GitHub Releases, linked later from the getpochimail.com landing page (E8, P14). Signing certificates are still decided before M8 | 2026-11-17 | maintainer | M8 |
 | P11 | Opt-in crash reporting needs an outbound host | **Defer to v1.x** (no crash reporting in v1; local logs + "export diagnostics" button) | 2026-11-17 | maintainer | — |
 | P12 | Training data for the decision heads (user mail can't be used) | **Synthetic multilingual corpus generated offline + the fixture mailbox + public corpora with compatible licenses**, kept in `packages/ai/training/`; no maintainer mail in the repo | 2026-11-17 | maintainer | M3 |
-| P13 | UI language in v1 | **English UI in v1, i18n-ready** (all strings in a catalog, FR/JA layouts tested for expansion); FR/JA translations in v1.x | 2026-11-17 | maintainer | M4 |
+| P13 | UI languages in v1 | **English (default and fallback), French and Japanese in v1**; catalogs are typed so a missing translation fails typecheck; more languages later | 2026-11-19 | maintainer | M4 |
 | P14 | Website getpochimail.com hosting | **Static site on GitHub Pages** from the repo (`apps/web` later) | 2026-11-17 | maintainer | M8 |
 | P15 | Package manager | **pnpm** (not Bun): electron-builder + native module rebuilds are best supported there (ADR 0001) | 2026-11-17 | maintainer | M0 |
 
