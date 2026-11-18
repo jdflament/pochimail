@@ -32,7 +32,14 @@ export const createRpcClient = (transport: Transport, options: { timeoutMs?: num
   let closed = false;
   const pending = new Map<number, Pending>();
   const listeners = new Map<number, Listener>();
-  const send = (message: ClientMessage): void => transport.post(message);
+  const post = (message: ClientMessage): void => {
+    try {
+      transport.post(message);
+    } catch {
+      shutdown();
+      throw new RpcError("CLOSED", "worker connection closed");
+    }
+  };
 
   const shutdown = (): void => {
     if (closed) return;
@@ -79,7 +86,13 @@ export const createRpcClient = (transport: Transport, options: { timeoutMs?: num
         }
       } finally {
         // Always ack, even when a screen's listener throws: a missing ack would stall the worker's window for good.
-        send({ kind: "ack" });
+        if (!closed) {
+          try {
+            post({ kind: "ack" });
+          } catch {
+            // The connection is gone; there is nowhere to ack to.
+          }
+        }
       }
     } else {
       listeners.get(value.sub)?.onError?.(new RpcError(value.error.code, value.error.message));
@@ -114,7 +127,13 @@ export const createRpcClient = (transport: Transport, options: { timeoutMs?: num
             else reject(new RpcError("BAD_OUTPUT", `invalid output from ${name}`));
           },
         });
-        send({ kind: "call", id, procedure: name, input: input.data });
+        try {
+          post({ kind: "call", id, procedure: name, input: input.data });
+        } catch (error) {
+          pending.delete(id);
+          clearTimeout(timer);
+          reject(error as RpcError);
+        }
       });
     },
 
@@ -132,10 +151,19 @@ export const createRpcClient = (transport: Transport, options: { timeoutMs?: num
         throw new RpcError("BAD_INPUT", `invalid input for ${topic}`);
       const id = nextId++;
       listeners.set(id, { topic, onEvent: onEvent as (event: never) => void, onError });
-      send({ kind: "subscribe", id, topic, input: parsed.data });
+      try {
+        post({ kind: "subscribe", id, topic, input: parsed.data });
+      } catch (error) {
+        listeners.delete(id);
+        throw error;
+      }
       return () => {
         if (!listeners.delete(id) || closed) return;
-        send({ kind: "unsubscribe", id });
+        try {
+          post({ kind: "unsubscribe", id });
+        } catch {
+          // The connection is gone; the worker will tear down on close.
+        }
       };
     },
   };

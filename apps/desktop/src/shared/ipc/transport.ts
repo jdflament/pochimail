@@ -7,10 +7,43 @@ export type Transport = {
   close: () => void;
 };
 
+type CloseablePort = MessagePort & {
+  addEventListener: MessagePort["addEventListener"];
+  on?: (event: "close", listener: () => void) => void;
+  __pochimailClosed?: boolean;
+};
+
 /** Adapts a DOM/Node `MessagePort` (renderer side, tests). The caller keeps ownership of `start()`. */
-export const fromDomPort = (port: MessagePort): Transport => ({
-  post: (message) => port.postMessage(message),
-  onMessage: (handler) => port.addEventListener("message", (event) => handler(event.data)),
-  onClose: (handler) => port.addEventListener("close", () => handler()),
-  close: () => port.close(),
-});
+export const fromDomPort = (port: MessagePort): Transport => {
+  const closeable = port as CloseablePort;
+  let closed = closeable.__pochimailClosed === true;
+  const markClosed = () => {
+    closed = true;
+    closeable.__pochimailClosed = true;
+  };
+  return {
+    post: (message) => {
+      if (closed) throw new Error("MessagePort closed");
+      port.postMessage(message);
+    },
+    onMessage: (handler) => port.addEventListener("message", (event) => handler(event.data)),
+    onClose: (handler) => {
+      if (closed) {
+        queueMicrotask(handler);
+        return;
+      }
+      const fire = () => {
+        if (closed) return;
+        markClosed();
+        handler();
+      };
+      port.addEventListener("close", fire);
+      // Node worker_threads ports also emit close via EventEmitter; support both.
+      closeable.on?.("close", fire);
+    },
+    close: () => {
+      markClosed();
+      port.close();
+    },
+  };
+};
