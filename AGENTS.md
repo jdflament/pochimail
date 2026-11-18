@@ -48,7 +48,7 @@ Source: [§5.10](docs/brief.md), [§5.4](docs/brief.md), [ADR 0002](docs/adr/000
 - Encrypted database at rest; key and OAuth refresh tokens only in the OS keychain (`safeStorage`), never in files or logs.
 - Least-privilege scopes; never a delete scope.
 - Electron: `contextIsolation`, sandbox, no `nodeIntegration`, narrow preload via `contextBridge`, strict CSP, navigation and new-window blocking, `webSecurity` on, Fuses set.
-- Email content is untrusted: never execute or render remote content; remote images blocked; never follow links in email bodies. Unsubscribe only via RFC 8058 one-click or `mailto:` ([§4](docs/brief.md)). Attachments are hashed and stored, never opened automatically.
+- Email content is untrusted: never execute or render remote content; remote images blocked; never follow links in email bodies. Unsubscribe only via RFC 8058 one-click or `mailto:` ([§4](docs/brief.md)). Attachments are hashed and stored only when the user saves them (D11), never opened automatically. Never persist message bodies.
 - OAuth client IDs come from env/config, never hard-coded ([§9b](docs/brief.md)).
 - Supply chain: pinned lockfile, minimal dependencies; ask before adding a heavyweight one ([§10](docs/brief.md)). CI runs osv-scanner on the lockfile; planned: an SBOM per release ([§5.10](docs/brief.md)).
 - pnpm's `minimumReleaseAge` stays on: we rely on pnpm 12's default, so do not add config for it; never add release-age exclusions without an ADR note.
