@@ -8,6 +8,7 @@
     "./ai-contract": "./src/ai-contract.ts",
     "./blob-store-contract": "./src/blob-store-contract.ts",
     "./contract": "./src/contract.ts",
+    "./device-name-contract": "./src/device-name-contract.ts",
     "./domain-samples": "./src/domain-samples.ts",
     "./entity-contract": "./src/entity-contract.ts",
     "./event-bus-contract": "./src/event-bus-contract.ts",
