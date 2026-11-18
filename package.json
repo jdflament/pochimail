@@ -6,7 +6,7 @@
   "license": "AGPL-3.0-only",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jdflament/pochimail.git"
+    "url": "git+https://github.com/pochimail/pochimail.git"
   },
   "packageManager": "pnpm@12.21.0",
   "engines": {

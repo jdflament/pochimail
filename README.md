@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/jdflament/pochimail/actions/workflows/ci.yml"><img src="https://github.com/jdflament/pochimail/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/pochimail/pochimail/actions/workflows/ci.yml"><img src="https://github.com/pochimail/pochimail/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
 </p>
 
 # Pochimail

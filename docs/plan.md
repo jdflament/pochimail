@@ -11,7 +11,7 @@ Status: **plan decisions P1 to P15 and ADRs 0001 to 0008 accepted by the maintai
 ### Made
 | # | Decision | Date | Where it lives |
 |---|---|---|---|
-| D1 | Repo `jdflament/pochimail`, owner read from one config value | brief | brief › top |
+| D1 | Repo `pochimail/pochimail`, owner read from one config value | brief | brief › top |
 | D2 | Code license **AGPL-3.0**; brand assets separate (TRADEMARKS.md, CC BY-NC-ND 4.0) | 2026-11-17 | brief §8, §9b |
 | D3 | Repo is **public** from day one | 2026-11-17 | brief §10 |
 | D4 | **Any provider in v1**: Gmail API, Microsoft Graph, and a generic IMAP connector with presets (Yahoo, iCloud, Fastmail, GMX…). OAuth/XOAUTH2 where allowed, app password in the keychain otherwise | 2026-11-17 | brief §1, §4, §5.1, §5.3, §7 |
