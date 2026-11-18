@@ -2,8 +2,10 @@ import type { Account } from "@pochimail/core/domain/account";
 import type { ActionLog, Suggestion } from "@pochimail/core/domain/action";
 import type { Message, SenderStats, Thread, Topic } from "@pochimail/core/domain/mail";
 import { Cancelled, NotFound, StorageError } from "@pochimail/core/errors";
+import type { WorkspaceId } from "@pochimail/core/ids";
 import type { AsyncResult, CancelSignal, Page, PageRequest } from "@pochimail/core/ports/common";
 import type { SyncCursor } from "@pochimail/core/ports/mail-provider";
+import type { OutboxRecord, OutboxStore } from "@pochimail/core/ports/outbox";
 import type { ReadRepositories, WriteRepositories } from "@pochimail/core/ports/repositories";
 import type { OutboxEntry, Transaction, UnitOfWork } from "@pochimail/core/ports/unit-of-work";
 import { err, ok, type Result } from "@pochimail/core/result";
@@ -45,12 +47,23 @@ function paginate<T>(sorted: readonly T[], page: PageRequest): Page<T> {
   const end = start + items.length;
   return { items, nextCursor: end < sorted.length ? String(end) : null };
 }
+const oldestFirst = (
+  log: Map<string, ActionLog>,
+  ws: WorkspaceId,
+  match: (l: ActionLog) => boolean,
+) =>
+  [...log.values()]
+    .filter((l) => l.workspaceId === ws && match(l))
+    .sort((a, b) => byText(a.at, b.at) || byText(a.id, b.id))
+    .map(copy);
 const byText = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
 
 export interface InMemoryUnitOfWork {
   readonly uow: UnitOfWork;
   /** Everything committed to the outbox so far, in order. */
   committedOutbox(): Promise<readonly OutboxEntry[]>;
+  /** The relay's view of the committed outbox: undelivered rows, and marking them delivered. */
+  readonly outboxStore: OutboxStore;
   /** Force repository and outbox calls to fail with a `StorageError`. */
   readonly faults: Faults<StorageError>;
 }
@@ -129,6 +142,14 @@ export function createInMemoryUnitOfWork(): InMemoryUnitOfWork {
                 .filter((l) => l.workspaceId === ws && l.actionId === actionId)
                 .map(copy),
             ),
+          ) as never,
+        listForKey: (ws, idempotencyKey) =>
+          guarded(() =>
+            ok(oldestFirst(data().actionLog, ws, (l) => l.idempotencyKey === idempotencyKey)),
+          ) as never,
+        listForBatch: (ws, batchId) =>
+          guarded(() =>
+            ok(oldestFirst(data().actionLog, ws, (l) => l.batchId === batchId)),
           ) as never,
         list: (ws, page) =>
           guarded(() => {
@@ -224,6 +245,26 @@ export function createInMemoryUnitOfWork(): InMemoryUnitOfWork {
     };
   }
 
+  // Committed outbox is append-only, so the index is a stable row id.
+  const delivered = new Set<number>();
+  const outboxStore: OutboxStore = {
+    async pending(limit) {
+      const rows: OutboxRecord[] = [];
+      committed.outbox.forEach((entry, i) => {
+        if (!delivered.has(i) && rows.length < limit)
+          rows.push({ id: String(i), entry: copy(entry) });
+      });
+      return ok(rows);
+    },
+    async markDelivered(id) {
+      const i = Number(id);
+      if (!Number.isInteger(i) || i < 0 || i >= committed.outbox.length)
+        return err(new StorageError("Outbox row not found"));
+      delivered.add(i);
+      return ok(undefined);
+    },
+  };
+
   let queue: Promise<unknown> = Promise.resolve();
 
   function run<T, E>(
@@ -257,6 +298,7 @@ export function createInMemoryUnitOfWork(): InMemoryUnitOfWork {
   return {
     uow: { reads: readers(() => committed), run },
     committedOutbox: async () => copy(committed.outbox),
+    outboxStore,
     faults,
   };
 }

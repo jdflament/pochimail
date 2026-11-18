@@ -100,6 +100,7 @@ export const makeActionLog = (n: number, over: Partial<ActionLog> = {}): ActionL
   id: `log-${n}` as ActionLogId,
   workspaceId: WS_A,
   actionId: "act-1" as ActionId,
+  idempotencyKey: `key-${n}`,
   outcome: "applied",
   command: { kind: "archive", messageIds: ["msg-1" as MessageId] },
   inverse: { kind: "unarchive", messageIds: ["msg-1" as MessageId] },
