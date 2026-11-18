@@ -109,6 +109,10 @@ describe("worker app over the real IPC layer", () => {
       expect(progress.at(-1)).toMatchObject({ phase: "classifying", processed: 100 }),
     );
     await client.call("scan.pause", { jobId });
+    // The worker, not the screen, knows the scan is paused (a reloaded screen asks this).
+    expect(await client.call("scan.status", { accountIds: [FIRST_ACCOUNT] })).toMatchObject([
+      { jobId, status: "paused" },
+    ]);
     release();
     await app.idle();
     expect(appEvents.map((e) => e.type)).not.toContain("ScanCompleted");
@@ -120,6 +124,7 @@ describe("worker app over the real IPC layer", () => {
       { type: "ScanCompleted", accountId: FIRST_ACCOUNT, processed: accountSize(FIRST_ACCOUNT) },
     ]);
     expect((await client.call("overview.get", {})).scanned).toBe(accountSize(FIRST_ACCOUNT));
+    expect(await client.call("scan.status", { accountIds: [FIRST_ACCOUNT] })).toEqual([]);
     close();
   });
 

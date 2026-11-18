@@ -47,5 +47,9 @@ describe("worker app at the brief §6 mock dataset size", () => {
       accountIds: mailbox.accounts.map((a) => a.id as never),
     });
     expect(summary.ok && summary.value.categories).toEqual(MOCK_DATASET.categories);
+    // The Overview's cleanable counts are those category totals. The 7 waiting / 3 deadlines / 12 important figures are NOT
+    // asserted: the detectors do not reach them yet (known M3 gap, docs/status.md).
+    for (const { category, count } of overview?.cleanable ?? [])
+      expect(count).toBe(MOCK_DATASET.categories[category]);
   }, 600_000);
 });

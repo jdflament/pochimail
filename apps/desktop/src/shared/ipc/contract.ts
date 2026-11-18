@@ -58,6 +58,20 @@ const queries = {
     input: z.object({ accountIds: z.array(accountId).max(100) }),
     output: z.record(categorySchema, z.number().int().nonnegative()),
   },
+  /** Read-only: the live (running or paused) scan jobs of the given accounts, so a screen can show Pause or Resume after a reload. */
+  "scan.status": {
+    input: z.object({ accountIds: z.array(accountId).max(100) }),
+    output: z
+      .array(
+        z.object({
+          accountId,
+          jobId,
+          status: z.enum(["running", "paused"]),
+          processed: z.number().int().nonnegative(),
+        }),
+      )
+      .max(100),
+  },
   "digest.get": {
     input: z.undefined(),
     output: z.object({ ready: z.boolean(), itemCount: z.number().int().nonnegative() }),

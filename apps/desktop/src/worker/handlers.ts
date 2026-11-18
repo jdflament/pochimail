@@ -91,6 +91,8 @@ export function createHandlers(deps: HandlerDeps): Handlers {
           ),
         );
       },
+      "scan.status": ({ accountIds }) =>
+        deps.scans.live(accountIds.map((id) => unwrapOrThrow(AccountId(id)))),
       "digest.get": () => deps.latestDigest.get(),
       "settings.get": async () => unwrapOrThrow(await deps.settings.get(workspaceId)),
       "settings.update": async (patch) => {

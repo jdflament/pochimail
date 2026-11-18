@@ -14,7 +14,13 @@ import { useNavigate, useSearch } from "@tanstack/react-router";
 import { queryKeys } from "../../lib/query/keys.ts";
 import { useWorkerClient } from "../../lib/worker-context.tsx";
 import { cleanSplit, overviewView, RECOMMENDATION_COPY } from "./overview-figures.ts";
-import { useScanStatus } from "./use-scan-status.ts";
+import { type ScanStatus, useScanStatus } from "./use-scan-status.ts";
+
+const scanStatusLine = (scan: ScanStatus): string => {
+  if (scan.paused) return t("overview.scan.paused");
+  if (scan.total === null) return t("overview.scan.progressNoTotal", { processed: scan.processed });
+  return t("overview.scan.progress", { processed: scan.processed, total: scan.total });
+};
 
 export function OverviewPage() {
   const client = useWorkerClient();
@@ -47,7 +53,7 @@ export function OverviewPage() {
       search: (prev) => prev,
     });
 
-  const view = overviewView(data, scan.active);
+  const view = overviewView(data, scan.active, overview.isError);
   const { cleanable: cleanableTotal, keep } =
     data === undefined ? { cleanable: 0, keep: 0 } : cleanSplit(data);
 
@@ -57,11 +63,7 @@ export function OverviewPage() {
         <StatusStrip
           progress={scan.percent}
           headline={t("overview.sorting", { device })}
-          status={
-            scan.total === null
-              ? t("overview.scan.progressNoTotal", { processed: scan.processed })
-              : t("overview.scan.progress", { processed: scan.processed, total: scan.total })
-          }
+          status={scanStatusLine(scan)}
         >
           <Button variant="secondary" size="sm" onClick={scan.paused ? scan.resume : scan.pause}>
             {scan.paused ? t("overview.resume") : t("overview.pause")}
@@ -84,6 +86,12 @@ export function OverviewPage() {
           <Skeleton className="h-16" />
           <Skeleton className="h-40" />
         </div>
+      )}
+      {view === "error" && (
+        <EmptyState
+          title={t("overview.worker.unavailable")}
+          action={{ label: t("overview.retry"), onClick: () => void overview.refetch() }}
+        />
       )}
       {view === "empty" && (
         <EmptyState

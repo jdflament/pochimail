@@ -10,9 +10,9 @@ Last updated: 2026-11-19
 - **Merged M2/M4 tickets**: M2-01 (#49), M2-02 (#46), M2-03 (#51), M2-04 (#53), M2-06 (#60), M4-01 (#54), M4-03 (#47), M4-04 (#50), M4-07 (#56), M4-08 (#64).
 - **Merged M2/M4 tickets**: M2-01 (#49), M2-02 (#46), M2-03 (#51), M2-04 (#53), M2-06 (#60), M2-07 (#75), M4-01 (#54), M4-03 (#47), M4-04 (#50), M4-07 (#56), M4-08 (#64).
 - **M4-09 Responsive layout** (sidebar, icon rail, bottom tabs, account switcher, hidden empty categories): done with #70. Known gaps (decided): the Overview was not scoped to the account switcher (fixed in M4-14), and the Topics group is not shown because no topic data exists yet.
+- **M4-14 Overview while sorting: live numbers**: done with #PR. Scoped by the account switcher (`?account=`); Pause/Resume state comes from the worker (`scan.status`). Unmet acceptance criteria, owned elsewhere: the 7 waiting / 3 deadlines / 12 important golden waits for the M3 detectors (JD deciding); the 6.4 GB / 3.1 GB criterion waits for a new follow-up ticket "message size" (entity `sizeBytes`, persistence, fixtures), so Clean up shows email counts; View summary stays with M4-15. There is no Storybook story of the screen (it needs the worker); the pieces have their own stories.
 - **M4-16 Required states**: 8 states (sign-in cancelled, offline status line, needs reconnecting, model download failed, rate limit, empty category, nothing to do, update ready) composed from `EmptyState` with en/fr/ja copy, an event reducer for worker-event triggers and light/dark stories. Done with #74.
 - **M4-05 Responsive sheet**: one reusable `Sheet` primitive in packages/ui (centred on desktop, bottom sheet below 560px, standard enter motion); the summary content is composed in M4-15. Done with #73.
-- **M4-14 Overview while sorting: live numbers**: done with #PR. Figures come from the real detectors (assert structure, not the brief's 22; M3 gap below). Scoped by the account switcher (`?account=`). Known gaps (decided): sizes in GB are not shown because the store keeps no per-email size, so Clean up shows email counts; the status strip has no View summary button until the summary sheet exists.
 - **M4-06 Mascot behaviours**: done with #57 (merge pending).
 - **M4-10 Welcome screen and onboarding stepper**: done except the visual-tolerance check against the light reference, deferred to M4-19; shared onboarding layout keeps Pochi and the step indicator in place across Welcome, Connect and Set up.
 - **M4-17 Motion catalog**: central timings in `lib/motion.ts` (test-pinned to Motion.dc.html), `useMotionEnabled` + `MotionProvider` (reduced motion or Animations off make everything instant), count-up, storage settle, row fold + `undoToast`, finding slide-up, check draw, replayable stories under Motion/Catalog. Done with the M4-17 PR.
@@ -39,6 +39,7 @@ Ordered by priority (UI first):
 
 ## Known follow-ups
 
+- **Message size**: new ticket (entity `sizeBytes` in M1-02, persisted by M2-03, mapped by M2-09/M2-11, fixtures); unblocks the Overview's GB figures.
 - **M3**: needs-reply detector has no age window; current precision 0.26. The Overview's `toReview` over the small fixture is 56, not 7 + 3 + 12 = 22: needs-reply 45 (7 expected: the scan stores no threads, so every inbound people email counts as last in its thread, and there is no age window), time-sensitive 11 (3: the deadline word list also matches ordinary mail), important-sender 0 (12: nothing in the scan records VIP or reply counts per sender). Needs real detector work (M3).
 - **Packaging CI**: macOS packaging job is flaky.
 

@@ -42,6 +42,10 @@ const setup = (initial: Record<string, Overview>, path = "/overview") => {
     overviews: structuredClone(initial),
     asked: [] as (string | undefined)[],
     calls: [] as string[],
+    /** The worker's live scan jobs; Pause and Resume change them like the real runner does. */
+    jobs: [] as OutputOf<"scan.status">,
+    failOverview: false,
+    stopped: 0,
     emitters: new Map<string, ((e: EventOf<"scan.progress">) => void)[]>(),
     /** Sends progress once the screen has subscribed for that account. */
     progress: async (event: EventOf<"scan.progress">) => {
@@ -66,24 +70,30 @@ const setup = (initial: Record<string, Overview>, path = "/overview") => {
         newsletters: 0,
         promotions: 0,
       }),
+      "scan.status": ({ accountIds }) => state.jobs.filter((j) => accountIds.includes(j.accountId)),
       "overview.get": ({ accountId }) => {
         state.asked.push(accountId);
+        if (state.failOverview) throw new Error("down");
         return state.overviews[accountId ?? "all"] ?? empty;
       },
       "digest.get": () => ({ ready: false, itemCount: 0 }),
       "settings.get": () => ({ autopilot: false, notifications: true }),
-      "scan.start": ({ accountId }) => {
-        state.calls.push(`start:${accountId}`);
-        return { jobId: `job-${accountId}` };
+      "scan.pause": ({ jobId }) => {
+        state.calls.push(`pause:${jobId}`);
+        state.jobs = state.jobs.map((j) => (j.jobId === jobId ? { ...j, status: "paused" } : j));
       },
-      "scan.pause": ({ jobId }) => void state.calls.push(`pause:${jobId}`),
-      "scan.resume": ({ jobId }) => void state.calls.push(`resume:${jobId}`),
+      "scan.resume": ({ jobId }) => {
+        state.calls.push(`resume:${jobId}`);
+        state.jobs = state.jobs.map((j) => (j.jobId === jobId ? { ...j, status: "running" } : j));
+      },
     },
     subscriptions: {
       "app.events": () => undefined,
       "scan.progress": ({ accountId }, emit) => {
         state.emitters.set(accountId, [...(state.emitters.get(accountId) ?? []), emit]);
-        return undefined;
+        return () => {
+          state.stopped++;
+        };
       },
     },
   });
@@ -112,6 +122,10 @@ describe("overview", () => {
 
   it("changes figures in place when a progress event arrives, without going back to a loading state (guards flicker and stale numbers)", async () => {
     const state = setup({ all: { ...sorted, waiting: 7 } });
+    state.jobs = [
+      { accountId: "a1", jobId: "j1", status: "running", processed: 500 },
+      { accountId: "a2", jobId: "j2", status: "running", processed: 0 },
+    ];
     await screen.findByText("people are waiting on you");
     state.overviews.all = { ...sorted, waiting: 8, toReview: 11 };
     await state.progress({ accountId: "a1", phase: "classifying", processed: 500, total: 1000 });
@@ -124,18 +138,61 @@ describe("overview", () => {
     expect(screen.getByText("25%")).toBeTruthy();
   });
 
-  it("pauses and resumes the running scans of the selected accounts only (guards a Pause that does nothing or restarts finished scans)", async () => {
+  it("pauses and resumes only live jobs through the worker, never starting a scan (guards Pause that restarts finished scans or a lookup that resumes)", async () => {
     const user = userEvent.setup();
     const state = setup({ all: sorted });
+    state.jobs = [{ accountId: "a1", jobId: "job-a1", status: "running", processed: 10 }];
     await screen.findByText("people are waiting on you");
-    await state.progress({ accountId: "a1", phase: "classifying", processed: 10, total: 100 });
-    await state.progress({ accountId: "a2", phase: "done", processed: 50, total: 50 });
 
     await user.click(await screen.findByRole("button", { name: "Pause" }));
-    await waitFor(() => expect(state.calls).toContain("pause:job-a1"));
-    expect(state.calls.filter((c) => c.endsWith("a2"))).toEqual([]);
-    await user.click(await screen.findByRole("button", { name: "Resume" }));
-    await waitFor(() => expect(state.calls).toContain("resume:job-a1"));
+    expect(await screen.findByRole("button", { name: "Resume" })).toBeTruthy();
+    expect(screen.getByText("Paused. Nothing was changed.")).toBeTruthy();
+    await user.click(screen.getByRole("button", { name: "Resume" }));
+    expect(await screen.findByRole("button", { name: "Pause" })).toBeTruthy();
+    expect(state.calls).toEqual(["pause:job-a1", "resume:job-a1"]);
+  });
+
+  it("shows Resume when the screen opens while the worker's scan is paused (guards pause state kept only in the component, stranding the scan after a reload)", async () => {
+    const state = setup({ all: sorted });
+    state.jobs = [{ accountId: "a1", jobId: "job-a1", status: "paused", processed: 400 }];
+    expect(await screen.findByRole("button", { name: "Resume" })).toBeTruthy();
+    expect(screen.getByText("Paused. Nothing was changed.")).toBeTruthy();
+  });
+
+  it("offers a retry when the figures cannot be loaded and recovers (guards skeletons forever after a failed first load)", async () => {
+    const user = userEvent.setup();
+    const state = setup({ all: sorted });
+    state.failOverview = true;
+    expect(
+      await screen.findByRole(
+        "heading",
+        { name: "I could not load your overview." },
+        { timeout: 5000 },
+      ),
+    ).toBeTruthy();
+    state.failOverview = false;
+    await user.click(screen.getByRole("button", { name: "Try again" }));
+    expect(await screen.findByText("people are waiting on you")).toBeTruthy();
+  });
+
+  it("refetches the figures at most once per second however many events arrive (guards a refetch per event)", async () => {
+    const state = setup({ all: sorted });
+    await screen.findByText("people are waiting on you");
+    const before = state.asked.length;
+    for (let i = 1; i <= 20; i++)
+      await state.progress({ accountId: "a1", phase: "classifying", processed: i, total: 100 });
+    await new Promise((r) => setTimeout(r, 1300));
+    // One immediate refresh and at most one trailing one for 20 events inside ~1 s.
+    expect(state.asked.length - before).toBeLessThanOrEqual(2);
+    expect(state.asked.length - before).toBeGreaterThanOrEqual(1);
+  });
+
+  it("stops listening when the screen is left (guards leaked subscriptions after navigating away)", async () => {
+    const state = setup({ all: sorted });
+    await screen.findByText("people are waiting on you");
+    await waitFor(() => expect(state.emitters.get("a1")?.length).toBeGreaterThan(0));
+    cleanup();
+    await waitFor(() => expect(state.stopped).toBeGreaterThan(0));
   });
 
   it("asks for the selected account only and answers with its numbers (guards an Overview that ignores the account switcher)", async () => {

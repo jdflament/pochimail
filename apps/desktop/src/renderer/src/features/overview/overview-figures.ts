@@ -24,11 +24,15 @@ export const RECOMMENDATION_COPY: Record<Cleanable, { sentence: MessageKey; reas
     },
   };
 
-export type OverviewView = "loading" | "empty" | "content";
+export type OverviewView = "loading" | "error" | "empty" | "content";
 
-/** What the screen shows: skeletons until the first answer, the empty state for an account with no emails, else the figures. */
-export const overviewView = (data: OverviewData | undefined, scanning: boolean): OverviewView => {
-  if (data === undefined) return "loading";
+/** What the screen shows: skeletons until the first answer, an error with retry when the first answer failed, the empty state for an account with no emails, else the figures. */
+export const overviewView = (
+  data: OverviewData | undefined,
+  scanning: boolean,
+  failed: boolean,
+): OverviewView => {
+  if (data === undefined) return failed ? "error" : "loading";
   return data.scanned === 0 && !scanning ? "empty" : "content";
 };
 

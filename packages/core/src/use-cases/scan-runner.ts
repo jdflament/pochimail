@@ -111,6 +111,28 @@ export class ScanRunner {
     return ok(undefined);
   }
 
+  /** Read-only: the running and paused jobs, optionally for some accounts. Never starts or changes anything. */
+  live(accountIds?: readonly AccountId[]): {
+    jobId: string;
+    accountId: AccountId;
+    status: "running" | "paused";
+    processed: number;
+  }[] {
+    return [...this.jobs.values()].flatMap((job) =>
+      (job.status === "running" || job.status === "paused") &&
+      (accountIds === undefined || accountIds.includes(job.accountId))
+        ? [
+            {
+              jobId: job.id,
+              accountId: job.accountId,
+              status: job.status,
+              processed: job.processed,
+            },
+          ]
+        : [],
+    );
+  }
+
   /** Resolves when no job is running; for orderly shutdown and tests. */
   async idle(): Promise<void> {
     await Promise.all(this.running);

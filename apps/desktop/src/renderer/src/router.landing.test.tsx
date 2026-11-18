@@ -35,6 +35,7 @@ const createFakeAppClient = (hasConnectedAccount: boolean) => {
         newsletters: 0,
         promotions: 0,
       }),
+      "scan.status": () => [],
       "digest.get": () => ({ ready: false, itemCount: 0 }),
       "settings.get": () => ({
         autonomy: "suggest" as const,

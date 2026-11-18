@@ -59,6 +59,7 @@ const setup = (initialPath = "/overview") => {
         oldestWaitingDays: 0,
         cleanable: [],
       }),
+      "scan.status": () => [],
       "digest.get": () => ({ ready: false, itemCount: 0 }),
       "settings.get": () => ({
         autonomy: "suggest" as const,
