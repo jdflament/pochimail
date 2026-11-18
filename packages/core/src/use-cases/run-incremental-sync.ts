@@ -156,7 +156,7 @@ export class RunIncrementalSync {
       }
 
       const { messages, nextCursor, hasMore } = batch.value;
-      const keep = messages.flatMap((m) => sanitize(m, request));
+      const keep = messages.flatMap((m) => sanitizeIncoming(m, request));
       const key = `${accountId}:${scope}:${position}`;
       const committed = await uow.run(async (tx) => {
         const rows = await tx.repositories.messages.upsertMany(keep);
@@ -210,7 +210,10 @@ type AccountState = DomainEventOf<"AccountStateChanged">["payload"]["state"];
  * (a smuggled `body`, `attachments`…), invalid or foreign-workspace messages are skipped, and
  * the snippet is cut to `MAX_SNIPPET_CHARS`. Only these headers and metadata reach a repository.
  */
-function sanitize(message: IncomingMessage, request: RunIncrementalSyncRequest): IncomingMessage[] {
+export function sanitizeIncoming(
+  message: IncomingMessage,
+  request: Pick<RunIncrementalSyncRequest, "workspaceId" | "accountId">,
+): IncomingMessage[] {
   const parsed = incomingMessageSchema.safeParse(message);
   if (!parsed.success) return [];
   const m = parsed.data;
