@@ -38,6 +38,11 @@ describe("worker connection across page loads", () => {
     });
 
     loads.emit("did-finish-load");
+    // The old page is attached and waiting before the reload, so its CLOSED outcome does not depend on event timing.
+    const oldPage = toRenderer[0] as MessagePort;
+    oldPage.start();
+    const stale = createRpcClient(fromDomPort(oldPage)).call("app.state", ...([] as []));
+    const staleOutcome = expect(stale).rejects.toMatchObject({ code: "CLOSED" });
     loads.emit("did-finish-load"); // the reload
 
     expect(toRenderer).toHaveLength(2);
@@ -47,10 +52,7 @@ describe("worker connection across page loads", () => {
       status: "ready",
     });
 
-    firstPage.start();
-    await expect(
-      createRpcClient(fromDomPort(firstPage), { timeoutMs: 50 }).call("app.state"),
-    ).rejects.toMatchObject({ code: "CLOSED" });
+    await staleOutcome;
     firstPage.close();
     secondPage.close();
     for (const port of workerPorts) port.close();
