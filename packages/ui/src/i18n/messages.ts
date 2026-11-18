@@ -118,6 +118,58 @@ export const messages = {
   "storageBar.descriptionItem": entry("{size} {label}", ["size", "label"]),
   "storageBar.itemSeparator": entry(", ", []),
   "storageBar.legendItem": entry("{label} · {size}", ["label", "size"]),
+  "state.signInCancelled.title": entry("Sign-in was cancelled", []),
+  "state.signInCancelled.body": entry(
+    "No problem. I didn’t get access to anything. You can try again whenever you’re ready.",
+    [],
+  ),
+  "state.signInCancelled.retry": entry("Try again", []),
+  "state.signInCancelled.other": entry("Choose another account", []),
+  "state.offline.title": entry("You’re offline", []),
+  "state.offline.body": entry(
+    "Keep browsing as usual. I’ll sync again and apply what you approved as soon as you’re back.",
+    [],
+  ),
+  "state.offline.dismiss": entry("Got it", []),
+  "state.reconnect.title": entry("I lost access to your {provider} account", ["provider"]),
+  "state.reconnect.body": entry(
+    "{provider} asked you to sign in again. Your sorting and settings are safe.",
+    ["provider"],
+  ),
+  "state.reconnect.action": entry("Reconnect", []),
+  "state.reconnect.remove": entry("Remove account", []),
+  "state.modelFailed.title": entry("The assistant model didn’t download", []),
+  "state.modelFailed.body": entry(
+    "I can still sort with simple rules while you retry. Results will be a bit less precise.",
+    [],
+  ),
+  "state.modelFailed.retry": entry("Retry download", []),
+  "state.modelFailed.rules": entry("Continue with rules", []),
+  "state.rateLimit.title": entry("{provider} is slowing me down", ["provider"]),
+  "state.rateLimit.body": entry(
+    "Large mailboxes hit the limits of {provider}. I’ll continue automatically in {minutes, plural, one {# minute} other {# minutes}}.",
+    ["provider", "minutes"],
+  ),
+  "state.rateLimit.dismiss": entry("Got it", []),
+  "state.emptyCategory.title": entry("Nothing to clean here", []),
+  "state.emptyCategory.body": entry(
+    "This category is already tidy. I’ll let you know when that changes.",
+    [],
+  ),
+  "state.emptyCategory.action": entry("Back to overview", []),
+  "state.nothingToDo.title": entry("Nothing to do", []),
+  "state.nothingToDo.body": entry(
+    "Everything is sorted and nobody is waiting on you. I’ll tell you when that changes.",
+    [],
+  ),
+  "state.nothingToDo.action": entry("Back to overview", []),
+  "state.updateReady.title": entry("A new version is ready", []),
+  "state.updateReady.body": entry(
+    "Pochimail {version} is ready. It installs when you restart, and your emails stay where they are.",
+    ["version"],
+  ),
+  "state.updateReady.restart": entry("Restart now", []),
+  "state.updateReady.whatsNew": entry("What’s new", []),
 } as const;
 
 export type MessageKey = keyof typeof messages;

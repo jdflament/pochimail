@@ -1,0 +1,144 @@
+import { Button } from "@pochimail/ui/components/button";
+import { EmptyState } from "@pochimail/ui/components/empty-state";
+import { t } from "@pochimail/ui/i18n/format.ts";
+import { cn } from "@pochimail/ui/lib/utils";
+import type * as React from "react";
+
+// The required states (brief §6): each composes the one EmptyState with its pose, copy and exactly
+// one primary action. Failures announce assertively (alert); calm notices announce politely (status).
+type Handler = { onAction: () => void };
+type WithSecondary = Handler & { onSecondary: () => void };
+
+function SignInCancelledState({ onAction, onSecondary }: WithSecondary) {
+  return (
+    <EmptyState
+      role="status"
+      pose="default"
+      title={t("state.signInCancelled.title")}
+      description={t("state.signInCancelled.body")}
+      action={{ label: t("state.signInCancelled.retry"), onClick: onAction }}
+      secondaryAction={{ label: t("state.signInCancelled.other"), onClick: onSecondary }}
+    />
+  );
+}
+
+/** A status line, never a pop-up or modal: it sits in the page flow and announces politely. */
+function OfflineStatusLine({
+  onAction,
+  className,
+  ...props
+}: Handler & Omit<React.ComponentProps<"div">, "children" | "title">) {
+  return (
+    <div
+      data-slot="offline-status-line"
+      role="status"
+      aria-live="polite"
+      className={cn(
+        "flex flex-wrap items-center gap-x-4 gap-y-2 border-y border-border py-2.5 text-[13px] text-muted-foreground",
+        className,
+      )}
+      {...props}
+    >
+      <span className="font-medium text-foreground">{t("state.offline.title")}</span>
+      <span className="min-w-0 flex-1 break-words">{t("state.offline.body")}</span>
+      <Button variant="ghost" onClick={onAction}>
+        {t("state.offline.dismiss")}
+      </Button>
+    </div>
+  );
+}
+
+function NeedsReconnectState({
+  provider,
+  onAction,
+  onSecondary,
+}: WithSecondary & { provider: string }) {
+  return (
+    <EmptyState
+      role="alert"
+      pose="night"
+      title={t("state.reconnect.title", { provider })}
+      description={t("state.reconnect.body", { provider })}
+      action={{ label: t("state.reconnect.action"), onClick: onAction }}
+      secondaryAction={{ label: t("state.reconnect.remove"), onClick: onSecondary }}
+    />
+  );
+}
+
+function ModelDownloadFailedState({ onAction, onSecondary }: WithSecondary) {
+  return (
+    <EmptyState
+      role="alert"
+      pose="night"
+      title={t("state.modelFailed.title")}
+      description={t("state.modelFailed.body")}
+      action={{ label: t("state.modelFailed.retry"), onClick: onAction }}
+      secondaryAction={{ label: t("state.modelFailed.rules"), onClick: onSecondary }}
+    />
+  );
+}
+
+function RateLimitState({
+  provider,
+  minutes,
+  onAction,
+}: Handler & { provider: string; minutes: number }) {
+  return (
+    <EmptyState
+      role="status"
+      pose="night"
+      title={t("state.rateLimit.title", { provider })}
+      description={t("state.rateLimit.body", { provider, minutes })}
+      action={{ label: t("state.rateLimit.dismiss"), onClick: onAction }}
+    />
+  );
+}
+
+function EmptyCategoryState({ onAction }: Handler) {
+  return (
+    <EmptyState
+      role="status"
+      pose="happy"
+      title={t("state.emptyCategory.title")}
+      description={t("state.emptyCategory.body")}
+      action={{ label: t("state.emptyCategory.action"), onClick: onAction }}
+    />
+  );
+}
+
+/** No mockup (JD 2026-11-18): copy and pose derived from the empty category state. */
+function NothingToDoState({ onAction }: Handler) {
+  return (
+    <EmptyState
+      role="status"
+      pose="happy"
+      title={t("state.nothingToDo.title")}
+      description={t("state.nothingToDo.body")}
+      action={{ label: t("state.nothingToDo.action"), onClick: onAction }}
+    />
+  );
+}
+
+function UpdateReadyState({ version, onAction, onSecondary }: WithSecondary & { version: string }) {
+  return (
+    <EmptyState
+      role="status"
+      pose="happy"
+      title={t("state.updateReady.title")}
+      description={t("state.updateReady.body", { version })}
+      action={{ label: t("state.updateReady.restart"), onClick: onAction }}
+      secondaryAction={{ label: t("state.updateReady.whatsNew"), onClick: onSecondary }}
+    />
+  );
+}
+
+export {
+  EmptyCategoryState,
+  ModelDownloadFailedState,
+  NeedsReconnectState,
+  NothingToDoState,
+  OfflineStatusLine,
+  RateLimitState,
+  SignInCancelledState,
+  UpdateReadyState,
+};
