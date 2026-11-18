@@ -1,3 +1,4 @@
+import { createServer } from "node:net";
 import { describe, expect, it } from "vitest";
 import { createFakeClock } from "../fake-clock.ts";
 import { generateMailbox } from "../fixture-mailbox/generator.ts";
@@ -5,13 +6,13 @@ import { readMailbox } from "../fixture-mailbox/mailbox-reader.ts";
 import { splitMboxRaw } from "../fixture-mailbox/mbox.ts";
 import { createHttpReplay, loadRecording, scripts } from "./http-replay.ts";
 import { gmailRecording } from "./http-wire.ts";
-import { connectImapWire } from "./imap-wire.ts";
 import {
   FIXTURE_IMAP_PASSWORD,
   FIXTURE_IMAP_USER,
   startScriptedImapServer,
 } from "./scripted-imap-server.ts";
 import { assertScrubbed, findScrubViolations } from "./scrub.ts";
+import { connectTestOnlyImap, loopbackOnlyGuard } from "./test-only-imap-client.ts";
 
 const small = generateMailbox({ seed: 20261117, scale: "small" });
 const account = small.accounts[0];
@@ -142,12 +143,16 @@ describe("scripted IMAP server", () => {
     expect(a.port).not.toBe(b.port);
     await a.close();
     await b.close();
-    await expect(connectImapWire(a.port)).rejects.toThrow();
+    await expect(
+      connectTestOnlyImap(a.port, { assertSocketAllowed: loopbackOnlyGuard }),
+    ).rejects.toThrow();
   });
 
   it("closes open sessions on close (guards a hung test process)", async () => {
     const server = await start();
-    const client = await connectImapWire(server.port);
+    const client = await connectTestOnlyImap(server.port, {
+      assertSocketAllowed: loopbackOnlyGuard,
+    });
     await client.command(login);
     expect(server.openConnections()).toBe(1);
     await server.close();
@@ -158,7 +163,9 @@ describe("scripted IMAP server", () => {
   it("rejects wrong credentials and serves nothing before login", async () => {
     const server = await start();
     try {
-      const client = await connectImapWire(server.port);
+      const client = await connectTestOnlyImap(server.port, {
+        assertSocketAllowed: loopbackOnlyGuard,
+      });
       expect((await client.command("SELECT INBOX")).status).toBe("NO");
       expect((await client.command('LOGIN "x" "y"')).status).toBe("NO");
       client.close();
@@ -170,7 +177,9 @@ describe("scripted IMAP server", () => {
   it("reports a changed UIDVALIDITY so a stored cursor can be detected as expired", async () => {
     const server = await start();
     try {
-      const client = await connectImapWire(server.port);
+      const client = await connectTestOnlyImap(server.port, {
+        assertSocketAllowed: loopbackOnlyGuard,
+      });
       await client.command(login);
       const before = (await client.command("SELECT INBOX")).untagged.join("\n");
       server.changeUidValidity();
@@ -182,13 +191,34 @@ describe("scripted IMAP server", () => {
     }
   });
 
+  it("times out instead of hanging when the server stops answering (guards a test run stuck on a silent socket)", async () => {
+    const silent = createServer(() => {});
+    await new Promise<void>((resolve) => silent.listen(0, "127.0.0.1", resolve));
+    const address = silent.address();
+    try {
+      if (address === null || typeof address === "string") throw new Error("no port");
+      await expect(
+        connectTestOnlyImap(address.port, {
+          assertSocketAllowed: loopbackOnlyGuard,
+          timeoutMs: 50,
+        }),
+      ).rejects.toThrow(/timed out/);
+    } finally {
+      silent.close();
+    }
+  });
+
   it("kills the socket on a scripted drop and serves the next connection normally", async () => {
     const server = await start();
     try {
-      const client = await connectImapWire(server.port);
+      const client = await connectTestOnlyImap(server.port, {
+        assertSocketAllowed: loopbackOnlyGuard,
+      });
       server.dropConnections(1);
       await expect(client.command("NOOP")).rejects.toThrow("closed");
-      const again = await connectImapWire(server.port);
+      const again = await connectTestOnlyImap(server.port, {
+        assertSocketAllowed: loopbackOnlyGuard,
+      });
       expect((await again.command("NOOP")).status).toBe("OK");
       again.close();
     } finally {
@@ -199,7 +229,9 @@ describe("scripted IMAP server", () => {
   it("resumes with QRESYNC: only changes since the modseq, plus what vanished (guards a full re-walk after every reconnect)", async () => {
     const server = await start();
     try {
-      const client = await connectImapWire(server.port);
+      const client = await connectTestOnlyImap(server.port, {
+        assertSocketAllowed: loopbackOnlyGuard,
+      });
       await client.command(login);
       await client.command("ENABLE QRESYNC");
       const first = (await client.command("SELECT INBOX")).untagged.join("\n");
@@ -222,7 +254,9 @@ describe("scripted IMAP server", () => {
   it("pushes EXISTS to an idling client when mail arrives (guards IDLE that never wakes the app)", async () => {
     const server = await start();
     try {
-      const client = await connectImapWire(server.port);
+      const client = await connectTestOnlyImap(server.port, {
+        assertSocketAllowed: loopbackOnlyGuard,
+      });
       await client.command(login);
       await client.command("SELECT INBOX");
       client.raw("a99 IDLE");

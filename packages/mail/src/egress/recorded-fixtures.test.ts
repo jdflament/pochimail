@@ -12,11 +12,11 @@ import {
   readGmailMailbox,
   readGraphMailbox,
 } from "@pochimail/testing/recorded/http-wire";
-import { readImapMailbox } from "@pochimail/testing/recorded/imap-wire";
 import { protocolContract } from "@pochimail/testing/recorded/protocol-contract";
 import { startScriptedImapServer } from "@pochimail/testing/recorded/scripted-imap-server";
+import { readMailboxOverTestOnlyImap } from "@pochimail/testing/recorded/test-only-imap-client";
 import { afterAll, describe, expect, it } from "vitest";
-import { egressPolicy } from "./allowlist.ts";
+import { BlockedSocketError, egressPolicy } from "./allowlist.ts";
 import { BlockedHostError, createHttpClient, RequestFailedError } from "./http-client.ts";
 import { createRateLimitedClient } from "./rate-limit.ts";
 
@@ -75,8 +75,9 @@ protocolContract("Scripted IMAP server serves the fixture mailbox", async () => 
   return {
     expected: gmailMessages.map((m) => m.message),
     read: async () => {
-      allowlist.assertSocketAllowed(server.host, server.port);
-      return readImapMailbox(server.port, ids(gmailAccount));
+      return readMailboxOverTestOnlyImap(server.port, ids(gmailAccount), {
+        assertSocketAllowed: allowlist.assertSocketAllowed,
+      });
     },
   };
 });
@@ -97,10 +98,16 @@ describe("recorded fixtures behind the egress client", () => {
     expect(replay.requests()).toEqual([]);
   });
 
-  it("does not let the IMAP fixture port through unless the account registered it (guards an open loopback hole)", async () => {
+  it("opens no IMAP socket to the scripted server until the account registered it (guards a test reader that bypasses assertSocketAllowed)", async () => {
     const server = await startScriptedImapServer({ mbox: gmailAccount.mbox });
     servers.push(server);
-    expect(() => egressPolicy.create().assertSocketAllowed(server.host, server.port)).toThrow();
+    const allowlist = egressPolicy.create();
+    await expect(
+      readMailboxOverTestOnlyImap(server.port, ids(gmailAccount), {
+        assertSocketAllowed: allowlist.assertSocketAllowed,
+      }),
+    ).rejects.toBeInstanceOf(BlockedSocketError);
+    expect(server.connectionsAccepted()).toBe(0);
   });
 
   it("surfaces a scripted 429 with Retry-After as RateLimited and recovers after the wait (guards M2-07 paths nobody exercises)", async () => {

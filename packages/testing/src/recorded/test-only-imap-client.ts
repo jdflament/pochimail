@@ -5,8 +5,9 @@ import { quoteFromLines } from "../fixture-mailbox/mbox.ts";
 import type { MailboxIds } from "./http-wire.ts";
 import { FIXTURE_IMAP_PASSWORD, FIXTURE_IMAP_USER } from "./scripted-imap-server.ts";
 
-// DEV/TEST ONLY. A minimal IMAP client for the scripted server, and a reference mailbox reader
-// built on it. Real adapters (imapflow) run `protocol-contract.ts` against their own code.
+// TEST ONLY, NEVER A PRODUCTION IMAP CLIENT. A minimal plaintext client for the scripted server and
+// a reference mailbox reader built on it. It has no TLS, no reconnect and no back-pressure; the
+// real adapter (M2-11, imapflow) must not reuse it and runs `protocol-contract.ts` on its own code.
 
 export interface ImapResponse {
   /** Untagged responses; literals are inlined as `{n}\r\n<bytes>` so callers can parse FETCH. */
@@ -15,7 +16,7 @@ export interface ImapResponse {
   readonly text: string;
 }
 
-export interface ImapWireClient {
+export interface TestOnlyImapClient {
   command(line: string): Promise<ImapResponse>;
   /** Resolves with the next untagged line (e.g. an IDLE `EXISTS` push). */
   nextUntagged(): Promise<string>;
@@ -24,10 +25,42 @@ export interface ImapWireClient {
   close(): void;
 }
 
-export async function connectImapWire(port: number, host = "127.0.0.1"): Promise<ImapWireClient> {
+/** The M2-06 `HostAllowlist.assertSocketAllowed`: throws when the endpoint is not allowed. */
+export type SocketGuard = (host: string, port: number) => void;
+
+/** For tests of the scripted server alone, where no allow-list is under test. */
+export const loopbackOnlyGuard: SocketGuard = (host) => {
+  if (host !== "127.0.0.1") throw new Error("Test-only IMAP client talks to loopback only");
+};
+
+export interface TestOnlyImapOptions {
+  /** Called before any socket is opened. Pass `allowlist.assertSocketAllowed` to prove egress. */
+  readonly assertSocketAllowed: SocketGuard;
+  readonly host?: string;
+  /** Longest wait for the connection or for one response line. Default 5 s. */
+  readonly timeoutMs?: number;
+}
+
+export async function connectTestOnlyImap(
+  port: number,
+  options: TestOnlyImapOptions,
+): Promise<TestOnlyImapClient> {
+  const host = options.host ?? "127.0.0.1";
+  const timeoutMs = options.timeoutMs ?? 5_000;
+  options.assertSocketAllowed(host, port);
   const socket: Socket = await new Promise((resolve, reject) => {
-    const s = connect({ host, port }, () => resolve(s));
-    s.once("error", reject);
+    const s = connect({ host, port }, () => {
+      clearTimeout(timer);
+      resolve(s);
+    });
+    const timer = setTimeout(() => {
+      s.destroy();
+      reject(new Error("Test-only IMAP connect timed out"));
+    }, timeoutMs);
+    s.once("error", (error) => {
+      clearTimeout(timer);
+      reject(error);
+    });
   });
   socket.setEncoding("latin1");
   let buffer = "";
@@ -72,7 +105,16 @@ export async function connectImapWire(port: number, host = "127.0.0.1"): Promise
       const line = take();
       if (line !== null) return line;
       if (closedError) throw closedError;
-      await new Promise<void>((resolve) => waiters.push(resolve));
+      await new Promise<void>((resolve, reject) => {
+        const timer = setTimeout(() => {
+          socket.destroy();
+          reject(new Error("Test-only IMAP response timed out"));
+        }, timeoutMs);
+        waiters.push(() => {
+          clearTimeout(timer);
+          resolve();
+        });
+      });
     }
   };
 
@@ -106,12 +148,12 @@ const bodyOf = (fetchLine: string): string | undefined => {
 };
 
 /** UID FETCH of every message in INBOX, parsed back into `IncomingMessage`s (flags decide `opened`). */
-export async function readImapMailbox(
+export async function readMailboxOverTestOnlyImap(
   port: number,
   ids: MailboxIds,
-  options: { readonly client?: ImapWireClient } = {},
+  options: TestOnlyImapOptions,
 ): Promise<IncomingMessage[]> {
-  const client = options.client ?? (await connectImapWire(port));
+  const client = await connectTestOnlyImap(port, options);
   try {
     const login = await client.command(`LOGIN "${FIXTURE_IMAP_USER}" "${FIXTURE_IMAP_PASSWORD}"`);
     if (login.status !== "OK") throw new Error("IMAP login refused");
@@ -132,6 +174,6 @@ export async function readImapMailbox(
     }
     return out;
   } finally {
-    if (options.client === undefined) client.close();
+    client.close();
   }
 }

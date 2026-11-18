@@ -31,7 +31,7 @@
     "./fixtures": "./src/fixtures.ts",
     "./recorded/http-replay": "./src/recorded/http-replay.ts",
     "./recorded/http-wire": "./src/recorded/http-wire.ts",
-    "./recorded/imap-wire": "./src/recorded/imap-wire.ts",
+    "./recorded/test-only-imap-client": "./src/recorded/test-only-imap-client.ts",
     "./recorded/protocol-contract": "./src/recorded/protocol-contract.ts",
     "./recorded/scripted-imap-server": "./src/recorded/scripted-imap-server.ts",
     "./recorded/scrub": "./src/recorded/scrub.ts",

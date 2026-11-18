@@ -38,6 +38,8 @@ export interface ScriptedImapServer {
   folderUids(folder: string): readonly number[];
   /** Number of client sockets currently open (0 after every session logged out or was dropped). */
   openConnections(): number;
+  /** Total sockets ever accepted: 0 proves a client never reached the server. */
+  connectionsAccepted(): number;
   close(): Promise<void>;
 }
 
@@ -115,10 +117,12 @@ export async function startScriptedImapServer(
   }
 
   const sockets = new Set<Socket>();
+  let accepted = 0;
   const idlers = new Set<{ socket: Socket; folder: Folder }>();
   let drops = 0;
 
   const server: Server = createServer((socket) => {
+    accepted++;
     sockets.add(socket);
     socket.on("close", () => sockets.delete(socket));
     socket.on("error", () => socket.destroy());
@@ -341,6 +345,7 @@ export async function startScriptedImapServer(
     },
     folderUids: (name) => folders.get(name)?.messages.map((m) => m.uid) ?? [],
     openConnections: () => sockets.size,
+    connectionsAccepted: () => accepted,
     close: () =>
       new Promise<void>((resolve) => {
         const closing = [...sockets].map(
