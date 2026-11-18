@@ -39,8 +39,14 @@ export const fr = {
     [],
   ),
 
-  "welcome.title": entry("Bienvenue", []),
   "welcome.headline": entry("Faites le tri dans vos emails. Gardez l’essentiel.", []),
+  "welcome.description": entry(
+    "Pochimail est un assistant privé pour les comptes email que vous avez déjà. Il repère ce qui a besoin de vous, fait le tri dans l’encombrement et enregistre vos documents. Vos emails ne quittent jamais votre {device}.",
+    ["device"],
+  ),
+  "welcome.cta": entry("Commencer", []),
+  "welcome.openSource": entry("Gratuit et open source", []),
+  "onboarding.progress": entry("Étape {current} sur {total}", ["current", "total"]),
 
   "connect.title": entry("Connexion", []),
   "connect.description": entry("Connectez un compte email pour commencer.", []),

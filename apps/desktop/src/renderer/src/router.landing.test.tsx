@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { createRpcClient } from "../../shared/ipc/client.ts";
 import { serveRpc } from "../../shared/ipc/server.ts";
@@ -49,7 +49,11 @@ describe("first-run redirect from app.state", () => {
   it("lands on Welcome on first launch when no account is connected", async () => {
     const fake = createFakeAppClient(false);
     render(<App workerClient={fake.client} />);
-    await waitFor(() => expect(screen.getByRole("heading", { name: "Welcome" })).toBeTruthy());
+    await waitFor(() =>
+      expect(
+        screen.getByRole("heading", { name: "Clean up your email. Keep what matters." }),
+      ).toBeTruthy(),
+    );
     expect(screen.queryByRole("heading", { name: "Overview" })).toBeNull();
     fake.close();
   });
@@ -58,7 +62,29 @@ describe("first-run redirect from app.state", () => {
     const fake = createFakeAppClient(true);
     render(<App workerClient={fake.client} />);
     await waitFor(() => expect(screen.getByRole("heading", { name: "Overview" })).toBeTruthy());
-    expect(screen.queryByRole("heading", { name: "Welcome" })).toBeNull();
+    expect(
+      screen.queryByRole("heading", { name: "Clean up your email. Keep what matters." }),
+    ).toBeNull();
+    fake.close();
+  });
+
+  // Guards: a Get started button that does not lead to Connect, or a stepper that does not advance.
+  it("Get started leads to Connect and moves the stepper to step 2", async () => {
+    const fake = createFakeAppClient(false);
+    render(<App workerClient={fake.client} />);
+    await waitFor(() => expect(screen.getByRole("list", { name: "Step 1 of 3" })).toBeTruthy());
+    fireEvent.click(screen.getByRole("link", { name: "Get started" }));
+    await waitFor(() => expect(screen.getByRole("heading", { name: "Connect" })).toBeTruthy());
+    expect(screen.getByRole("list", { name: "Step 2 of 3" })).toBeTruthy();
+    fake.close();
+  });
+
+  // Guards: the privacy promise shipping with an unresolved {device} placeholder.
+  it("Welcome shows the device in the privacy promise with no placeholder left", async () => {
+    const fake = createFakeAppClient(false);
+    render(<App workerClient={fake.client} />);
+    await waitFor(() => expect(screen.getByText(/never leaves this device\./)).toBeTruthy());
+    expect(document.body.textContent).not.toMatch(/[{}[\]]/);
     fake.close();
   });
 });

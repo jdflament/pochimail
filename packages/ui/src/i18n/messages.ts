@@ -55,8 +55,14 @@ export const messages = {
   "shell.error.title": entry("Something went wrong", []),
   "shell.error.body": entry("Pochimail hit a problem. Close and reopen the app to try again.", []),
 
-  "welcome.title": entry("Welcome", []),
   "welcome.headline": entry("Clean up your email. Keep what matters.", []),
+  "welcome.description": entry(
+    "Pochimail is a private assistant for the email accounts you already have. It flags what needs you, clears the clutter and saves your documents. Your email never leaves this {device}.",
+    ["device"],
+  ),
+  "welcome.cta": entry("Get started", []),
+  "welcome.openSource": entry("Free and open source", []),
+  "onboarding.progress": entry("Step {current} of {total}", ["current", "total"]),
 
   "connect.title": entry("Connect", []),
   "connect.description": entry("Connect an email account to get started.", []),
