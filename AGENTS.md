@@ -17,6 +17,7 @@
 - Reuse before creating: check `packages/ui` and the feature folder first. A new `packages/ui` component only if `docs/design.md` names it.
 - One source of truth for every value (tokens, timings, copy, policies). No duplicated lists or literals.
 - Follow the established patterns of the codebase (shadcn conventions, hexagonal core, use cases behind ports). Do not invent a second way.
+- Every package has one reason to exist and owns one capability, strictly separated (like midday-ai/midday packages). No catch-all package where everything lands; new code goes in the package that owns that capability.
 
 **Neutral wording.** Never write a personal name in code, docs, commits, PR titles or PR bodies.
 
