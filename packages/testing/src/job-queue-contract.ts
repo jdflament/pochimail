@@ -72,7 +72,7 @@ export const jobQueueChecks: readonly Check<JobQueueHarness>[] = [
   check("a completed job never comes back (guards finished work re-running)", async ({ queue }) => {
     await queue.enqueue(ws, req("done"));
     const job = unwrap(await queue.claim(["sync"], never));
-    await queue.complete(job?.id ?? "");
+    await queue.complete(job?.id ?? "", job?.lease);
     expect(unwrap(await queue.claim(["sync"], never))).toBeNull();
   }),
   check(
@@ -81,7 +81,7 @@ export const jobQueueChecks: readonly Check<JobQueueHarness>[] = [
       await queue.enqueue(ws, req("retry"));
       const first = unwrap(await queue.claim(["sync"], never));
       const retryAt = new Date(clock.now().getTime() + 5_000).toISOString();
-      await queue.fail(first?.id ?? "", "provider.offline", retryAt);
+      await queue.fail(first?.id ?? "", "provider.offline", retryAt, first?.lease);
       expect(unwrap(await queue.claim(["sync"], never))).toBeNull();
       clock.advance(5_000);
       const second = unwrap(await queue.claim(["sync"], never));
@@ -94,7 +94,7 @@ export const jobQueueChecks: readonly Check<JobQueueHarness>[] = [
     async ({ queue, clock }) => {
       await queue.enqueue(ws, req("dead"));
       const job = unwrap(await queue.claim(["sync"], never));
-      await queue.fail(job?.id ?? "", "storage.failed");
+      await queue.fail(job?.id ?? "", "storage.failed", undefined, job?.lease);
       clock.advance(10 * 60_000);
       expect(unwrap(await queue.claim(["sync"], never))).toBeNull();
     },

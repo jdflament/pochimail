@@ -201,7 +201,9 @@ export function runPipelineContract(
       const pipeline = build(h, batchesSource(2, 2), [picky, pass("end", (i) => done.push(i))]);
       const report = unwrap(await pipeline.run(new AbortController().signal));
       expect(report).toMatchObject({ status: "completed", processed: 3, deferred: 1 });
-      expect(done).toEqual(["i0", "i2", "i3"]);
+      // Batches run concurrently (maxInFlightBatches), so the order items reach the last stage across
+      // batches depends on how fast the queue parks i1. Only the cursor commit order is promised.
+      expect([...done].sort()).toEqual(["i0", "i2", "i3"]);
 
       const signal = new AbortController().signal;
       expect(unwrap(await pipeline.drainRetries(signal))).toMatchObject({ retried: 1 });
