@@ -2,6 +2,9 @@ name: CI
 
 on:
   pull_request:
+  # GitHub merge queue: every required job below (check x3, eval, osv-scanner) runs unconditionally on merge_group, no `if:` gates them.
+  merge_group:
+    types: [checks_requested]
   # Feature-branch pushes are covered by pull_request; only run push CI on main (avoids double runs).
   push:
     branches: [main]
@@ -11,7 +14,8 @@ permissions:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+  # github.ref is unique per merge queue entry (refs/heads/gh-readonly-queue/...), so entries never share a group; never cancel queue runs.
+  cancel-in-progress: ${{ github.event_name != 'merge_group' && github.ref != 'refs/heads/main' }}
 
 jobs:
   # Required status checks (branch protection), names must stay stable:
@@ -57,7 +61,7 @@ jobs:
         run: pnpm manypkg
 
   # Unsigned packaging smoke build per OS (brief §5.9). The smoke also proves the encrypted WAL SQLite database with FTS5 inside the packaged app (M0-12). Runs on main, and on PRs that touch packaging inputs.
-  # Not a required check: when a PR touches nothing relevant the job still runs and reports success, but every step after the scope check is skipped.
+  # Not a required check, and it stays scoped (the scope step below reports run=false on merge_group). When a PR touches nothing relevant the job still runs and reports success, but every step after the scope check is skipped.
   package:
     name: package (${{ matrix.os }})
     needs: check
