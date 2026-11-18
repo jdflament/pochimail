@@ -8,7 +8,7 @@ Modern, calm and sober, with an **editorial signature**: screens read like a wel
 - Data is shown as **ledgers** (rows with dotted leaders, tabular numbers), not stat tiles.
 - **Clean up = recommendations** (macOS Storage pattern): headline figure, one monochrome storage bar (solid = keep, hatched = can be cleaned), then sentences ordered by impact with reason, size and one "Review" button. No color coding in content.
 - Containers only where content needs one (the summary sheet, list blocks). No cards inside cards.
-- Summaries are a **sheet from Pochi over the current screen** (never a separate page): mascot stamp, "From Pochi", serif title, one sentence, three figures, one next step, Keep it tidy choices. Show only what is new; the Overview holds the details. Bottom sheet on phones.
+- Summaries are a **plain sheet from Pochi over the current screen** (never a separate page), built on the existing Dialog/Sheet primitives: small Pochi icon + "From Pochi · date", title, one sentence, three figures, one next step, Keep it tidy choices. Show only what is new; the Overview holds the details. Bottom sheet on phones.
 
 ## Typography
 | Role | Font | Size / weight | Use |
@@ -45,7 +45,7 @@ Category colors (reserved for rare charts; screens use monochrome icons, never c
 Radius: 6 (small), 10 (controls), 12 (buttons), 16 (cards/panels), pill. Spacing on a 4px grid (8, 12, 16, 20, 24, 32, 40, 48). Targets: 32px minimum, 36px sidebar items, 44px primary buttons.
 
 ## Components (shadcn/ui in `packages/ui`)
-Button (primary charcoal, secondary outline, ghost), Switch, Checkbox card, Radio card, Pill radio group, Recommendation row (sentence, reason, size, Review), Storage bar (solid/hatched), Ledger row (label, leader, count, size), Signal row (big figure + text + Review), Status strip (2px progress + status line), Speech bubble (mascot), Letter (paper sheet, stamp, P.S.), Account switcher, Sidebar item, Empty/error state, sonner toast + action. Follow shadcn conventions (CVA variants, `data-slot`, `asChild`, focus-visible) and composition over boolean props.
+Button (primary charcoal, secondary outline, ghost), Switch, Checkbox card, Radio card, Pill radio group, Recommendation row (sentence, reason, size, Review), Storage bar (solid/hatched), Ledger row (label, leader, count, size), Signal row (big figure + text + Review), Status strip (2px progress + status line), Speech bubble (mascot), Account switcher, Sidebar item, Empty/error state, sonner toast + action. Follow shadcn conventions (CVA variants, `data-slot`, `asChild`, focus-visible) and composition over boolean props.
 
 ## Motion
 150ms press/hover, 220ms panels and toasts, ease-out `cubic-bezier(0.22, 1, 0.36, 1)`. Pressed buttons scale to 0.98. Numbers count up when results arrive (600ms). No looping or pulsing UI animation. Everything respects `prefers-reduced-motion`.
@@ -59,7 +59,7 @@ Button (primary charcoal, secondary outline, ghost), Switch, Checkbox card, Radi
 | Clean up, then undo | Row folds away (height + fade) instead of vanishing; dark undo toast rises from below for 5s; Undo unfolds the row | 260ms fold, 220ms toast |
 | Pochi at rest | Slow breathing (scale 1 → 1.012 wide / 1.025 tall, from the base) and blinks | 4.2s breathing loop, 5.3s blink loop |
 | Pochi finds something | Squish, bounce up 14px, settle | 620ms |
-| Summary arrives | Scrim fades in, sheet slides down 18px and fades in; stamp lands with a small overshoot and settles at 3°; first paragraph follows | 420ms, stamp 520ms (+260ms), text 300ms (+320ms) |
+| Summary arrives | Standard sheet enter: scrim fades in and the plain sheet slides in over the Overview; no stamp landing, overshoot or rotation | ~250ms, one easing (`cubic-bezier(0.22, 1, 0.36, 1)`) |
 | Choices respond | Checkmark draws itself; ring and background cross-fade; switch thumb glides | 150–220ms |
 | Screen to screen | Mascot stays; content slides in 16px from the right; step indicator stretches to the active step | 220–240ms |
 | Panels and menus | Fade + 4px scale-up from the trigger | 220ms |
