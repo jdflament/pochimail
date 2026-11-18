@@ -11,12 +11,18 @@
     "typecheck": "tsc",
     "lint": "biome check .",
     "knip": "knip",
-    "test": "vitest run"
+    "test": "vitest run",
+    "pochi:run": "tsx src/main.ts"
   },
   "devDependencies": {
     "@pochimail/typescript-config": "workspace:*",
     "@types/node": "26.6.6",
+    "tsx": "4.23.15",
     "typescript": "7.0.2",
     "vitest": "5.1.0"
+  },
+  "dependencies": {
+    "@pochimail/core": "workspace:*",
+    "@pochimail/testing": "workspace:*"
   }
 }

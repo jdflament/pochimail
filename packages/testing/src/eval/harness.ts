@@ -4,26 +4,23 @@ import {
   SIGNAL_KINDS,
   type SignalKind,
 } from "@pochimail/core/domain/category";
-import type { Message, SenderStats, Thread } from "@pochimail/core/domain/mail";
-import { AccountId, MessageId, ThreadId, WorkspaceId } from "@pochimail/core/ids";
+import type { Message } from "@pochimail/core/domain/mail";
+import { AccountId, MessageId, WorkspaceId } from "@pochimail/core/ids";
 import type { Classifier } from "@pochimail/core/ports/ai";
 import { unwrap } from "@pochimail/core/result";
 import { ClassifyBatch } from "@pochimail/core/use-cases/classify-batch";
 import { DetectSignals } from "@pochimail/core/use-cases/detect-signals";
 import { RunIncrementalSync } from "@pochimail/core/use-cases/run-incremental-sync";
 import { createFakeClock } from "../fake-clock.ts";
-import { CORRESPONDENTS, VIP_COUNT } from "../fixture-mailbox/content.ts";
 import { createFixtureMailProvider } from "../fixture-mailbox/fixture-mail-provider.ts";
 import { FIXTURE_NOW, type GeneratedMailbox } from "../fixture-mailbox/generator.ts";
 import { createInMemoryUnitOfWork } from "../in-memory-store.ts";
 import { scoreMultiLabel, scoreSingleLabel } from "./metrics.ts";
 import { type EvalReport, evalReportSchema } from "./report.ts";
+import { seedContext } from "./seed-context.ts";
 
 const BATCH = 100;
 const live = () => new AbortController().signal;
-const VIP_ADDRESSES: ReadonlySet<string> = new Set(
-  CORRESPONDENTS.slice(0, VIP_COUNT).map((c) => c.address),
-);
 
 export interface RunEvalOptions {
   /** Any `Classifier`: the ground-truth stub today, the real one in M3. */
@@ -144,61 +141,4 @@ async function readAll(
     cursor = page.nextCursor ?? undefined;
   } while (cursor);
   return out;
-}
-
-/**
- * What sync does not provide yet: threads (from the thread ids the fixture stamps on each
- * message) and per-sender stats (the fixture's important senders are marked VIP).
- */
-async function seedContext(
-  uow: ReturnType<typeof createInMemoryUnitOfWork>["uow"],
-  messages: readonly Message[],
-  owner: string,
-) {
-  const byThread = new Map<string, Message[]>();
-  const bySender = new Map<string, Message[]>();
-  for (const m of messages) {
-    byThread.set(m.threadId, [...(byThread.get(m.threadId) ?? []), m]);
-    if (m.from.toLowerCase() !== owner.toLowerCase())
-      bySender.set(m.from, [...(bySender.get(m.from) ?? []), m]);
-  }
-  const newest = (list: readonly Message[]) =>
-    list
-      .map((m) => m.receivedAt)
-      .sort()
-      .at(-1) ?? "";
-  const first = messages[0];
-  if (!first) return;
-  const threads: Thread[] = [...byThread.entries()].map(([id, list]) => {
-    const ordered = [...list].sort(
-      (a, b) => a.receivedAt.localeCompare(b.receivedAt) || a.id.localeCompare(b.id),
-    );
-    return {
-      schemaVersion: 1,
-      id: unwrap(ThreadId(id)),
-      workspaceId: first.workspaceId,
-      accountId: first.accountId,
-      subject: ordered[0]?.subject ?? "",
-      messageIds: ordered.map((m) => m.id),
-      lastMessageAt: newest(ordered),
-    };
-  });
-  const senders: SenderStats[] = [...bySender.entries()].map(([address, list]) => ({
-    schemaVersion: 1,
-    workspaceId: first.workspaceId,
-    accountId: first.accountId,
-    address,
-    messageCount: list.length,
-    openedCount: list.filter((m) => m.opened).length,
-    repliedCount: 0,
-    lastMessageAt: newest(list),
-    vip: VIP_ADDRESSES.has(address),
-  }));
-  unwrap(
-    await uow.run(async (tx) => {
-      for (const t of threads) unwrap(await tx.repositories.threads.upsert(t));
-      for (const s of senders) unwrap(await tx.repositories.senders.upsert(s));
-      return { ok: true as const, value: undefined };
-    }, live()),
-  );
 }

@@ -51,7 +51,10 @@
     "./domain/digest": "./src/domain/digest.ts",
     "./use-cases/detect-signals": "./src/use-cases/detect-signals.ts",
     "./use-cases/propose-suggestions": "./src/use-cases/propose-suggestions.ts",
-    "./use-cases/build-digest": "./src/use-cases/build-digest.ts"
+    "./use-cases/build-digest": "./src/use-cases/build-digest.ts",
+    "./use-cases/store-messages": "./src/use-cases/store-messages.ts",
+    "./use-cases/summarize-mailbox": "./src/use-cases/summarize-mailbox.ts",
+    "./jobs/scan-pipeline": "./src/jobs/scan-pipeline.ts"
   },
   "scripts": {
     "typecheck": "tsc",

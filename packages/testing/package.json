@@ -58,7 +58,8 @@
     "./eval/degraded-classifier": "./src/eval/degraded-classifier.ts",
     "./eval/harness": "./src/eval/harness.ts",
     "./eval/metrics": "./src/eval/metrics.ts",
-    "./eval/report": "./src/eval/report.ts"
+    "./eval/report": "./src/eval/report.ts",
+    "./eval/seed-context": "./src/eval/seed-context.ts"
   },
   "scripts": {
     "typecheck": "tsc",
