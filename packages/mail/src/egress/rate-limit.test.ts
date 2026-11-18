@@ -10,25 +10,104 @@ import { createFakeMailProvider } from "@pochimail/testing/fake-mail-provider";
 import { makeIncomingMessage, WS_A } from "@pochimail/testing/fixtures";
 import { createInMemorySecretStore } from "@pochimail/testing/in-memory-secret-store";
 import { createInMemoryUnitOfWork } from "@pochimail/testing/in-memory-store";
-import { expect, it } from "vitest";
-import type { HttpClient } from "./http-client.ts";
-import { createConnectionLimiter, createRateLimitedClient } from "./rate-limit.ts";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { type HttpClient, RequestCancelledError } from "./http-client.ts";
+import { createConnectionLimiter, createRateLimitedClient, systemSleep } from "./rate-limit.ts";
 import { registerRateLimitContract } from "./rate-limit-contract.ts";
 
 registerRateLimitContract(({ inner, clock, random, sleep, onEvent }) =>
   createRateLimitedClient({ inner, clock, random, sleep, onEvent }),
 );
 
-it("refuses a second IMAP connection beyond the per-account limit and frees it on release", () => {
+it("frees the IMAP connection slot after fn throws, so a failure cannot leak a slot", async () => {
   const limiter = createConnectionLimiter(1);
   const id = unwrap(AccountId("acc-imap"));
-  const first = limiter.tryAcquire(id);
-  expect(first.ok).toBe(true);
-  const second = limiter.tryAcquire(id);
+  await expect(
+    limiter.withConnection(id, async () => {
+      throw new Error("boom");
+    }),
+  ).rejects.toThrow("boom");
+  expect((await limiter.withConnection(id, async () => 1)).ok).toBe(true);
+});
+
+it("frees the IMAP slot after an aborted operation and refuses a second concurrent connection", async () => {
+  const limiter = createConnectionLimiter(1);
+  const id = unwrap(AccountId("acc-imap"));
+  const controller = new AbortController();
+  const running = limiter.withConnection(
+    id,
+    () =>
+      new Promise<void>((_resolve, reject) =>
+        controller.signal.addEventListener("abort", () => reject(new Error("aborted"))),
+      ),
+  );
+  const second = await limiter.withConnection(id, async () => 1);
   expect(second.ok).toBe(false);
   if (!second.ok) expect(second.error).toBeInstanceOf(RateLimited);
-  if (first.ok) first.value();
-  expect(limiter.tryAcquire(id).ok).toBe(true);
+  controller.abort();
+  await expect(running).rejects.toThrow("aborted");
+  expect((await limiter.withConnection(id, async () => 1)).ok).toBe(true);
+});
+
+describe("a wait that is pending when the caller aborts", () => {
+  const account = { id: unwrap(AccountId("acc-wait")), provider: "gmail" as const };
+  const setup = (statuses: number[]) => {
+    vi.useFakeTimers();
+    const calls: number[] = [];
+    const inner: HttpClient = {
+      async request() {
+        calls.push(Date.now());
+        const status = statuses.shift() ?? 200;
+        return ok({ status, ok: status === 200, body: "" });
+      },
+    };
+    const client = createRateLimitedClient({
+      inner,
+      clock: { now: () => new Date(Date.now()) },
+      random: () => 0.5,
+      sleep: systemSleep,
+    });
+    return { client, calls };
+  };
+  afterEach(() => vi.useRealTimers());
+
+  it("rejects a bucket wait promptly and sends no request (guards a cancelled sync that still fires)", async () => {
+    const { client, calls } = setup([]);
+    for (let i = 0; i < 300; i++)
+      await client.request({ url: "https://gmail.googleapis.com/v1/m", account, cost: 20 });
+    const sent = calls.length;
+    const controller = new AbortController();
+    const pending = client.request({
+      url: "https://gmail.googleapis.com/v1/m",
+      account,
+      cost: 20,
+      signal: controller.signal,
+    });
+    await vi.advanceTimersByTimeAsync(50); // part-way through the 200 ms wait
+    controller.abort();
+    const result = await pending; // settles without advancing time further
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBeInstanceOf(RequestCancelledError);
+    await vi.advanceTimersByTimeAsync(10_000);
+    expect(calls).toHaveLength(sent);
+  });
+
+  it("rejects a backoff wait promptly and does not retry (guards a retry after cancel)", async () => {
+    const { client, calls } = setup([429]);
+    const controller = new AbortController();
+    const pending = client.request({
+      url: "https://gmail.googleapis.com/v1/m",
+      account,
+      signal: controller.signal,
+    });
+    await vi.advanceTimersByTimeAsync(100); // first call answered 429, now backing off
+    controller.abort();
+    const result = await pending;
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error).toBeInstanceOf(RequestCancelledError);
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(calls).toHaveLength(1);
+  });
 });
 
 it("RunIncrementalSync pauses the account at Retry-After and resumes once the provider recovers", async () => {

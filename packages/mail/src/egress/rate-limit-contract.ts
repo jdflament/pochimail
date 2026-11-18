@@ -5,7 +5,13 @@ import { type Check, check, registerContract } from "@pochimail/testing/contract
 import { createFakeClock, type FakeClock } from "@pochimail/testing/fake-clock";
 import { expect } from "vitest";
 import { type HttpClient, type HttpResponse, RequestCancelledError } from "./http-client.ts";
-import type { RateLimitEvent, RateLimitedClient, RateLimitedRequest, Sleep } from "./rate-limit.ts";
+import {
+  MAX_RETRY_AFTER_MS,
+  type RateLimitEvent,
+  type RateLimitedClient,
+  type RateLimitedRequest,
+  type Sleep,
+} from "./rate-limit.ts";
 
 export interface RateLimitHarnessDeps {
   readonly inner: HttpClient;
@@ -18,6 +24,7 @@ export interface RateLimitHarnessDeps {
 export interface RateLimitHarness {
   readonly client: RateLimitedClient;
   readonly clock: FakeClock;
+  setRandom(value: number): void;
   /** Queue the next transport answers; once empty every call answers 200. */
   respond(...responses: readonly Partial<HttpResponse>[]): void;
   /** Requests that reached the transport, with the fake time they were sent at. */
@@ -66,7 +73,13 @@ export const rateLimitChecks: readonly Check<RateLimitHarness>[] = [
         expect((result.error as RateLimited).retryAfterMs).toBe(30_000);
       }
       expect(h.events()).toEqual([
-        { type: "RateLimited", provider: "gmail", resumeAt: t0 + 30_000 },
+        {
+          type: "RateLimited",
+          provider: "Google",
+          accountId: A,
+          providerKind: "gmail",
+          resumeAt: t0 + 30_000,
+        },
       ]);
       expect(h.calls()).toHaveLength(1); // honoured, not retried inline
     },
@@ -77,6 +90,55 @@ export const rateLimitChecks: readonly Check<RateLimitHarness>[] = [
     const result = await h.client.request(get());
     if (result.ok) throw new Error("expected RateLimited");
     expect((result.error as RateLimited).retryAfterMs).toBe(45_000);
+  }),
+
+  check("caps a huge or non-finite Retry-After so resumeAt stays finite and bounded", async (h) => {
+    for (const value of ["9".repeat(400), "999999999999", "86400"]) {
+      h.clock.advance(MAX_RETRY_AFTER_MS + 1); // previous cooldown has ended
+      h.respond(throttled(value));
+      const result = await h.client.request(get());
+      if (result.ok) throw new Error("expected RateLimited");
+      const { retryAfterMs } = result.error as RateLimited;
+      expect(Number.isFinite(retryAfterMs)).toBe(true);
+      expect(retryAfterMs).toBeLessThanOrEqual(MAX_RETRY_AFTER_MS);
+    }
+    for (const e of h.events()) {
+      if (e.type === "RateLimited") expect(Number.isSafeInteger(e.resumeAt)).toBe(true);
+    }
+  }),
+
+  check(
+    "treats a garbage Retry-After as absent and backs off instead of trusting Date.parse",
+    async (h) => {
+      for (const value of ["-5", "soon", "Infinity", "1e9", "30 seconds"]) {
+        h.respond(throttled(value), { status: 200, ok: true });
+        const result = await h.client.request(get());
+        expect(result.ok, value).toBe(true);
+      }
+      expect(h.sleeps()).toHaveLength(5);
+    },
+  ),
+
+  check(
+    "treats a Retry-After date in the past as retry-now with backoff, not a pause",
+    async (h) => {
+      h.respond(throttled(new Date(h.clock.now().getTime() - 60_000).toUTCString()), {
+        status: 200,
+        ok: true,
+      });
+      expect((await h.client.request(get())).ok).toBe(true);
+      expect(h.events()).toEqual([]);
+    },
+  ),
+
+  check("keeps backoff delays inside the jitter bounds at both random extremes", async (h) => {
+    h.setRandom(0);
+    h.respond(throttled(), { status: 200, ok: true });
+    await h.client.request(get());
+    h.setRandom(1);
+    h.respond(throttled(), { status: 200, ok: true });
+    await h.client.request(get());
+    expect(h.sleeps()).toEqual([500, 1_000]);
   }),
 
   check("makes no calls for a throttled account until its Retry-After has passed", async (h) => {
@@ -200,10 +262,14 @@ export const registerRateLimitContract = (make: RateLimitHarnessFactory): void =
       return true;
     };
     // Deterministic jitter at the midpoint of the allowed range.
-    const random = () => 0.5;
+    let randomValue = 0.5;
+    const random = () => randomValue;
     return {
       client: make({ inner, clock, random, sleep, onEvent: (e) => events.push(e) }),
       clock,
+      setRandom: (v) => {
+        randomValue = v;
+      },
       respond: (...r) => void queue.push(...r),
       calls: () => calls,
       sleeps: () => sleeps,
