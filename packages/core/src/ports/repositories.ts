@@ -33,12 +33,22 @@ export interface AccountReader {
 }
 export interface AccountWriter {
   save(account: Account): AsyncResult<void, StorageError>;
+  /**
+   * Deletes the account and every row that belongs to it (messages, threads, derived data,
+   * signals, senders, suggestions, cursors, digest state). Nothing of another account changes.
+   * The action log is the append-only audit trail and stays.
+   */
+  remove(ws: WorkspaceId, id: AccountId): AsyncResult<void, StorageError>;
 }
 
 export interface MessageQuery extends PageRequest {
   readonly accountId: AccountId;
   readonly category?: Category;
   readonly senderAddress?: string;
+  /** Only messages stored after this ingest sequence (see `latestSequence`). */
+  readonly afterSequence?: number;
+  /** Only messages stored up to and including this ingest sequence. */
+  readonly throughSequence?: number;
 }
 export interface MessageReader {
   get(ws: WorkspaceId, id: MessageId): AsyncResult<Message, StorageError | NotFound>;
@@ -47,6 +57,11 @@ export interface MessageReader {
     query: MessageQuery,
     signal?: CancelSignal,
   ): AsyncResult<Page<Message>, StorageError>;
+  /**
+   * The ingest sequence of the last message stored for the account (0 when none). It grows with
+   * every first insert, whatever the message's own date, so "stored since" never misses late mail.
+   */
+  latestSequence(ws: WorkspaceId, accountId: AccountId): AsyncResult<number, StorageError>;
 }
 export interface MessageWriter {
   /** Inserts or updates by id; a re-run with the same input changes nothing (idempotent). */
@@ -167,9 +182,17 @@ export interface SignalWriter {
 export interface DigestStateReader {
   /** When the last digest of the account was generated; `null` before the first one. */
   get(ws: WorkspaceId, accountId: AccountId): AsyncResult<string | null, StorageError>;
+  /** The ingest sequence the last digest covered up to; 0 before the first one. */
+  getSequence(ws: WorkspaceId, accountId: AccountId): AsyncResult<number, StorageError>;
 }
 export interface DigestStateWriter {
-  set(ws: WorkspaceId, accountId: AccountId, lastDigestAt: string): AsyncResult<void, StorageError>;
+  /** `lastSequence` is the newest ingest sequence the digest covered (default 0). */
+  set(
+    ws: WorkspaceId,
+    accountId: AccountId,
+    lastDigestAt: string,
+    lastSequence?: number,
+  ): AsyncResult<void, StorageError>;
 }
 
 export type AccountRepository = AccountReader & AccountWriter;

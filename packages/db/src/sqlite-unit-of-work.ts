@@ -9,8 +9,8 @@ import type { OutboxEntry, Transaction, UnitOfWork } from "@pochimail/core/ports
 import { err, ok, type Result } from "@pochimail/core/result";
 import { z } from "zod";
 import { exclusiveResult, type Storage } from "./open-storage.ts";
-import { guardPayload } from "./payload-guard.ts";
-import { createSqliteRepositories } from "./sqlite-repositories.ts";
+import { accountIdOf, guardPayload } from "./payload-guard.ts";
+import { createSqliteRepositories, type MessageSearch } from "./sqlite-repositories.ts";
 
 // Rows are parsed at the boundary. Events are loosely typed on purpose: the catalog (core) owns
 // their shape, this adapter only has to give back what it was given.
@@ -51,6 +51,8 @@ export interface SqliteUnitOfWork {
   readonly uow: UnitOfWork;
   /** The relay's view: undelivered rows in append order, and marking them delivered. */
   readonly outboxStore: OutboxStore;
+  /** Full-text search over metadata and derived data, on the read-only connection. */
+  readonly search: MessageSearch;
 }
 
 /**
@@ -63,10 +65,11 @@ export function createSqliteUnitOfWork(
   storage: Storage,
   clock: Clock = { now: () => new Date() },
 ): SqliteUnitOfWork {
-  const read = createSqliteRepositories(storage.reader).reads;
+  const readSide = createSqliteRepositories(storage.reader);
+  const read = readSide.reads;
   const write = createSqliteRepositories(storage.writer).writes;
   const insertOutbox = storage.writer.prepare(
-    "INSERT INTO outbox (kind, workspace_id, payload) VALUES (?, ?, ?)",
+    "INSERT INTO outbox (kind, workspace_id, payload, account_id) VALUES (?, ?, ?, ?)",
   );
 
   const tx: Transaction = {
@@ -84,6 +87,11 @@ export function createSqliteUnitOfWork(
             entry.kind,
             entry.kind === "event" ? entry.event.workspaceId : entry.workspaceId,
             guarded.value,
+            accountIdOf(
+              entry.kind === "event"
+                ? (entry.event as { payload?: unknown }).payload
+                : entry.job.payload,
+            ),
           );
           return ok(undefined);
         } catch (cause) {
@@ -155,5 +163,5 @@ export function createSqliteUnitOfWork(
       }),
   };
 
-  return { uow, outboxStore };
+  return { uow, outboxStore, search: readSide.search };
 }

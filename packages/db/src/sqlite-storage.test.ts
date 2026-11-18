@@ -6,15 +6,13 @@ import type { WorkspaceId } from "@pochimail/core/ids";
 import { createOutboxRelay } from "@pochimail/core/jobs/outbox-relay";
 import type { BusEvent, EventBus } from "@pochimail/core/ports/event-bus";
 import { err, ok, unwrap } from "@pochimail/core/result";
-import { failingChecks, registerContract } from "@pochimail/testing/contract";
-import { digestStateContract } from "@pochimail/testing/digest-state-contract";
+import { failingChecks } from "@pochimail/testing/contract";
 import { sampleEvent } from "@pochimail/testing/event-samples";
 import { createFakeClock } from "@pochimail/testing/fake-clock";
 import { jobQueueContract } from "@pochimail/testing/job-queue-contract";
 import { runJobQueueContract } from "@pochimail/testing/job-queue-lease-contract";
 import { runOutboxContract } from "@pochimail/testing/outbox-contract";
 import { runPipelineContract } from "@pochimail/testing/pipeline-contract";
-import { repositoriesChecks } from "@pochimail/testing/repositories-contract";
 import { unitOfWorkChecks, unitOfWorkContract } from "@pochimail/testing/unit-of-work-contract";
 import Database from "better-sqlite3-multiple-ciphers";
 import { afterEach, describe, expect, it } from "vitest";
@@ -93,19 +91,7 @@ runPipelineContract(() => {
   };
 });
 
-// The repositories M2-01 implements (topics, cursors, digest state); the rest arrive with M2-03.
-const implemented = [
-  "never returns another workspace",
-  "stores a copy",
-  "sync cursors",
-  "topics list",
-];
-registerContract(
-  "Repositories contract (topics, cursors)",
-  repositoriesChecks.filter((c) => implemented.some((n) => c.name.startsWith(n))),
-  sqliteUnitOfWorkHarness,
-);
-digestStateContract(sqliteUnitOfWorkHarness);
+// The repository contracts (all of them, none skipped) run in sqlite-repositories.test.ts.
 
 const ws = "w-1" as WorkspaceId;
 const recordingBus = () => {
@@ -307,9 +293,11 @@ describe("migrator", () => {
     const path = freshPath();
     const first = open(path);
     first.writer
-      .prepare("INSERT INTO digest_state VALUES ('w', 'a', '2026-01-01T00:00:00.000Z')")
+      .prepare(
+        "INSERT INTO digest_state (workspace_id, account_id, last_digest_at) VALUES ('w', 'a', '2026-01-01T00:00:00.000Z')",
+      )
       .run();
-    expect(unwrap(migrate(first.writer))).toEqual({ from: 1, to: 1 });
+    expect(unwrap(migrate(first.writer))).toEqual({ from: 2, to: 2 });
     first.close();
     const again = open(path);
     expect(again.writer.prepare("SELECT count(*) AS n FROM digest_state").get()).toEqual({ n: 1 });
