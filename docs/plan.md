@@ -21,6 +21,10 @@ Status: **plan decisions P1 to P15 and ADRs 0001 to 0008 accepted by the maintai
 | D9 | **Autopilot confidence threshold defaults to 0.9** (`AUTOPILOT_CONFIDENCE_THRESHOLD`), tuned later against the eval set; Autopilot may auto-apply only archive and unsubscribe (M1-05, default pending calibration) | 2026-11-17 | brief §2, M1-05 |
 | D10 | Autopilot may unsubscribe (brief §2) although unsubscribe is irreversible (D8); it is logged and reported after, decided by the maintainer 2026-11-17 | 2026-11-17 | brief §2, M1-05 |
 | D11 | **Store metadata, not mail**: persist headers, metadata and derived data only; full bodies and attachments are never persisted (a saved document is the one exception); FTS5 indexes metadata + derived data only. JD approved ([ADR 0009](adr/0009-store-metadata-not-mail.md)) | 2026-11-18 | brief §5.3, §5.10, ADR 0009 |
+| D12 | **Overview/Summary figures (JD 2026-11-19)**: emails archived (and those that could be archived), attachments saved (count + size) and newsletters unsubscribed. Archiving does not free mailbox space, so drop "GB you can free"/"freeable"; recommendations are action sentences (M2-20) | 2026-11-19 | JD answer 2026-11-19: brief §6, §7.4–5, docs/design.md, M2-20 |
+| D13 | **Fixtures and demo data are for developers and contributors only**: excluded from production builds at build time (not just gated at runtime), so the shipped app stays light | 2026-11-19 | JD answer 2026-11-19: AGENTS.md §5, this file |
+| D14 | **Product priority (JD 2026-11-19)**: the four jobs (save/export attachments, unsubscribe from useless newsletters, archive unneeded mail, categorize to keep only relevant mail) are core; "Catch what matters" signals are secondary | 2026-11-19 | JD answer 2026-11-19: brief §1-2 |
+| D15 | **Date-aware signals (JD 2026-11-19)**: old conversations never count as "waiting on you"; only recent threads whose last message is from a real person to you. Configurable age window; default set in M3 | 2026-11-19 | JD answer 2026-11-19: E3, M3 signals |
 | D6 | **Tracker = GitHub Project "Pochimail v1"** with draft items; a draft becomes an issue only when work starts | 2026-11-17 | brief §10 |
 
 ### Decided by the maintainer (2026-11-17, M0-15)
@@ -44,6 +48,13 @@ JD (maintainer) accepted every proposed default on 2026-11-17 (decision sheet it
 | P13 | UI languages in v1 | **English (default and fallback), French and Japanese in v1**; catalogs are typed so a missing translation fails typecheck; more languages later | 2026-11-19 | maintainer | M4 |
 | P14 | Website getpochimail.com hosting | **Static site on GitHub Pages** from the repo (`apps/web` later) | 2026-11-17 | maintainer | M8 |
 | P15 | Package manager | **pnpm** (not Bun): electron-builder + native module rebuilds are best supported there (ADR 0001) | 2026-11-17 | maintainer | M0 |
+
+### Open for JD (2026-11-19)
+- **Overview storage bar**: after the figures change, what does it show — or is it dropped? **OPEN for JD**; do not invent a meaning (brief §7.4, docs/design.md).
+- **Review lists**: brief §7 proposes metadata-only lists (sender, subject, date, snippet; "Open in Gmail/Outlook/mail app"; body preview on demand in memory, never persisted) — **proposed, JD to confirm**.
+
+### Accepted gaps (2026-11-19)
+- **Demo Overview counts (7 people waiting / 3 deadlines / 12 important)**: accepted by JD until the M3 detectors land; do not change the numbers.
 
 ### Working assumptions (not questions)
 - Sub-agents are Orca workers (Sonnet) running inside the repo; reviewers are separate workers; Haiku for read-only lookups.

@@ -48,6 +48,7 @@ Source: [§5.10](docs/brief.md), [§8 Backend](docs/brief.md), [ADR 0008](docs/a
 - Network only to: Google/Microsoft APIs, the IMAP/SMTP hosts of connected accounts, GitHub Releases, the model manifest and its hosts (exactly `huggingface.co` and `us.aws.cdn.hf.co`, no wildcard), enforced by a session-level request filter. Plan P1 (accepted): one exception, the RFC 8058 one-click unsubscribe POST to the exact `List-Unsubscribe` URL through one dedicated logged path. Do not add an outbound host without documenting it and asking ([§5.10](docs/brief.md)).
 - Update checks send no identifiers ([§5.7](docs/brief.md)).
 - Never put real mail, addresses or secrets in fixtures, tests, docs or screenshots; use the mock dataset ([§6 Mock data](docs/brief.md)).
+- Fixtures and demo data (`packages/testing`, the fixture mailbox, `POCHIMAIL_DEMO`) are for **developers and contributors only**: exclude them from production builds **at build time**, not just behind a runtime gate, so the shipped app stays light ([D13](docs/plan.md)).
 
 ## 6. Security rules
 Source: [§5.10](docs/brief.md), [§5.4](docs/brief.md), [ADR 0002](docs/adr/0002-electron-process-model-and-ipc.md), [ADR 0005](docs/adr/0005-local-storage.md), [ADR 0007](docs/adr/0007-oauth-credentials-scopes.md).
