@@ -1,3 +1,9 @@
+## Start here
+
+- Read [`docs/status.md`](docs/status.md) for current progress and next work.
+- Read the ticket in [`docs/tickets/`](docs/tickets/) for the task you are doing.
+- Read the brief sections listed by that ticket, plus [§1 vision and principles](docs/brief.md) and [§8 standards](docs/brief.md).
+
 # AGENTS.md — rules for every agent working on Pochimail
 
 Pochimail is a privacy-first, local-only desktop assistant that sorts and cleans mailboxes. It is **not** a mail client. Every rule below links to the brief section it comes from (`docs/brief.md`, "§"). **The brief wins over everything**, then `docs/plan.md` (decisions D1–D8 and P1–P15, all decided by the maintainer on 2026-11-17), then `docs/adr/`. If two sources disagree, follow the higher one and say so in your PR.
@@ -70,6 +76,7 @@ Source: [§10](docs/brief.md), [§8 Open-source hygiene](docs/brief.md), [§9b C
 - **Tickets live in the GitHub Project "Pochimail v1"** (draft items, converted to issues when work starts). Draft IDs (`M0-01`…) go in the issue body. Order and dependencies: `docs/plan.md`.
 - **Delegation rules ([§10](docs/brief.md))**: one issue → one sub-agent → one branch → one PR that closes the issue. Respect dependency order; run independent issues in parallel. Every PR is reviewed by a separate reviewer agent against §8 and the acceptance criteria before merge; CI must be green. Small chores (docs, config, renames) may go in one batched PR. No ceremony that doesn't catch real bugs.
 - Branch: `<type>/<issue-number>-<slug>` (types `feature|bug|chore|docs`). Squash merge only; branches deleted on merge.
+- Every PR that finishes a ticket updates [`docs/status.md`](docs/status.md) (move it to Done with the PR number) in the same PR.
 - Commits: Conventional Commits (`feat(core): …`). No CLA; DCO sign-off (`git commit -s`) only once outside contributors arrive.
 - Labels: `type:*`, `area:*`, `p0|p1`, `blocked`. Keep them few.
 - Do not commit, push or touch GitHub unless your ticket says so.

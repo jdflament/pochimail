@@ -1,6 +1,6 @@
 # Contributing to Pochimail
 
-Keep it light: this is a solo-maintained project with agent help. Read [AGENTS.md](AGENTS.md) first; it holds the full rules and links to the brief sections they come from.
+Keep it light: this is a solo-maintained project with agent help. Read [AGENTS.md](AGENTS.md) first; it holds the full rules and links to the brief sections they come from. For current progress and work items, see [docs/status.md](docs/status.md) and [docs/tickets/](docs/tickets/).
 
 ## Setup
 Requirements: Node and pnpm at the versions pinned in `.nvmrc` and the `packageManager` field of `package.json`.
