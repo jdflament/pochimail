@@ -1,4 +1,6 @@
 // @vitest-environment jsdom
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { createRpcClient } from "../../../../shared/ipc/client.ts";
@@ -36,25 +38,58 @@ const entries = (kind: "state" | "motion") =>
     el.getAttribute("data-gallery-entry")?.slice(kind.length + 1),
   );
 
-// The motion moments of docs/design.md › Motion catalog (Panels and menus are covered by the summary sheet).
-const motionMoments = [
-  "LiveProgress",
-  "NumbersArrive",
-  "StorageSettles",
-  "CleanUpThenUndo",
-  "SummarySheet",
-  "ChoicesRespond",
-  "ScreenToScreen",
-  "PochiAtRest",
-  "PochiFindsSomething",
-];
+// The catalogs are the source of truth: docs/design.md › Motion catalog (moment names) and the required-states exports.
+const designMoments = (): string[] => {
+  const doc = readFileSync(
+    resolve(import.meta.dirname, "../../../../../../../docs/design.md"),
+    "utf8",
+  );
+  const table = doc.split("## Motion catalog")[1]?.split("\n## ")[0] ?? "";
+  return table
+    .split("\n")
+    .filter((l) => l.startsWith("| ") && !l.startsWith("| Moment") && !l.startsWith("|---"))
+    .map((l) => l.split("|")[1]?.trim() ?? "");
+};
+
+// Catalog name → gallery entry. A new catalog row or state export fails the test until it is mapped (and so listed).
+const momentEntry: Record<string, string> = {
+  "Live progress": "LiveProgress",
+  "Numbers arrive": "NumbersArrive",
+  "Storage settles": "StorageSettles",
+  "Clean up, then undo": "CleanUpThenUndo",
+  "Pochi at rest": "PochiAtRest",
+  "Pochi finds something": "PochiFindsSomething",
+  "Summary arrives": "SummarySheet",
+  "Choices respond": "ChoicesRespond",
+  "Screen to screen": "ScreenToScreen",
+  // Panels and menus share the sheet's enter motion (fade + scale/slide from the trigger).
+  "Panels and menus": "SummarySheet",
+};
+const stateEntry: Record<string, string> = {
+  SignInCancelledState: "SignInCancelled",
+  OfflineStatusLine: "Offline",
+  NeedsReconnectState: "NeedsReconnecting",
+  ModelDownloadFailedState: "ModelDownloadFailed",
+  RateLimitState: "RateLimit",
+  EmptyCategoryState: "EmptyCategory",
+  NothingToDoState: "NothingToDo",
+  UpdateReadyState: "UpdateReady",
+};
 
 describe("dev gallery", () => {
   // Guards: a new required state or motion moment that ships without being reviewable (or testable by M4-19) in the app shell.
   it("lists every required state and every motion moment of the catalogs", async () => {
     await openGallery();
-    expect(entries("state")).toHaveLength(Object.keys(requiredStates).length);
-    expect(entries("motion")).toEqual(motionMoments);
+    const moments = designMoments();
+    expect(moments.length).toBeGreaterThan(0);
+    expect(moments.filter((m) => momentEntry[m] === undefined)).toEqual([]);
+    expect(entries("motion")).toEqual(expect.arrayContaining(moments.map((m) => momentEntry[m])));
+    expect(Object.keys(requiredStates).filter((s) => stateEntry[s] === undefined)).toEqual([]);
+    expect(entries("state").sort()).toEqual(
+      Object.keys(requiredStates)
+        .map((s) => stateEntry[s])
+        .sort(),
+    );
   });
 
   // Guards: theme and reduced-motion toggles that do nothing, so reviewers believe they saw dark / instant motion.
@@ -67,7 +102,14 @@ describe("dev gallery", () => {
     fireEvent.click(screen.getByRole("switch", { name: "Dark theme" }));
     await waitFor(() => expect(root.classList.contains("dark")).toBe(true));
 
+    // Behaviour, not just the attribute: the count-up rolls from 0 with motion on and shows its final value at once with it off.
+    const figure = () =>
+      document.querySelector(
+        '[data-gallery-entry="motion:NumbersArrive"] [data-slot="count-up"] [aria-hidden]',
+      )?.textContent;
+    expect(figure()).not.toBe("7");
     fireEvent.click(screen.getByRole("switch", { name: "Reduce motion" }));
     await waitFor(() => expect(root.getAttribute("data-animations")).toBe("off"));
+    await waitFor(() => expect(figure()).toBe("7"));
   });
 });

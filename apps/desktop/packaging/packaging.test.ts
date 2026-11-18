@@ -1,6 +1,7 @@
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { electronBinaryPath, isUniversalSlice } from "./apply-fuses.ts";
+import { galleryMarkersIn } from "./gallery-check.ts";
 import { sizeTable } from "./size-report.ts";
 
 const app = { appOutDir: "release/x", productFilename: "Pochimail", executableName: "pochimail" };
@@ -44,5 +45,14 @@ describe("size report", () => {
     expect(() => sizeTable("Linux", [{ name: "builder-debug.yml", bytes: 1 }])).toThrow(
       /No installer/,
     );
+  });
+});
+
+describe("gallery leak check", () => {
+  // Guards: the smoke check passing because its markers stopped matching, or failing on a clean app.
+  it("flags an archive that contains the gallery chunk and passes one that does not", () => {
+    const leaky = Buffer.from(`{"files":{"dev-gallery-page-x.js":{}}} x:"/gallery"`);
+    expect(galleryMarkersIn(leaky)).toEqual(["dev-gallery-page", '"/gallery"']);
+    expect(galleryMarkersIn(Buffer.from('{"files":{"index-x.js":{}}}'))).toEqual([]);
   });
 });

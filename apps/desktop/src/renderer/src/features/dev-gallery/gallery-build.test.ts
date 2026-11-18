@@ -1,38 +1,53 @@
-import { resolve } from "node:path";
+import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { build } from "vite";
-import { describe, expect, it } from "vitest";
-import { galleryDefine, galleryEnabled } from "../../../../shared/gallery-build.ts";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import electronViteConfig from "../../../../../electron.vite.config.ts";
 
-const bundle = async (enabled: boolean): Promise<string> => {
-  const output = await build({
-    configFile: false,
-    logLevel: "silent",
-    define: galleryDefine(enabled),
-    build: {
-      write: false,
-      minify: false,
-      lib: { entry: resolve(import.meta.dirname, "../../router.tsx"), formats: ["es"] },
-    },
-  });
-  const outputs = Array.isArray(output) ? output : [output];
-  return outputs
-    .flatMap((o) => ("output" in o ? o.output : []))
-    .map((chunk) => (chunk.type === "chunk" ? chunk.code : ""))
-    .join("\n");
+afterEach(() => vi.unstubAllEnvs());
+
+/** Builds the renderer from the real electron.vite.config.ts (same define, plugins and input), into a temp dir. */
+const buildRenderer = async (): Promise<{ files: string[]; code: string }> => {
+  const config =
+    typeof electronViteConfig === "function"
+      ? await electronViteConfig({ command: "build", mode: "production" })
+      : electronViteConfig;
+  const renderer = config.renderer;
+  if (renderer === undefined) throw new Error("electron.vite.config.ts has no renderer config");
+  const outDir = mkdtempSync(join(tmpdir(), "pochimail-gallery-"));
+  try {
+    await build({
+      ...renderer,
+      configFile: false,
+      logLevel: "silent",
+      build: { ...renderer.build, outDir, emptyOutDir: true, minify: false },
+    });
+    const assets = readdirSync(join(outDir, "assets"));
+    const code = assets
+      .filter((f) => f.endsWith(".js"))
+      .map((f) => readFileSync(join(outDir, "assets", f), "utf8"))
+      .join("\n");
+    return { files: assets, code };
+  } finally {
+    rmSync(outDir, { recursive: true, force: true });
+  }
 };
 
-describe("dev gallery build flag", () => {
+describe("dev gallery in built renderers", () => {
   // Guards: the dev-only /gallery route (and the stories behind it) shipping in the packaged app.
-  it("a production bundle has no gallery route and no gallery code", async () => {
-    const production = await bundle(galleryEnabled("build", {}));
-    expect(production).not.toContain("/gallery");
-    expect(production).not.toContain("Sorting privately on this Mac");
-  }, 60_000);
+  it("a production build has no gallery route and no gallery chunk", async () => {
+    vi.stubEnv("POCHIMAIL_E2E", "");
+    const { files, code } = await buildRenderer();
+    expect(files.some((f) => f.includes("dev-gallery"))).toBe(false);
+    expect(code).not.toContain('"/gallery"');
+  }, 120_000);
 
-  // Guards: the check above passing only because the probe strings changed.
-  it("a dev or E2E bundle does contain the route", async () => {
-    const dev = await bundle(galleryEnabled("build", { POCHIMAIL_E2E: "1" }));
-    expect(dev).toContain("/gallery");
-    expect(dev).toContain("Sorting privately on this Mac");
-  }, 60_000);
+  // Guards: the check above passing only because the real config no longer produces the gallery anywhere.
+  it("an E2E build does contain the gallery route and chunk", async () => {
+    vi.stubEnv("POCHIMAIL_E2E", "1");
+    const { files, code } = await buildRenderer();
+    expect(files.some((f) => f.includes("dev-gallery"))).toBe(true);
+    expect(code).toContain('"/gallery"');
+  }, 120_000);
 });
