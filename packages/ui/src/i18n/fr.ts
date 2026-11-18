@@ -31,6 +31,22 @@ export const fr = {
   "overview.catch.title": entry("Ce qui compte vraiment", []),
   "overview.clean.title": entry("Faire le tri", []),
   "summary.from": entry("De Pochi · {date, date, long} · sur votre {device}", ["date", "device"]),
+  "summary.title": entry("Pendant votre absence", []),
+  "summary.sentence": entry(
+    "{count, plural, one {J’ai trié # nouvel email.} other {J’ai trié # nouveaux emails.}} Rien n’a été supprimé.",
+    ["count"],
+  ),
+  "summary.figure.sorted": entry("triés", []),
+  "summary.figure.review": entry("à vérifier", []),
+  "summary.figure.free": entry("à libérer", []),
+  "summary.tidy": entry("Garder au propre", []),
+  "summary.tidy.weekly": entry("Chaque semaine", []),
+  "summary.tidy.daily": entry("Chaque jour", []),
+  "summary.later": entry("Plus tard", []),
+  "summary.reviewCount": entry(
+    "{count, plural, one {Vérifier # email} other {Vérifier # emails}}",
+    ["count"],
+  ),
 
   "shell.loading": entry("Démarrage…", []),
   "shell.error.title": entry("Un problème est survenu", []),

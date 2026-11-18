@@ -1,18 +1,11 @@
 import { t } from "@pochimail/ui/i18n/format.ts";
 import { cn } from "@pochimail/ui/lib/utils";
-import { cva } from "class-variance-authority";
 import { XIcon } from "lucide-react";
 import { Dialog as SheetPrimitive } from "radix-ui";
-import * as React from "react";
-
-/** Narrower than this, the sheet docks to the bottom edge instead of floating in the centre. */
-const BOTTOM_SHEET_BELOW = 560;
-
-type SheetLayout = "centered" | "bottom";
+import type * as React from "react";
 
 /**
- * A modal sheet over the current screen: centred on desktop, a bottom sheet in a container narrower than 560px
- * (the same markup; the layout follows the width of the sheet's own layer, so it also holds in a narrow window or story frame).
+ * A modal sheet over the current screen: a bottom sheet below 560px, a centred sheet from 560px (CSS container query on the layer, same markup).
  *
  * Composition: <Sheet><SheetTrigger/><SheetContent><SheetHeader><SheetTitle/><SheetDescription/></SheetHeader>…<SheetFooter><SheetClose/></SheetFooter></SheetContent></Sheet>.
  * Dialog semantics (labelled by the title, focus trap, scroll lock, Esc, focus returns to the opener) come from Radix Dialog.
@@ -45,68 +38,31 @@ function SheetOverlay({
   );
 }
 
-const sheetContentVariants = cva(
-  "pointer-events-auto relative grid max-h-full min-w-0 gap-4 overflow-y-auto bg-background p-6 text-foreground outline-none",
-  {
-    variants: {
-      layout: {
-        centered:
-          "w-full max-w-lg rounded-2xl shadow-lg data-[state=closed]:animate-sheet-out data-[state=open]:animate-sheet-in",
-        bottom:
-          "w-full rounded-t-2xl pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-lg data-[state=closed]:animate-sheet-bottom-out data-[state=open]:animate-sheet-bottom-in",
-      },
-    },
-    defaultVariants: { layout: "centered" },
-  },
+/** Layout follows the width of the sheet's layer (the window, or the portal container): below 560px a bottom sheet, from 560px a centred sheet. */
+const sheetContentClass = cn(
+  "pointer-events-auto relative grid max-h-full min-w-0 gap-4 overflow-y-auto bg-background p-6 text-foreground shadow-lg outline-none",
+  // Below 560px: bottom sheet.
+  "@max-[559px]:w-full @max-[559px]:rounded-t-2xl @max-[559px]:pb-[max(1.5rem,env(safe-area-inset-bottom))] @max-[559px]:data-[state=closed]:animate-sheet-bottom-out @max-[559px]:data-[state=open]:animate-sheet-bottom-in",
+  // From 560px: centred sheet.
+  "@min-[560px]:m-4 @min-[560px]:w-full @min-[560px]:max-w-lg @min-[560px]:self-center @min-[560px]:rounded-2xl @min-[560px]:data-[state=closed]:animate-sheet-out @min-[560px]:data-[state=open]:animate-sheet-in",
 );
 
-const sheetLayerVariants = cva("@container pointer-events-none fixed inset-0 z-50 flex", {
-  variants: {
-    layout: {
-      centered: "items-center justify-center p-4",
-      bottom: "items-end justify-center",
-    },
-  },
-  defaultVariants: { layout: "centered" },
-});
+type SheetContentProps = React.ComponentProps<typeof SheetPrimitive.Content> & {
+  /** Where to mount the sheet; defaults to the document body (the whole window). */
+  container?: React.ComponentProps<typeof SheetPrimitive.Portal>["container"];
+};
 
-/** Tracks the layer's own width; measured before first paint so the sheet never flashes in the wrong layout. */
-function useSheetLayout(): [React.RefCallback<HTMLDivElement>, SheetLayout] {
-  const [layout, setLayout] = React.useState<SheetLayout>("centered");
-  const ref = React.useCallback((node: HTMLDivElement | null) => {
-    if (!node) return;
-    const measure = (width: number) =>
-      setLayout(width < BOTTOM_SHEET_BELOW ? "bottom" : "centered");
-    measure(node.getBoundingClientRect().width);
-    const observer = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      if (entry) measure(entry.contentRect.width);
-    });
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
-  return [ref, layout];
-}
-
-function SheetContent({
-  className,
-  children,
-  ...props
-}: React.ComponentProps<typeof SheetPrimitive.Content>) {
-  const [layerRef, layout] = useSheetLayout();
+function SheetContent({ className, children, container, ...props }: SheetContentProps) {
   return (
-    <SheetPrimitive.Portal data-slot="sheet-portal">
+    <SheetPrimitive.Portal container={container}>
       <SheetOverlay />
       <div
-        ref={layerRef}
         data-slot="sheet-layer"
-        data-layout={layout}
-        className={sheetLayerVariants({ layout })}
+        className="@container pointer-events-none fixed inset-0 z-50 flex items-end justify-center"
       >
         <SheetPrimitive.Content
           data-slot="sheet-content"
-          data-layout={layout}
-          className={cn(sheetContentVariants({ layout }), className)}
+          className={cn(sheetContentClass, className)}
           {...props}
         >
           {children}
@@ -173,6 +129,7 @@ export {
   Sheet,
   SheetClose,
   SheetContent,
+  type SheetContentProps,
   SheetDescription,
   SheetFooter,
   SheetHeader,
