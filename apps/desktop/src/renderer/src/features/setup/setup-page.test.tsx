@@ -59,7 +59,15 @@ const harness = (opts: Options = {}) => {
         { id: "acc-1", provider: "google" as const, displayName: "a@example.test" },
         { id: "acc-2", provider: "microsoft" as const, displayName: "b@example.test" },
       ],
-      "overview.get": () => ({ scanned: 0, toReview: 0 }),
+      "overview.get": () => ({
+        scanned: 0,
+        toReview: 0,
+        waiting: 0,
+        deadlines: 0,
+        important: 0,
+        oldestWaitingDays: 0,
+        cleanable: [],
+      }),
       "mailbox.categories": () => ({
         people: 0,
         records: 0,

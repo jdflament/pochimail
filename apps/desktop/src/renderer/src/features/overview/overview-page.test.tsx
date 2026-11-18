@@ -77,7 +77,16 @@ const setup = (initial: Record<string, Overview>, path = "/overview") => {
         return state.overviews[accountId ?? "all"] ?? empty;
       },
       "digest.get": () => ({ ready: false, itemCount: 0 }),
-      "settings.get": () => ({ autopilot: false, notifications: true }),
+      "settings.get": () => ({
+        autonomy: "suggest" as const,
+        capabilities: {
+          "catch-what-matters": true,
+          declutter: true,
+          organize: true,
+          "save-documents": true,
+        },
+        notifications: true,
+      }),
       "scan.pause": ({ jobId }) => {
         state.calls.push(`pause:${jobId}`);
         state.jobs = state.jobs.map((j) => (j.jobId === jobId ? { ...j, status: "paused" } : j));
