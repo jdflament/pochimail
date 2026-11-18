@@ -12,7 +12,7 @@ Last updated: 2026-11-19
 
 ## In progress
 
-(None.)
+- **i18n: French + Japanese** — PR #62 (`feat/i18n-fr-ja`; typed fr/ja catalogs, locale resolution, locale plural/number/date rules).
 
 ## Next
 
