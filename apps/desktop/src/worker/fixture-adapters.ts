@@ -46,6 +46,7 @@ export async function createFixtureAdapters(
     provider: account.provider,
     address: account.address,
     connectedAt: clock.now().toISOString(),
+    grantedScopes: [],
   }));
   const seeded = await store.uow.run(async (tx) => {
     for (const account of accounts) {
