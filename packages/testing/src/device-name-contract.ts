@@ -7,9 +7,9 @@ export type DeviceNameFor = (os: unknown) => DeviceName;
 /** Reusable by the desktop adapter and any M2 platform adapter: no adapter-specific imports. */
 export const deviceNameChecks: readonly Check<DeviceNameFor>[] = [
   check(
-    "falls back to 'computer' when the OS is missing or unknown (guards 'undefined' in copy)",
+    "falls back to 'device' when the OS is missing or unknown (guards 'undefined' in copy)",
     async (deviceName) => {
-      for (const os of [undefined, "", 42, "plan9"]) expect(deviceName(os)).toBe("computer");
+      for (const os of [undefined, "", 42, "plan9"]) expect(deviceName(os)).toBe("device");
     },
   ),
   check("calls macOS 'Mac' and Windows 'PC' (guards 'your Mac' on a PC)", async (deviceName) => {

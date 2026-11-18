@@ -8,7 +8,7 @@ type WorkerState = "connecting" | "connected" | "unavailable";
 type State = { readonly worker: WorkerState; readonly device: DeviceName };
 
 export function OverviewPage() {
-  const [state, setState] = useState<State>({ worker: "connecting", device: "computer" });
+  const [state, setState] = useState<State>({ worker: "connecting", device: "device" });
 
   useEffect(() => {
     let cancelled = false;

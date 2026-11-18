@@ -226,7 +226,7 @@ The app must feel instant on mailboxes with 100k+ messages. Use these patterns w
 - Release order: **macOS first** (Apple Silicon + Intel, universal build), then **Windows**, then **Linux**. The code must build and run on all three from the start; CI runs the test suite and a packaging smoke build on macOS, Windows and Linux runners.
 - Packaging with electron-builder: `dmg` + `zip` (macOS, signed and notarized), `nsis`/`msix` (Windows, signed), `AppImage` + `deb`/`rpm` (Linux).
 - Everything platform-specific sits behind ports in `core` with one adapter per OS: secret storage (Electron `safeStorage` / OS keychain), menu bar (macOS) vs system tray (Windows/Linux), login item, notifications, file locations, power and thermal state, GPU acceleration for local models (Metal / CUDA / Vulkan / CPU fallback).
-- **Device naming is dynamic**: copy never hard-codes "Mac". A `deviceName()` helper returns "Mac", "PC" or "computer" (Linux) and every string uses it ("Sorting privately on this {device}", "Your email never leaves this {device}"). The designs show the macOS wording because macOS ships first.
+- **Device naming is dynamic**: copy never hard-codes "Mac". A `deviceName()` helper returns "Mac", "PC" or "device" (Linux, unknown OS) and every string uses it ("Sorting privately on this {device}", "Your email never leaves this {device}"). The designs show the macOS wording because macOS ships first.
 - Keyboard shortcuts use the platform modifier (⌘ on macOS, Ctrl elsewhere); window chrome follows each OS (traffic lights on macOS, native controls on Windows/Linux).
 
 ### 5.10 Security and privacy hardening

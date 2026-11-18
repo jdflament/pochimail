@@ -19,8 +19,8 @@ describe("t() (design › Writing, P13)", () => {
 
   it("substitutes the device name from the port, never a hard-coded Mac (guards Windows copy)", () => {
     expect(t("overview.sorting", { device: "PC" })).toBe("Sorting privately on this PC");
-    expect(t("overview.promise.device", { device: "computer" })).toBe(
-      "Your email never leaves this computer.",
+    expect(t("overview.promise.device", { device: "device" })).toBe(
+      "Your email never leaves this device.",
     );
   });
 
