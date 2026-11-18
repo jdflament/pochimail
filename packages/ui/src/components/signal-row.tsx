@@ -5,8 +5,8 @@ import type * as React from "react";
 
 type SignalRowProps = Omit<React.ComponentProps<"li">, "children"> & {
   asChild?: boolean;
-  /** The large figure, e.g. 7. */
-  figure: number | string;
+  /** The large figure, e.g. 7 or <CountUp value={7} />. */
+  figure: React.ReactNode;
   title: React.ReactNode;
   detail?: React.ReactNode;
   onReview?: () => void;

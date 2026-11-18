@@ -1,3 +1,4 @@
+import { MotionProvider } from "@pochimail/ui/components/motion-provider";
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { mascotBehaviorContract } from "../test-support/mascot-contract";
@@ -23,9 +24,9 @@ describe("Mascot public behavior", () => {
 
   it("guards idle loops missing when animations are enabled by running breathing and blink loops", () => {
     const html = renderMarkup(
-      <MascotProvider animations>
+      <MotionProvider animations>
         <Mascot pose="default" />
-      </MascotProvider>,
+      </MotionProvider>,
     );
     expect(html).toContain("animate-pochi-breathe");
     expect(html).toContain("animate-pochi-blink");
@@ -40,9 +41,9 @@ describe("Mascot public behavior", () => {
 
   it("guards found reaction animating when Animations are off", () => {
     const html = renderMarkup(
-      <MascotProvider animations={false}>
+      <MotionProvider animations={false}>
         <Mascot reaction="found" />
-      </MascotProvider>,
+      </MotionProvider>,
     );
     expect(html).not.toContain("animate-pochi-found");
     expect(html).not.toContain("animate-pochi-breathe");

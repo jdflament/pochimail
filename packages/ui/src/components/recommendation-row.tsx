@@ -1,4 +1,5 @@
 import { Button } from "@pochimail/ui/components/button";
+import { MOTION, MOTION_FADE_EASE, transition } from "@pochimail/ui/lib/motion";
 import { cn } from "@pochimail/ui/lib/utils";
 import { Slot } from "radix-ui";
 import type * as React from "react";
@@ -13,6 +14,8 @@ type RecommendationRowProps = Omit<React.ComponentProps<"li">, "children"> & {
   size?: string;
   onReview?: () => void;
   reviewLabel: string;
+  /** Folds the row away (height 260ms + fade 200ms) instead of removing it, so Undo can unfold it. Hidden from assistive tech and focus while folded. */
+  folded?: boolean;
 };
 
 function RecommendationRow({
@@ -23,6 +26,8 @@ function RecommendationRow({
   size,
   onReview,
   reviewLabel,
+  folded = false,
+  style,
   ...props
 }: RecommendationRowProps) {
   const Comp = asChild ? Slot.Root : "li";
@@ -30,9 +35,23 @@ function RecommendationRow({
   return (
     <Comp
       data-slot="recommendation-row"
+      data-folded={folded ? "true" : undefined}
+      style={{
+        transition: transition(
+          { property: "height", ms: MOTION.rowFoldMs },
+          { property: "padding-block", ms: MOTION.rowFoldMs },
+          { property: "opacity", ms: MOTION.rowFadeMs, ease: MOTION_FADE_EASE },
+        ),
+        ...style,
+      }}
+      inert={folded}
+      aria-hidden={folded ? true : undefined}
       className={cn(
+        // Real height transition (not a max-height guess): `interpolate-size` lets height animate between auto and 0.
+        "h-auto overflow-hidden [interpolate-size:allow-keywords]",
         "@container grid list-none grid-cols-[minmax(0,1fr)_auto] items-center gap-x-[18px] gap-y-1 py-3.5 @[560px]:grid-cols-[minmax(0,1fr)_auto_auto]",
         className,
+        folded && "h-0 py-0 opacity-0",
       )}
       {...props}
     >

@@ -1,3 +1,6 @@
+import { t } from "@pochimail/ui/i18n/format.ts";
+import { MOTION } from "@pochimail/ui/lib/motion";
+import { once } from "@pochimail/ui/lib/once";
 import { cn } from "@pochimail/ui/lib/utils";
 import { CircleCheckIcon, InfoIcon, OctagonXIcon, TriangleAlertIcon } from "lucide-react";
 import type * as React from "react";
@@ -29,4 +32,12 @@ function Toaster({ theme = "dark", className, ...props }: ToasterProps) {
   );
 }
 
-export { Toaster, toast };
+/** The dark undo toast after a cleanup: lives 5s, Undo runs at most once. */
+function undoToast(message: string, onUndo: () => void) {
+  return toast(message, {
+    duration: MOTION.undoMs,
+    action: { label: t("action.undo"), onClick: once(onUndo) },
+  });
+}
+
+export { Toaster, toast, undoToast };

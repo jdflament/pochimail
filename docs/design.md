@@ -64,7 +64,9 @@ Button (primary charcoal, secondary outline, ghost), Switch, Checkbox card, Radi
 | Screen to screen | Mascot stays; content slides in 16px from the right; step indicator stretches to the active step | 220–240ms |
 | Panels and menus | Fade + 4px scale-up from the trigger | 220ms |
 
-Never animate: layout jumps, decorative loops, pulsing indicators, skeleton shimmer longer than needed. With `prefers-reduced-motion`, every motion becomes an instant cross-fade and the mascot holds still.
+Implementation: timings and easing live in `packages/ui/src/lib/motion.ts` (pinned to the board by a test); `MotionProvider` owns Settings › Appearance › Animations (Pochi reads it, nothing else writes it), and `useMotionEnabled` / `CountUp` / `undoToast` are the shared helpers. Reduced motion and Animations off share one rule set in `globals.css`.
+
+Never animate: layout jumps, decorative loops, pulsing indicators, skeleton shimmer longer than needed. With `prefers-reduced-motion`, every motion becomes an instant (~120ms) opacity cross-fade (no transforms, numbers show their final value) and the mascot holds still.
 
 ## Writing
 - Device name is dynamic: use `{device}` (Mac / PC / device) in every string, e.g. "Sorting privately on this {device}". Designs show "Mac" because macOS ships first.

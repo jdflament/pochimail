@@ -1,7 +1,9 @@
+import { useMotionEnabled } from "@pochimail/ui/hooks/use-motion";
 import { t } from "@pochimail/ui/i18n/format.ts";
+import { MOTION, MOTION_EASE } from "@pochimail/ui/lib/motion";
 import { cn } from "@pochimail/ui/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
-import type * as React from "react";
+import * as React from "react";
 
 const segmentVariants = cva("", {
   variants: {
@@ -32,6 +34,14 @@ type StorageBarProps = Omit<React.ComponentProps<"div">, "children"> & {
 };
 
 function StorageBar({ className, segments, summary, ...props }: StorageBarProps) {
+  const motion = useMotionEnabled();
+  // Fills once on mount (keep segment, then the hatched one 140ms later); later value changes (after a cleanup) glide the same way.
+  const [settled, setSettled] = React.useState(!motion);
+  React.useEffect(() => {
+    if (!motion) return;
+    const frame = requestAnimationFrame(() => setSettled(true));
+    return () => cancelAnimationFrame(frame);
+  }, [motion]);
   const description = t("storageBar.description", {
     summary,
     items: segments
@@ -47,7 +57,14 @@ function StorageBar({ className, segments, summary, ...props }: StorageBarProps)
             key={s.id}
             data-slot="storage-segment"
             data-pattern={s.pattern}
-            style={{ flex: `${s.value} 1 0` }}
+            style={{
+              flex: `${settled || !motion ? s.value : 0} 1 0`,
+              ...(motion
+                ? {
+                    transition: `flex-grow ${MOTION.storageBarMs}ms ${MOTION_EASE} ${s.pattern === "hatched" ? MOTION.storageBarHatchedDelayMs : 0}ms`,
+                  }
+                : {}),
+            }}
             className={cn(
               segmentVariants({ pattern: s.pattern }),
               "rounded-[3px]",

@@ -196,7 +196,7 @@ function SidebarMenuItem({
 }
 
 const sidebarMenuButtonVariants = cva(
-  "flex min-h-9 w-full items-center gap-3 rounded-[10px] px-2 text-start text-[15px] outline-hidden transition-colors duration-150 hover:bg-background/60 focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-[current=page]:bg-background aria-[current=page]:font-medium aria-disabled:opacity-60 aria-disabled:hover:bg-transparent [&_svg]:size-[18px] [&_svg]:shrink-0 @max-[960px]:justify-center @max-[560px]:min-h-12 @max-[560px]:flex-col @max-[560px]:justify-center @max-[560px]:gap-0.5 @max-[560px]:px-1 @max-[560px]:text-[12px]",
+  "flex min-h-9 w-full items-center gap-3 rounded-[10px] px-2 text-start text-[15px] outline-hidden transition-colors duration-(--duration-press) hover:bg-background/60 focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-[current=page]:bg-background aria-[current=page]:font-medium aria-disabled:opacity-60 aria-disabled:hover:bg-transparent [&_svg]:size-[18px] [&_svg]:shrink-0 @max-[960px]:justify-center @max-[560px]:min-h-12 @max-[560px]:flex-col @max-[560px]:justify-center @max-[560px]:gap-0.5 @max-[560px]:px-1 @max-[560px]:text-[12px]",
   {
     variants: {
       tone: {

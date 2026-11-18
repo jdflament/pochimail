@@ -1,3 +1,4 @@
+import { MotionProvider } from "@pochimail/ui/components/motion-provider";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Mascot, MascotProvider } from "./mascot";
 
@@ -26,9 +27,9 @@ export const FoundReaction: Story = {
 export const AnimationsOff: Story = {
   decorators: [
     (Story) => (
-      <MascotProvider animations={false}>
+      <MotionProvider animations={false}>
         <Story />
-      </MascotProvider>
+      </MotionProvider>
     ),
   ],
 };

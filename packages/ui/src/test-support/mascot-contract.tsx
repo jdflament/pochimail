@@ -1,3 +1,4 @@
+import { MotionProvider } from "@pochimail/ui/components/motion-provider";
 import type * as React from "react";
 import { expect, it } from "vitest";
 import {
@@ -34,9 +35,9 @@ function stubReducedMotion(matches: boolean): () => void {
 export function mascotBehaviorContract(render: MascotRender): void {
   it("guards still mascot when Animations preference is off", () => {
     const html = render(
-      <MascotProvider animations={false}>
+      <MotionProvider animations={false}>
         <Mascot pose="default" />
-      </MascotProvider>,
+      </MotionProvider>,
     );
     expect(html).not.toMatch(/animate-pochi-(breathe|blink|found)/);
   });

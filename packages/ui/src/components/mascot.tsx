@@ -8,6 +8,8 @@ import readingPose2x from "@pochimail/ui/assets/mascot/pochi-reading@2x.png";
 import readingPose from "@pochimail/ui/assets/mascot/pochi-reading.png";
 import savingPose2x from "@pochimail/ui/assets/mascot/pochi-saving@2x.png";
 import savingPose from "@pochimail/ui/assets/mascot/pochi-saving.png";
+import { useMotionEnabled } from "@pochimail/ui/hooks/use-motion";
+import { MOTION } from "@pochimail/ui/lib/motion";
 import { cn } from "@pochimail/ui/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import * as React from "react";
@@ -22,44 +24,22 @@ const poses = {
 
 export type MascotPose = keyof typeof poses;
 
-/** Timings from docs/design/screens/source/Motion.dc.html (source of truth). */
-export const MASCOT_BREATHING_DURATION_MS = 4200;
-export const MASCOT_BLINK_DURATION_MS = 5300;
-export const MASCOT_FOUND_DURATION_MS = 620;
+/** Timings live in lib/motion.ts (Motion.dc.html is the source of truth). */
+export const MASCOT_BREATHING_DURATION_MS = MOTION.mascotBreathingMs;
+export const MASCOT_BLINK_DURATION_MS = MOTION.mascotBlinkMs;
+export const MASCOT_FOUND_DURATION_MS = MOTION.mascotFoundMs;
 
-// Settings › Appearance: "Show Pochi" hides every mascot; "Animations" holds Pochi still.
 const ShowPochiContext = React.createContext(true);
-const AnimationsContext = React.createContext(true);
 
-function usePrefersReducedMotion(): boolean {
-  const subscribe = React.useCallback((onStoreChange: () => void) => {
-    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return () => {};
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    media.addEventListener("change", onStoreChange);
-    return () => media.removeEventListener("change", onStoreChange);
-  }, []);
-  const getSnapshot = React.useCallback(() => {
-    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return false;
-    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  }, []);
-  const getServerSnapshot = React.useCallback(() => false, []);
-  return React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-}
-
+/** "Show Pochi" setting. The Animations setting comes from MotionProvider (one writer); Pochi reads it through useMotionEnabled. */
 function MascotProvider({
   showPochi = true,
-  animations = true,
   children,
 }: {
   showPochi?: boolean;
-  animations?: boolean;
   children: React.ReactNode;
 }) {
-  return (
-    <ShowPochiContext value={showPochi}>
-      <AnimationsContext value={animations}>{children}</AnimationsContext>
-    </ShowPochiContext>
-  );
+  return <ShowPochiContext value={showPochi}>{children}</ShowPochiContext>;
 }
 
 const mascotVariants = cva("block h-auto select-none", {
@@ -94,9 +74,7 @@ function Mascot({
   ...props
 }: MascotProps) {
   const showPochi = React.use(ShowPochiContext);
-  const animationsPref = React.use(AnimationsContext);
-  const prefersReducedMotion = usePrefersReducedMotion();
-  const animationsEnabled = (animations ?? animationsPref) && !prefersReducedMotion;
+  const animationsEnabled = useMotionEnabled(animations);
 
   if (!show || !showPochi) {
     return (

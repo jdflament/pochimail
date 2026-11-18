@@ -1,3 +1,4 @@
+import { MOTION, transition } from "@pochimail/ui/lib/motion";
 import { cn } from "@pochimail/ui/lib/utils";
 import { LockIcon } from "lucide-react";
 import type * as React from "react";
@@ -28,8 +29,11 @@ function StatusStrip({
       <div aria-hidden="true" className="h-0.5 bg-muted">
         <div
           data-slot="status-progress"
-          className="h-full bg-primary transition-[width] duration-200 ease-out motion-reduce:transition-none"
-          style={{ width: `${pct}%` }}
+          className="h-full bg-primary"
+          style={{
+            width: `${pct}%`,
+            transition: transition({ property: "width", ms: MOTION.progressMs }),
+          }}
         />
       </div>
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5 text-[13px] text-muted-foreground">
@@ -43,7 +47,16 @@ function StatusStrip({
             {headline}
           </span>
           <span className="tabular-nums">{pct}%</span>
-          {status ? <span className="break-words">{status}</span> : null}
+          {status ? (
+            // Keyed so each new finding slides up 8px and fades in, replacing the previous one.
+            <span
+              key={status}
+              data-slot="status-finding"
+              className="animate-finding-in break-words"
+            >
+              {status}
+            </span>
+          ) : null}
         </div>
         {children ? <div className="ml-auto flex gap-1.5">{children}</div> : null}
       </div>
