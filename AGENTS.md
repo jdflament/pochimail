@@ -33,7 +33,7 @@ Source: [§8](docs/brief.md). Gates: `pnpm check` runs typecheck, lint (Biome), 
 - Explicit use cases with dependencies injected through ports.
 - Frontend: React 19 function components (no `forwardRef`), `data-slot`, CVA variants, `cn()`, exported `VariantProps`, `asChild` via Slot, `focus-visible`; wrap primitives, don't fork them. Composition over boolean props. Renderer layout `features/<name>/` + `components/`. Worker data in TanStack Query fed by IPC events; filters in the router; virtualize large lists; forms with react-hook-form + zod.
 - Tests: Vitest (unit/integration), Playwright (Electron E2E), Storybook with accessibility + contrast checks. Test behaviour through public entry points, each test guarding a named failure; few sharp tests. `core` is tested with in-memory adapters; adapters against recorded fixtures; the fixture mailbox doubles as the eval set.
-- CI gate on every PR: typecheck, lint, test, build, knip, eval-regression. Nothing merges red.
+- CI gate on every PR: typecheck, lint, test, build, knip, eval-regression (`pnpm eval`; refresh the baseline on purpose with `pnpm --filter @pochimail/testing eval:update-baseline`). Nothing merges red.
 
 ## 5. Privacy and logging
 Source: [§5.10](docs/brief.md), [§8 Backend](docs/brief.md), [ADR 0008](docs/adr/0008-notifications-and-privacy.md).

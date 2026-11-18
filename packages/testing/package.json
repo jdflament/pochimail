@@ -51,13 +51,20 @@
     "./pipeline-contract": "./src/pipeline-contract.ts",
     "./sync-contract": "./src/sync-contract.ts",
     "./derived-contract": "./src/derived-contract.ts",
-    "./insight-contract": "./src/insight-contract.ts"
+    "./insight-contract": "./src/insight-contract.ts",
+    "./eval/compare": "./src/eval/compare.ts",
+    "./eval/degraded-classifier": "./src/eval/degraded-classifier.ts",
+    "./eval/harness": "./src/eval/harness.ts",
+    "./eval/metrics": "./src/eval/metrics.ts",
+    "./eval/report": "./src/eval/report.ts"
   },
   "scripts": {
     "typecheck": "tsc",
     "lint": "biome check .",
     "knip": "knip",
-    "test": "vitest run"
+    "test": "vitest run",
+    "eval": "EVAL_BASELINE=eval/baseline.small.json EVAL_REPORT=eval/report.json vitest run --config vitest.eval.config.ts",
+    "eval:update-baseline": "EVAL_UPDATE_BASELINE=1 EVAL_BASELINE=eval/baseline.small.json vitest run --config vitest.eval.config.ts"
   },
   "devDependencies": {
     "@pochimail/core": "workspace:*",

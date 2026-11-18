@@ -1,7 +1,7 @@
 import { execSync } from "node:child_process";
 import { evaluateGate, type GateName } from "./gate-counts.ts";
 
-const gates: GateName[] = ["typecheck", "lint", "test", "build", "knip"];
+const gates: GateName[] = ["typecheck", "lint", "test", "build", "knip", "eval"];
 
 // Run from the repo root (`pnpm gates`) so turbo sees every workspace. The command string is built
 // from the fixed gate list above, never from user input; a shell lets Windows resolve `pnpm.cmd`.
