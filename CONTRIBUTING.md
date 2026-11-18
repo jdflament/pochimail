@@ -11,6 +11,8 @@ pnpm check      # typecheck + test today; lint, knip and manypkg join in M0-04
 pnpm test
 ```
 
+`pnpm install` also downloads the Electron binary (the `postinstall` script in `apps/desktop`: Electron 45 has no install hook of its own). If `pnpm dev` fails with an Electron "failed to install correctly" error, run `pnpm --filter @pochimail/desktop exec install-electron`.
+
 Scripts are defined at the repository root and run through Turborepo. If a command above is missing, the scaffold is still in progress: see `package.json`.
 
 ## Your own OAuth client IDs

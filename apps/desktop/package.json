@@ -8,6 +8,7 @@
     "./package-info": "./src/package-info.ts"
   },
   "scripts": {
+    "postinstall": "install-electron",
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
