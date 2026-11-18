@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { FuseState, FuseV1Options, getCurrentFuseWire } from "@electron/fuses";
 import { fuses } from "../src/main/fuses.ts";
 import { electronBinaryPath } from "./apply-fuses.ts";
-import { galleryMarkersIn } from "./gallery-check.ts";
+import { galleryLeaksIn } from "./gallery-check.ts";
 import { checkStorageOutput, storageSummary } from "./storage-check.ts";
 
 /** Smoke test of a packaged build: fuses are flipped on the binary and the app starts, loads its window and quits. */
@@ -37,7 +37,7 @@ const asarPath = join(
     : join(appOutDir, "resources"),
   "app.asar",
 );
-const leaked = galleryMarkersIn(readFileSync(asarPath));
+const leaked = galleryLeaksIn(readFileSync(asarPath));
 if (leaked.length > 0)
   throw new Error(`The packaged app contains the dev gallery (${leaked.join(", ")})`);
 console.log("gallery: absent");
