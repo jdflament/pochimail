@@ -12,8 +12,9 @@ setLocale(appLocale());
 
 const root = document.getElementById("root");
 if (root === null) throw new Error("missing #root");
+const workerClient = connectWorker();
 createRoot(root).render(
   <StrictMode>
-    <App workerClient={connectWorker()} getWorkerClient={connectWorker} />
+    <App workerClient={workerClient} />
   </StrictMode>,
 );

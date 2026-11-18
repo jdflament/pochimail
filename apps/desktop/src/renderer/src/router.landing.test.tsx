@@ -39,7 +39,7 @@ const createFakeAppClient = (hasConnectedAccount: boolean) => {
 describe("first-run redirect from app.state", () => {
   it("lands on Welcome on first launch when no account is connected", async () => {
     const fake = createFakeAppClient(false);
-    render(<App workerClient={fake.client} getWorkerClient={() => Promise.resolve(fake.client)} />);
+    render(<App workerClient={fake.client} />);
     await waitFor(() => expect(screen.getByRole("heading", { name: "Welcome" })).toBeTruthy());
     expect(screen.queryByRole("heading", { name: "Overview" })).toBeNull();
     fake.close();
@@ -47,7 +47,7 @@ describe("first-run redirect from app.state", () => {
 
   it("lands on Overview when a connected account already exists", async () => {
     const fake = createFakeAppClient(true);
-    render(<App workerClient={fake.client} getWorkerClient={() => Promise.resolve(fake.client)} />);
+    render(<App workerClient={fake.client} />);
     await waitFor(() => expect(screen.getByRole("heading", { name: "Overview" })).toBeTruthy());
     expect(screen.queryByRole("heading", { name: "Welcome" })).toBeNull();
     fake.close();

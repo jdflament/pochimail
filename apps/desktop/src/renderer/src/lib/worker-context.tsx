@@ -1,7 +1,6 @@
 import { t } from "@pochimail/ui/i18n/format.ts";
 import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 import type { RpcClient } from "../../../shared/ipc/client.ts";
-import { resolveWorkerClient } from "./resolve-client.ts";
 import { connectWorker } from "./worker.ts";
 
 type WorkerState =
@@ -31,8 +30,7 @@ export function WorkerClientProvider({
 
   useEffect(() => {
     let cancelled = false;
-    const promise = provided === undefined ? connectWorker() : resolveWorkerClient(provided);
-    promise
+    Promise.resolve(provided === undefined ? connectWorker() : provided)
       .then((client) => {
         if (!cancelled) setState({ status: "ready", client });
       })

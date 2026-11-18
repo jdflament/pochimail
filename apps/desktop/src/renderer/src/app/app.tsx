@@ -5,12 +5,9 @@ import { useMemo } from "react";
 import type { RpcClient } from "../../../shared/ipc/client.ts";
 import { AppEventsBridge } from "../lib/app-events-bridge.tsx";
 import { AppErrorBoundary } from "../lib/error-boundary.tsx";
-import {
-  createDefaultOptimisticRegistry,
-  OptimisticActionProvider,
-} from "../lib/optimistic-context.tsx";
+import { OptimisticActionProvider } from "../lib/optimistic-context.tsx";
 import { createAppQueryClient } from "../lib/query/client.ts";
-import { resolveWorkerClient } from "../lib/resolve-client.ts";
+import { createOptimisticActionRegistry } from "../lib/query/optimistic.ts";
 import { useWorkerClient, WorkerClientProvider } from "../lib/worker-context.tsx";
 import { type AppRouter, createAppRouter } from "../router.tsx";
 
@@ -24,14 +21,11 @@ function AppShell({ router }: { router: AppRouter }) {
   );
 }
 
-type WorkerClientValue = RpcClient | Promise<RpcClient>;
-
 export type AppProps = {
   queryClient?: QueryClient;
   router?: AppRouter;
-  /** Fake or pre-resolved worker client for tests. */
-  workerClient?: WorkerClientValue;
-  getWorkerClient?(): Promise<RpcClient>;
+  /** Worker client injected via context (useful for tests and stories with a fake IPC). */
+  workerClient?: RpcClient | Promise<RpcClient>;
 };
 
 /**
@@ -43,26 +37,19 @@ export function App(props: AppProps = {}) {
     () => props.queryClient ?? createAppQueryClient(),
     [props.queryClient],
   );
-  const registry = useMemo(() => createDefaultOptimisticRegistry(), []);
-  const getWorkerClient = useMemo(() => {
-    if (props.getWorkerClient !== undefined) return props.getWorkerClient;
-    if (props.workerClient !== undefined) {
-      const workerClient = props.workerClient;
-      return () => resolveWorkerClient(workerClient);
-    }
-    return undefined;
-  }, [props.getWorkerClient, props.workerClient]);
+  const registry = useMemo(() => createOptimisticActionRegistry(), []);
+  const workerClient = props.workerClient;
   const router = useMemo(() => {
     if (props.router !== undefined) return props.router;
-    if (getWorkerClient === undefined) throw new Error("App requires a worker client");
-    return createAppRouter({ getWorkerClient });
-  }, [props.router, getWorkerClient]);
+    if (workerClient === undefined) throw new Error("App requires a worker client");
+    return createAppRouter({ getWorkerClient: () => Promise.resolve(workerClient) });
+  }, [props.router, workerClient]);
 
   return (
     <AppErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <OptimisticActionProvider registry={registry}>
-          <WorkerClientProvider client={props.workerClient}>
+          <WorkerClientProvider client={workerClient}>
             <AppShell router={router} />
             <Toaster />
           </WorkerClientProvider>
@@ -71,5 +58,3 @@ export function App(props: AppProps = {}) {
     </AppErrorBoundary>
   );
 }
-
-export { createAppQueryClient, createAppRouter };

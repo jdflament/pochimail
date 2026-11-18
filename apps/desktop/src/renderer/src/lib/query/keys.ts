@@ -5,5 +5,6 @@ export const queryKeys = {
   overview: () => ["overview"] as const,
   digest: () => ["digest"] as const,
   settings: () => ["settings"] as const,
+  deviceName: () => ["device", "name"] as const,
   scanProgress: (accountId: string) => ["scan", "progress", accountId] as const,
 };

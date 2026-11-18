@@ -1,8 +1,5 @@
-import { createContext, type ReactNode, useContext } from "react";
-import {
-  createOptimisticActionRegistry,
-  type OptimisticActionRegistry,
-} from "./query/optimistic.ts";
+import { createContext, type ReactNode, useContext, useEffect } from "react";
+import type { OptimisticActionRegistry } from "./query/optimistic.ts";
 
 const OptimisticContext = createContext<OptimisticActionRegistry | null>(null);
 
@@ -19,8 +16,10 @@ export function OptimisticActionProvider({
   children: ReactNode;
   registry: OptimisticActionRegistry;
 }) {
+  useEffect(() => {
+    return () => {
+      registry.dispose();
+    };
+  }, [registry]);
   return <OptimisticContext.Provider value={registry}>{children}</OptimisticContext.Provider>;
 }
-
-export const createDefaultOptimisticRegistry = (): OptimisticActionRegistry =>
-  createOptimisticActionRegistry();

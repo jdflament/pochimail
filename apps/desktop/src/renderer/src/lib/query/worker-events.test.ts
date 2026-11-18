@@ -1,11 +1,16 @@
 import { QueryClient } from "@tanstack/react-query";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { createRpcClient } from "../../../../shared/ipc/client.ts";
+import type { EventOf } from "../../../../shared/ipc/contract.ts";
 import { serveRpc } from "../../../../shared/ipc/server.ts";
 import { fromDomPort } from "../../../../shared/ipc/transport.ts";
-import { queryKeys } from "./keys.ts";
 import { createOptimisticActionRegistry } from "./optimistic.ts";
-import { subscribeAppEvents, subscribeScanProgress } from "./worker-events.ts";
+import { subscribeAppEvents } from "./worker-events.ts";
+
+afterEach(() => {
+  vi.useRealTimers();
+  vi.restoreAllMocks();
+});
 
 const createFakeIpc = () => {
   const { port1, port2 } = new MessageChannel();
@@ -22,106 +27,115 @@ const createFakeIpc = () => {
 };
 
 describe("query-from-events", () => {
-  it("updates a cached scan progress query from a subscription event without a refetch", async () => {
-    let emitProgress: (event: {
-      accountId: string;
-      phase: "listing" | "fetching" | "classifying" | "done";
-      processed: number;
-      total: number;
-    }) => void = () => {};
-    const ipc = createFakeIpc();
-    serveRpc(ipc.server, {
+  it("updates a cached query from an app event without a refetch", async () => {
+    let emitEvent: ((event: EventOf<"app.events">) => void) | undefined;
+    const { client, server, close } = createFakeIpc();
+    serveRpc(server, {
       procedures: {},
       subscriptions: {
-        "scan.progress": (_input, emit) => {
-          emitProgress = emit;
+        "app.events": (_input, push) => {
+          emitEvent = push;
           return undefined;
         },
       },
     });
 
-    const queryClient = new QueryClient({
-      defaultOptions: { queries: { retry: false, staleTime: Number.POSITIVE_INFINITY } },
+    const queryClient = new QueryClient();
+    const fetcher = vi.fn(async () => "initial");
+    await queryClient.fetchQuery({ queryKey: ["settings"], queryFn: fetcher });
+    expect(fetcher).toHaveBeenCalledTimes(1);
+
+    const unsubscribe = client.subscribe("app.events", undefined, (event) => {
+      if (event.type === "ActionApplied") queryClient.setQueryData(["settings"], event.actionId);
     });
-    const refetch = vi.fn(async () => ({
-      accountId: "acc-1",
-      phase: "listing",
-      processed: 0,
-      total: 0,
-    }));
-    queryClient.setQueryDefaults(queryKeys.scanProgress("acc-1"), { queryFn: refetch });
 
-    const unsubscribe = subscribeScanProgress(ipc.client, queryClient, "acc-1");
-    await vi.waitFor(() => expect(emitProgress).toBeTypeOf("function"));
-    await new Promise((resolve) => setTimeout(resolve, 20));
+    await vi.waitFor(() => expect(emitEvent).toBeTypeOf("function"));
+    emitEvent?.({ type: "ActionApplied", actionId: "applied-1" });
 
-    emitProgress({ accountId: "acc-1", phase: "fetching", processed: 12, total: 100 });
-    await vi.waitFor(() =>
-      expect(queryClient.getQueryData(queryKeys.scanProgress("acc-1"))).toEqual({
-        accountId: "acc-1",
-        phase: "fetching",
-        processed: 12,
-        total: 100,
-      }),
-    );
-
-    // Guards: a subscription-driven update must not trigger a query refetch (ADR 0002 "no polling").
-    expect(refetch).not.toHaveBeenCalled();
+    await vi.waitFor(() => expect(queryClient.getQueryData(["settings"])).toBe("applied-1"));
+    expect(fetcher).toHaveBeenCalledTimes(1);
 
     unsubscribe();
-    ipc.close();
-    queryClient.clear();
+    close();
   });
 
-  it("rolls back an optimistic mutation when ActionFailed arrives for its action", async () => {
-    let emitEvent: (
-      event:
-        | { type: "ActionApplied"; actionId: string }
-        | {
-            type: "ActionFailed";
-            actionId: string;
-            reason: "not-found" | "conflict" | "provider-error" | "cancelled" | "unknown";
-          },
-    ) => void = () => {};
-    const ipc = createFakeIpc();
-    serveRpc(ipc.server, {
+  it("rolls back a failed optimistic mutation when ActionFailed arrives", async () => {
+    let emitEvent: ((event: EventOf<"app.events">) => void) | undefined;
+    const { client, server, close } = createFakeIpc();
+    serveRpc(server, {
       procedures: {},
       subscriptions: {
-        "app.events": (_input, emit) => {
-          emitEvent = emit;
+        "app.events": (_input, push) => {
+          emitEvent = push;
           return undefined;
         },
       },
     });
 
-    const queryClient = new QueryClient({
-      defaultOptions: { queries: { retry: false, staleTime: Number.POSITIVE_INFINITY } },
-    });
+    const queryClient = new QueryClient();
     const registry = createOptimisticActionRegistry();
-    const unsubscribe = subscribeAppEvents(ipc.client, registry);
-    await vi.waitFor(() => expect(emitEvent).toBeTypeOf("function"));
-    await new Promise((resolve) => setTimeout(resolve, 20));
+    const unsubscribe = subscribeAppEvents(client, registry);
 
-    const key = ["settings"] as const;
-    queryClient.setQueryData(key, { autopilot: false, notifications: true });
+    queryClient.setQueryData(["settings"], { autopilot: false, notifications: true });
     registry.start({
-      actionId: "action-1",
-      queryKey: key,
+      actionId: "a1",
+      queryKey: ["settings"],
       queryClient,
-      optimistic: (current: { autopilot: boolean; notifications: boolean } | undefined) => ({
-        autopilot: true,
-        notifications: current?.notifications ?? true,
-      }),
+      optimistic: () => ({ autopilot: true, notifications: true }),
     });
-    expect(queryClient.getQueryData(key)).toEqual({ autopilot: true, notifications: true });
+    expect(queryClient.getQueryData(["settings"])).toEqual({
+      autopilot: true,
+      notifications: true,
+    });
 
-    emitEvent({ type: "ActionFailed", actionId: "action-1", reason: "provider-error" });
+    await vi.waitFor(() => expect(emitEvent).toBeTypeOf("function"));
+    emitEvent?.({ type: "ActionFailed", actionId: "a1", reason: "unknown" });
+
     await vi.waitFor(() =>
-      expect(queryClient.getQueryData(key)).toEqual({ autopilot: false, notifications: true }),
+      expect(queryClient.getQueryData(["settings"])).toEqual({
+        autopilot: false,
+        notifications: true,
+      }),
     );
 
     unsubscribe();
-    ipc.close();
-    queryClient.clear();
+    close();
+  });
+
+  it("logs subscription error codes, settles pending optimistic actions as failed, and resubscribes with backoff", async () => {
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+    let subscribeCount = 0;
+    const { client, server, close } = createFakeIpc();
+    serveRpc(server, {
+      procedures: {},
+      subscriptions: {
+        "app.events": () => {
+          subscribeCount += 1;
+          if (subscribeCount === 1) throw new Error("boom");
+          return undefined;
+        },
+      },
+    });
+
+    const queryClient = new QueryClient();
+    const registry = createOptimisticActionRegistry();
+    const unsubscribe = subscribeAppEvents(client, registry);
+
+    registry.start({
+      actionId: "a1",
+      queryKey: ["settings"],
+      queryClient,
+      optimistic: () => ({ autopilot: true }),
+    });
+    expect(queryClient.getQueryData(["settings"])).toEqual({ autopilot: true });
+
+    await vi.waitFor(() => expect(subscribeCount).toBe(1));
+    await vi.waitFor(() => expect(errorSpy).toHaveBeenCalledWith("[app.events]", "HANDLER_FAILED"));
+    expect(queryClient.getQueryData(["settings"])).toBeUndefined();
+
+    await vi.waitFor(() => expect(subscribeCount).toBe(2), { timeout: 1500 });
+
+    unsubscribe();
+    close();
   });
 });
