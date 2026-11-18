@@ -56,4 +56,10 @@ export const ja = {
 
   "devGallery.title": entry("開発ギャラリー", []),
   "devGallery.description": entry("開発用の状態とモーションのプレビューです。", []),
+  "action.close": entry("閉じる", []),
+  "action.undo": entry("元に戻す", []),
+  "storageBar.description": entry("{summary}：{items}", ["summary", "items"]),
+  "storageBar.descriptionItem": entry("{label} {size}", ["size", "label"]),
+  "storageBar.itemSeparator": entry("、", []),
+  "storageBar.legendItem": entry("{label} · {size}", ["label", "size"]),
 } satisfies Catalog;

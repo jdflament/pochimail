@@ -45,7 +45,7 @@ Category colors (reserved for rare charts; screens use monochrome icons, never c
 Radius: 6 (small), 10 (controls), 12 (buttons), 16 (cards/panels), pill. Spacing on a 4px grid (8, 12, 16, 20, 24, 32, 40, 48). Targets: 32px minimum, 36px sidebar items, 44px primary buttons.
 
 ## Components (shadcn/ui in `packages/ui`)
-Button (primary charcoal, secondary outline, ghost), Switch, Checkbox card, Radio card, Pill radio group, Recommendation row (sentence, reason, size, Review), Storage bar (solid/hatched), Ledger row (label, leader, count, size), Signal row (big figure + text + Review), Status strip (2px progress + status line), Speech bubble (mascot), Letter (paper sheet, stamp, P.S.), Account switcher, Sidebar item, Empty/error state, Undo toast. Follow shadcn conventions (CVA variants, `data-slot`, `asChild`, focus-visible) and composition over boolean props.
+Button (primary charcoal, secondary outline, ghost), Switch, Checkbox card, Radio card, Pill radio group, Recommendation row (sentence, reason, size, Review), Storage bar (solid/hatched), Ledger row (label, leader, count, size), Signal row (big figure + text + Review), Status strip (2px progress + status line), Speech bubble (mascot), Letter (paper sheet, stamp, P.S.), Account switcher, Sidebar item, Empty/error state, sonner toast + action. Follow shadcn conventions (CVA variants, `data-slot`, `asChild`, focus-visible) and composition over boolean props.
 
 ## Motion
 150ms press/hover, 220ms panels and toasts, ease-out `cubic-bezier(0.22, 1, 0.36, 1)`. Pressed buttons scale to 0.98. Numbers count up when results arrive (600ms). No looping or pulsing UI animation. Everything respects `prefers-reduced-motion`.

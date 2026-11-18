@@ -60,4 +60,10 @@ export const fr = {
 
   "devGallery.title": entry("Galerie de développement", []),
   "devGallery.description": entry("Aperçus des états et des animations pour le développement.", []),
+  "action.close": entry("Fermer", []),
+  "action.undo": entry("Annuler", []),
+  "storageBar.description": entry("{summary} : {items}", ["summary", "items"]),
+  "storageBar.descriptionItem": entry("{size} {label}", ["size", "label"]),
+  "storageBar.itemSeparator": entry(", ", []),
+  "storageBar.legendItem": entry("{label} · {size}", ["label", "size"]),
 } satisfies Catalog;

@@ -1,3 +1,4 @@
+import { t } from "@pochimail/ui/i18n/format.ts";
 import { cn } from "@pochimail/ui/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
@@ -31,7 +32,12 @@ type StorageBarProps = Omit<React.ComponentProps<"div">, "children"> & {
 };
 
 function StorageBar({ className, segments, summary, ...props }: StorageBarProps) {
-  const description = `${summary}: ${segments.map((s) => `${s.size} ${s.label}`).join(", ")}`;
+  const description = t("storageBar.description", {
+    summary,
+    items: segments
+      .map((s) => t("storageBar.descriptionItem", { size: s.size, label: s.label }))
+      .join(t("storageBar.itemSeparator")),
+  });
 
   return (
     <div data-slot="storage-bar" className={cn("flex flex-col gap-3", className)} {...props}>
@@ -65,7 +71,7 @@ function StorageBar({ className, segments, summary, ...props }: StorageBarProps)
               )}
             />
             <span className="break-words">
-              {s.label} · {s.size}
+              {t("storageBar.legendItem", { label: s.label, size: s.size })}
             </span>
           </li>
         ))}

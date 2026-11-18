@@ -18,9 +18,9 @@ it("lets className override variant classes", () => {
   expect(html).not.toContain("min-h-11");
 });
 
-// Guards: the Dialog close (portal-rendered, so checked in source) keeps a 32px target and focus-visible only.
+// Guards: the composed dialog close (portal-rendered, so checked in source) keeps a 32px target and focus-visible only.
 it("dialog close has a 32px target and uses focus-visible", () => {
-  const src = readFileSync(new URL("./dialog.tsx", import.meta.url), "utf8");
+  const src = readFileSync(new URL("./dialog.stories.tsx", import.meta.url), "utf8");
   const close = src.match(/data-slot="dialog-close"\s+className="([^"]*)"/)?.[1] ?? "";
   expect(close).toContain("size-8");
   expect(close).toContain("focus-visible:ring-2");

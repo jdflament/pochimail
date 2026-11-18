@@ -1,22 +1,15 @@
+import { cn } from "@pochimail/ui/lib/utils";
 import { CircleCheckIcon, InfoIcon, OctagonXIcon, TriangleAlertIcon } from "lucide-react";
-import * as React from "react";
+import type * as React from "react";
 import { Toaster as Sonner, type ToasterProps } from "sonner";
 
-function subscribe(onChange: () => void) {
-  const observer = new MutationObserver(onChange);
-  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-  return () => observer.disconnect();
-}
-const getTheme = () => (document.documentElement.classList.contains("dark") ? "dark" : "light");
-
-// Follows the `.dark` class on <html> (the app's theme switch, even when forced against the OS); pass `theme` to override.
-function Toaster({ theme, ...props }: ToasterProps) {
-  const current = React.useSyncExternalStore(subscribe, getTheme, () => "light" as const);
+// Defaults to dark so `.dark` tokens resolve (e.g. undo toasts); pass `theme`/`className` to override.
+function Toaster({ theme = "dark", className, ...props }: ToasterProps) {
   return (
     <Sonner
       data-slot="toaster"
-      theme={theme ?? current}
-      className="toaster group"
+      theme={theme}
+      className={cn("toaster group dark", className)}
       icons={{
         success: <CircleCheckIcon className="size-4" />,
         info: <InfoIcon className="size-4" />,

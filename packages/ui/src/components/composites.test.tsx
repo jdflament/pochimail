@@ -1,3 +1,4 @@
+import { Button } from "@pochimail/ui/components/button";
 import { LedgerRow } from "@pochimail/ui/components/ledger-row";
 import { RecommendationRow } from "@pochimail/ui/components/recommendation-row";
 import { SignalRow } from "@pochimail/ui/components/signal-row";
@@ -13,11 +14,15 @@ import { expect, it, vi } from "vitest";
 it.each([
   [
     "signal row",
-    (onReview: () => void) => <SignalRow figure={7} title="waiting" onReview={onReview} />,
+    (onReview: () => void) => (
+      <SignalRow figure={7} title="waiting" onReview={onReview} reviewLabel="Review" />
+    ),
   ],
   [
     "recommendation row",
-    (onReview: () => void) => <RecommendationRow sentence="Unsubscribe" onReview={onReview} />,
+    (onReview: () => void) => (
+      <RecommendationRow sentence="Unsubscribe" onReview={onReview} reviewLabel="Review" />
+    ),
   ],
 ])("%s: clicking Review calls onReview once", async (_name, row) => {
   const onReview = vi.fn();
@@ -26,29 +31,28 @@ it.each([
   expect(onReview).toHaveBeenCalledTimes(1);
 });
 
-// Guards: Pause/Resume stuck on one label, or reporting the wrong next state.
-it("status strip toggles between Pause and Resume and reports the next state", async () => {
-  const onPausedChange = vi.fn();
+// Guards: action children announced inside the live region, or a composed Pause/Resume toggle not working.
+it("status strip renders action children outside the live region", async () => {
   function Harness() {
     const [paused, setPaused] = useState(false);
     return (
-      <StatusStrip
-        progress={40}
-        headline="Sorting"
-        paused={paused}
-        onPausedChange={(next) => {
-          onPausedChange(next);
-          setPaused(next);
-        }}
-      />
+      <StatusStrip progress={40} headline="Sorting">
+        <Button
+          variant="secondary"
+          size="sm"
+          data-slot="status-toggle"
+          onClick={() => setPaused((p) => !p)}
+        >
+          {paused ? "Resume" : "Pause"}
+        </Button>
+      </StatusStrip>
     );
   }
   render(<Harness />);
   await userEvent.click(screen.getByRole("button", { name: "Pause" }));
-  expect(onPausedChange).toHaveBeenLastCalledWith(true);
-  await userEvent.click(screen.getByRole("button", { name: "Resume" }));
-  expect(onPausedChange).toHaveBeenLastCalledWith(false);
-  expect(screen.getByRole("button", { name: "Pause" })).toBeTruthy();
+  expect(screen.getByRole("button", { name: "Resume" })).toBeTruthy();
+  const live = screen.getByRole("status");
+  expect(live.querySelector("button")).toBeNull();
 });
 
 // Guards: progress announcements lost (brief §6: role=status + aria-live=polite) or a width outside 0-100%.
@@ -96,9 +100,14 @@ it("ledger counts use the locale and tabular numbers", () => {
 it("row actions keep a 32px target and focus-visible ring", () => {
   const html = renderToStaticMarkup(
     <>
-      <SignalRow figure={1} title="a" />
-      <RecommendationRow sentence="b" />
-      <StatusStrip progress={1} headline="c" />
+      <SignalRow figure={1} title="a" reviewLabel="Review" />
+      <RecommendationRow sentence="b" reviewLabel="Review" />
+      <StatusStrip progress={1} headline="c">
+        <Button variant="secondary" size="sm">
+          Pause
+        </Button>
+        <Button size="sm">View summary</Button>
+      </StatusStrip>
     </>,
   );
   for (const m of html.matchAll(/<button[^>]*class="([^"]*)"/g)) {

@@ -1,5 +1,6 @@
 import { Button } from "@pochimail/ui/components/button";
 import { Toaster } from "@pochimail/ui/components/sonner";
+import { t } from "@pochimail/ui/i18n/format.ts";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { toast } from "sonner";
 
@@ -13,7 +14,9 @@ const meta = {
       <Button
         variant="secondary"
         onClick={() =>
-          toast("24 emails archived", { action: { label: "Undo", onClick: () => {} } })
+          toast("24 emails archived", {
+            action: { label: t("action.undo"), onClick: () => {} },
+          })
         }
       >
         Archive

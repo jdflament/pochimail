@@ -12,7 +12,7 @@ type RecommendationRowProps = Omit<React.ComponentProps<"li">, "children"> & {
   /** Already formatted size, e.g. "1.2 GB". */
   size?: string;
   onReview?: () => void;
-  reviewLabel?: string;
+  reviewLabel: string;
 };
 
 function RecommendationRow({
@@ -22,7 +22,7 @@ function RecommendationRow({
   reason,
   size,
   onReview,
-  reviewLabel = "Review",
+  reviewLabel,
   ...props
 }: RecommendationRowProps) {
   const Comp = asChild ? Slot.Root : "li";
