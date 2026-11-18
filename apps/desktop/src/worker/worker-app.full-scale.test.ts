@@ -35,7 +35,7 @@ describe("worker app at the brief §6 mock dataset size", () => {
       await app.handlers.procedures["scan.start"]?.({ accountId: account.id });
     await app.idle();
 
-    const overview = await app.handlers.procedures["overview.get"]?.(undefined);
+    const overview = await app.handlers.procedures["overview.get"]?.({});
     expect(overview?.scanned).toBe(MOCK_DATASET.totalMessages);
 
     // Category totals are the ones on the reference screens.

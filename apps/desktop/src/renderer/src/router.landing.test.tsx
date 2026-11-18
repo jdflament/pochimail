@@ -17,7 +17,15 @@ const createFakeAppClient = (hasConnectedAccount: boolean) => {
       "app.state": () => ({ status: "ready" as const, hasConnectedAccount }),
       "device.name": () => "Mac" as const,
       "accounts.list": () => [],
-      "overview.get": () => ({ scanned: 0, toReview: 0 }),
+      "overview.get": () => ({
+        scanned: 0,
+        toReview: 0,
+        waiting: 0,
+        deadlines: 0,
+        important: 0,
+        oldestWaitingDays: 0,
+        cleanable: [],
+      }),
       "mailbox.categories": () => ({
         people: 0,
         records: 0,

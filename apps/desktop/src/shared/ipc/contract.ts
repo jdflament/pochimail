@@ -33,11 +33,24 @@ const queries = {
       )
       .max(100),
   },
+  /** The Overview's figures, for every account or the one named; counts only, never content. */
   "overview.get": {
-    input: z.undefined(),
+    input: z.object({ accountId: accountId.optional() }),
     output: z.object({
       scanned: z.number().int().nonnegative(),
       toReview: z.number().int().nonnegative(),
+      waiting: z.number().int().nonnegative(),
+      deadlines: z.number().int().nonnegative(),
+      important: z.number().int().nonnegative(),
+      oldestWaitingDays: z.number().int().nonnegative(),
+      cleanable: z
+        .array(
+          z.object({
+            category: z.enum(["newsletters", "promotions", "notifications", "sign-ins-security"]),
+            count: z.number().int().nonnegative(),
+          }),
+        )
+        .max(4),
     }),
   },
   /** Email counts per category over the given accounts (the switcher's selection); counts only, never content. */

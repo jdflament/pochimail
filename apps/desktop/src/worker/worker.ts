@@ -50,7 +50,15 @@ const emptyHandlers: Handlers = {
     "app.state": () => ({ status: "ready", hasConnectedAccount: false }),
     "device.name": () => platform.deviceName(),
     "accounts.list": () => [],
-    "overview.get": () => ({ scanned: 0, toReview: 0 }),
+    "overview.get": () => ({
+      scanned: 0,
+      toReview: 0,
+      waiting: 0,
+      deadlines: 0,
+      important: 0,
+      oldestWaitingDays: 0,
+      cleanable: [],
+    }),
     "mailbox.categories": () => ({
       people: 0,
       records: 0,

@@ -16,7 +16,10 @@ export function AppEventsBridge({ client }: { client: RpcClient }) {
         client,
         registry,
         () => toast.error(t("scan.failed")),
-        () => void queryClient.invalidateQueries({ queryKey: ["mailbox"] }),
+        () => {
+          void queryClient.invalidateQueries({ queryKey: ["mailbox"] });
+          void queryClient.invalidateQueries({ queryKey: ["overview"] });
+        },
       ),
     [client, registry, queryClient],
   );
