@@ -230,6 +230,12 @@ importers:
       '@electron/fuses':
         specifier: 2.1.3
         version: 2.1.3
+      '@pochimail/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@pochimail/testing':
+        specifier: workspace:*
+        version: link:../../packages/testing
       '@pochimail/typescript-config':
         specifier: workspace:*
         version: link:../../tooling/typescript
