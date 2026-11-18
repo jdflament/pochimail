@@ -5,6 +5,7 @@ import react, { reactCompilerPreset } from "@vitejs/plugin-react";
 import { defineConfig } from "electron-vite";
 import type { Plugin } from "vite";
 import { buildCsp } from "./src/shared/csp.ts";
+import { galleryDefine, galleryEnabled } from "./src/shared/gallery-build.ts";
 
 const injectCsp = (): Plugin => {
   let dev = false;
@@ -17,7 +18,7 @@ const injectCsp = (): Plugin => {
   };
 };
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   main: {
     build: {
       rollupOptions: {
@@ -41,9 +42,10 @@ export default defineConfig({
   },
   renderer: {
     root: resolve(import.meta.dirname, "src/renderer"),
+    define: galleryDefine(galleryEnabled(command, process.env)),
     build: {
       rollupOptions: { input: { index: resolve(import.meta.dirname, "src/renderer/index.html") } },
     },
     plugins: [injectCsp(), tailwindcss(), react(), babel({ presets: [reactCompilerPreset()] })],
   },
-});
+}));

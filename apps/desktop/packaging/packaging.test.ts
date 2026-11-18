@@ -1,6 +1,7 @@
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { electronBinaryPath, isUniversalSlice } from "./apply-fuses.ts";
+import { galleryLeaksIn } from "./gallery-check.ts";
 import { sizeTable } from "./size-report.ts";
 
 const app = { appOutDir: "release/x", productFilename: "Pochimail", executableName: "pochimail" };
@@ -44,5 +45,53 @@ describe("size report", () => {
     expect(() => sizeTable("Linux", [{ name: "builder-debug.yml", bytes: 1 }])).toThrow(
       /No installer/,
     );
+  });
+});
+
+describe("gallery leak check", () => {
+  // Builds a minimal asar: [4, headerPickleSize, payloadSize, jsonLength] + JSON header + file data.
+  const asar = (files: Record<string, string>) => {
+    let offset = 0;
+    const entries = Object.entries(files).map(([path, content]) => {
+      const node = { size: content.length, offset: String(offset) };
+      offset += content.length;
+      return [path, node] as const;
+    });
+    const tree: Record<string, unknown> = {};
+    for (const [path, node] of entries) {
+      const parts = path.split("/");
+      let dir = tree;
+      for (const part of parts.slice(0, -1)) {
+        const next = (dir[part] as { files: Record<string, unknown> } | undefined) ?? { files: {} };
+        dir[part] = next;
+        dir = next.files;
+      }
+      dir[parts.at(-1) as string] = node;
+    }
+    const json = Buffer.from(JSON.stringify({ files: tree }));
+    const header = Buffer.alloc(16);
+    header.writeUInt32LE(4, 0);
+    header.writeUInt32LE(json.length + 8, 4);
+    header.writeUInt32LE(json.length + 4, 8);
+    header.writeUInt32LE(json.length, 12);
+    return Buffer.concat([header, json, Buffer.from(Object.values(files).join(""))]);
+  };
+
+  // Guards: a smoke check that misses a shipped gallery (chunk or route path), or flags the inert sources under src/ of a clean app.
+  it("flags a gallery chunk or route path in out/renderer and ignores src/", () => {
+    expect(galleryLeaksIn(asar({ "out/renderer/assets/dev-gallery-page-x.js": "x" }))).toHaveLength(
+      1,
+    );
+    expect(
+      galleryLeaksIn(asar({ "out/renderer/assets/index-x.js": 'a={path:"/gallery"}' })),
+    ).toHaveLength(1);
+    expect(
+      galleryLeaksIn(
+        asar({
+          "out/renderer/assets/index-x.js": "a",
+          "src/renderer/src/features/dev-gallery/dev-gallery-page.tsx": '"/gallery"',
+        }),
+      ),
+    ).toEqual([]);
   });
 });

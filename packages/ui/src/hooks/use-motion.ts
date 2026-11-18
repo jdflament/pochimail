@@ -21,5 +21,7 @@ function usePrefersReducedMotion(): boolean {
 /** False under prefers-reduced-motion or when the Animations setting is off: components then skip transforms and transitions. */
 export function useMotionEnabled(local?: boolean): boolean {
   const setting = React.use(AnimationsContext);
-  return (local ?? setting) && !usePrefersReducedMotion();
+  // Always call the hook: a short-circuit would change the hook order when the Animations setting flips at runtime.
+  const reduced = usePrefersReducedMotion();
+  return (local ?? setting) && !reduced;
 }

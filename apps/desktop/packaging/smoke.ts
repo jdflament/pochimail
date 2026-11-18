@@ -1,9 +1,10 @@
 import { spawn } from "node:child_process";
-import { appendFileSync, existsSync, readdirSync } from "node:fs";
+import { appendFileSync, existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { FuseState, FuseV1Options, getCurrentFuseWire } from "@electron/fuses";
 import { fuses } from "../src/main/fuses.ts";
 import { electronBinaryPath } from "./apply-fuses.ts";
+import { galleryLeaksIn } from "./gallery-check.ts";
 import { checkStorageOutput, storageSummary } from "./storage-check.ts";
 
 /** Smoke test of a packaged build: fuses are flipped on the binary and the app starts, loads its window and quits. */
@@ -28,6 +29,18 @@ const binary = electronBinaryPath({
   productFilename: "Pochimail",
   executableName: "pochimail",
 });
+
+// M4-18: the dev gallery route must not ship.
+const asarPath = join(
+  process.platform === "darwin"
+    ? join(appOutDir, "Pochimail.app", "Contents", "Resources")
+    : join(appOutDir, "resources"),
+  "app.asar",
+);
+const leaked = galleryLeaksIn(readFileSync(asarPath));
+if (leaked.length > 0)
+  throw new Error(`The packaged app contains the dev gallery (${leaked.join(", ")})`);
+console.log("gallery: absent");
 
 const wire = await getCurrentFuseWire(binary);
 const expected = {

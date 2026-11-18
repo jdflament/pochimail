@@ -214,6 +214,10 @@ export const fr = {
 
   "devGallery.title": entry("Galerie de développement", []),
   "devGallery.description": entry("Aperçus des états et des animations pour le développement.", []),
+  "devGallery.dark": entry("Thème sombre", []),
+  "devGallery.reduceMotion": entry("Réduire les animations", []),
+  "devGallery.states": entry("États", []),
+  "devGallery.motion": entry("Animations", []),
   "action.close": entry("Fermer", []),
   "action.undo": entry("Annuler", []),
   "storageBar.description": entry("{summary} : {items}", ["summary", "items"]),

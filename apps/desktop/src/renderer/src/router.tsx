@@ -3,6 +3,7 @@ import {
   createRootRouteWithContext,
   createRoute,
   createRouter,
+  lazyRouteComponent,
   Outlet,
   redirect,
 } from "@tanstack/react-router";
@@ -10,7 +11,6 @@ import type { RpcClient } from "../../shared/ipc/client.ts";
 import { ActivityPage } from "./features/activity/activity-page.tsx";
 import { CategoryPage } from "./features/category/category-page.tsx";
 import { ConnectPage } from "./features/connect/connect-page.tsx";
-import { DevGalleryPage } from "./features/dev-gallery/dev-gallery-page.tsx";
 import { DocumentsPage } from "./features/documents/documents-page.tsx";
 import { OnboardingLayout } from "./features/onboarding/onboarding-layout.tsx";
 import { OverviewPage } from "./features/overview/overview-page.tsx";
@@ -102,11 +102,19 @@ const settingsRoute = createRoute({
   component: SettingsPage,
 });
 
-const devGalleryRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/dev/gallery",
-  component: DevGalleryPage,
-});
+// Dev and E2E builds only: __POCHIMAIL_GALLERY__ is a build-time literal, so a production bundle drops this branch and the gallery chunk.
+const galleryRoutes = __POCHIMAIL_GALLERY__
+  ? [
+      createRoute({
+        getParentRoute: () => rootRoute,
+        path: "/gallery",
+        component: lazyRouteComponent(
+          () => import("./features/dev-gallery/dev-gallery-page.tsx"),
+          "DevGalleryPage",
+        ),
+      }),
+    ]
+  : [];
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
@@ -118,7 +126,7 @@ const routeTree = rootRoute.addChildren([
     activityRoute,
     settingsRoute,
   ]),
-  devGalleryRoute,
+  ...galleryRoutes,
 ]);
 
 export type AppRouter = ReturnType<typeof createAppRouter>;

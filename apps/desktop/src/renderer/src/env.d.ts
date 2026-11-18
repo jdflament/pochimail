@@ -9,3 +9,6 @@ interface Window {
     chooseFolder: () => Promise<string | null>;
   };
 }
+
+/** Replaced at build time (src/shared/gallery-build.ts): true only in dev and E2E builds. */
+declare const __POCHIMAIL_GALLERY__: boolean;

@@ -79,6 +79,23 @@ describe("MotionProvider", () => {
   });
 });
 
+describe("flipping the Animations setting while a motion component is mounted", () => {
+  // Guards: a conditional hook in useMotionEnabled that crashes the screen when Animations is toggled at runtime.
+  it("keeps CountUp mounted and shows its final value", () => {
+    reducedMotion(false);
+    const ui = (animations: boolean) => (
+      <MotionProvider animations={animations}>
+        <CountUp value={42} />
+      </MotionProvider>
+    );
+    const { rerender } = render(ui(true));
+    rerender(ui(false));
+    expect(screen.getAllByText("42").length).toBeGreaterThan(0);
+    rerender(ui(true));
+    expect(screen.getAllByText("42").length).toBeGreaterThan(0);
+  });
+});
+
 describe("with motion on", () => {
   // Guards: numbers jumping to the final value instead of rolling up once from 0.
   it("CountUp rolls up from 0 and lands on the value", async () => {
