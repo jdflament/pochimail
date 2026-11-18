@@ -12,6 +12,7 @@ import { CategoryPage } from "./features/category/category-page.tsx";
 import { ConnectPage } from "./features/connect/connect-page.tsx";
 import { DevGalleryPage } from "./features/dev-gallery/dev-gallery-page.tsx";
 import { DocumentsPage } from "./features/documents/documents-page.tsx";
+import { OnboardingLayout } from "./features/onboarding/onboarding-layout.tsx";
 import { OverviewPage } from "./features/overview/overview-page.tsx";
 import { SettingsPage } from "./features/settings/settings-page.tsx";
 import { SetupPage } from "./features/setup/setup-page.tsx";
@@ -47,20 +48,26 @@ const indexRoute = createRoute({
   component: () => null,
 });
 
-const welcomeRoute = createRoute({
+const onboardingRoute = createRoute({
   getParentRoute: () => rootRoute,
+  id: "onboarding",
+  component: OnboardingLayout,
+});
+
+const welcomeRoute = createRoute({
+  getParentRoute: () => onboardingRoute,
   path: "/welcome",
   component: WelcomePage,
 });
 
 const connectRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => onboardingRoute,
   path: "/connect",
   component: ConnectPage,
 });
 
 const setupRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => onboardingRoute,
   path: "/setup",
   component: SetupPage,
 });
@@ -103,9 +110,7 @@ const devGalleryRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
-  welcomeRoute,
-  connectRoute,
-  setupRoute,
+  onboardingRoute.addChildren([welcomeRoute, connectRoute, setupRoute]),
   shellRoute.addChildren([
     overviewRoute,
     categoryRoute,

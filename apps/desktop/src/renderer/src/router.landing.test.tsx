@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { createRpcClient } from "../../shared/ipc/client.ts";
 import { serveRpc } from "../../shared/ipc/server.ts";
@@ -15,7 +15,7 @@ const createFakeAppClient = (hasConnectedAccount: boolean) => {
   serveRpc(fromDomPort(port2), {
     procedures: {
       "app.state": () => ({ status: "ready" as const, hasConnectedAccount }),
-      "device.name": () => "device" as const,
+      "device.name": () => "Mac" as const,
       "accounts.list": () => [],
       "overview.get": () => ({ scanned: 0, toReview: 0 }),
       "mailbox.categories": () => ({
@@ -49,7 +49,11 @@ describe("first-run redirect from app.state", () => {
   it("lands on Welcome on first launch when no account is connected", async () => {
     const fake = createFakeAppClient(false);
     render(<App workerClient={fake.client} />);
-    await waitFor(() => expect(screen.getByRole("heading", { name: "Welcome" })).toBeTruthy());
+    await waitFor(() =>
+      expect(
+        screen.getByRole("heading", { name: "Clean up your email. Keep what matters." }),
+      ).toBeTruthy(),
+    );
     expect(screen.queryByRole("heading", { name: "Overview" })).toBeNull();
     fake.close();
   });
@@ -58,7 +62,41 @@ describe("first-run redirect from app.state", () => {
     const fake = createFakeAppClient(true);
     render(<App workerClient={fake.client} />);
     await waitFor(() => expect(screen.getByRole("heading", { name: "Overview" })).toBeTruthy());
-    expect(screen.queryByRole("heading", { name: "Welcome" })).toBeNull();
+    expect(
+      screen.queryByRole("heading", { name: "Clean up your email. Keep what matters." }),
+    ).toBeNull();
+    fake.close();
+  });
+
+  // Guards: a Get started button that does not lead to Connect, or a stepper that does not advance.
+  it("Get started leads to Connect and moves the stepper to step 2", async () => {
+    const fake = createFakeAppClient(false);
+    render(<App workerClient={fake.client} />);
+    await waitFor(() => expect(screen.getByRole("list", { name: "Step 1 of 3" })).toBeTruthy());
+    fireEvent.click(screen.getByRole("link", { name: "Get started" }));
+    await waitFor(() => expect(screen.getByRole("heading", { name: "Connect" })).toBeTruthy());
+    expect(screen.getByRole("list", { name: "Step 2 of 3" })).toBeTruthy();
+    fake.close();
+  });
+
+  // Guards: the privacy promise ignoring the OS name (showing "device" or a raw placeholder).
+  it("Welcome names the OS in the privacy promise", async () => {
+    const fake = createFakeAppClient(false);
+    render(<App workerClient={fake.client} />);
+    await waitFor(() =>
+      expect(screen.getByText(/Your email never leaves this Mac\./)).toBeTruthy(),
+    );
+    expect(document.body.textContent).not.toMatch(/[{}[\]]/);
+    fake.close();
+  });
+
+  // Guards: focus dropping to <body> when Get started unmounts (keyboard users lose their place).
+  it("moves focus to the Connect heading after Get started", async () => {
+    const fake = createFakeAppClient(false);
+    render(<App workerClient={fake.client} />);
+    fireEvent.click(await screen.findByRole("link", { name: "Get started" }));
+    const heading = await screen.findByRole("heading", { name: "Connect" });
+    await waitFor(() => expect(document.activeElement).toBe(heading));
     fake.close();
   });
 });

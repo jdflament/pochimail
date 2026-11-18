@@ -38,8 +38,14 @@ export const ja = {
     [],
   ),
 
-  "welcome.title": entry("ようこそ", []),
   "welcome.headline": entry("メールを整理して、大切なものを残しましょう。", []),
+  "welcome.description": entry(
+    "Pochimailは、今お使いのメールアカウントのためのプライベートなアシスタントです。対応が必要なメールを見つけ、不要なメールを片付け、書類を保存します。メールがこの{device}の外に出ることはありません。",
+    ["device"],
+  ),
+  "welcome.cta": entry("始める", []),
+  "welcome.openSource": entry("無料のオープンソース", []),
+  "onboarding.progress": entry("ステップ{current}／{total}", ["current", "total"]),
 
   "connect.title": entry("接続", []),
   "connect.description": entry("始めるにはメールアカウントを接続してください。", []),

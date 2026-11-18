@@ -10,6 +10,7 @@ Last updated: 2026-11-19
 - **Merged M2/M4 tickets**: M2-01 (#49), M2-02 (#46), M2-03 (#51), M2-04 (#53), M2-06 (#60), M4-01 (#54), M4-03 (#47), M4-04 (#50), M4-07 (#56), M4-08 (#64).
 - **M4-09 Responsive layout** (sidebar, icon rail, bottom tabs, account switcher, hidden empty categories): done with #70. Known gaps (decided): the Overview is not scoped to the account switcher yet (deferred to M4-14, the Overview ticket; only the sidebar counts follow the switcher), and the Topics group is not shown because no topic data exists yet.
 - **M4-06 Mascot behaviours**: done with #57 (merge pending).
+- **M4-10 Welcome screen and onboarding stepper**: done except the visual-tolerance check against the light reference, deferred to M4-19; shared onboarding layout keeps Pochi and the step indicator in place across Welcome, Connect and Set up.
 - **M2-05 OAuth PKCE loopback sign-in**: done with #66 (merge pending; wired into the Connect screen by M4-12).
 - **i18n: French + Japanese**: done with #62 (typed fr/ja catalogs, locale resolution, locale plural/number/date rules).
 - **Refactor**: UI component rule cleanup (ui-audit-20261119 items 1–4,8): undo toast replaced by sonner toast + action with `once` helper, status-strip/dialog composition, review labels required, storage-bar/i18n copy cleanup (#61).
@@ -22,7 +23,7 @@ Last updated: 2026-11-19
 
 Ordered by priority (UI first):
 
-1. **M4 UI**: M4-10, M4-14.
+1. **M4 UI**: M4-14.
 2. **M2 lane**: M2-05 onward (see [`docs/tickets/m2-m4-lanes.md`](tickets/m2-m4-lanes.md)).
 
 ## Open decisions
