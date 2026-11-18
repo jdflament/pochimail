@@ -43,7 +43,10 @@
     "./ports/outbox": "./src/ports/outbox.ts",
     "./jobs/retry": "./src/jobs/retry.ts",
     "./jobs/outbox-relay": "./src/jobs/outbox-relay.ts",
-    "./jobs/pipeline": "./src/jobs/pipeline.ts"
+    "./jobs/pipeline": "./src/jobs/pipeline.ts",
+    "./use-cases/connect-account": "./src/use-cases/connect-account.ts",
+    "./use-cases/run-incremental-sync": "./src/use-cases/run-incremental-sync.ts",
+    "./use-cases/classify-batch": "./src/use-cases/classify-batch.ts"
   },
   "scripts": {
     "typecheck": "tsc",
