@@ -34,7 +34,7 @@ Pochi always reflects the real state of the app. One pose at a time, driven by d
 | Model downloading | Thinking (eyes up) | Slow sway | "Getting my brain ready. I'm already sorting with simple rules." |
 | Sorting in the background | Reading (glasses) | Reading bob, eyes scanning | "Keep browsing, I'm on it." |
 | Found documents / people waiting | Found | Squish, flap lifts | "Saved 412 documents." |
-| Sorting finished / summary sheet | Happy | Bounce, then rests on the stamp | "Your mailbox, sorted." |
+| Sorting finished / summary sheet | Happy | Small bounce, then rests in the plain sheet header | "Your mailbox, sorted." |
 | Review: user applies a cleanup | Happy | Small nod per batch | "Done. You can undo it anytime." |
 | Undo | Default | Quick rewind wiggle | "Put back." |
 | Paused / offline / quiet hours | Sleepy (half-closed eyes) | Slower breathing | "I'll continue when you're back." |
