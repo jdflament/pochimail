@@ -1,10 +1,10 @@
+import { StorageError } from "@pochimail/core/errors";
 import type { AccountId } from "@pochimail/core/ids";
 import { err, ok } from "@pochimail/core/result";
-import { StorageError } from "@pochimail/core/errors";
 import type { RunScan, RunScanOutcome } from "@pochimail/core/use-cases/run-scan";
 import { ScanRunner } from "@pochimail/core/use-cases/scan-runner";
 import { describe, expect, it, vi } from "vitest";
-import { ACCOUNT_1, WS_A, makeAccount } from "./fixtures.ts";
+import { ACCOUNT_1, makeAccount, WS_A } from "./fixtures.ts";
 import { createInMemoryUnitOfWork } from "./in-memory-store.ts";
 
 type Execute = RunScan["execute"];
