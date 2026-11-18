@@ -69,6 +69,62 @@ export const fr = {
 
   "setup.title": entry("Configuration", []),
   "setup.description": entry("Choisissez comment Pochi peut vous aider.", []),
+  "setup.bubble": entry(
+    "Bonjour, je suis Pochi. Dites-moi ce que je peux faire pour vous et jusqu'où je peux aller. Vous pourrez changer cela à tout moment dans les réglages.",
+    [],
+  ),
+  "setup.capabilities.heading": entry("Que dois-je faire pour vous ?", []),
+  "setup.capabilities.hint": entry("Plusieurs choix possibles", []),
+  "setup.capability.catch-what-matters.title": entry("Repérer l'essentiel", []),
+  "setup.capability.catch-what-matters.description": entry(
+    "Signaler les personnes qui vous attendent, les échéances et les expéditeurs importants.",
+    [],
+  ),
+  "setup.capability.declutter.title": entry("Faire le tri", []),
+  "setup.capability.declutter.description": entry(
+    "Vous désabonner et archiver ce dont vous n'avez pas besoin.",
+    [],
+  ),
+  "setup.capability.organize.title": entry("Organiser", []),
+  "setup.capability.organize.description": entry(
+    "Classer vos emails en catégories et sujets clairs, sous forme de libellés.",
+    [],
+  ),
+  "setup.capability.save-documents.title": entry("Enregistrer les documents", []),
+  "setup.capability.save-documents.description": entry(
+    "Repérer les pièces jointes importantes et les ranger dans un dossier.",
+    [],
+  ),
+  "setup.autonomy.heading": entry("Jusqu'où puis-je aller ?", []),
+  "setup.autonomy.recommended": entry("Recommandé", []),
+  "setup.autonomy.just-look.title": entry("Observer", []),
+  "setup.autonomy.just-look.description": entry(
+    "Je vous montre, mais je ne change jamais rien.",
+    [],
+  ),
+  "setup.autonomy.suggest.title": entry("Proposer", []),
+  "setup.autonomy.suggest.description": entry("Je prépare, vous validez chaque étape.", []),
+  "setup.autonomy.autopilot.title": entry("Pilote automatique", []),
+  "setup.autonomy.autopilot.description": entry(
+    "Je m'occupe de l'évident, puis je vous le dis.",
+    [],
+  ),
+  "setup.autonomy.autopilot.reminder": entry(
+    "Avec le pilote automatique, je n'archive ou ne désabonne que si j'en suis sûr à au moins {percent} %, et je ne touche jamais aux emails de vraies personnes. Je consigne tout et je vous en rends compte ensuite. Vous pouvez l'annuler, sauf un désabonnement.",
+    ["percent"],
+  ),
+  "setup.invariants": entry(
+    "Quel que soit le mode, je ne supprime jamais rien et je n'agis jamais sur les emails de vraies personnes sans vous demander. Je consigne chaque action, et vous pouvez toutes les annuler, sauf un désabonnement.",
+    [],
+  ),
+  "setup.capabilities.none": entry(
+    "Choisissez au moins une chose pour laquelle je peux vous aider.",
+    [],
+  ),
+  "setup.settingsError": entry("Je n'ai pas pu charger vos choix.", []),
+  "setup.retry": entry("Réessayer", []),
+  "setup.start": entry("Commencer le tri", []),
+  "setup.error": entry("Je n'ai pas pu lancer le tri. Veuillez réessayer.", []),
 
   "documents.title": entry("Documents", []),
   "documents.description": entry("Les documents enregistrés apparaîtront ici.", []),

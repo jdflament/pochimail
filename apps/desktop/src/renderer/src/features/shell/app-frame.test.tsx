@@ -52,7 +52,16 @@ const setup = (initialPath = "/overview") => {
       },
       "overview.get": () => ({ scanned: 0, toReview: 0 }),
       "digest.get": () => ({ ready: false, itemCount: 0 }),
-      "settings.get": () => ({ autopilot: false, notifications: true }),
+      "settings.get": () => ({
+        autonomy: "suggest" as const,
+        capabilities: {
+          "catch-what-matters": true,
+          declutter: true,
+          organize: true,
+          "save-documents": true,
+        },
+        notifications: true,
+      }),
     },
     subscriptions: {
       "app.events": (_input, emit) => {

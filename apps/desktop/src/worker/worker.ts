@@ -1,5 +1,6 @@
 import type { Timer } from "@pochimail/core/events/batching";
 import { createLogger } from "@pochimail/core/logger";
+import { DEFAULT_APP_SETTINGS } from "@pochimail/core/ports/settings-store";
 import { demoScale } from "../shared/demo.ts";
 import type { Handlers } from "../shared/ipc/server.ts";
 import { serveRpc } from "../shared/ipc/server.ts";
@@ -60,7 +61,7 @@ const emptyHandlers: Handlers = {
       promotions: 0,
     }),
     "digest.get": () => ({ ready: false, itemCount: 0 }),
-    "settings.get": () => ({ autopilot: false, notifications: true }),
+    "settings.get": () => DEFAULT_APP_SETTINGS,
   },
   subscriptions: {
     "app.events": () => undefined,
