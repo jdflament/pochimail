@@ -24,7 +24,7 @@ export const subscribeAppEvents = (
         (event: EventOf<"app.events">) => {
           backoffMs = INITIAL_BACKOFF_MS;
           if (event.type === "ActionApplied") registry.apply(event.actionId);
-          else registry.fail(event.actionId);
+          else if (event.type === "ActionFailed") registry.fail(event.actionId);
         },
         (error) => {
           console.error("[app.events]", error.code);

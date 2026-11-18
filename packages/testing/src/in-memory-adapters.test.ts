@@ -17,6 +17,7 @@ import { createInMemoryJobQueue } from "./in-memory-job-queue.ts";
 import { createInMemoryNotifier } from "./in-memory-notifier.ts";
 import { createFakeScheduler } from "./in-memory-scheduler.ts";
 import { createInMemorySecretStore } from "./in-memory-secret-store.ts";
+import { createInMemorySettingsStore } from "./in-memory-settings-store.ts";
 import { createInMemoryUnitOfWork } from "./in-memory-store.ts";
 import { jobQueueContract } from "./job-queue-contract.ts";
 import { mailProviderContract } from "./mail-provider-contract.ts";
@@ -26,6 +27,7 @@ import { powerMonitorContract } from "./power-monitor-contract.ts";
 import { repositoriesContract } from "./repositories-contract.ts";
 import { schedulerContract } from "./scheduler-contract.ts";
 import { secretStoreContract } from "./secret-store-contract.ts";
+import { settingsStoreContract } from "./settings-store-contract.ts";
 import { signalRepositoryContract } from "./signal-repository-contract.ts";
 import { unitOfWorkContract } from "./unit-of-work-contract.ts";
 
@@ -36,6 +38,7 @@ signalRepositoryContract(createInMemoryUnitOfWork);
 digestStateContract(createInMemoryUnitOfWork);
 blobStoreContract(createInMemoryBlobStore);
 secretStoreContract(createInMemorySecretStore);
+settingsStoreContract(createInMemorySettingsStore);
 jobQueueContract(() => {
   const clock = createFakeClock();
   return { queue: createInMemoryJobQueue(clock), clock };

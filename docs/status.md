@@ -7,7 +7,7 @@ Last updated: 2026-11-19
 - **M0 Foundation**: complete (#10–#21, #25, #28 and related chores).
 - **M1 Core & events**: complete (#22, #24, #26, #27, #30–#34, #39, #41–#43, #45, #48).
 - **Docs/chores**: D11 recorded (#44); repo and CI maintenance (#23, #29, #35–#38, #40, #52); Electron install documented and verified on a cold install (#59).
-- **Merged M2/M4 tickets**: M2-01 (#49), M2-02 (#46), M2-03 (#51), M2-04 (#53), M2-06 (#60), M4-01 (#54), M4-03 (#47), M4-04 (#50), M4-07 (#56), M4-08 (#64).
+- **Merged M2/M4 tickets**: M2-01 (#49), M2-02 (#46), M2-03 (#51), M2-04 (#53), M2-06 (#60), M4-01 (#54), M4-02 (#PR), M4-03 (#47), M4-04 (#50), M4-07 (#56), M4-08 (#64).
 - **M4-06 Mascot behaviours**: done with #57 (merge pending).
 - **M2-05 OAuth PKCE loopback sign-in**: done with #66 (merge pending; wired into the Connect screen by M4-12).
 - **i18n: French + Japanese**: done with #62 (typed fr/ja catalogs, locale resolution, locale plural/number/date rules).
@@ -21,16 +21,17 @@ Last updated: 2026-11-19
 
 Ordered by priority (UI first):
 
-1. **M4 UI**: M4-02, M4-10, M4-14.
+1. **M4 UI**: M4-10, M4-14.
 2. **M2 lane**: M2-05 onward (see [`docs/tickets/m2-m4-lanes.md`](tickets/m2-m4-lanes.md)).
 
 ## Open decisions
 
+- **Demo mode in packaged builds (M4-02)**: demo mode (`POCHIMAIL_DEMO=small|full`, fixture mailbox) is dev/E2E only; a packaged app ignores it. How `@pochimail/testing` ships in a packaged build is for the maintainer to decide.
 - None blocking. Resolved planning questions are recorded in [`docs/tickets/m2-m4-lanes.md`](tickets/m2-m4-lanes.md).
 
 ## Known follow-ups
 
-- **M3**: needs-reply detector has no age window; current precision 0.26.
+- **M3**: needs-reply detector has no age window; current precision 0.26. Because of it the Overview's `toReview` over the fixture is 56 (7 + 3 + 12 = 22 expected; important-sender detects 0 of 12) until M3.
 - **Packaging CI**: macOS packaging job is flaky.
 
 ## How to resume

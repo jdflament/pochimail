@@ -28,6 +28,8 @@ export interface ScanPipelineDeps {
   readonly accountId: AccountId;
   readonly maxInFlightBatches?: number;
   readonly retryPolicy?: RetryPolicy;
+  /** Called after each batch left the last stage, with its message count (progress reporting). */
+  readonly onBatchProcessed?: (count: number) => Promise<void> | void;
 }
 
 /** One provider batch travels through the stages as one item. */
@@ -83,7 +85,9 @@ export function createScanPipeline(deps: ScanPipelineDeps): Pipeline {
     process: async (item) => {
       if (item.ids.length === 0) return ok(0);
       const found = await detect.execute({ workspaceId, accountId, messageIds: item.ids }, never);
-      return found.ok ? ok(found.value.length) : err(found.error);
+      if (!found.ok) return err(found.error);
+      await deps.onBatchProcessed?.(item.ids.length);
+      return ok(found.value.length);
     },
   };
 

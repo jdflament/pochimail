@@ -63,7 +63,9 @@
     "./eval/harness": "./src/eval/harness.ts",
     "./eval/metrics": "./src/eval/metrics.ts",
     "./eval/report": "./src/eval/report.ts",
-    "./eval/seed-context": "./src/eval/seed-context.ts"
+    "./eval/seed-context": "./src/eval/seed-context.ts",
+    "./in-memory-settings-store": "./src/in-memory-settings-store.ts",
+    "./settings-store-contract": "./src/settings-store-contract.ts"
   },
   "scripts": {
     "typecheck": "tsc",

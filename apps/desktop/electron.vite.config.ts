@@ -24,6 +24,7 @@ export default defineConfig({
         input: {
           index: resolve(import.meta.dirname, "src/main/main.ts"),
           worker: resolve(import.meta.dirname, "src/worker/worker.ts"),
+          "model-host": resolve(import.meta.dirname, "src/model-host/model-host.ts"),
           "storage-smoke": resolve(import.meta.dirname, "src/worker/storage-smoke.ts"),
         },
       },
