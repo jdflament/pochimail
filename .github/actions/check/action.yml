@@ -1,0 +1,40 @@
+name: check
+description: The full quality gate (install, gates, typecheck, lint, test, build, knip, manypkg). One place for the steps; ci.yml calls it from one job per OS. The caller must run actions/checkout first.
+runs:
+  using: composite
+  steps:
+    # pnpm version comes from `packageManager` in package.json.
+    - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+    - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      with:
+        node-version-file: .nvmrc
+        cache: pnpm
+    - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: .turbo/cache
+        key: turbo-${{ runner.os }}-${{ github.sha }}
+        restore-keys: turbo-${{ runner.os }}-
+    - run: pnpm install --frozen-lockfile
+      shell: bash
+    # A gate that runs zero tasks must not pass (turbo exits 0 on "0 total").
+    - name: Assert every gate runs tasks
+      run: pnpm gates
+      shell: bash
+    - name: Typecheck
+      run: pnpm typecheck
+      shell: bash
+    - name: Lint
+      run: pnpm lint
+      shell: bash
+    - name: Test
+      run: pnpm test
+      shell: bash
+    - name: Build
+      run: pnpm build
+      shell: bash
+    - name: Knip
+      run: pnpm knip
+      shell: bash
+    - name: Manypkg
+      run: pnpm manypkg
+      shell: bash
