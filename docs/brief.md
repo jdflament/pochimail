@@ -4,7 +4,7 @@ You are the coordinator agent. You plan the work, set up the repository and GitH
 
 Your first run produces a plan and a backlog, not code. Stop for my review before any implementation starts (see section 10).
 
-> **Name (decided):** the app is **Pochimail**, the mascot and assistant is **Pochi** (from *pochi-bukuro* ポチ袋, the small decorative Japanese envelope). Website: **getpochimail.com**. Repository: **`jdflament/pochimail`** (personal account for v1; the `pochimail` GitHub org exists and the repo will be transferred there later if the project grows. GitHub keeps redirects, issues, stars and releases on transfer, so never hard-code the owner: read it from one config value, e.g. `repository` in package.json and the updater's `publish` config). npm scope `@pochimail` is for internal workspace package names only; nothing is published to npm in v1. The app is "Pochimail" in product copy; the assistant speaks as "Pochi" ("Hi, I'm Pochi").
+> **Name (decided):** the app is **Pochimail**, the mascot and assistant is **Pochi** (from *pochi-bukuro* ポチ袋, the small decorative Japanese envelope). Website: **getpochimail.com**. Repository: **`pochimail/pochimail`** (moved to the `pochimail` GitHub org on 2026-11-18; GitHub keeps redirects, issues, stars and releases on transfer, so never hard-code the owner: read it from one config value, e.g. `repository` in package.json and the updater's `publish` config). npm scope `@pochimail` is for internal workspace package names only; nothing is published to npm in v1. The app is "Pochimail" in product copy; the assistant speaks as "Pochi" ("Hi, I'm Pochi").
 
 ---
 
@@ -432,7 +432,7 @@ Verify current versions and docs (Electron, Turborepo, shadcn CLI, the SQLite la
 ## 10. How to organize the work
 
 ### Repository and GitHub setup
-1. After I confirm the license: create `jdflament/pochimail` with `gh`, **public** (decided 2026-11-17), default branch `main`. Protection: PRs + green CI required, **no required human review** (the reviewer agent is the review; I merge or approve merges in batches). Squash merge only, delete branches on merge.
+1. After I confirm the license: create `pochimail/pochimail` with `gh`, **public** (decided 2026-11-17), default branch `main`. Protection: PRs + green CI required, **no required human review** (the reviewer agent is the review; I merge or approve merges in batches). Squash merge only, delete branches on merge.
 2. Labels (keep it small): `type:feature|bug|chore|docs`, `area:core|mail|ai|ui|desktop|infra|design`, `p0|p1`, `blocked`. Add more only when filtering actually needs them.
 3. Milestones (refine them):
    - **M0 Foundation:** monorepo, tooling, CI, docs, ADRs, AGENTS.md, design tokens in `packages/ui`
@@ -462,7 +462,7 @@ Verify current versions and docs (Electron, Turborepo, shadcn CLI, the SQLite la
 `docs/plan.md` and this brief are living documents. When a decision changes (by me or through an ADR), update `docs/plan.md`, the affected issues and `AGENTS.md` in the same PR.
 
 ### First run deliverables (then stop)
-1. The decisions you need from me (code license, public or private repo, anything else blocking). Owner is decided: `jdflament/pochimail`.
+1. The decisions you need from me (code license, public or private repo, anything else blocking). Owner is decided: `pochimail/pochimail`.
 2. `docs/plan.md` draft: milestones, epics, dependency graph, order of execution.
 3. ADR drafts: monorepo layout and package manager, Electron process model + IPC streaming, hexagonal core + event bus + outbox/job queue, incremental sync and IDLE wake-ups, local storage, local AI runtimes and model selection, OAuth approach, notifications and privacy.
 4. The full M0 and M1 issue list (titles, acceptance criteria, labels, dependencies) ready to create, plus epic-level issues for M2–M8.

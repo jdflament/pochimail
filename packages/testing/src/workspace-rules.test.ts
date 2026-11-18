@@ -103,7 +103,7 @@ describe("workspace rules (ADR 0001)", () => {
   });
 
   it("reads the repository URL from one place", () => {
-    expect(manifest(root).repository.url).toMatch(/github\.com\/jdflament\/pochimail/);
+    expect(manifest(root).repository.url).toMatch(/github\.com\/pochimail\/pochimail/);
     for (const dir of workspaces) expect(manifest(dir).repository, dir).toBeUndefined();
   });
 });
