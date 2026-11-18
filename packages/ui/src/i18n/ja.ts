@@ -141,6 +141,10 @@ export const ja = {
 
   "devGallery.title": entry("開発ギャラリー", []),
   "devGallery.description": entry("開発用の状態とモーションのプレビューです。", []),
+  "devGallery.dark": entry("ダークテーマ", []),
+  "devGallery.reduceMotion": entry("モーションを減らす", []),
+  "devGallery.states": entry("状態", []),
+  "devGallery.motion": entry("モーション", []),
   "action.close": entry("閉じる", []),
   "action.undo": entry("元に戻す", []),
   "storageBar.description": entry("{summary}：{items}", ["summary", "items"]),

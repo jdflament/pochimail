@@ -161,6 +161,10 @@ export const messages = {
 
   "devGallery.title": entry("Dev gallery", []),
   "devGallery.description": entry("States and motion previews for development.", []),
+  "devGallery.dark": entry("Dark theme", []),
+  "devGallery.reduceMotion": entry("Reduce motion", []),
+  "devGallery.states": entry("States", []),
+  "devGallery.motion": entry("Motion", []),
   "storageBar.description": entry("{summary}: {items}", ["summary", "items"]),
   "storageBar.descriptionItem": entry("{size} {label}", ["size", "label"]),
   "storageBar.itemSeparator": entry(", ", []),
