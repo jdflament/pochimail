@@ -30,7 +30,11 @@ const setup = (initialPath = "/overview") => {
   const { port1, port2 } = new MessageChannel();
   port1.start();
   port2.start();
-  const state = { mailboxes: structuredClone(mailboxes), emit: (_e: EventOf<"app.events">) => {} };
+  const state = {
+    mailboxes: structuredClone(mailboxes),
+    emit: (_e: EventOf<"app.events">) => {},
+    progress: (_e: EventOf<"scan.progress">) => {},
+  };
   serveRpc(fromDomPort(port2), {
     procedures: {
       "app.state": () => ({ status: "ready" as const, hasConnectedAccount: true }),
@@ -55,7 +59,10 @@ const setup = (initialPath = "/overview") => {
         state.emit = emit;
         return undefined;
       },
-      "scan.progress": () => undefined,
+      "scan.progress": (_input, emit) => {
+        state.progress = emit;
+        return undefined;
+      },
     },
   });
   const client = createRpcClient(fromDomPort(port1));
@@ -121,5 +128,34 @@ describe("app frame", () => {
     expect(screen.getAllByRole("navigation")).toHaveLength(1);
     expect(screen.getAllByRole("button", { name: /Account:/ })).toHaveLength(1);
     expect(screen.getByRole("button", { name: /Teams/ }).hasAttribute("disabled")).toBe(true);
+  });
+
+  it("shows a category as soon as scan progress brings mail, before the scan completes (guards D5 waiting for ScanCompleted)", async () => {
+    const state = setup();
+    const nav = await sidebar();
+    await waitFor(() => expect(nav.getByRole("link", { name: /People/ })).toBeTruthy());
+    await waitFor(() => expect(state.progress).not.toBe(undefined));
+    state.mailboxes.a1 = { ...zero, people: 10, newsletters: 5, promotions: 4 };
+    state.progress({ accountId: "a1", phase: "classifying", processed: 4, total: 100 });
+    expect(await nav.findByRole("link", { name: /Promotions/ })).toBeTruthy();
+  });
+
+  it("tabs through the switcher, then Overview, then the categories in order (guards a rail or tab bar that reorders focus)", async () => {
+    setup();
+    const nav = await sidebar();
+    await waitFor(() => expect(nav.getByRole("link", { name: /People/ })).toBeTruthy());
+    const focused: string[] = [];
+    for (let i = 0; i < 4; i++) {
+      await userEvent.tab();
+      focused.push(
+        document.activeElement?.getAttribute("aria-label") ??
+          document.activeElement?.textContent ??
+          "",
+      );
+    }
+    expect(focused[0]).toMatch(/^Account:/);
+    expect(focused[1]).toBe("Overview");
+    expect(focused[2]).toMatch(/^People/);
+    expect(focused[3]).toMatch(/^Records/);
   });
 });

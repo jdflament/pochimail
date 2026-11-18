@@ -124,6 +124,28 @@ export const repositoriesChecks: readonly Check<H>[] = [
     },
   ),
   check(
+    "countByCategory counts only the selected accounts and lists every category (guards counts leaking across accounts)",
+    async (h) => {
+      const other = "acc-2" as AccountId;
+      await write(h, (tx) =>
+        tx.repositories.messages.upsertMany([
+          makeIncomingMessage(1),
+          makeIncomingMessage(2),
+          makeIncomingMessage(3, { accountId: other }),
+        ]),
+      );
+      await write(h, (tx) =>
+        tx.repositories.messages.setCategory(WS_A, makeIncomingMessage(1).id, "newsletters"),
+      );
+      const one = unwrap(await h.uow.reads.messages.countByCategory(WS_A, [ACCOUNT_1]));
+      expect(Object.values(one).reduce((a, b) => a + b, 0)).toBe(2);
+      expect(one.newsletters).toBe(1);
+      expect(one.promotions).toBe(0);
+      const none = unwrap(await h.uow.reads.messages.countByCategory(WS_A, []));
+      expect(Object.values(none).every((n) => n === 0)).toBe(true);
+    },
+  ),
+  check(
     "setCategory on an unknown message is NotFound (guards silently ignoring a bad id)",
     async (h) => {
       await write(h, async (tx) => {

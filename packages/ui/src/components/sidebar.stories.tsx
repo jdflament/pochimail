@@ -1,4 +1,17 @@
-import { AccountSwitcher } from "@pochimail/ui/components/account-switcher";
+import {
+  AccountSwitcher,
+  AccountSwitcherContent,
+  AccountSwitcherGroup,
+  AccountSwitcherItem,
+  AccountSwitcherLabel,
+  AccountSwitcherTrigger,
+  ALL_ACCOUNTS,
+} from "@pochimail/ui/components/account-switcher";
+import {
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from "@pochimail/ui/components/dropdown-menu";
 import {
   Sidebar,
   SidebarBrand,
@@ -19,11 +32,13 @@ import {
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import {
   BellIcon,
+  ChevronDownIcon,
   FileTextIcon,
   KeyRoundIcon,
   LayoutGridIcon,
   NewspaperIcon,
   PaperclipIcon,
+  PlusIcon,
   SettingsIcon,
   ShoppingBagIcon,
   TagIcon,
@@ -56,6 +71,7 @@ function Frame({
   categories?: readonly (typeof CATEGORIES)[number][];
 }) {
   const [account, setAccount] = useState<string | null>(null);
+  const current = ACCOUNTS.find((a) => a.id === account)?.label ?? "All accounts";
   return (
     <div style={{ width, height: 640 }} className="max-w-full overflow-hidden border border-border">
       <SidebarProvider>
@@ -63,27 +79,49 @@ function Frame({
           <Sidebar>
             <SidebarHeader>
               <SidebarBrand>Pochimail</SidebarBrand>
-              <AccountSwitcher
-                accounts={ACCOUNTS}
-                value={account}
-                onValueChange={setAccount}
-                onAddAccount={() => {}}
-                labels={{ menu: "Account", all: "All accounts", add: "Add another account" }}
-              />
+              <AccountSwitcher>
+                <AccountSwitcherTrigger aria-label={`Account: ${current}`}>
+                  <UsersIcon aria-hidden="true" />
+                  <AccountSwitcherLabel>{current}</AccountSwitcherLabel>
+                  <ChevronDownIcon
+                    aria-hidden="true"
+                    className="@min-[560px]:@max-[960px]:hidden"
+                  />
+                </AccountSwitcherTrigger>
+                <AccountSwitcherContent>
+                  <DropdownMenuLabel>Account</DropdownMenuLabel>
+                  <AccountSwitcherGroup
+                    value={account ?? ALL_ACCOUNTS}
+                    onValueChange={(next) => setAccount(next === ALL_ACCOUNTS ? null : next)}
+                  >
+                    <AccountSwitcherItem value={ALL_ACCOUNTS}>All accounts</AccountSwitcherItem>
+                    {ACCOUNTS.map((a) => (
+                      <AccountSwitcherItem key={a.id} value={a.id}>
+                        {a.label}
+                      </AccountSwitcherItem>
+                    ))}
+                  </AccountSwitcherGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <PlusIcon aria-hidden="true" />
+                    Add another account
+                  </DropdownMenuItem>
+                </AccountSwitcherContent>
+              </AccountSwitcher>
             </SidebarHeader>
             <SidebarContent aria-label="Main navigation">
               <SidebarGroup>
                 <SidebarGroupLabel>Email</SidebarGroupLabel>
                 <SidebarMenu>
                   <SidebarMenuItem>
-                    <SidebarMenuButton href="#overview" isActive>
+                    <SidebarMenuButton href="#overview" isActive tooltip="Overview">
                       <LayoutGridIcon />
                       <SidebarMenuLabel>Overview</SidebarMenuLabel>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                   {categories.map(([label, Icon, count]) => (
                     <SidebarMenuItem key={label} reach="wide">
-                      <SidebarMenuButton href="#category" tone="muted">
+                      <SidebarMenuButton href="#category" tone="muted" tooltip={label}>
                         <Icon />
                         <SidebarMenuLabel>{label}</SidebarMenuLabel>
                         <SidebarMenuBadge>{count.toLocaleString("en")}</SidebarMenuBadge>
@@ -103,7 +141,7 @@ function Frame({
                     ] as const
                   ).map(([label, Icon]) => (
                     <SidebarMenuItem key={label}>
-                      <SidebarMenuButton href={`#${label}`}>
+                      <SidebarMenuButton href={`#${label}`} tooltip={label}>
                         <Icon />
                         <SidebarMenuLabel>{label}</SidebarMenuLabel>
                       </SidebarMenuButton>
@@ -115,7 +153,7 @@ function Frame({
             <SidebarFooter>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton asChild tone="muted">
+                  <SidebarMenuButton asChild tone="muted" tooltip="Teams">
                     <button type="button" disabled aria-disabled="true">
                       <UsersIcon />
                       <SidebarMenuLabel>Teams</SidebarMenuLabel>
@@ -151,8 +189,10 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const FullSidebar: Story = { args: { width: 1100 } };
+/** 760-960: rail, content in a rounded panel. */
 export const IconRail: Story = { args: { width: 860 } };
-export const IconRailNarrowWindow: Story = { args: { width: 720 } };
+/** 560-760: rail, edge to edge (the desktop window minimum is 720). */
+export const IconRailEdgeToEdge: Story = { args: { width: 720 } };
 export const BottomTabs: Story = { args: { width: 420 } };
 /** Empty categories are the caller's to omit (D5): here only People and Newsletters have mail. */
 export const HiddenEmptyCategories: Story = {

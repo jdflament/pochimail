@@ -1,96 +1,100 @@
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@pochimail/ui/components/dropdown-menu";
 import { cn } from "@pochimail/ui/lib/utils";
-import { ChevronDownIcon, PlusIcon, UsersIcon } from "lucide-react";
+import { cva, type VariantProps } from "class-variance-authority";
 import type * as React from "react";
 
-type AccountOption = { id: string; label: string };
+/** The radio value of "All accounts" (an account id never equals it). */
+const ALL_ACCOUNTS = "__all__";
 
-type AccountSwitcherLabels = {
-  /** The menu's accessible name, e.g. "Account". */
-  menu: string;
-  /** "All accounts". */
-  all: string;
-  /** "Add another account". */
-  add: string;
-};
+const accountSwitcherTriggerVariants = cva(
+  "flex min-h-10 min-w-0 items-center gap-2 rounded-[10px] px-3 text-start text-[15px] outline-hidden focus-visible:ring-[3px] focus-visible:ring-ring/50 @max-[960px]:justify-center @max-[960px]:px-0 @min-[560px]:@max-[960px]:w-full [&_svg]:size-[18px] [&_svg]:shrink-0",
+  {
+    variants: {
+      variant: {
+        outline: "border border-border bg-background",
+        ghost: "hover:bg-accent",
+      },
+    },
+    defaultVariants: { variant: "outline" },
+  },
+);
 
-type AccountSwitcherProps = Omit<React.ComponentProps<"button">, "value" | "onChange"> & {
-  accounts: readonly AccountOption[];
-  /** The selected account id, or `null` for all accounts. */
-  value: string | null;
-  onValueChange: (accountId: string | null) => void;
-  onAddAccount: () => void;
-  labels: AccountSwitcherLabels;
-};
+/**
+ * Composition: <AccountSwitcher><AccountSwitcherTrigger/><AccountSwitcherContent>
+ * <AccountSwitcherGroup><AccountSwitcherItem/>…</AccountSwitcherGroup> …menu items…</AccountSwitcherContent>.
+ * The menu's extras (label, separator, "Add another account") are the DropdownMenu parts as they are.
+ */
+function AccountSwitcher({ ...props }: React.ComponentProps<typeof DropdownMenu>) {
+  return <DropdownMenu {...props} />;
+}
 
-const ALL = "__all__";
-
-/** A DropdownMenu of radio items: All accounts, one per account, then "Add another account". */
-function AccountSwitcher({
+function AccountSwitcherTrigger({
   className,
-  accounts,
-  value,
-  onValueChange,
-  onAddAccount,
-  labels,
+  variant,
   ...props
-}: AccountSwitcherProps) {
-  const current = accounts.find((account) => account.id === value)?.label ?? labels.all;
+}: Omit<React.ComponentProps<"button">, "type"> &
+  VariantProps<typeof accountSwitcherTriggerVariants>) {
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button
-          type="button"
-          data-slot="account-switcher"
-          aria-label={`${labels.menu}: ${current}`}
-          className={cn(
-            "flex min-h-10 min-w-0 items-center gap-2 rounded-[10px] border border-border bg-background px-3 text-start text-[15px] outline-hidden focus-visible:ring-[3px] focus-visible:ring-ring/50 @max-[960px]:justify-center @max-[960px]:px-0 @min-[560px]:@max-[960px]:w-full [&_svg]:size-[18px] [&_svg]:shrink-0",
-            className,
-          )}
-          {...props}
-        >
-          <UsersIcon aria-hidden="true" />
-          <span className="min-w-0 flex-1 truncate font-medium @min-[560px]:@max-[960px]:sr-only">
-            {current}
-          </span>
-          <ChevronDownIcon aria-hidden="true" className="@min-[560px]:@max-[960px]:hidden" />
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="min-w-56">
-        <DropdownMenuLabel>{labels.menu}</DropdownMenuLabel>
-        <DropdownMenuRadioGroup
-          value={value ?? ALL}
-          onValueChange={(next) => onValueChange(next === ALL ? null : next)}
-        >
-          <DropdownMenuRadioItem value={ALL}>{labels.all}</DropdownMenuRadioItem>
-          {accounts.map((account) => (
-            <DropdownMenuRadioItem key={account.id} value={account.id}>
-              {account.label}
-            </DropdownMenuRadioItem>
-          ))}
-        </DropdownMenuRadioGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={onAddAccount}>
-          <PlusIcon aria-hidden="true" />
-          {labels.add}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <DropdownMenuTrigger asChild>
+      <button
+        type="button"
+        data-slot="account-switcher-trigger"
+        className={cn(accountSwitcherTriggerVariants({ variant }), className)}
+        {...props}
+      />
+    </DropdownMenuTrigger>
   );
 }
 
+/** The current account's name: hidden (still read aloud) in the icon rail. */
+function AccountSwitcherLabel({ className, ...props }: React.ComponentProps<"span">) {
+  return (
+    <span
+      data-slot="account-switcher-label"
+      className={cn(
+        "min-w-0 flex-1 truncate font-medium @min-[560px]:@max-[960px]:sr-only",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+function AccountSwitcherContent({
+  className,
+  ...props
+}: React.ComponentProps<typeof DropdownMenuContent>) {
+  return (
+    <DropdownMenuContent
+      data-slot="account-switcher-content"
+      align="start"
+      className={cn("min-w-56", className)}
+      {...props}
+    />
+  );
+}
+
+function AccountSwitcherGroup({ ...props }: React.ComponentProps<typeof DropdownMenuRadioGroup>) {
+  return <DropdownMenuRadioGroup data-slot="account-switcher-group" {...props} />;
+}
+
+function AccountSwitcherItem({ ...props }: React.ComponentProps<typeof DropdownMenuRadioItem>) {
+  return <DropdownMenuRadioItem data-slot="account-switcher-item" {...props} />;
+}
+
 export {
-  type AccountOption,
   AccountSwitcher,
-  type AccountSwitcherLabels,
-  type AccountSwitcherProps,
+  AccountSwitcherContent,
+  AccountSwitcherGroup,
+  AccountSwitcherItem,
+  AccountSwitcherLabel,
+  AccountSwitcherTrigger,
+  ALL_ACCOUNTS,
+  accountSwitcherTriggerVariants,
 };

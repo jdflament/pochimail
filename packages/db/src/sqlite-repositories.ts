@@ -37,6 +37,7 @@ export function createSqliteRepositories(db: Database): {
     get: lift(core.messages.get),
     query: lift(core.messages.query),
     latestSequence: lift(core.messages.latestSequence),
+    countByCategory: lift(core.messages.countByCategory),
   };
   const derived = { get: lift(core.derived.get), list: lift(core.derived.list) };
   const threads = { get: lift(core.threads.get) };

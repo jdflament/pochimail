@@ -1,24 +1,65 @@
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@pochimail/ui/components/tooltip";
 import { cn } from "@pochimail/ui/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Slot } from "radix-ui";
-import type * as React from "react";
+import * as React from "react";
 
 /*
- * Note: Tailwind's `@max-[N]` is "narrower than N", so `@max-[560px]` pairs with `@min-[560px]` with no gap.
  * Responsive frame (brief §6 › Responsive layout). One markup, restyled by the width of the
  * SidebarProvider box (container queries, not the viewport, so Storybook and tests can resize it):
  *   >= 960px  full sidebar
- *   560-959   icon rail (labels, counts, categories and topics hide)
+ *   760-959   icon rail, content in a rounded panel
+ *   560-759   icon rail, edge to edge (the ledger drops its bar, secondary hints hide)
  *   < 560     top bar (SidebarHeader) + bottom tabs (the nav); the content never remounts.
+ * Tailwind's `@max-[N]` means "narrower than N", so `@max-[560px]` pairs with `@min-[560px]` with no gap.
+ * Page content hides its own secondary hints with `@max-[760px]:hidden`.
  */
 
+const SIDEBAR_BREAKPOINTS = { full: 960, rail: 760, tabs: 560 } as const;
+
+type SidebarLayoutMode = "full" | "rail" | "compact" | "tabs";
+
+/** Mirrors the container-query steps above; used for behaviour that CSS cannot express (tooltips). */
+const sidebarLayoutFor = (width: number): SidebarLayoutMode =>
+  width >= SIDEBAR_BREAKPOINTS.full
+    ? "full"
+    : width >= SIDEBAR_BREAKPOINTS.rail
+      ? "rail"
+      : width >= SIDEBAR_BREAKPOINTS.tabs
+        ? "compact"
+        : "tabs";
+
+const SidebarLayoutContext = React.createContext<SidebarLayoutMode>("full");
+
 function SidebarProvider({ className, ...props }: React.ComponentProps<"div">) {
+  const ref = React.useRef<HTMLDivElement>(null);
+  const [mode, setMode] = React.useState<SidebarLayoutMode>("full");
+  React.useEffect(() => {
+    const node = ref.current;
+    if (node === null || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry !== undefined) setMode(sidebarLayoutFor(entry.contentRect.width));
+    });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
   return (
-    <div
-      data-slot="sidebar-provider"
-      className={cn("@container h-full min-h-0 w-full", className)}
-      {...props}
-    />
+    <SidebarLayoutContext.Provider value={mode}>
+      <TooltipProvider delayDuration={300}>
+        <div
+          ref={ref}
+          data-slot="sidebar-provider"
+          data-layout={mode}
+          className={cn("@container h-full min-h-0 w-full", className)}
+          {...props}
+        />
+      </TooltipProvider>
+    </SidebarLayoutContext.Provider>
   );
 }
 
@@ -135,8 +176,6 @@ const sidebarMenuItemVariants = cva("list-none @max-[560px]:flex-1", {
     reach: {
       always: "",
       wide: "@max-[960px]:hidden",
-      // Not part of the phone tab bar (Teams).
-      "not-tabs": "@max-[560px]:hidden",
     },
   },
   defaultVariants: { reach: "always" },
@@ -174,6 +213,8 @@ type SidebarMenuButtonProps = React.ComponentProps<"a"> &
     asChild?: boolean;
     /** Marks the current page: sets `aria-current="page"`. */
     isActive?: boolean;
+    /** The item's name as a tooltip; shown only while the label is hidden (icon rail). */
+    tooltip?: string;
   };
 
 function SidebarMenuButton({
@@ -181,10 +222,12 @@ function SidebarMenuButton({
   asChild = false,
   isActive = false,
   tone,
+  tooltip,
   ...props
 }: SidebarMenuButtonProps) {
+  const mode = React.useContext(SidebarLayoutContext);
   const Comp = asChild ? Slot.Root : "a";
-  return (
+  const button = (
     <Comp
       data-slot="sidebar-menu-button"
       data-active={isActive}
@@ -192,6 +235,14 @@ function SidebarMenuButton({
       className={cn(sidebarMenuButtonVariants({ tone }), className)}
       {...props}
     />
+  );
+  if (tooltip === undefined) return button;
+  // Always wrapped (so a resize never remounts the item); only the rail opens it.
+  return (
+    <Tooltip {...(mode === "rail" || mode === "compact" ? {} : { open: false })}>
+      <TooltipTrigger asChild>{button}</TooltipTrigger>
+      <TooltipContent side="right">{tooltip}</TooltipContent>
+    </Tooltip>
   );
 }
 
@@ -228,7 +279,11 @@ function SidebarInset({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="sidebar-inset"
-      className={cn("min-h-0 min-w-0 overflow-y-auto @max-[560px]:row-start-2", className)}
+      className={cn(
+        // >= 760px the content sits in a rounded panel; below it, it runs edge to edge.
+        "min-h-0 min-w-0 overflow-y-auto @min-[760px]:m-2 @min-[760px]:ms-0 @min-[760px]:rounded-2xl @min-[760px]:bg-card @max-[560px]:row-start-2",
+        className,
+      )}
       {...props}
     />
   );

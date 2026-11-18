@@ -37,6 +37,7 @@
     "./events/bus": "./src/events/bus.ts",
     "./events/batching": "./src/events/batching.ts",
     "./ports/id-generator": "./src/ports/id-generator.ts",
+    "./use-cases/count-categories": "./src/use-cases/count-categories.ts",
     "./use-cases/apply-action": "./src/use-cases/apply-action.ts",
     "./use-cases/undo-action": "./src/use-cases/undo-action.ts",
     "./use-cases/action-events": "./src/use-cases/action-events.ts",
