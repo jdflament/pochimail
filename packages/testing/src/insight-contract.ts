@@ -401,6 +401,28 @@ export const insightChecks: readonly Check<InsightHarness>[] = [
   ),
 ];
 
+/** The late-mail case: a message dated before the last digest, but stored after it. */
+export const lateMailCheck: Check<InsightHarness> = check(
+  "mail delivered late with an old date still appears in the next digest (guards a digest cursor keyed on the message date)",
+  async (h) => {
+    const base = h.clock.now().getTime();
+    const at = (ms: number) => new Date(base + ms).toISOString();
+    await seed(h, { 1: { message: { receivedAt: at(-3_000_000) }, category: "newsletters" } });
+    const build = new BuildDigest({ uow: h.uow, clock: h.clock });
+    const request = { workspaceId: WS_A, accountId: ACCOUNT_1 };
+    expect(unwrap(await build.execute(request, live())).newMessageCount).toBe(1);
+
+    h.clock.advance(3_600_000);
+    await seed(h, { 2: { message: { receivedAt: at(-9_000_000) }, category: "promotions" } });
+    const second = unwrap(await build.execute(request, live()));
+    expect(second.newMessageCount).toBe(1);
+    expect(second.byCategory).toEqual({ promotions: 1 });
+    // A re-sync of the same mail is not new again.
+    await seed(h, { 2: { message: { receivedAt: at(-9_000_000) }, category: "promotions" } });
+    expect(unwrap(await build.execute(request, live())).newMessageCount).toBe(0);
+  },
+);
+
 export function insightContract(make: () => InsightHarness | Promise<InsightHarness>): void {
-  registerContract("Signals, suggestions and digest", insightChecks, make);
+  registerContract("Signals, suggestions and digest", [...insightChecks, lateMailCheck], make);
 }

@@ -6,7 +6,7 @@ import type { Job, JobQueue } from "@pochimail/core/ports/job-queue";
 import { err, ok } from "@pochimail/core/result";
 import { z } from "zod";
 import { exclusiveResult, type Storage } from "./open-storage.ts";
-import { guardPayload } from "./payload-guard.ts";
+import { accountIdOf, guardPayload } from "./payload-guard.ts";
 
 export const DEFAULT_LEASE_MS = 30_000;
 
@@ -59,8 +59,8 @@ export function createSqliteJobQueue(
         if (!guarded.ok) return guarded;
         try {
           db.prepare(
-            `INSERT OR IGNORE INTO job (id, workspace_id, type, payload, idempotency_key, run_at, run_at_ms)
-             VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT OR IGNORE INTO job (id, workspace_id, type, payload, idempotency_key, run_at, run_at_ms, account_id)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
           ).run(
             randomUUID(),
             workspaceId,
@@ -69,6 +69,7 @@ export function createSqliteJobQueue(
             request.idempotencyKey,
             request.runAt ?? null,
             request.runAt === undefined ? 0 : Date.parse(request.runAt),
+            accountIdOf(request.payload),
           );
           return ok(undefined);
         } catch (cause) {

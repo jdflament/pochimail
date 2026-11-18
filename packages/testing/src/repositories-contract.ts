@@ -1,8 +1,9 @@
-import type { ActionId, MessageId, TopicId } from "@pochimail/core/ids";
+import type { AccountId, ActionId, MessageId, TopicId } from "@pochimail/core/ids";
 import type { Page } from "@pochimail/core/ports/common";
 import { ok, unwrap } from "@pochimail/core/result";
 import { expect } from "vitest";
 import { type Check, check, registerContract } from "./contract.ts";
+import { makeDerived } from "./derived-contract.ts";
 import {
   ACCOUNT_1,
   makeAccount,
@@ -15,6 +16,7 @@ import {
   WS_A,
   WS_B,
 } from "./fixtures.ts";
+import { makeSignal } from "./signal-repository-contract.ts";
 import type { UnitOfWorkHarness } from "./unit-of-work-contract.ts";
 
 type H = UnitOfWorkHarness;
@@ -228,6 +230,88 @@ export const repositoriesChecks: readonly Check<H>[] = [
         ok({ scope: "inbox", token: "t1" }),
       );
       expect(await h.uow.reads.cursors.get(WS_B, ACCOUNT_1, "inbox")).toEqual(ok(null));
+    },
+  ),
+  check(
+    "removing an account deletes every row scoped to it, its pending events and jobs, anonymises its log entries, and changes nothing else (guards leftovers of a removed account and collateral deletes)",
+    async (h) => {
+      const other = "acc-2" as AccountId;
+      const keep = makeIncomingMessage(9, { accountId: other });
+      const event = (account: AccountId, id: string) =>
+        ({
+          kind: "event",
+          event: {
+            id,
+            type: "MessagesUpserted",
+            version: 1,
+            workspaceId: WS_A,
+            occurredAt: "2026-01-01T00:00:00.000Z",
+            payload: { accountId: account, count: 1 },
+          },
+        }) as const;
+      const job = (account: AccountId, key: string) =>
+        ({
+          kind: "job",
+          workspaceId: WS_A,
+          job: { type: "sync", payload: { accountId: account }, idempotencyKey: key },
+        }) as const;
+      await write(h, async (tx) => {
+        await tx.repositories.accounts.save(makeAccount());
+        await tx.repositories.accounts.save(makeAccount({ id: other, address: "two@example.com" }));
+        await tx.repositories.messages.upsertMany([makeIncomingMessage(1), keep]);
+        await tx.repositories.derived.save(makeDerived(1));
+        await tx.repositories.derived.save(makeDerived(9, { accountId: other }));
+        await tx.repositories.signals.replaceForMessages(WS_A, ["msg-1", "msg-9"] as MessageId[], [
+          makeSignal(1),
+          makeSignal(9),
+        ]);
+        await tx.repositories.threads.upsert(makeThread());
+        await tx.repositories.senders.upsert(makeSender());
+        await tx.repositories.suggestions.save(makeSuggestion());
+        await tx.repositories.cursors.set(WS_A, ACCOUNT_1, { scope: "inbox", token: "t1" });
+        await tx.repositories.cursors.set(WS_A, other, { scope: "inbox", token: "t2" });
+        await tx.repositories.digestState.set(WS_A, ACCOUNT_1, "2026-01-01T00:00:00.000Z");
+        await tx.repositories.actionLog.append(
+          makeActionLog(1, { command: { kind: "archive", messageIds: ["msg-1" as MessageId] } }),
+        );
+        await tx.repositories.topics.save(makeTopic());
+        await tx.outbox.append(event(ACCOUNT_1, "e-gone"));
+        await tx.outbox.append(event(other, "e-kept"));
+        await tx.outbox.append(job(ACCOUNT_1, "j-gone"));
+        await tx.outbox.append(job(other, "j-kept"));
+      });
+      await write(h, (tx) => tx.repositories.accounts.remove(WS_A, ACCOUNT_1));
+      const reads = h.uow.reads;
+      expect(unwrap(await reads.accounts.list(WS_A)).map((a) => a.id)).toEqual([other]);
+      expect((await reads.messages.get(WS_A, "msg-1" as MessageId)).ok).toBe(false);
+      expect((await reads.messages.get(WS_A, keep.id)).ok).toBe(true);
+      expect((await reads.derived.get(WS_A, "msg-1" as MessageId)).ok).toBe(false);
+      expect((await reads.derived.get(WS_A, "msg-9" as MessageId)).ok).toBe(true);
+      expect(
+        unwrap(await reads.signals.listForMessages(WS_A, ["msg-1", "msg-9"] as MessageId[])).map(
+          (s) => s.messageId,
+        ),
+      ).toEqual(["msg-9"]);
+      expect((await reads.threads.get(WS_A, makeThread().id)).ok).toBe(false);
+      expect((await reads.senders.get(WS_A, ACCOUNT_1, makeSender().address)).ok).toBe(false);
+      expect((await reads.suggestions.get(WS_A, makeSuggestion().id)).ok).toBe(false);
+      expect(unwrap(await reads.cursors.get(WS_A, ACCOUNT_1, "inbox"))).toBeNull();
+      expect(unwrap(await reads.cursors.get(WS_A, other, "inbox"))).toEqual({
+        scope: "inbox",
+        token: "t2",
+      });
+      expect(unwrap(await reads.digestState.get(WS_A, ACCOUNT_1))).toBeNull();
+      expect(unwrap(await reads.topics.list(WS_A))).toHaveLength(1);
+      const pending = JSON.stringify(await h.committedOutbox());
+      expect(pending).toContain("e-kept");
+      expect(pending).toContain("j-kept");
+      expect(pending).not.toContain("e-gone");
+      expect(pending).not.toContain("j-gone");
+      const entry = unwrap(await reads.actionLog.get(WS_A, makeActionLog(1).id));
+      expect(entry.command.kind).toBe("archive");
+      expect(entry.outcome).toBe("applied");
+      expect(entry.at).toBe(makeActionLog(1).at);
+      expect(JSON.stringify(entry)).not.toContain('msg-1"');
     },
   ),
   check("topics list returns every saved topic (guards a repository losing rows)", async (h) => {

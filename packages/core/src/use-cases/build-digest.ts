@@ -52,17 +52,28 @@ export class BuildDigest {
       if (!last.ok) return last;
       since = last.value ?? FIRST_DIGEST_SINCE;
     }
+    // "New" means stored since the last digest (ingest sequence), not dated after it: mail that
+    // is delivered late with an old date must still show up. An explicit `since` is a date filter.
+    const lastSequence = await uow.reads.digestState.getSequence(
+      request.workspaceId,
+      request.accountId,
+    );
+    if (!lastSequence.ok) return lastSequence;
+    const newest = await uow.reads.messages.latestSequence(request.workspaceId, request.accountId);
+    if (!newest.ok) return newest;
+    const byDate = request.since !== undefined;
     const fresh: { id: MessageId; category: Category }[] = [];
     let cursor: string | undefined;
     do {
       const page = await uow.reads.messages.query(request.workspaceId, {
         accountId: request.accountId,
         limit: PAGE,
+        ...(byDate ? {} : { afterSequence: lastSequence.value, throughSequence: newest.value }),
         ...(cursor === undefined ? {} : { cursor }),
       });
       if (!page.ok) return page;
       for (const m of page.value.items)
-        if (m.receivedAt > since) fresh.push({ id: m.id, category: m.category });
+        if (!byDate || m.receivedAt > since) fresh.push({ id: m.id, category: m.category });
       cursor = page.value.nextCursor ?? undefined;
     } while (cursor !== undefined);
 
@@ -98,6 +109,7 @@ export class BuildDigest {
         request.workspaceId,
         request.accountId,
         generatedAt,
+        newest.value,
       );
       if (!advanced.ok) return advanced;
       if (fresh.length === 0) return ok(undefined);

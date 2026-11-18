@@ -34,6 +34,19 @@ export const digestStateChecks: readonly Check<UnitOfWorkHarness>[] = [
       expect(unwrap(await h.uow.reads.digestState.get(WS_B, ACCOUNT_1))).toBeNull();
     },
   ),
+  check(
+    "setting the date alone keeps the sequence the last digest covered (guards a caller re-reporting the whole account)",
+    async (h) => {
+      const r = await h.uow.run(async (tx) => {
+        unwrap(await tx.repositories.digestState.set(WS_A, ACCOUNT_1, AT, 42));
+        unwrap(await tx.repositories.digestState.set(WS_A, ACCOUNT_1, LATER));
+        return ok(undefined);
+      });
+      expect(r.ok).toBe(true);
+      expect(unwrap(await h.uow.reads.digestState.getSequence(WS_A, ACCOUNT_1))).toBe(42);
+      expect(unwrap(await h.uow.reads.digestState.get(WS_A, ACCOUNT_1))).toBe(LATER);
+    },
+  ),
 ];
 
 export function digestStateContract(

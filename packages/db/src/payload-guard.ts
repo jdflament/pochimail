@@ -38,3 +38,12 @@ export function guardPayload(payload: unknown): Result<string, StorageError> {
   }
   return ok(json);
 }
+
+/** The `accountId` a payload names (events and jobs carry it), so account removal can purge them. */
+export function accountIdOf(payload: unknown): string | null {
+  const id =
+    typeof payload === "object" && payload !== null && "accountId" in payload
+      ? payload.accountId
+      : undefined;
+  return typeof id === "string" ? id : null;
+}

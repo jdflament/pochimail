@@ -30,6 +30,10 @@ interface Data {
   cursors: Map<string, SyncCursor>;
   signals: Map<string, StoredSignal>;
   digestState: Map<string, string>;
+  /** Ingest sequence per message key, plus the counter and each digest's covered sequence. */
+  messageSequence: Map<string, number>;
+  counters: Map<string, number>;
+  digestSequence: Map<string, number>;
   outbox: OutboxEntry[];
 }
 
@@ -45,6 +49,9 @@ const emptyData = (): Data => ({
   cursors: new Map(),
   signals: new Map(),
   digestState: new Map(),
+  messageSequence: new Map(),
+  counters: new Map(),
+  digestSequence: new Map(),
   outbox: [],
 });
 
@@ -69,6 +76,60 @@ const oldestFirst = (
     .filter((l) => l.workspaceId === ws && match(l))
     .sort((a, b) => byText(a.at, b.at) || byText(a.id, b.id))
     .map(copy);
+function inSequenceRange(
+  data: Data,
+  m: Message,
+  q: { afterSequence?: number; throughSequence?: number },
+): boolean {
+  const seq = data.messageSequence.get(key(m.workspaceId, m.id)) ?? 0;
+  return (
+    (q.afterSequence === undefined || seq > q.afterSequence) &&
+    (q.throughSequence === undefined || seq <= q.throughSequence)
+  );
+}
+
+/** Drops the account and everything that belongs to it; the action log is the audit trail. */
+function removeAccount(data: Data, ws: WorkspaceId, id: string): void {
+  const doomed = new Set<string>();
+  for (const [k, m] of data.messages)
+    if (m.workspaceId === ws && m.accountId === id) {
+      doomed.add(m.id);
+      data.messages.delete(k);
+      data.messageSequence.delete(k);
+    }
+  const owned = <T extends { workspaceId: string; accountId: string }>(map: Map<string, T>) => {
+    for (const [k, v] of map) if (v.workspaceId === ws && v.accountId === id) map.delete(k);
+  };
+  owned(data.threads);
+  owned(data.derived);
+  owned(data.senders);
+  owned(data.suggestions);
+  for (const [k, s] of data.signals)
+    if (s.workspaceId === ws && doomed.has(s.messageId)) data.signals.delete(k);
+  // Pending events and jobs of the account go; log entries about its mail are anonymised.
+  data.outbox = data.outbox.filter((e) => {
+    const payload = e.kind === "event" ? (e.event as { payload?: unknown }).payload : e.job.payload;
+    const owner = (payload as { accountId?: unknown } | null)?.accountId;
+    return owner !== id;
+  });
+  for (const [k, log] of data.actionLog) {
+    if (log.workspaceId !== ws || !doomed.has(log.command.messageIds[0] ?? "")) continue;
+    const redact = <C extends { kind: string; messageIds: readonly string[] }>(c: C) => ({
+      kind: c.kind,
+      messageIds: c.messageIds.map((_, i) => `removed-${i + 1}`),
+    });
+    data.actionLog.set(k, {
+      ...log,
+      command: redact(log.command) as never,
+      inverse: log.inverse === null ? null : (redact(log.command) as never),
+    });
+  }
+  data.accounts.delete(key(ws, id));
+  for (const k of [...data.cursors.keys()])
+    if (k.startsWith(key(ws, id, ""))) data.cursors.delete(k);
+  data.digestState.delete(key(ws, id));
+  data.digestSequence.delete(key(ws, id));
+}
 const byText = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
 
 export interface InMemoryUnitOfWork {
@@ -121,10 +182,20 @@ export function createInMemoryUnitOfWork(): InMemoryUnitOfWork {
                   m.workspaceId === ws &&
                   m.accountId === q.accountId &&
                   (q.category === undefined || m.category === q.category) &&
-                  (q.senderAddress === undefined || m.from === q.senderAddress),
+                  (q.senderAddress === undefined || m.from === q.senderAddress) &&
+                  inSequenceRange(data(), m, q),
               )
               .sort((a, b) => byText(b.receivedAt, a.receivedAt) || byText(a.id, b.id));
             return ok(paginate(rows, q));
+          }) as never,
+        latestSequence: (ws, acc) =>
+          guarded(() => {
+            const d = data();
+            let newest = 0;
+            for (const m of d.messages.values())
+              if (m.workspaceId === ws && m.accountId === acc)
+                newest = Math.max(newest, d.messageSequence.get(key(ws, m.id)) ?? 0);
+            return ok(newest);
           }) as never,
       },
       threads: { get: (ws, id) => found(data().threads, key(ws, id), "Thread") },
@@ -208,6 +279,8 @@ export function createInMemoryUnitOfWork(): InMemoryUnitOfWork {
       },
       digestState: {
         get: (ws, acc) => guarded(() => ok(data().digestState.get(key(ws, acc)) ?? null)) as never,
+        getSequence: (ws, acc) =>
+          guarded(() => ok(data().digestSequence.get(key(ws, acc)) ?? 0)) as never,
       },
     };
   }
@@ -224,6 +297,12 @@ export function createInMemoryUnitOfWork(): InMemoryUnitOfWork {
       accounts: {
         ...r.accounts,
         save: (a) => put(() => data().accounts, key(a.workspaceId, a.id), a),
+        remove: async (ws, id) => {
+          const failure = fail();
+          if (failure) return err(failure);
+          removeAccount(data(), ws, id);
+          return ok(undefined);
+        },
       },
       messages: {
         ...r.messages,
@@ -233,6 +312,11 @@ export function createInMemoryUnitOfWork(): InMemoryUnitOfWork {
           for (const m of messages) {
             const k = key(m.workspaceId, m.id);
             const existing = data().messages.get(k);
+            if (!existing) {
+              const next = (data().counters.get("ingest") ?? 0) + 1;
+              data().counters.set("ingest", next);
+              data().messageSequence.set(k, next);
+            }
             // Re-running with the same input changes nothing; a known category survives.
             data().messages.set(
               k,
@@ -299,7 +383,13 @@ export function createInMemoryUnitOfWork(): InMemoryUnitOfWork {
       },
       digestState: {
         ...r.digestState,
-        set: (ws, acc, at) => put(() => data().digestState, key(ws, acc), at),
+        set: async (ws, acc, at, lastSequence) => {
+          const failure = fail();
+          if (failure) return err(failure);
+          data().digestState.set(key(ws, acc), at);
+          if (lastSequence !== undefined) data().digestSequence.set(key(ws, acc), lastSequence);
+          return ok(undefined);
+        },
       },
     };
   }
