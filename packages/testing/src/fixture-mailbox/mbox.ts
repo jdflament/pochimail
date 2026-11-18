@@ -134,12 +134,12 @@ export interface RawMessage {
   readonly body: string;
 }
 
-/** Splits an mbox into messages. Header names are lower-cased; folded lines are unfolded. */
-export function splitMbox(mbox: string): RawMessage[] {
-  const messages: RawMessage[] = [];
+/** The raw text of each message in an mbox (`\n` line ends, `>From ` escaping not yet undone). */
+export function splitMboxRaw(mbox: string): string[] {
+  const messages: string[] = [];
   let current: string[] | null = null;
   const finish = () => {
-    if (current) messages.push(parseRaw(current.join("\n")));
+    if (current) messages.push(current.join("\n"));
   };
   for (const line of mbox.split("\n")) {
     if (line.startsWith("From ")) {
@@ -149,6 +149,11 @@ export function splitMbox(mbox: string): RawMessage[] {
   }
   finish();
   return messages;
+}
+
+/** Splits an mbox into messages. Header names are lower-cased; folded lines are unfolded. */
+export function splitMbox(mbox: string): RawMessage[] {
+  return splitMboxRaw(mbox).map(parseRaw);
 }
 
 function parseRaw(raw: string): RawMessage {
