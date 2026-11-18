@@ -1,13 +1,10 @@
 import { EventEmitter } from "node:events";
 import { describe, expect, it } from "vitest";
-import { createEchoClient, serveEcho, type Transport } from "../shared/ipc/echo.ts";
+import { createRpcClient } from "../shared/ipc/client.ts";
+import { serveRpc } from "../shared/ipc/server.ts";
+import { fromDomPort } from "../shared/ipc/transport.ts";
 import { acceptPorts } from "../worker/ports.ts";
 import { linkWorkerOnEveryLoad } from "./worker-link.ts";
-
-const asTransport = (port: MessagePort): Transport => ({
-  post: (message) => port.postMessage(message),
-  onMessage: (handler) => port.addEventListener("message", (event) => handler(event.data)),
-});
 
 // Guards: after a renderer reload (Cmd+R) the page must get a working worker port again, not stay stuck on "Starting…".
 describe("worker connection across page loads", () => {
@@ -29,12 +26,15 @@ describe("worker connection across page loads", () => {
       },
       () => new MessageChannel() as never,
     );
-    // Worker side: real port-accepting code serving echo.
+    // Worker side: real port-accepting code serving app.state.
     const workerPorts: MessagePort[] = [];
     acceptPorts(parent as never, (port: MessagePort) => {
       workerPorts.push(port);
       port.start();
-      serveEcho(asTransport(port));
+      return serveRpc(fromDomPort(port), {
+        procedures: { "app.state": () => ({ status: "ready" as const }) },
+        subscriptions: {},
+      });
     });
 
     loads.emit("did-finish-load");
@@ -43,14 +43,14 @@ describe("worker connection across page loads", () => {
     expect(toRenderer).toHaveLength(2);
     const [firstPage, secondPage] = toRenderer as [MessagePort, MessagePort];
     secondPage.start();
-    await expect(createEchoClient(asTransport(secondPage)).echo("after reload")).resolves.toBe(
-      "after reload",
-    );
+    await expect(createRpcClient(fromDomPort(secondPage)).call("app.state")).resolves.toEqual({
+      status: "ready",
+    });
 
     firstPage.start();
-    await expect(createEchoClient(asTransport(firstPage), 50).echo("stale page")).rejects.toThrow(
-      "worker did not answer",
-    );
+    await expect(
+      createRpcClient(fromDomPort(firstPage), { timeoutMs: 50 }).call("app.state"),
+    ).rejects.toMatchObject({ code: "CLOSED" });
     firstPage.close();
     secondPage.close();
     for (const port of workerPorts) port.close();

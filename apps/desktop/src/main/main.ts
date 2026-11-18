@@ -6,20 +6,25 @@ import { createLogger } from "@pochimail/core/logger";
 import {
   app,
   BrowserWindow,
+  dialog,
+  ipcMain,
   MessageChannelMain,
   nativeImage,
   nativeTheme,
   safeStorage,
   session,
+  shell,
   utilityProcess,
 } from "electron";
+import { registerOsCalls } from "./os-calls.ts";
 import { createSecretVault, type SecretVault } from "./secret-vault.ts";
 import { hardenWebContents, isAppUrl, isRequestAllowed, webPreferences } from "./security.ts";
 import { keyProtection, loadOrCreateDatabaseKey } from "./storage-key.ts";
 import { linkWorkerOnEveryLoad } from "./worker-link.ts";
 import { bootWorker } from "./worker-start.ts";
 
-const devServerUrl = process.env.ELECTRON_RENDERER_URL;
+// A packaged app never honours the dev-server variable, so an environment override cannot point the window elsewhere.
+const devServerUrl = app.isPackaged ? undefined : process.env.ELECTRON_RENDERER_URL;
 const devServerOrigin = devServerUrl === undefined ? undefined : new URL(devServerUrl).origin;
 const rendererFile = join(import.meta.dirname, "../renderer/index.html");
 // Dev only: a packaged app gets its icon from the installer (electron-builder, apps/desktop/build); `electron .` would show Electron's.
@@ -154,7 +159,7 @@ const createWindow = (): void => {
 };
 
 app.on("web-contents-created", (_event, contents) =>
-  hardenWebContents(contents, (url) => isAppUrl(url, { devServerOrigin })),
+  hardenWebContents(contents, (url) => isAppUrl(url, { devServerOrigin, rendererFile })),
 );
 
 void app.whenReady().then(() => {
@@ -162,6 +167,19 @@ void app.whenReady().then(() => {
   if (devIconPath !== undefined && process.platform === "darwin")
     app.dock?.setIcon(nativeImage.createFromPath(devIconPath));
   lockDownSession();
+  registerOsCalls({
+    ipc: ipcMain,
+    openExternal: (url) => shell.openExternal(url),
+    showItemInFolder: (path) => shell.showItemInFolder(path),
+    chooseFolder: async () => {
+      const result = await dialog.showOpenDialog({
+        properties: ["openDirectory", "createDirectory"],
+      });
+      return result.canceled ? null : (result.filePaths[0] ?? null);
+    },
+    isAppUrl: (url) => isAppUrl(url, { devServerOrigin, rendererFile }),
+    appDataDirs: () => [app.getPath("userData")],
+  });
   createWindow();
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

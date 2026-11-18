@@ -1,20 +1,30 @@
-import { serveDeviceName } from "../shared/ipc/device-name.ts";
-import { serveEcho, type Transport } from "../shared/ipc/echo.ts";
+import { serveRpc } from "../shared/ipc/server.ts";
 import { createPlatformAdapter } from "../shared/platform.ts";
 import { acceptPorts } from "./ports.ts";
 import { acceptStart } from "./start.ts";
 
-// Runs inside Electron's utilityProcess. The composition root (core + adapters) will live here; for now it echoes.
+// Runs inside Electron's utilityProcess. The composition root (core + adapters) will live here; M4-02 wires real handlers.
+// Until then `app.state` and `device.name` answer; every other procedure returns a typed NOT_IMPLEMENTED error.
 const platform = createPlatformAdapter(process.platform, process.cwd());
 
 acceptPorts(process.parentPort, (port) => {
-  const transport: Transport = {
-    post: (message) => port.postMessage(message),
-    onMessage: (handler) => port.on("message", (portEvent) => handler(portEvent.data)),
-  };
-  serveEcho(transport);
-  serveDeviceName(transport, platform);
+  const dispose = serveRpc(
+    {
+      post: (message) => port.postMessage(message),
+      onMessage: (handler) => port.on("message", (portEvent) => handler(portEvent.data)),
+      onClose: (handler) => port.on("close", handler),
+      close: () => port.close(),
+    },
+    {
+      procedures: {
+        "app.state": () => ({ status: "ready" }),
+        "device.name": () => platform.deviceName(),
+      },
+      subscriptions: {},
+    },
+  );
   port.start();
+  return dispose;
 });
 
 // The database key and the keychain-backed SecretStore come from main; the composition root (M2-02) consumes them.

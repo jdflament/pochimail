@@ -1,3 +1,4 @@
+import { pathToFileURL } from "node:url";
 import type { WebContents, WebPreferences } from "electron";
 
 /** Hosts the app may reach. Empty on purpose: every outbound host is added with an ADR note (brief §5.10, docs/security/network.md). */
@@ -54,10 +55,13 @@ export const hardenWebContents = (
   contents.on("will-attach-webview", (event) => event.preventDefault());
 };
 
-/** True only for the app's own page: the dev server origin in dev, the packaged renderer file otherwise. */
+/**
+ * True only for the app's own page: the dev server origin (dev builds only, the caller passes none when packaged) or
+ * exactly the packaged renderer file. Any other `file:` path is refused.
+ */
 export const isAppUrl = (
   rawUrl: string,
-  options: { devServerOrigin?: string | undefined } = {},
+  options: { devServerOrigin?: string | undefined; rendererFile?: string | undefined } = {},
 ): boolean => {
   let url: URL;
   try {
@@ -66,7 +70,6 @@ export const isAppUrl = (
     return false;
   }
   if (options.devServerOrigin !== undefined) return url.origin === options.devServerOrigin;
-  return (
-    url.protocol === "file:" && decodeURIComponent(url.pathname).endsWith("/renderer/index.html")
-  );
+  if (options.rendererFile === undefined || url.protocol !== "file:") return false;
+  return url.pathname === pathToFileURL(options.rendererFile).pathname;
 };

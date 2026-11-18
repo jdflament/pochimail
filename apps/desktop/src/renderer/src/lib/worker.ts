@@ -1,25 +1,24 @@
-import { createDeviceNameClient } from "../../../shared/ipc/device-name.ts";
-import { createEchoClient, type Transport } from "../../../shared/ipc/echo.ts";
+import { createRpcClient, type RpcClient } from "../../../shared/ipc/client.ts";
+import { fromDomPort } from "../../../shared/ipc/transport.ts";
 
-export type WorkerClient = ReturnType<typeof createEchoClient> &
-  ReturnType<typeof createDeviceNameClient>;
+let connection: Promise<RpcClient> | undefined;
 
-/** Asks the preload for the worker MessagePort and wraps it in the typed RPC clients. */
-export const connectWorker = (): Promise<WorkerClient> =>
-  new Promise((resolve) => {
+/**
+ * Asks the preload for the worker MessagePort and wraps it in the typed RPC client. The preload hands the port over once,
+ * so this is idempotent: every caller (StrictMode double effects, remounts) gets the same client and a port never has two.
+ */
+export const connectWorker = (): Promise<RpcClient> => {
+  connection ??= new Promise((resolve) => {
     const onMessage = (event: MessageEvent) => {
       if (event.source !== window || event.data !== "pochimail:worker-port") return;
       const port = event.ports[0];
       if (port === undefined) return;
       window.removeEventListener("message", onMessage);
-      const transport: Transport = {
-        post: (message) => port.postMessage(message),
-        onMessage: (handler) =>
-          port.addEventListener("message", (portEvent) => handler(portEvent.data)),
-      };
       port.start();
-      resolve(Object.assign(createEchoClient(transport), createDeviceNameClient(transport)));
+      resolve(createRpcClient(fromDomPort(port)));
     };
     window.addEventListener("message", onMessage);
     window.pochimail.requestWorkerPort();
   });
+  return connection;
+};

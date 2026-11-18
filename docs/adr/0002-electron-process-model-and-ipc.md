@@ -24,6 +24,13 @@ The UI must stay instant while a 100k-message sync and model inference run. Mail
 - Fuses are defined in `src/main/fuses.ts` and applied at packaging (M0-10) by `apps/desktop/packaging/apply-fuses.ts`, an electron-builder `afterPack` hook (skipped for the per-arch slices of the macOS universal build; the merged app is flipped). `pnpm package:smoke` reads the fuses back from the packaged binary. `GrantFileProtocolExtraPrivileges` is left at its default while the renderer loads from `file://`.
 - Electronegativity's last release is from 2023, so the baseline is enforced by a checklist test (`src/main/security.test.ts`).
 
+## Implementation notes (M4-01)
+- Production layer in `apps/desktop/src/shared/ipc/`: `contract.ts` (zod schemas for queries, mutations, subscriptions: `accounts`, `scan`, `overview`, `digest`, `settings`, `app.state`; names and shapes only, handlers in M4-02), `protocol.ts` (wire messages, typed `RpcError` codes), `server.ts` (worker), `client.ts` (renderer), `batcher.ts` (50 ms flush, max batch 500, ack window of 2, per-key coalescing), `transport.ts`. It replaces the M0-09 echo and the M0-14 benchmark file.
+- Validation: the client checks input before posting and output/events on receipt; the worker checks input, output and each emitted event. Failures are `RpcError` with a stable code (`BAD_INPUT`, `BAD_OUTPUT`, `NOT_IMPLEMENTED`, `HANDLER_FAILED`, `TIMEOUT`, `CLOSED`); handler error messages are never forwarded. A batch envelope is validated once, each payload by its topic schema.
+- Closing the port stops every subscription and the batcher on both sides; pending calls reject with `CLOSED`.
+- Preload (`src/preload/preload.ts`) exposes exactly `requestWorkerPort`, `openMailAppLink` (`mailto:` and `message:` only), `showInFinder`, `chooseFolder`, each validated before `ipcRenderer.invoke`. Main registers only those three handlers (`src/main/os-calls.ts`) and refuses senders that are not the app page. Nothing mail related goes through main.
+- `rpc.contract.ts` exports `describeRpcContract(name, connect)` so any transport pair or adapter runs the same behaviour suite. The M0-14 timing assertions (`POCHI_BENCH=1`) were dropped with the prototype; the lossless slow-consumer check is now a real test.
+
 ## IPC transport research (M0-14)
 **Adapters checked (2026-11-17, `npm view` and package contents):**
 - `electron-trpc` 1.0.0 (maintained, peers `@trpc/*` ^11.10): built on `ipcMain`/`ipcRenderer` and `contextBridge`. No MessagePort or `utilityProcess` code, so every message passes through a main-process handler. That contradicts "renderer ↔ worker traffic bypasses main" and puts mail data in main.

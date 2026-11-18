@@ -1,7 +1,10 @@
 import { err, ok, type Result } from "@pochimail/core/result";
 import { z } from "zod";
 import { SECRET_FAILURES, SecretStoreError } from "../secret-error.ts";
-import type { Transport } from "./echo.ts";
+import type { Transport } from "./transport.ts";
+
+/** The secret channel needs only two methods; RPC teardown hooks are not part of it. */
+type SecretTransport = Pick<Transport, "post" | "onMessage">;
 
 /**
  * Secret RPC between main (owns the keychain) and the worker, on its own MessagePort. It is never given to the
@@ -40,7 +43,7 @@ type Service = {
 };
 
 /** Main side: answers valid requests, drops anything else. */
-export const serveSecrets = (transport: Transport, service: Service): void => {
+export const serveSecrets = (transport: SecretTransport, service: Service): void => {
   transport.onMessage((data) => {
     const parsed = requestSchema.safeParse(data);
     if (!parsed.success) return;
@@ -72,7 +75,7 @@ export const serveSecrets = (transport: Transport, service: Service): void => {
 };
 
 /** Worker side: the client behind the `SecretStore` adapter. */
-export const createSecretsClient = (transport: Transport, timeoutMs = 10_000) => {
+export const createSecretsClient = (transport: SecretTransport, timeoutMs = 10_000) => {
   let nextId = 0;
   const pending = new Map<number, (response: z.infer<typeof responseSchema>) => void>();
   transport.onMessage((data) => {

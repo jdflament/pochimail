@@ -30,7 +30,8 @@ const fakeWebContents = () => {
   return { contents, fire, open: () => openHandler?.() };
 };
 
-const isApp = (url: string) => isAppUrl(url);
+const rendererFile = "/app/out/renderer/index.html";
+const isApp = (url: string) => isAppUrl(url, { rendererFile });
 
 describe("window hardening", () => {
   // Guards: a page (or injected email content) opening a new window or leaving the app for an external site.
@@ -47,15 +48,18 @@ describe("window hardening", () => {
   it("lets the app navigate within its own origin", () => {
     const { contents, fire } = fakeWebContents();
     hardenWebContents(contents as unknown as WebContents, isApp);
-    expect(fire("will-navigate", "file:///app/renderer/index.html")).toBe(false);
+    expect(fire("will-navigate", "file:///app/out/renderer/index.html")).toBe(false);
   });
 
   // Guards: file:// URLs that merely resemble the app page (other files, other dev origins) being treated as the app.
   it("recognises only the real app page", () => {
-    expect(isAppUrl("file:///app/out/renderer/index.html")).toBe(true);
-    expect(isAppUrl("file:///etc/passwd")).toBe(false);
-    expect(isAppUrl("https://evil.example/renderer/index.html")).toBe(false);
-    expect(isAppUrl("garbage")).toBe(false);
+    expect(isAppUrl("file:///app/out/renderer/index.html", { rendererFile })).toBe(true);
+    expect(isAppUrl("file:///app/out/renderer/index.html#/x?y=1", { rendererFile })).toBe(true);
+    expect(isAppUrl("file:///etc/passwd", { rendererFile })).toBe(false);
+    expect(isAppUrl("file:///tmp/evil/renderer/index.html", { rendererFile })).toBe(false);
+    expect(isAppUrl("file:///app/out/renderer/index.html")).toBe(false);
+    expect(isAppUrl("https://evil.example/renderer/index.html", { rendererFile })).toBe(false);
+    expect(isAppUrl("garbage", { rendererFile })).toBe(false);
     expect(isAppUrl("http://localhost:5173/x", { devServerOrigin: "http://localhost:5173" })).toBe(
       true,
     );
