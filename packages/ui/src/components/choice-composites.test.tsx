@@ -6,7 +6,8 @@ import { RadioCard } from "@pochimail/ui/components/radio-card";
 import { RadioGroup } from "@pochimail/ui/components/radio-group";
 import { Toaster } from "@pochimail/ui/components/sonner";
 import { SpeechBubble } from "@pochimail/ui/components/speech-bubble";
-import { useRunOnce } from "@pochimail/ui/hooks/use-run-once";
+import { t } from "@pochimail/ui/i18n/format.ts";
+import { once } from "@pochimail/ui/lib/once";
 import { act, configure, getConfig, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { toast } from "sonner";
@@ -159,6 +160,17 @@ it("speech bubble keeps its message when Pochi is hidden", () => {
 // Let sonner mount the toast (RTL's waitFor does not drive vitest's fake timers).
 const flush = () => act(() => vi.advanceTimersByTimeAsync(50));
 
+type ShowUndo = (message: string, undo: () => void) => void;
+function UndoHarness({ showRef }: { showRef: { current: ShowUndo } }) {
+  showRef.current = (message, undo) => {
+    toast(message, {
+      duration: 5000,
+      action: { label: t("action.undo"), onClick: once(undo) },
+    });
+  };
+  return <Toaster theme="dark" />;
+}
+
 describe("undo toast", () => {
   // RTL's default asyncWrapper waits on a real setTimeout, which never fires once vitest fakes it.
   const { asyncWrapper } = getConfig();
@@ -173,20 +185,10 @@ describe("undo toast", () => {
     vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime, delay: null });
     const onUndo = vi.fn();
-    let show = (_message: string, _onUndo: () => void) => {};
-    function Harness() {
-      const once = useRunOnce();
-      show = (message, undo) => {
-        toast(message, {
-          duration: 5000,
-          action: { label: "Undo", onClick: once(undo) },
-        });
-      };
-      return <Toaster theme="dark" />;
-    }
-    render(<Harness />);
+    const showRef: { current: ShowUndo } = { current: () => {} };
+    render(<UndoHarness showRef={showRef} />);
     act(() => {
-      show("24 emails archived", onUndo);
+      showRef.current("24 emails archived", onUndo);
     });
     await flush();
     expect(screen.getByText("24 emails archived")).toBeTruthy();
@@ -197,7 +199,7 @@ describe("undo toast", () => {
     // Sonner pauses its timers while the pointer is over the toasts.
     await user.unhover(screen.getByRole("button", { name: "Undo" }));
     act(() => {
-      show("Left alone", vi.fn());
+      showRef.current("Left alone", vi.fn());
     });
     await flush();
     expect(screen.getByText("Left alone")).toBeTruthy();
