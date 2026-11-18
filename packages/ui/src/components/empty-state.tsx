@@ -1,7 +1,7 @@
 import { Button } from "@pochimail/ui/components/button";
 import { Mascot, type MascotPose } from "@pochimail/ui/components/mascot";
 import { cn } from "@pochimail/ui/lib/utils";
-import type * as React from "react";
+import * as React from "react";
 
 type StateAction = { label: string; onClick: () => void };
 
@@ -25,9 +25,11 @@ function EmptyState({
   secondaryAction,
   ...props
 }: EmptyStateProps) {
+  const titleId = React.useId();
   return (
     <section
       data-slot="empty-state"
+      aria-labelledby={titleId}
       className={cn(
         "flex flex-col items-center gap-2.5 rounded-xl bg-card px-5 py-6 text-center shadow-[inset_0_0_0_1px_var(--border)]",
         className,
@@ -35,7 +37,9 @@ function EmptyState({
       {...props}
     >
       <Mascot pose={pose} size="sm" />
-      <h2 className="m-0 text-[17px] font-semibold break-words">{title}</h2>
+      <h2 id={titleId} className="m-0 text-[17px] font-semibold break-words">
+        {title}
+      </h2>
       {description ? (
         <p className="m-0 max-w-[260px] text-sm leading-normal break-words text-muted-foreground">
           {description}

@@ -9,6 +9,7 @@ Last updated: 2026-11-19
 - **Docs/chores**: D11 recorded (#44); repo and CI maintenance (#23, #29, #35–#38, #40, #52); Electron install documented and verified on a cold install (#59).
 - **Merged M2/M4 tickets**: M2-01 (#49), M2-02 (#46), M2-03 (#51), M2-04 (#53), M2-06 (#60), M4-01 (#54), M4-03 (#47), M4-04 (#50), M4-07 (#56), M4-08 (#64).
 - **M4-09 Responsive layout** (sidebar, icon rail, bottom tabs, account switcher, hidden empty categories): done with #70. Known gaps (decided): the Overview is not scoped to the account switcher yet (deferred to M4-14, the Overview ticket; only the sidebar counts follow the switcher), and the Topics group is not shown because no topic data exists yet.
+- **M4-16 Required states**: 8 states (sign-in cancelled, offline status line, needs reconnecting, model download failed, rate limit, empty category, nothing to do, update ready) composed from `EmptyState` with en/fr/ja copy, an event reducer for worker-event triggers and light/dark stories. Done with #74.
 - **M4-05 Responsive sheet**: one reusable `Sheet` primitive in packages/ui (centred on desktop, bottom sheet below 560px, standard enter motion); the summary content is composed in M4-15. Done with #73.
 - **M4-06 Mascot behaviours**: done with #57 (merge pending).
 - **M4-10 Welcome screen and onboarding stepper**: done except the visual-tolerance check against the light reference, deferred to M4-19; shared onboarding layout keeps Pochi and the step indicator in place across Welcome, Connect and Set up.
