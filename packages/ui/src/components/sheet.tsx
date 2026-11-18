@@ -1,3 +1,4 @@
+import { useMotionEnabled } from "@pochimail/ui/hooks/use-motion";
 import { t } from "@pochimail/ui/i18n/format.ts";
 import { cn } from "@pochimail/ui/lib/utils";
 import { XIcon } from "lucide-react";
@@ -26,11 +27,14 @@ function SheetOverlay({
   className,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Overlay>) {
+  const motion = useMotionEnabled();
   return (
     <SheetPrimitive.Overlay
       data-slot="sheet-overlay"
       className={cn(
-        "fixed inset-0 z-50 bg-frame/80 data-[state=closed]:animate-sheet-scrim-out data-[state=open]:animate-sheet-scrim-in",
+        "fixed inset-0 z-50 bg-frame/80",
+        motion &&
+          "data-[state=closed]:animate-sheet-scrim-out data-[state=open]:animate-sheet-scrim-in",
         className,
       )}
       {...props}
@@ -42,10 +46,13 @@ function SheetOverlay({
 const sheetContentClass = cn(
   "pointer-events-auto relative grid max-h-full min-w-0 gap-4 overflow-y-auto bg-background p-6 text-foreground shadow-lg outline-none",
   // Below 560px: bottom sheet.
-  "@max-[559px]:w-full @max-[559px]:rounded-t-2xl @max-[559px]:pb-[max(1.5rem,env(safe-area-inset-bottom))] @max-[559px]:data-[state=closed]:animate-sheet-bottom-out @max-[559px]:data-[state=open]:animate-sheet-bottom-in",
+  "@max-[559px]:w-full @max-[559px]:rounded-t-2xl @max-[559px]:pb-[max(1.5rem,env(safe-area-inset-bottom))]",
   // From 560px: centred sheet.
-  "@min-[560px]:m-4 @min-[560px]:w-full @min-[560px]:max-w-lg @min-[560px]:self-center @min-[560px]:rounded-2xl @min-[560px]:data-[state=closed]:animate-sheet-out @min-[560px]:data-[state=open]:animate-sheet-in",
+  "@min-[560px]:m-4 @min-[560px]:w-full @min-[560px]:max-w-lg @min-[560px]:self-center @min-[560px]:rounded-2xl",
 );
+/** Enter/exit slides, dropped when motion is off (Radix then unmounts at once instead of waiting for animationend). */
+const sheetMotionClass =
+  "@max-[559px]:data-[state=closed]:animate-sheet-bottom-out @max-[559px]:data-[state=open]:animate-sheet-bottom-in @min-[560px]:data-[state=closed]:animate-sheet-out @min-[560px]:data-[state=open]:animate-sheet-in";
 
 type SheetContentProps = React.ComponentProps<typeof SheetPrimitive.Content> & {
   /** Where to mount the sheet; defaults to the document body (the whole window). */
@@ -53,6 +60,7 @@ type SheetContentProps = React.ComponentProps<typeof SheetPrimitive.Content> & {
 };
 
 function SheetContent({ className, children, container, ...props }: SheetContentProps) {
+  const motion = useMotionEnabled();
   return (
     <SheetPrimitive.Portal container={container}>
       <SheetOverlay />
@@ -62,7 +70,7 @@ function SheetContent({ className, children, container, ...props }: SheetContent
       >
         <SheetPrimitive.Content
           data-slot="sheet-content"
-          className={cn(sheetContentClass, className)}
+          className={cn(sheetContentClass, motion && sheetMotionClass, className)}
           {...props}
         >
           {children}

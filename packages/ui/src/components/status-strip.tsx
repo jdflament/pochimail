@@ -1,3 +1,4 @@
+import { useMotionEnabled } from "@pochimail/ui/hooks/use-motion";
 import { cn } from "@pochimail/ui/lib/utils";
 import { LockIcon } from "lucide-react";
 import type * as React from "react";
@@ -21,6 +22,7 @@ function StatusStrip({
   children,
   ...props
 }: StatusStripProps) {
+  const motion = useMotionEnabled();
   const pct = Math.round(Math.min(100, Math.max(0, progress)));
 
   return (
@@ -28,7 +30,10 @@ function StatusStrip({
       <div aria-hidden="true" className="h-0.5 bg-muted">
         <div
           data-slot="status-progress"
-          className="h-full bg-primary transition-[width] duration-200 ease-out motion-reduce:transition-none"
+          className={cn(
+            "h-full bg-primary",
+            motion && "transition-[width] duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
+          )}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -43,7 +48,16 @@ function StatusStrip({
             {headline}
           </span>
           <span className="tabular-nums">{pct}%</span>
-          {status ? <span className="break-words">{status}</span> : null}
+          {status ? (
+            // Keyed so each new finding slides up 8px and fades in, replacing the previous one.
+            <span
+              key={status}
+              data-slot="status-finding"
+              className={cn("break-words", motion && "animate-finding-in")}
+            >
+              {status}
+            </span>
+          ) : null}
         </div>
         {children ? <div className="ml-auto flex gap-1.5">{children}</div> : null}
       </div>

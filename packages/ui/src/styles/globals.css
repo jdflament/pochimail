@@ -33,9 +33,38 @@
   }
 }
 
-/* Reduced motion: stop mascot loops and reactions (components also gate in JS), and keep global motion minimal. */
+/* Reduced motion, and Settings › Animations off (MotionProvider sets data-animations="off" on <html>): every motion becomes instant.
+   Components also gate in JS (useMotionEnabled); this catches the CSS-only ones. */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-iteration-count: 1 !important; }
+  *, *::before, *::after { animation-iteration-count: 1 !important; transition-delay: 0s !important; }
+}
+:root[data-animations="off"] *, :root[data-animations="off"] *::before, :root[data-animations="off"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  transition-delay: 0s !important;
+}
+
+/* Live progress: each new finding slides up 8px and fades in (220ms). Check mark draws itself (150ms). */
+@theme {
+  --animate-finding-in: finding-in 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-check-draw: check-draw 150ms cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @keyframes finding-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @keyframes check-draw {
+    from { stroke-dashoffset: 1; }
+    to { stroke-dashoffset: 0; }
+  }
+}
+
+/* Undo toast (sonner) rises from below in 220ms, same easing. */
+[data-sonner-toast] {
+  transition-duration: 220ms !important;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1) !important;
 }
 
 /* Screen to screen (docs/design.md Motion): content slides in 16px from the right, 220ms. */
