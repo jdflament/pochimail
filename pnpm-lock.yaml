@@ -233,6 +233,9 @@ importers:
       '@pochimail/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@pochimail/mail':
+        specifier: workspace:*
+        version: link:../../packages/mail
       '@pochimail/testing':
         specifier: workspace:*
         version: link:../../packages/testing
@@ -381,7 +384,14 @@ importers:
         version: 5.1.0(@types/node@26.6.6)(jsdom@31.0.1(@noble/hashes@1.8.0))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
 
   packages/mail:
+    dependencies:
+      '@pochimail/core':
+        specifier: workspace:*
+        version: link:../core
     devDependencies:
+      '@pochimail/testing':
+        specifier: workspace:*
+        version: link:../testing
       '@pochimail/typescript-config':
         specifier: workspace:*
         version: link:../../tooling/typescript

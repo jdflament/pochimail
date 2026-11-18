@@ -18,7 +18,13 @@ import {
 } from "electron";
 import { registerOsCalls } from "./os-calls.ts";
 import { createSecretVault, type SecretVault } from "./secret-vault.ts";
-import { hardenWebContents, isAppUrl, isRequestAllowed, webPreferences } from "./security.ts";
+import {
+  hardenWebContents,
+  isAppUrl,
+  isRequestAllowed,
+  sessionEgress,
+  webPreferences,
+} from "./security.ts";
 import { keyProtection, loadOrCreateDatabaseKey } from "./storage-key.ts";
 import { linkWorkerOnEveryLoad } from "./worker-link.ts";
 import { bootWorker } from "./worker-start.ts";
@@ -37,7 +43,11 @@ const lockDownSession = (): void => {
   defaultSession.setPermissionCheckHandler(() => false);
   defaultSession.setDevicePermissionHandler(() => false);
   defaultSession.webRequest.onBeforeRequest((details, callback) => {
-    const allowed = isRequestAllowed(details.url, { devServerOrigin });
+    // Same shared policy as the worker client: static H1–H5 hosts and connected account hosts.
+    const allowed = isRequestAllowed(details.url, {
+      devServerOrigin,
+      allowlist: sessionEgress.hosts(),
+    });
     // Log the host only: never a full URL (privacy rules, AGENTS.md §5).
     if (!allowed)
       console.warn(

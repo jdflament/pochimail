@@ -7,7 +7,7 @@ Last updated: 2026-11-19
 - **M0 Foundation**: complete (#10–#21, #25, #28 and related chores).
 - **M1 Core & events**: complete (#22, #24, #26, #27, #30–#34, #39, #41–#43, #45, #48).
 - **Docs/chores**: D11 recorded (#44); repo and CI maintenance (#23, #29, #35–#38, #40, #52); Electron install documented and verified on a cold install (#59).
-- **Merged M2/M4 tickets**: M2-01 (#49), M2-02 (#46), M2-03 (#51), M2-04 (#53), M4-01 (#54), M4-03 (#47), M4-04 (#50), M4-07 (#56), M4-08 (#64).
+- **Merged M2/M4 tickets**: M2-01 (#49), M2-02 (#46), M2-03 (#51), M2-04 (#53), M2-06 (#60), M4-01 (#54), M4-03 (#47), M4-04 (#50), M4-07 (#56), M4-08 (#64).
 - **M4-06 Mascot behaviours**: done with #57 (merge pending).
 - **i18n: French + Japanese**: done with #62 (typed fr/ja catalogs, locale resolution, locale plural/number/date rules).
 - **Refactor**: UI component rule cleanup (ui-audit-20261119 items 1–4,8): undo toast replaced by sonner toast + action with `once` helper, status-strip/dialog composition, review labels required, storage-bar/i18n copy cleanup (#61).

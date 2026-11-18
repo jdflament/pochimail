@@ -1,8 +1,19 @@
 import { pathToFileURL } from "node:url";
+import { egressPolicy, matchesAllowlistEntry } from "@pochimail/mail/egress/allowlist";
 import type { WebContents, WebPreferences } from "electron";
 
-/** Hosts the app may reach. Empty on purpose: every outbound host is added with an ADR note (brief §5.10, docs/security/network.md). */
+/**
+ * Default of the low-level helper: deny everything until a caller supplies a policy. Main passes
+ * `sessionEgress`, so the session filter and the worker's HTTP client share one set of rules.
+ */
 export const allowedHosts: readonly string[] = [];
+
+/**
+ * Main's view of the shared egress policy: static H1–H5 hosts plus connected account hosts.
+ * Account connect/remove flows register endpoints here as they land (M2-09/M2-11); removing an
+ * account revokes both its IMAP and SMTP hosts from the session filter.
+ */
+export const sessionEgress = egressPolicy.create();
 
 export const webPreferences = {
   contextIsolation: true,
@@ -38,7 +49,10 @@ export const isRequestAllowed = (
     url.host === new URL(options.devServerOrigin).host
   )
     return true;
-  return allowlist.includes(url.hostname);
+  // Exact host (and recorded port) only: no wildcard or suffix match, same as the worker client.
+  // Remote plaintext HTTP is never allowed (threat model N2); the dev server passed above.
+  if (url.protocol === "http:") return false;
+  return allowlist.some((entry) => matchesAllowlistEntry(entry, url));
 };
 
 /** Blocks window.open, webviews and any navigation away from the app's own origin. */
