@@ -5,7 +5,10 @@
   "license": "AGPL-3.0-only",
   "type": "module",
   "exports": {
-    "./package-info": "./src/package-info.ts"
+    "./package-info": "./src/package-info.ts",
+    "./egress/allowlist": "./src/egress/allowlist.ts",
+    "./egress/http-client": "./src/egress/http-client.ts",
+    "./egress/http-client-contract": "./src/egress/http-client-contract.ts"
   },
   "scripts": {
     "typecheck": "tsc",
@@ -13,7 +16,11 @@
     "knip": "knip",
     "test": "vitest run"
   },
+  "dependencies": {
+    "@pochimail/core": "workspace:*"
+  },
   "devDependencies": {
+    "@pochimail/testing": "workspace:*",
     "@pochimail/typescript-config": "workspace:*",
     "@types/node": "26.6.6",
     "typescript": "7.0.2",

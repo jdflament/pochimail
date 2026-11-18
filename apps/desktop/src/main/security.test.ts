@@ -2,6 +2,10 @@ import { EventEmitter } from "node:events";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { FuseV1Options } from "@electron/fuses";
+import { AccountId } from "@pochimail/core/ids";
+import { unwrap } from "@pochimail/core/result";
+import { BlockedSocketError, egressPolicy } from "@pochimail/mail/egress/allowlist";
+import { BlockedHostError, createHttpClient } from "@pochimail/mail/egress/http-client";
 import type { WebContents } from "electron";
 import { describe, expect, it } from "vitest";
 import { buildCsp } from "../shared/csp.ts";
@@ -11,6 +15,7 @@ import {
   hardenWebContents,
   isAppUrl,
   isRequestAllowed,
+  sessionEgress,
   webPreferences,
 } from "./security.ts";
 
@@ -93,6 +98,50 @@ describe("session request filter", () => {
       isRequestAllowed("http://localhost:9999/", { devServerOrigin: "http://localhost:5173" }),
     ).toBe(false);
     expect(isRequestAllowed("https://api.example/v1", { allowlist: ["api.example"] })).toBe(true);
+  });
+
+  // Guards: a TLS downgrade to a host that is otherwise on the allow-list.
+  it("blocks plaintext HTTP even to a documented host", () => {
+    expect(isRequestAllowed("http://gmail.googleapis.com/v1")).toBe(false);
+    expect(
+      isRequestAllowed("http://gmail.googleapis.com/v1", {
+        allowlist: ["gmail.googleapis.com"],
+      }),
+    ).toBe(false);
+  });
+
+  // Guards: main's registry drifting from the account sockets registered for the worker client.
+  it("follows the shared policy when an account's IMAP socket is added and removed", () => {
+    const guarded = () => sessionEgress.assertSocketAllowed("imap.example.com", 993);
+    const accountId = unwrap(AccountId("acc-session-1"));
+    expect(guarded).toThrow(BlockedSocketError);
+
+    sessionEgress.addAccount({ accountId, imap: { host: "imap.example.com", port: 993 } });
+    expect(guarded).not.toThrow();
+
+    sessionEgress.removeAccount(accountId);
+    expect(guarded).toThrow(BlockedSocketError);
+  });
+
+  // Guards: main and worker drifting onto different policies or normalisations.
+  it("makes the session filter and the worker client reject the same host", async () => {
+    const worker = createHttpClient({
+      allowlist: egressPolicy.create(),
+      fetch: async () => {
+        throw new Error("the transport must never be called");
+      },
+    });
+    const blocked = "https://unlisted.example/v1";
+    const lookalike = "https://evil-graph.microsoft.com.example/v1";
+    for (const url of [blocked, lookalike]) {
+      expect(isRequestAllowed(url, { allowlist: sessionEgress.hosts() })).toBe(false);
+      const result = await worker.request({ url });
+      expect(result.ok).toBe(false);
+      if (!result.ok) expect(result.error).toBeInstanceOf(BlockedHostError);
+    }
+    expect(
+      isRequestAllowed("https://GRAPH.microsoft.com./v1", { allowlist: sessionEgress.hosts() }),
+    ).toBe(true);
   });
 });
 

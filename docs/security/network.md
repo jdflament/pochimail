@@ -2,11 +2,11 @@
 
 Ticket M0-16 · Written 2026-11-17 · Sources: brief [§5.10](../brief.md) (No network except), [ADR 0004](../adr/0004-incremental-sync-and-imap.md), [0006](../adr/0006-local-ai-runtimes-and-models.md), [0007](../adr/0007-oauth-credentials-scopes.md), [0008](../adr/0008-notifications-and-privacy.md), [OAuth findings](oauth-verification.md), plan P1, P3, P11 · Companion: [threat model](threat-model.md).
 
-Rule: **the app contacts only the hosts below.** A session-level request filter (`session.webRequest` in every Electron session) and the worker's HTTP client enforce it, and block everything else. Adding a host means adding a row here, updating the threat model and asking the maintainer first (AGENTS.md section 11). No telemetry, no crash reporting (P11), no analytics, no fonts or scripts from CDNs (fonts are self-hosted). Update and model requests carry no identifiers.
+Rule: **the app contacts only the hosts below.** A session-level request filter (`session.webRequest` in every Electron session) enforces it for requests Electron sees, and the worker's HTTP client enforces it for HTTP(S). Raw IMAP/SMTP sockets are not visible to either: those clients (M2-11/12) must open sockets only through `assertSocketAllowed(host, port)` from the shared allow-list. Everything else is blocked. Adding a host means adding a row here, updating the threat model and asking the maintainer first (AGENTS.md section 11). No telemetry, no crash reporting (P11), no analytics, no fonts or scripts from CDNs (fonts are self-hosted). Update and model requests carry no identifiers.
 
 Mitigation links point to Project "Pochimail v1" Draft IDs (`E2` = "Epic: M2 Accounts & sync", etc.; see the [threat model](threat-model.md)) or ADRs.
 
-Status: **v0, nothing is implemented yet.** Hosts marked *to confirm* come from a provider page that was summarised, not read verbatim, or from a decision still open; each names where it gets confirmed.
+Status: **v0; H1–H5 are enforced since M2-06** (shared host registry, worker HTTP client and main session filter). H6/H7 endpoints are registered on connect and checked by the socket guard that IMAP/SMTP clients must use. Hosts marked *to confirm* come from a provider page that was summarised, not read verbatim, or from a decision still open; each names where it gets confirmed.
 
 ## 1. Always-on, by feature
 
@@ -53,12 +53,13 @@ In development only, the Vite dev server on `localhost` serves the renderer; it 
 
 Telemetry or analytics, crash reporting (P11, deferred to v1.x), remote push relay or Gmail Pub/Sub / Graph webhooks (v1.x, off by default), cloud AI or any inference over the network, remote images or fonts in email content, link following in email bodies, MX or autoconfig lookups, license or account servers. A fork or a future feature that needs one of these must change this file and the threat model.
 
-## 5. Enforcement and tests (planned)
+## 5. Enforcement and tests
 
 | Control | Where built |
 |---|---|
-| `session.webRequest` filter on every session, deny by default; renderer sessions allow no remote host at all (CSP `default-src 'self'` plus the filter) | E2 (network allowlist) · M0-09 (CSP) |
-| Worker HTTP client takes the allowlist from one config source shared with the filter; connected IMAP/SMTP hosts are added when an account is connected and removed when it is removed | E2 |
-| A test asserts a request to an unlisted host is blocked and that the one-click path refuses redirects, `http`, private addresses and a URL different from the header | E2 · E5 |
-| A test (or CI check) that every host in code appears in this file | E2 |
+| `session.webRequest` filter on every session, deny by default; renderer sessions allow no remote host at all (CSP `default-src 'self'` plus the filter). Main reads the shared registry's `hosts()` snapshot. | E2 · M0-09 (CSP) · M2-06 |
+| Worker HTTP client and main filter create their instances from one policy source (`egressPolicy` in `@pochimail/mail/egress/allowlist`), so static H1–H5 hosts and normalisation are identical in both processes. No wildcard or suffix match, no plaintext HTTP; blocked requests log the host only. X1 is deliberately excluded. | E2 · M2-06 |
+| Connected IMAP/SMTP host:port endpoints (H6/H7) are added on connect and removed on account removal. Because Electron's filter and the HTTP client cannot see raw sockets, IMAP/SMTP clients (M2-11/12) **must** call `assertSocketAllowed(host, port)` from the same allow-list before opening a socket; it throws a typed `BlockedSocketError`. A registry alone does not enforce socket egress. | E2 · M2-06 · M2-11/12 |
+| A test asserts a request to an unlisted host (including a lookalike host) is blocked before a network call; contract checks cover account socket add/remove via the guard, ports, `AbortSignal` cancellation, timeouts that win even against a transport that ignores the signal, redirects and host-only logs. The one-click path still needs its own tests for `http`, private addresses and a URL different from the header. | E2 · M2-06 · E5 |
+| The static hosts in code live in one `STATIC_EGRESS_HOSTS` list mapped to rows H1–H5 and are reached through `egressPolicy`; the CI check for every host in code is still planned. | E2 |
 | Model host has no HTTP client and no network permission | E3 · E4 |
