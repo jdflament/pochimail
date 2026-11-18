@@ -63,6 +63,10 @@ const graphicPairs: [string, string][] = [
   // Unchecked checkbox/radio outline (components use border-foreground-tertiary, see the source check below).
   ["foreground-tertiary", "background"],
   ["foreground-tertiary", "card"],
+  // Composites (M4-03): hatched storage segment and ledger bar fill on the muted track, progress fill on its track.
+  ["foreground-tertiary", "muted"],
+  ["primary", "muted"],
+  ...categories.map((c): [string, string] => [c, "muted"]),
   ...categories.flatMap((c): [string, string][] => [
     [c, "background"],
     [c, "card"],
