@@ -21,6 +21,11 @@
     "./fake-power-monitor": "./src/fake-power-monitor.ts",
     "./fake-timer": "./src/fake-timer.ts",
     "./faults": "./src/faults.ts",
+    "./fixture-mailbox/fixture-mail-provider": "./src/fixture-mailbox/fixture-mail-provider.ts",
+    "./fixture-mailbox/generator": "./src/fixture-mailbox/generator.ts",
+    "./fixture-mailbox/labels": "./src/fixture-mailbox/labels.ts",
+    "./fixture-mailbox/mailbox-reader": "./src/fixture-mailbox/mailbox-reader.ts",
+    "./fixture-mailbox/mbox": "./src/fixture-mailbox/mbox.ts",
     "./fixtures": "./src/fixtures.ts",
     "./ground-truth-classifier": "./src/ground-truth-classifier.ts",
     "./in-memory-blob-store": "./src/in-memory-blob-store.ts",
@@ -60,5 +65,8 @@
     "@types/node": "26.6.6",
     "typescript": "7.0.2",
     "vitest": "5.1.0"
+  },
+  "dependencies": {
+    "zod": "4.6.7"
   }
 }
