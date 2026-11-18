@@ -1,13 +1,13 @@
 # Project status
 
-Last updated: 2026-11-18
+Last updated: 2026-11-19
 
 ## Done
 
 - **M0 Foundation**: complete (#10–#21, #25, #28 and related chores).
 - **M1 Core & events**: complete (#22, #24, #26, #27, #30–#34, #39, #41–#43, #45, #48).
 - **Docs/chores**: D11 recorded (#44); repo and CI maintenance (#23, #29, #35–#38, #40, #52).
-- **Merged M2/M4 tickets**: M2-01 (#49), M2-02 (#46), M2-03 (#51), M2-04 (#53), M4-03 (#47), M4-04 (#50).
+- **Merged M2/M4 tickets**: M2-01 (#49), M2-02 (#46), M2-03 (#51), M2-04 (#53), M4-03 (#47), M4-04 (#50), M4-06 (#57).
 
 ## In progress
 
@@ -17,7 +17,7 @@ Last updated: 2026-11-18
 
 Ordered by priority (UI first):
 
-1. **M4 UI**: M4-07, M4-06, M4-08, M4-02, M4-10, M4-14.
+1. **M4 UI**: M4-07, M4-08, M4-02, M4-10, M4-14.
 2. **M2 lane**: M2-05 onward (see [`docs/tickets/m2-m4-lanes.md`](tickets/m2-m4-lanes.md)).
 
 ## Open decisions
