@@ -1,0 +1,6 @@
+# osv-scanner config. Keep entries time-boxed and justified.
+
+[[IgnoredVulns]]
+id = "GHSA-fc5q-39xc-vjpf"
+ignoreUntil = 2026-12-18
+reason = "picomatch 4.0.7 ReDoS, no fixed version available. Only reachable through dev/build tooling (vite, vitest, knip, tinyglobby, rolldown plugins); not shipped in the app. Re-check when a patched picomatch is released."
