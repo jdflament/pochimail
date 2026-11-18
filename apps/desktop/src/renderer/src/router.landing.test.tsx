@@ -15,7 +15,7 @@ const createFakeAppClient = (hasConnectedAccount: boolean) => {
   serveRpc(fromDomPort(port2), {
     procedures: {
       "app.state": () => ({ status: "ready" as const, hasConnectedAccount }),
-      "device.name": () => "computer" as const,
+      "device.name": () => "device" as const,
       "accounts.list": () => [],
       "overview.get": () => ({ scanned: 0, toReview: 0 }),
       "digest.get": () => ({ ready: false, itemCount: 0 }),
