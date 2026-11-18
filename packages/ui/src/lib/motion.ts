@@ -25,12 +25,25 @@ export const MOTION = {
   toastMs: 220,
   /** Switch thumb glide. */
   switchMs: 180,
+  /** How long the undo toast stays. */
+  undoMs: 5000,
   /** Pochi. */
   mascotBreathingMs: 4200,
   mascotBlinkMs: 5300,
   mascotFoundMs: 620,
 } as const;
 
+/** Opacity-only fades (row fade, reduced-motion cross-fade). */
+export const MOTION_FADE_EASE = "ease-out";
 export const MOTION_EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
 /** Same curve as a function (1 − (1 − k)³), for JS-driven numbers. */
 export const easeOutCubic = (k: number) => 1 - (1 - k) ** 3;
+
+/** Inline `transition` value in catalog timing, e.g. transition({ property: "width", ms: MOTION.progressMs }). Reduced motion strips non-opacity properties (globals.css). */
+export function transition(
+  ...parts: { property: string; ms: number; delayMs?: number; ease?: string }[]
+): string {
+  return parts
+    .map((p) => `${p.property} ${p.ms}ms ${p.ease ?? MOTION_EASE} ${p.delayMs ?? 0}ms`)
+    .join(", ");
+}

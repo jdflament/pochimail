@@ -1,3 +1,4 @@
+import { MOTION, transition } from "@pochimail/ui/lib/motion";
 import { cn } from "@pochimail/ui/lib/utils";
 import { Switch as SwitchPrimitive } from "radix-ui";
 import type * as React from "react";
@@ -21,8 +22,9 @@ function Switch({
     >
       <SwitchPrimitive.Thumb
         data-slot="switch-thumb"
+        style={{ transition: transition({ property: "transform", ms: MOTION.switchMs }) }}
         className={cn(
-          "pointer-events-none block rounded-full bg-background ring-0 transition-transform duration-[180ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none group-data-[size=default]/switch:size-4 group-data-[size=sm]/switch:size-3 data-[state=checked]:translate-x-[calc(100%-2px)] data-[state=unchecked]:translate-x-0 dark:data-[state=checked]:bg-primary-foreground dark:data-[state=unchecked]:bg-foreground",
+          "pointer-events-none block rounded-full bg-background ring-0 group-data-[size=default]/switch:size-4 group-data-[size=sm]/switch:size-3 data-[state=checked]:translate-x-[calc(100%-2px)] data-[state=unchecked]:translate-x-0 dark:data-[state=checked]:bg-primary-foreground dark:data-[state=unchecked]:bg-foreground",
         )}
       />
     </SwitchPrimitive.Root>

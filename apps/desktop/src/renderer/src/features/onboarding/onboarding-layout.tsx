@@ -46,7 +46,7 @@ export function OnboardingLayout() {
               key={path}
               aria-current={position + 1 === current ? "step" : undefined}
               className={cn(
-                "h-1.5 rounded-full transition-[width,background-color] duration-[220ms] ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none",
+                "h-1.5 rounded-full transition-[width,background-color] duration-(--duration-panel) ease-(--ease-out) motion-reduce:transition-none",
                 position + 1 === current ? "w-8 bg-foreground" : "w-1.5 bg-border",
               )}
             />

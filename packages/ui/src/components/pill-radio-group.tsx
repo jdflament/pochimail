@@ -22,7 +22,7 @@ function PillRadioGroupItem({
     <RadioGroupPrimitive.Item
       data-slot="pill-radio-group-item"
       className={cn(
-        "inline-flex min-h-8 items-center justify-center rounded-full border border-foreground-tertiary px-4 text-sm font-medium whitespace-nowrap outline-none transition-[color,background-color,border-color,transform] duration-150 ease-out hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground motion-reduce:transition-none motion-reduce:active:scale-100",
+        "inline-flex min-h-8 items-center justify-center rounded-full border border-foreground-tertiary px-4 text-sm font-medium whitespace-nowrap outline-none transition-[color,background-color,border-color,transform] duration-(--duration-press) ease-(--ease-out) hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground motion-reduce:transition-none motion-reduce:active:scale-100",
         className,
       )}
       {...props}

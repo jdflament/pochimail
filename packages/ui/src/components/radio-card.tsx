@@ -21,7 +21,7 @@ function RadioCard({ className, title, description, badge, id, ...props }: Radio
       data-slot="radio-card"
       htmlFor={radioId}
       className={cn(
-        "flex min-w-0 cursor-pointer items-center gap-3 rounded-xl bg-card py-3 pr-4 pl-4 text-left shadow-[inset_0_0_0_1px_var(--border)] transition-shadow duration-150 has-[[data-state=checked]]:shadow-[0_0_0_2px_var(--primary)] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50 motion-reduce:transition-none",
+        "flex min-w-0 cursor-pointer items-center gap-3 rounded-xl bg-card py-3 pr-4 pl-4 text-left shadow-[inset_0_0_0_1px_var(--border)] transition-shadow duration-(--duration-press) has-[[data-state=checked]]:shadow-[0_0_0_2px_var(--primary)] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring has-[:focus-visible]:ring-offset-2 has-[:focus-visible]:ring-offset-background has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-50 motion-reduce:transition-none",
         className,
       )}
     >

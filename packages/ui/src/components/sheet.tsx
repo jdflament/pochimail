@@ -1,4 +1,3 @@
-import { useMotionEnabled } from "@pochimail/ui/hooks/use-motion";
 import { t } from "@pochimail/ui/i18n/format.ts";
 import { cn } from "@pochimail/ui/lib/utils";
 import { XIcon } from "lucide-react";
@@ -27,14 +26,11 @@ function SheetOverlay({
   className,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Overlay>) {
-  const motion = useMotionEnabled();
   return (
     <SheetPrimitive.Overlay
       data-slot="sheet-overlay"
       className={cn(
-        "fixed inset-0 z-50 bg-frame/80",
-        motion &&
-          "data-[state=closed]:animate-sheet-scrim-out data-[state=open]:animate-sheet-scrim-in",
+        "fixed inset-0 z-50 bg-frame/80 data-[state=closed]:animate-sheet-scrim-out data-[state=open]:animate-sheet-scrim-in",
         className,
       )}
       {...props}
@@ -50,7 +46,7 @@ const sheetContentClass = cn(
   // From 560px: centred sheet.
   "@min-[560px]:m-4 @min-[560px]:w-full @min-[560px]:max-w-lg @min-[560px]:self-center @min-[560px]:rounded-2xl",
 );
-/** Enter/exit slides, dropped when motion is off (Radix then unmounts at once instead of waiting for animationend). */
+/** Enter/exit slides; under reduced motion or Animations off globals.css zeroes the slide distance, leaving a short opacity cross-fade. */
 const sheetMotionClass =
   "@max-[559px]:data-[state=closed]:animate-sheet-bottom-out @max-[559px]:data-[state=open]:animate-sheet-bottom-in @min-[560px]:data-[state=closed]:animate-sheet-out @min-[560px]:data-[state=open]:animate-sheet-in";
 
@@ -60,7 +56,6 @@ type SheetContentProps = React.ComponentProps<typeof SheetPrimitive.Content> & {
 };
 
 function SheetContent({ className, children, container, ...props }: SheetContentProps) {
-  const motion = useMotionEnabled();
   return (
     <SheetPrimitive.Portal container={container}>
       <SheetOverlay />
@@ -70,13 +65,13 @@ function SheetContent({ className, children, container, ...props }: SheetContent
       >
         <SheetPrimitive.Content
           data-slot="sheet-content"
-          className={cn(sheetContentClass, motion && sheetMotionClass, className)}
+          className={cn(sheetContentClass, sheetMotionClass, className)}
           {...props}
         >
           {children}
           <SheetPrimitive.Close
             data-slot="sheet-close-button"
-            className="absolute top-3 right-3 inline-flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors duration-150 hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden motion-reduce:transition-none [&_svg]:size-4"
+            className="absolute top-3 right-3 inline-flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors duration-(--duration-press) hover:bg-accent hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden motion-reduce:transition-none [&_svg]:size-4"
           >
             <XIcon aria-hidden="true" />
             <span className="sr-only">{t("action.close")}</span>

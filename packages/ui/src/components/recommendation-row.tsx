@@ -1,5 +1,5 @@
 import { Button } from "@pochimail/ui/components/button";
-import { useMotionEnabled } from "@pochimail/ui/hooks/use-motion";
+import { MOTION, MOTION_FADE_EASE, transition } from "@pochimail/ui/lib/motion";
 import { cn } from "@pochimail/ui/lib/utils";
 import { Slot } from "radix-ui";
 import type * as React from "react";
@@ -27,24 +27,31 @@ function RecommendationRow({
   onReview,
   reviewLabel,
   folded = false,
+  style,
   ...props
 }: RecommendationRowProps) {
-  const motion = useMotionEnabled();
   const Comp = asChild ? Slot.Root : "li";
 
   return (
     <Comp
       data-slot="recommendation-row"
       data-folded={folded ? "true" : undefined}
+      style={{
+        transition: transition(
+          { property: "height", ms: MOTION.rowFoldMs },
+          { property: "padding-block", ms: MOTION.rowFoldMs },
+          { property: "opacity", ms: MOTION.rowFadeMs, ease: MOTION_FADE_EASE },
+        ),
+        ...style,
+      }}
       inert={folded}
       aria-hidden={folded ? true : undefined}
       className={cn(
-        "max-h-40 overflow-hidden",
-        motion &&
-          "transition-[max-height,padding,opacity] duration-[260ms,260ms,200ms] ease-[cubic-bezier(0.22,1,0.36,1),cubic-bezier(0.22,1,0.36,1),ease-out]",
-        folded && "max-h-0 py-0 opacity-0",
+        // Real height transition (not a max-height guess): `interpolate-size` lets height animate between auto and 0.
+        "h-auto overflow-hidden [interpolate-size:allow-keywords]",
         "@container grid list-none grid-cols-[minmax(0,1fr)_auto] items-center gap-x-[18px] gap-y-1 py-3.5 @[560px]:grid-cols-[minmax(0,1fr)_auto_auto]",
         className,
+        folded && "h-0 py-0 opacity-0",
       )}
       {...props}
     >

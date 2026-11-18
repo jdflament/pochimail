@@ -8,7 +8,7 @@ import readingPose2x from "@pochimail/ui/assets/mascot/pochi-reading@2x.png";
 import readingPose from "@pochimail/ui/assets/mascot/pochi-reading.png";
 import savingPose2x from "@pochimail/ui/assets/mascot/pochi-saving@2x.png";
 import savingPose from "@pochimail/ui/assets/mascot/pochi-saving.png";
-import { AnimationsContext, useMotionEnabled } from "@pochimail/ui/hooks/use-motion";
+import { useMotionEnabled } from "@pochimail/ui/hooks/use-motion";
 import { MOTION } from "@pochimail/ui/lib/motion";
 import { cn } from "@pochimail/ui/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
@@ -29,23 +29,17 @@ export const MASCOT_BREATHING_DURATION_MS = MOTION.mascotBreathingMs;
 export const MASCOT_BLINK_DURATION_MS = MOTION.mascotBlinkMs;
 export const MASCOT_FOUND_DURATION_MS = MOTION.mascotFoundMs;
 
-// Settings › Appearance: "Show Pochi" hides every mascot; "Animations" holds Pochi still.
 const ShowPochiContext = React.createContext(true);
 
+/** "Show Pochi" setting. The Animations setting comes from MotionProvider (one writer); Pochi reads it through useMotionEnabled. */
 function MascotProvider({
   showPochi = true,
-  animations = true,
   children,
 }: {
   showPochi?: boolean;
-  animations?: boolean;
   children: React.ReactNode;
 }) {
-  return (
-    <ShowPochiContext value={showPochi}>
-      <AnimationsContext value={animations}>{children}</AnimationsContext>
-    </ShowPochiContext>
-  );
+  return <ShowPochiContext value={showPochi}>{children}</ShowPochiContext>;
 }
 
 const mascotVariants = cva("block h-auto select-none", {

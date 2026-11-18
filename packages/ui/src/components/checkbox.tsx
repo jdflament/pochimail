@@ -9,7 +9,7 @@ function Checkbox({ className, ...props }: React.ComponentProps<typeof CheckboxP
     <CheckboxPrimitive.Root
       data-slot="checkbox"
       className={cn(
-        "relative after:absolute after:top-1/2 after:left-1/2 after:h-8 after:w-full after:min-w-8 after:-translate-x-1/2 after:-translate-y-1/2 after:content-[''] peer size-4 shrink-0 rounded-[4px] border border-foreground-tertiary transition-[background-color,border-color,box-shadow] duration-150 outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:bg-input/30 dark:aria-invalid:ring-destructive/40 dark:data-[state=checked]:bg-primary",
+        "relative after:absolute after:top-1/2 after:left-1/2 after:h-8 after:w-full after:min-w-8 after:-translate-x-1/2 after:-translate-y-1/2 after:content-[''] peer size-4 shrink-0 rounded-[4px] border border-foreground-tertiary transition-[background-color,border-color,box-shadow] duration-(--duration-press) outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:bg-input/30 dark:aria-invalid:ring-destructive/40 dark:data-[state=checked]:bg-primary",
         className,
       )}
       {...props}

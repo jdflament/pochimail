@@ -33,25 +33,13 @@
   }
 }
 
-/* Reduced motion, and Settings › Animations off (MotionProvider sets data-animations="off" on <html>): every motion becomes instant.
-   Components also gate in JS (useMotionEnabled); this catches the CSS-only ones. */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-iteration-count: 1 !important; transition-delay: 0s !important; }
-}
-:root[data-animations="off"] *, :root[data-animations="off"] *::before, :root[data-animations="off"] *::after {
-  animation-duration: 0.01ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: 0.01ms !important;
-  transition-delay: 0s !important;
-}
-
 /* Live progress: each new finding slides up 8px and fades in (220ms). Check mark draws itself (150ms). */
 @theme {
   --animate-finding-in: finding-in 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-check-draw: check-draw 150ms cubic-bezier(0.22, 1, 0.36, 1) both;
 
   @keyframes finding-in {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translateY(var(--motion-shift-sm, 8px)); }
     to { opacity: 1; transform: none; }
   }
 
@@ -72,12 +60,12 @@
   --animate-screen-in: screen-in 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
 
   @keyframes screen-in {
-    from { opacity: 0; transform: translateX(16px); }
+    from { opacity: 0; transform: translateX(var(--motion-shift-md, 16px)); }
     to { opacity: 1; transform: none; }
   }
 }
 
-/* Sheet (docs/design.md Motion): scrim fades while the sheet slides in, ~250ms, one easing. Reduced motion collapses these in theme.css. */
+/* Sheet (docs/design.md Motion): scrim fades while the sheet slides in, ~250ms, one easing. Reduced motion and Animations off collapse them at the end of this file. */
 @theme {
   --animate-sheet-scrim-in: sheet-scrim-in 250ms cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-sheet-scrim-out: sheet-scrim-out 250ms cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -88,8 +76,40 @@
 
   @keyframes sheet-scrim-in { from { opacity: 0; } to { opacity: 1; } }
   @keyframes sheet-scrim-out { from { opacity: 1; } to { opacity: 0; } }
-  @keyframes sheet-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-  @keyframes sheet-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(16px); } }
-  @keyframes sheet-bottom-in { from { transform: translateY(100%); } to { transform: none; } }
-  @keyframes sheet-bottom-out { from { transform: none; } to { transform: translateY(100%); } }
+  @keyframes sheet-in { from { opacity: 0; transform: translateY(var(--motion-shift-md, 16px)); } to { opacity: 1; transform: none; } }
+  @keyframes sheet-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(var(--motion-shift-md, 16px)); } }
+  @keyframes sheet-bottom-in { from { opacity: 0; transform: translateY(var(--motion-sheet-from, 100%)); } to { opacity: 1; transform: none; } }
+  @keyframes sheet-bottom-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(var(--motion-sheet-from, 100%)); } }
+}
+
+/* Reduced motion, and Settings › Animations off (MotionProvider sets data-animations="off" on <html>): every motion becomes an instant
+   (~120ms) opacity cross-fade. No transform moves: slide distances go to 0, scale/translate enter/exit vars go neutral, and only
+   opacity and colors may transition. Two identical blocks (media query / attribute), keep them in sync (motion.test.ts checks both). */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-shift-sm: 0px; --motion-shift-md: 0px; --motion-sheet-from: 0px;
+  }
+  *, *::before, *::after, [data-sonner-toast] {
+    --tw-enter-scale: 1 !important; --tw-exit-scale: 1 !important;
+    --tw-enter-translate-x: 0 !important; --tw-enter-translate-y: 0 !important;
+    --tw-exit-translate-x: 0 !important; --tw-exit-translate-y: 0 !important;
+    animation-duration: 120ms !important;
+    animation-iteration-count: 1 !important;
+    transition-property: opacity, color, background-color, border-color, outline-color, box-shadow, fill, stroke !important;
+    transition-duration: 120ms !important;
+    transition-delay: 0s !important;
+  }
+}
+:root[data-animations="off"] {
+  --motion-shift-sm: 0px; --motion-shift-md: 0px; --motion-sheet-from: 0px;
+}
+:root[data-animations="off"] *, :root[data-animations="off"] *::before, :root[data-animations="off"] *::after, :root[data-animations="off"] [data-sonner-toast] {
+  --tw-enter-scale: 1 !important; --tw-exit-scale: 1 !important;
+  --tw-enter-translate-x: 0 !important; --tw-enter-translate-y: 0 !important;
+  --tw-exit-translate-x: 0 !important; --tw-exit-translate-y: 0 !important;
+  animation-duration: 120ms !important;
+  animation-iteration-count: 1 !important;
+  transition-property: opacity, color, background-color, border-color, outline-color, box-shadow, fill, stroke !important;
+  transition-duration: 120ms !important;
+  transition-delay: 0s !important;
 }

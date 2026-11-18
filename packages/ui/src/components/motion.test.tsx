@@ -1,10 +1,14 @@
 import { CountUp } from "@pochimail/ui/components/count-up";
+import { Mascot, MascotProvider } from "@pochimail/ui/components/mascot";
 import { MotionProvider } from "@pochimail/ui/components/motion-provider";
 import { RecommendationRow } from "@pochimail/ui/components/recommendation-row";
-import { Sheet, SheetContent, SheetTitle } from "@pochimail/ui/components/sheet";
+import { Toaster, undoToast } from "@pochimail/ui/components/sonner";
 import { StatusStrip } from "@pochimail/ui/components/status-strip";
 import { StorageBar } from "@pochimail/ui/components/storage-bar";
-import { render, screen } from "@testing-library/react";
+import { t } from "@pochimail/ui/i18n/format.ts";
+import { act, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const segments = [
@@ -26,7 +30,6 @@ function reducedMotion(on: boolean) {
 
 afterEach(() => vi.restoreAllMocks());
 
-// Each case: motion on by default, then off via the OS preference and via the Animations setting.
 const modes = [
   ["prefers-reduced-motion", () => reducedMotion(true), (ui: React.ReactNode) => ui],
   [
@@ -37,18 +40,8 @@ const modes = [
 ] as const;
 
 describe.each(modes)("%s", (_name, setup, wrap) => {
-  // Guards: the progress line gliding or the finding sliding up when motion is off.
-  it("StatusStrip has no glide and no slide-up", () => {
-    setup();
-    render(wrap(<StatusStrip progress={40} headline="Sorting privately" status="Labeled 214" />));
-    expect(document.querySelector("[data-slot=status-progress]")?.className).not.toContain(
-      "transition",
-    );
-    expect(screen.getByText("Labeled 214").className).not.toContain("animate-");
-  });
-
-  // Guards: the bar settling from empty when motion is off (it must render final widths at once).
-  it("StorageBar renders final widths immediately with no transition", () => {
+  // Guards: the bar settling from empty (a transform-free but still animated fill) when motion is off.
+  it("StorageBar renders final widths immediately", () => {
     setup();
     render(wrap(<StorageBar segments={segments} summary="5 GB used" />));
     const seg = document.querySelector<HTMLElement>("[data-slot=storage-segment]");
@@ -56,49 +49,51 @@ describe.each(modes)("%s", (_name, setup, wrap) => {
     expect(seg?.style.transition).toBe("");
   });
 
-  // Guards: the count-up rolling from 0 when motion is off.
+  // Guards: the count-up rolling through intermediate values when motion is off.
   it("CountUp shows the final number at once", () => {
     setup();
     render(wrap(<CountUp value={12940} />));
-    expect(screen.getByText("12940")).toBeTruthy();
+    expect(screen.getAllByText("12940")).toHaveLength(2);
+  });
+});
+
+describe("MotionProvider", () => {
+  // Guards: Animations off leaking to the rest of the app after the provider unmounts (or never being applied to CSS-only motion).
+  it("sets data-animations=off on the document and clears it on unmount", () => {
+    const { unmount } = render(<MotionProvider animations={false}>x</MotionProvider>);
+    expect(document.documentElement.getAttribute("data-animations")).toBe("off");
+    unmount();
+    expect(document.documentElement.hasAttribute("data-animations")).toBe(false);
   });
 
-  // Guards: row fold transition (height/opacity) still applied when motion is off.
-  it("RecommendationRow folds without a transition", () => {
-    setup();
-    render(wrap(<RecommendationRow sentence="Archive" reviewLabel="Review" folded />));
-    const row = document.querySelector("[data-slot=recommendation-row]");
-    expect(row?.getAttribute("data-folded")).toBe("true");
-    expect(row?.className).not.toContain("transition");
-  });
-
-  // Guards: the sheet slide/scrim animations running (and delaying unmount) when motion is off.
-  it("Sheet enters without slide or scrim animation", () => {
-    setup();
-    render(
-      wrap(
-        <Sheet open>
-          <SheetContent>
-            <SheetTitle>Summary</SheetTitle>
-          </SheetContent>
-        </Sheet>,
-      ),
+  // Guards: two writers for the Animations setting, so a nested MascotProvider keeps Pochi moving while Animations is off.
+  it("holds Pochi still even inside a MascotProvider", () => {
+    const html = renderToStaticMarkup(
+      <MotionProvider animations={false}>
+        <MascotProvider>
+          <Mascot pose="default" />
+        </MascotProvider>
+      </MotionProvider>,
     );
-    expect(document.querySelector("[data-slot=sheet-content]")?.className).not.toContain(
-      "animate-sheet",
-    );
-    expect(document.querySelector("[data-slot=sheet-overlay]")?.className).not.toContain(
-      "animate-sheet",
-    );
+    expect(html).not.toMatch(/animate-pochi/);
   });
 });
 
 describe("with motion on", () => {
-  // Guards: numbers jumping to the final value instead of rolling up once from 0 (and never settling).
+  // Guards: numbers jumping to the final value instead of rolling up once from 0.
   it("CountUp rolls up from 0 and lands on the value", async () => {
     render(<CountUp value={100} />);
-    expect(screen.getByText("0")).toBeTruthy();
-    expect(await screen.findByText("100", {}, { timeout: 2000 })).toBeTruthy();
+    expect(screen.getAllByText("0").length).toBeGreaterThan(0);
+    await vi.waitFor(() => expect(screen.getAllByText("100")).toHaveLength(2), { timeout: 2000 });
+  });
+
+  // Guards: screen readers hearing 0 and every intermediate value instead of the final number once.
+  it("CountUp exposes the final value once to assistive tech", () => {
+    render(<CountUp value={12940} />);
+    const readable = screen
+      .getAllByText(/\d/)
+      .filter((el) => el.getAttribute("aria-hidden") !== "true");
+    expect(readable.map((el) => el.textContent)).toEqual(["12940"]);
   });
 
   // Guards: the finding changing without the slide-up (live progress reads as a flicker).
@@ -107,11 +102,26 @@ describe("with motion on", () => {
     expect(screen.getByText("Labeled 1").className).toContain("animate-finding-in");
   });
 
-  // Guards: the folded row staying reachable by keyboard or screen reader.
-  it("a folded row is inert and hidden", () => {
+  // Guards: the folded row staying reachable by keyboard or screen reader, or folding with a guessed max-height instead of its real height.
+  it("a folded row is inert, hidden, and transitions its measured height", () => {
     render(<RecommendationRow sentence="Archive" reviewLabel="Review" folded />);
-    const row = document.querySelector("[data-slot=recommendation-row]");
+    const row = document.querySelector<HTMLElement>("[data-slot=recommendation-row]");
     expect(row?.hasAttribute("inert")).toBe(true);
     expect(row?.getAttribute("aria-hidden")).toBe("true");
+    expect(row?.style.transition).toContain("height 260ms");
+    expect(row?.className).not.toMatch(/max-h-/);
+  });
+
+  // Guards: Undo firing twice or no toast shown after a cleanup.
+  it("undoToast shows the message and runs Undo once", async () => {
+    const onUndo = vi.fn();
+    render(<Toaster theme="dark" />);
+    act(() => {
+      undoToast("24 emails archived", onUndo);
+    });
+    const undo = await screen.findByRole("button", { name: t("action.undo") });
+    await userEvent.dblClick(undo);
+    expect(screen.getByText("24 emails archived")).toBeTruthy();
+    expect(onUndo).toHaveBeenCalledTimes(1);
   });
 });
