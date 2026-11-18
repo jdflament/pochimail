@@ -13,7 +13,7 @@ import { t } from "@pochimail/ui/i18n/format.ts";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { LockIcon } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { queryKeys } from "../../lib/query/keys.ts";
 import { useWorkerClient } from "../../lib/worker-context.tsx";
 
@@ -29,8 +29,21 @@ export function SetupPage() {
   // The form starts from the saved answers, so it waits for them; the title stays put so focus is not lost.
   return (
     <div className="flex w-full flex-col gap-8">
-      <h1 className="sr-only">{t("setup.title")}</h1>
+      {/* Shown on focus so the keyboard focus the layout moves here is visible (docs/design.md, focus). */}
+      <h1 className="sr-only rounded-md focus:not-sr-only focus:self-center focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+        {t("setup.title")}
+      </h1>
       {settings.data ? <SetupForm initial={settings.data} /> : null}
+      {settings.isError ? (
+        <div className="flex flex-col items-center gap-3">
+          <p role="alert" className="text-sm text-destructive">
+            {t("setup.settingsError")}
+          </p>
+          <Button variant="secondary" onClick={() => void settings.refetch()}>
+            {t("setup.retry")}
+          </Button>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -42,12 +55,28 @@ function SetupForm({ initial }: { initial: Choice }) {
   const [capabilities, setCapabilities] = useState(initial.capabilities);
   const [autonomy, setAutonomy] = useState(initial.autonomy);
 
+  // Accounts whose scan already runs: a retry after a partial failure must not start them twice.
+  const started = useRef(new Set<string>());
+  // Set synchronously: a second click can land before the pending state has rendered.
+  const inFlight = useRef(false);
+  const noneChosen = !CAPABILITIES.some((capability) => capabilities[capability]);
+
   const start = useMutation({
     mutationFn: async () => {
       await client.call("settings.update", { autonomy, capabilities });
       const accounts = await client.call("accounts.list");
-      // The scan runs in the background; progress arrives on the Overview.
-      await Promise.all(accounts.map(({ id }) => client.call("scan.start", { accountId: id })));
+      // The scans run in the background; progress arrives on the Overview.
+      const pending = accounts.filter(({ id }) => !started.current.has(id));
+      const results = await Promise.allSettled(
+        pending.map(async ({ id }) => {
+          await client.call("scan.start", { accountId: id });
+          started.current.add(id);
+        }),
+      );
+      if (results.some((result) => result.status === "rejected")) throw new Error("scan.start");
+    },
+    onSettled: () => {
+      inFlight.current = false;
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.settings() });
@@ -63,6 +92,8 @@ function SetupForm({ initial }: { initial: Choice }) {
       className="flex w-full flex-col gap-8 text-left"
       onSubmit={(event) => {
         event.preventDefault();
+        if (inFlight.current || noneChosen) return;
+        inFlight.current = true;
         start.mutate();
       }}
     >
@@ -122,9 +153,20 @@ function SetupForm({ initial }: { initial: Choice }) {
       </section>
 
       <div className="flex flex-col items-center gap-3">
-        <Button type="submit" size="lg" className="w-full max-w-[26rem]" disabled={start.isPending}>
+        <Button
+          type="submit"
+          size="lg"
+          className="w-full max-w-[26rem]"
+          disabled={start.isPending || noneChosen}
+          aria-describedby={noneChosen ? "setup-none" : undefined}
+        >
           {t("setup.start")}
         </Button>
+        {noneChosen ? (
+          <p id="setup-none" className="text-sm text-muted-foreground">
+            {t("setup.capabilities.none")}
+          </p>
+        ) : null}
         {start.isError ? (
           <p role="alert" className="text-sm text-destructive">
             {t("setup.error")}

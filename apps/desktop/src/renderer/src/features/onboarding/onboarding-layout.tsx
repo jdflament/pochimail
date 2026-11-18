@@ -64,7 +64,7 @@ export function OnboardingLayout() {
           key={pathname}
           ref={content}
           className={cn(
-            "animate-screen-in motion-reduce:animate-none flex w-full flex-col items-center text-center [&_h1]:outline-none",
+            "animate-screen-in motion-reduce:animate-none flex w-full flex-col items-center text-center [&_h1]:rounded-md [&_h1]:outline-none [&_h1]:focus-visible:ring-2 [&_h1]:focus-visible:ring-ring [&_h1]:focus-visible:ring-offset-2 [&_h1]:focus-visible:ring-offset-background",
             !isSetup && "mt-8",
           )}
         >

@@ -1,6 +1,6 @@
 import type { StorageError } from "../errors.ts";
 import type { WorkspaceId } from "../ids.ts";
-import type { AutonomyLevel } from "../policies/autonomy.ts";
+import { AUTONOMY_LEVELS, type AutonomyLevel } from "../policies/autonomy.ts";
 import type { AsyncResult } from "./common.ts";
 
 /** Workspace-wide preferences the Settings screen edits. Defaults are the safe ones: suggest only, counts-only notifications. */
@@ -39,4 +39,32 @@ export interface SettingsStore {
   get(workspaceId: WorkspaceId): AsyncResult<AppSettings, StorageError>;
   /** Replaces the stored settings. */
   save(workspaceId: WorkspaceId, settings: AppSettings): AsyncResult<void, StorageError>;
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+/**
+ * Turns whatever a store holds into the current shape, never leaving a field undefined. A legacy row
+ * `{ autopilot, notifications }` keeps its meaning: `autopilot: true` becomes autonomy "autopilot",
+ * anything else falls back to the safe default "suggest".
+ */
+export function normalizeSettings(raw: unknown): AppSettings {
+  const row = isRecord(raw) ? raw : {};
+  const autonomy = AUTONOMY_LEVELS.find((level) => level === row["autonomy"]);
+  const saved = isRecord(row["capabilities"]) ? row["capabilities"] : {};
+  const capabilities = Object.fromEntries(
+    CAPABILITIES.map((name) => {
+      const value = saved[name];
+      return [name, typeof value === "boolean" ? value : DEFAULT_CAPABILITIES[name]];
+    }),
+  ) as { -readonly [K in Capability]: boolean };
+  return {
+    autonomy: autonomy ?? (row["autopilot"] === true ? "autopilot" : DEFAULT_APP_SETTINGS.autonomy),
+    capabilities,
+    notifications:
+      typeof row["notifications"] === "boolean"
+        ? row["notifications"]
+        : DEFAULT_APP_SETTINGS.notifications,
+  };
 }

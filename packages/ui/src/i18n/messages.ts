@@ -104,13 +104,16 @@ export const messages = {
   "setup.autonomy.autopilot.title": entry("Autopilot", []),
   "setup.autonomy.autopilot.description": entry("I handle the obvious, then tell you.", []),
   "setup.autonomy.autopilot.reminder": entry(
-    "With Autopilot I only archive or unsubscribe when I'm at least {percent}% sure, and I never touch email from real people. I report what I did and you can undo it, except an unsubscribe, which can't be undone.",
+    "With Autopilot I only archive or unsubscribe when I'm at least {percent}% sure, and I never touch email from real people. I log everything and report it afterward. You can undo it, except an unsubscribe.",
     ["percent"],
   ),
   "setup.invariants": entry(
-    "In every mode, I never delete anything, never act on email from real people without asking, and everything can be undone.",
+    "In every mode, I never delete anything and never act on email from real people without asking. I log every action, and you can undo any of them except an unsubscribe.",
     [],
   ),
+  "setup.capabilities.none": entry("Choose at least one thing for me to help with.", []),
+  "setup.settingsError": entry("I couldn't load your choices.", []),
+  "setup.retry": entry("Try again", []),
   "setup.start": entry("Start sorting", []),
   "setup.error": entry("I couldn't start sorting. Please try again.", []),
 

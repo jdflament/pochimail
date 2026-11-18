@@ -94,13 +94,19 @@ export const fr = {
     [],
   ),
   "setup.autonomy.autopilot.reminder": entry(
-    "Avec le pilote automatique, je n'archive ou ne désabonne que si j'en suis sûr à au moins {percent} %, et je ne touche jamais aux emails de vraies personnes. Je vous rends compte de ce que j'ai fait et vous pouvez l'annuler, sauf un désabonnement, qui est irréversible.",
+    "Avec le pilote automatique, je n'archive ou ne désabonne que si j'en suis sûr à au moins {percent} %, et je ne touche jamais aux emails de vraies personnes. Je consigne tout et je vous en rends compte ensuite. Vous pouvez l'annuler, sauf un désabonnement.",
     ["percent"],
   ),
   "setup.invariants": entry(
-    "Quel que soit le mode, je ne supprime jamais rien, je n'agis jamais sur les emails de vraies personnes sans vous demander, et tout peut être annulé.",
+    "Quel que soit le mode, je ne supprime jamais rien et je n'agis jamais sur les emails de vraies personnes sans vous demander. Je consigne chaque action, et vous pouvez toutes les annuler, sauf un désabonnement.",
     [],
   ),
+  "setup.capabilities.none": entry(
+    "Choisissez au moins une chose pour laquelle je peux vous aider.",
+    [],
+  ),
+  "setup.settingsError": entry("Je n'ai pas pu charger vos choix.", []),
+  "setup.retry": entry("Réessayer", []),
   "setup.start": entry("Commencer le tri", []),
   "setup.error": entry("Je n'ai pas pu lancer le tri. Veuillez réessayer.", []),
 

@@ -87,13 +87,16 @@ export const ja = {
   "setup.autonomy.autopilot.title": entry("オートパイロット", []),
   "setup.autonomy.autopilot.description": entry("明らかなものは私が処理し、あとで報告します。", []),
   "setup.autonomy.autopilot.reminder": entry(
-    "オートパイロットでは、{percent}％以上確実なときだけアーカイブや配信停止を行い、個人からのメールには一切触れません。行った内容は報告され、元に戻せます。ただし配信停止は元に戻せません。",
+    "オートパイロットでは、{percent}％以上確実なときだけアーカイブや配信停止を行い、個人からのメールには一切触れません。すべて記録し、あとで報告します。配信停止を除き、元に戻せます。",
     ["percent"],
   ),
   "setup.invariants": entry(
-    "どのモードでも、何も削除せず、個人からのメールは確認なしに操作せず、すべて元に戻せます。",
+    "どのモードでも、何も削除せず、個人からのメールは確認なしに操作しません。すべての操作を記録し、配信停止を除いて元に戻せます。",
     [],
   ),
+  "setup.capabilities.none": entry("お手伝いすることを1つ以上選んでください。", []),
+  "setup.settingsError": entry("選択内容を読み込めませんでした。", []),
+  "setup.retry": entry("もう一度試す", []),
   "setup.start": entry("整理を始める", []),
   "setup.error": entry("整理を開始できませんでした。もう一度お試しください。", []),
 
