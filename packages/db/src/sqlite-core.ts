@@ -104,6 +104,17 @@ const messageOf = (r: Row): Message =>
 const MESSAGE_COLUMNS =
   "workspace_id, id, account_id, thread_id, sender, recipients, subject, snippet, received_at, has_list_unsubscribe, opened, topic_ids, suspicious_reasons, suspicious_confidence, category";
 
+/** `granted_scopes` is a JSON array of scope strings; a bad value means "no scopes", never a crash. */
+const parseScopes = (raw: unknown): string[] => {
+  if (typeof raw !== "string") return [];
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((s): s is string => typeof s === "string") : [];
+  } catch {
+    return [];
+  }
+};
+
 const accountOf = (r: Row) =>
   accountSchema.parse({
     schemaVersion: 1,
@@ -112,6 +123,7 @@ const accountOf = (r: Row) =>
     provider: r.provider,
     address: r.address,
     connectedAt: r.connected_at,
+    grantedScopes: parseScopes(r.granted_scopes),
   });
 
 const threadOf = (r: Row) =>
@@ -249,13 +261,14 @@ export function createSqliteCore(db: Database) {
       guard(() => {
         const v = accountSchema.parse(a);
         run(
-          `INSERT INTO account (workspace_id, id, provider, address, connected_at) VALUES (?, ?, ?, ?, ?)
-           ON CONFLICT (workspace_id, id) DO UPDATE SET provider = excluded.provider, address = excluded.address, connected_at = excluded.connected_at`,
+          `INSERT INTO account (workspace_id, id, provider, address, connected_at, granted_scopes) VALUES (?, ?, ?, ?, ?, ?)
+           ON CONFLICT (workspace_id, id) DO UPDATE SET provider = excluded.provider, address = excluded.address, connected_at = excluded.connected_at, granted_scopes = excluded.granted_scopes`,
           v.workspaceId,
           v.id,
           v.provider,
           v.address,
           v.connectedAt,
+          JSON.stringify(v.grantedScopes),
         );
       }),
     /**

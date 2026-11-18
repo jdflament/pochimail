@@ -97,6 +97,7 @@ export async function runScenario(options: ScenarioOptions): Promise<ScenarioRes
       provider: fixture.provider,
       address: fixture.address,
       connectedAt: clock.now().toISOString(),
+      grantedScopes: [],
     };
     unwrap(await uow.run((tx) => tx.repositories.accounts.save(account), live()));
     const fixtureProvider = createFixtureMailProvider({

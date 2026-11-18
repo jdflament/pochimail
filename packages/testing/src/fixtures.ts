@@ -26,6 +26,7 @@ export const makeAccount = (over: Partial<Account> = {}): Account => ({
   provider: "gmail",
   address: "owner@example.com",
   connectedAt: AT,
+  grantedScopes: [],
   ...over,
 });
 

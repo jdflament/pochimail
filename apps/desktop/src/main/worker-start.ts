@@ -1,29 +1,33 @@
 import type { Logger } from "@pochimail/core/logger";
 import type { Result } from "@pochimail/core/result";
 import type { MessageChannelMain, MessagePortMain } from "electron";
+import { serveOpenBrowser } from "../shared/ipc/open-browser.ts";
 import { serveSecrets } from "../shared/ipc/secrets.ts";
 import type { SecretVault } from "./secret-vault.ts";
 import type { DatabaseKeyError } from "./storage-key.ts";
 
 /**
- * Hands the worker what only main can produce: the database key and a private port to the keychain service.
- * The port goes to the worker alone, never to a WebContents. Without a key (no keychain, no user choice yet) the
- * worker starts without one and must not open the database.
+ * Hands the worker what only main can produce: the database key and a private port to the keychain service
+ * and to the system browser. The port goes to the worker alone, never to a WebContents. Without a key (no
+ * keychain, no user choice yet) the worker starts without one and must not open the database.
  */
 export const startWorker = (
   worker: { postMessage: (message: unknown, transfer: MessagePortMain[]) => void },
   secrets: SecretVault,
   databaseKey: Buffer | undefined,
   createChannel: () => Pick<MessageChannelMain, "port1" | "port2">,
+  openExternal: (url: string) => Promise<void> = async () => {
+    throw new Error("no system browser");
+  },
 ): void => {
   const { port1, port2 } = createChannel();
-  serveSecrets(
-    {
-      post: (message) => port1.postMessage(message),
-      onMessage: (handler) => port1.on("message", (event) => handler(event.data)),
-    },
-    secrets,
-  );
+  const transport = {
+    post: (message: unknown) => port1.postMessage(message),
+    onMessage: (handler: (data: unknown) => void) =>
+      port1.on("message", (event) => handler(event.data)),
+  };
+  serveSecrets(transport, secrets);
+  serveOpenBrowser(transport, openExternal);
   port1.start();
   worker.postMessage(
     {
@@ -46,6 +50,8 @@ export const bootWorker = async (options: {
   secrets: SecretVault;
   loadKey: () => Promise<Result<Buffer | undefined, DatabaseKeyError>>;
   createChannel: () => Pick<MessageChannelMain, "port1" | "port2">;
+  /** Main opens the system browser for sign-in; the worker only ever asks for a consent URL. */
+  openExternal?: (url: string) => Promise<void>;
   logger: Logger;
 }): Promise<boolean> => {
   const { worker, secrets, loadKey, createChannel, logger } = options;
@@ -60,6 +66,6 @@ export const bootWorker = async (options: {
     worker.kill();
     return false;
   }
-  startWorker(worker, secrets, key.value, createChannel);
+  startWorker(worker, secrets, key.value, createChannel, options.openExternal);
   return true;
 };

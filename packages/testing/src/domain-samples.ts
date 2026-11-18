@@ -44,6 +44,7 @@ export const sampleBuilders = {
     provider: r.pick(PROVIDER_KINDS),
     address: addr(r),
     connectedAt: ts(r),
+    grantedScopes: r.bool() ? ["gmail.readonly"] : [],
   }),
   incomingMessage: (r: Rng) => ({
     ...base(r),

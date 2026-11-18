@@ -8,7 +8,13 @@
     "./package-info": "./src/package-info.ts",
     "./egress/allowlist": "./src/egress/allowlist.ts",
     "./egress/http-client": "./src/egress/http-client.ts",
-    "./egress/http-client-contract": "./src/egress/http-client-contract.ts"
+    "./egress/http-client-contract": "./src/egress/http-client-contract.ts",
+    "./oauth/http": "./src/oauth/http.ts",
+    "./oauth/loopback": "./src/oauth/loopback.ts",
+    "./oauth/providers": "./src/oauth/providers.ts",
+    "./oauth/revoke": "./src/oauth/revoke.ts",
+    "./oauth/sign-in": "./src/oauth/sign-in.ts",
+    "./oauth/tokens": "./src/oauth/tokens.ts"
   },
   "scripts": {
     "typecheck": "tsc",
@@ -17,7 +23,8 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@pochimail/core": "workspace:*"
+    "@pochimail/core": "workspace:*",
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@pochimail/testing": "workspace:*",
