@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { readFileSync } from "node:fs";
 import { Button } from "@pochimail/ui/components/button";
 import { renderToStaticMarkup } from "react-dom/server";

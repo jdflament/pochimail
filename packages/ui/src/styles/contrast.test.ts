@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
@@ -50,6 +51,9 @@ const textPairs: [string, string][] = [
     ["foreground-tertiary", s],
   ]),
   ["primary-foreground", "primary"],
+  // Composites (M4-04): card text, the always-dark undo toast, the selected pill label.
+  ["card-foreground", "card"],
+  ["popover-foreground", "popover"],
   ["destructive", "background"],
   ["destructive", "card"],
   ["background", "destructive"], // destructive button label
@@ -135,8 +139,11 @@ it("reports a token changed to a failing value", () => {
 });
 
 // Guards: the control outlines reverting to the hairline --input/--border token (about 1.3:1, fails the 3:1 graphic rule).
-it.each(["checkbox", "radio-group"])("%s outline uses the gated token", (name) => {
-  const src = readFileSync(new URL(`../components/${name}.tsx`, import.meta.url), "utf8");
-  expect(src).toContain("border-foreground-tertiary");
-  expect(src).not.toMatch(/border-(input|border)\b/);
-});
+it.each(["checkbox", "radio-group", "pill-radio-group"])(
+  "%s outline uses the gated token",
+  (name) => {
+    const src = readFileSync(new URL(`../components/${name}.tsx`, import.meta.url), "utf8");
+    expect(src).toContain("border-foreground-tertiary");
+    expect(src).not.toMatch(/border-(input|border)\b/);
+  },
+);
