@@ -1,5 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { AiUnavailable } from "@pochimail/core/errors";
 import { err } from "@pochimail/core/result";
 import { describe, expect, it } from "vitest";
@@ -8,7 +9,7 @@ import { main } from "./main.ts";
 import { runScenario } from "./scenario.ts";
 
 const golden = readFileSync(new URL("./golden/mock-small.txt", import.meta.url), "utf8");
-const cliDir = new URL("..", import.meta.url).pathname;
+const cliDir = fileURLToPath(new URL("..", import.meta.url));
 
 async function run(argv: string[], overrides?: Parameters<typeof main>[2]) {
   const lines: string[] = [];
@@ -24,10 +25,14 @@ describe("pochi:run fixtures/mock", () => {
   });
 
   it("runs as a real command and exits 0 with the same summary (CI integration)", () => {
-    const stdout = execFileSync("pnpm", ["--silent", "pochi:run", "fixtures/mock"], {
-      cwd: cliDir,
-      encoding: "utf8",
-    });
+    const stdout = execFileSync(
+      process.execPath,
+      ["--import", "tsx", "src/main.ts", "fixtures/mock"],
+      {
+        cwd: cliDir,
+        encoding: "utf8",
+      },
+    );
     expect(stdout).toBe(golden);
   });
 
