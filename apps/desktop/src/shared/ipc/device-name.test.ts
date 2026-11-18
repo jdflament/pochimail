@@ -46,7 +46,7 @@ describe("device-name RPC contract (M4-07)", () => {
   it("uses the neutral name when the worker's OS is empty", async () => {
     const { client, server, close } = loopback();
     serveDeviceName(server, undefined);
-    expect(await createRpcClient(client).call("device.name")).toBe("computer");
+    expect(await createRpcClient(client).call("device.name")).toBe("device");
     close();
   });
 

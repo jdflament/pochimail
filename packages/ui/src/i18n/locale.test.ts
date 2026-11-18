@@ -27,10 +27,10 @@ describe("locale resolution from the OS/app language list (P13)", () => {
     expect(localeFromLanguages(undefined)).toBe("en");
   });
 
-  it("labels the unnamed host in the active language (guards 'votre computer' in French copy)", () => {
-    expect(deviceLabel("computer", "fr")).toBe("ordinateur");
-    expect(deviceLabel("computer", "ja")).toBe("パソコン");
-    expect(deviceLabel("computer", "en")).toBe("computer");
+  it("labels the unnamed host in the active language (guards an English word in French copy)", () => {
+    expect(deviceLabel("device", "fr")).toBe("appareil");
+    expect(deviceLabel("device", "ja")).toBe("デバイス");
+    expect(deviceLabel("device", "en")).toBe("device");
     expect(deviceLabel("Mac", "ja")).toBe("Mac");
     expect(deviceLabel("PC", "fr")).toBe("PC");
   });

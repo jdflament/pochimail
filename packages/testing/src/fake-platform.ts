@@ -3,7 +3,7 @@ import type { DeviceName, OperatingSystem, Platform } from "@pochimail/core/port
 const DEVICE: Record<OperatingSystem, DeviceName> = {
   macos: "Mac",
   windows: "PC",
-  linux: "computer",
+  linux: "device",
 };
 
 export function createFakePlatform(

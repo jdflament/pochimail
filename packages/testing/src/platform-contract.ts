@@ -11,7 +11,7 @@ export const platformChecks: readonly Check<Platform>[] = [
     },
   ),
   check("the device name matches the OS (guards 'your Mac' on Windows)", async (p) => {
-    const expected = { macos: "Mac", windows: "PC", linux: "computer" }[p.os];
+    const expected = { macos: "Mac", windows: "PC", linux: "device" }[p.os];
     expect(p.deviceName()).toBe(expected);
   }),
   check(

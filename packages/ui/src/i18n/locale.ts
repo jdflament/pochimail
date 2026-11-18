@@ -13,15 +13,16 @@ export const localeFromLanguages = (languages: readonly string[] | undefined): U
   return "en";
 };
 
-const COMPUTER_LABEL: Readonly<Record<UserLocale, string>> = {
-  en: "computer",
-  fr: "ordinateur",
-  ja: "パソコン",
+/** Generic fallback word, never a guessed machine: the host is not always a computer (JD, 2026-11-19). */
+const DEVICE_LABEL: Readonly<Record<UserLocale, string>> = {
+  en: "device",
+  fr: "appareil",
+  ja: "デバイス",
 };
 
 /**
- * The OS name is a label, not a code: `deviceName()` returns "computer" when it cannot tell,
- * and French/Japanese copy must not say "votre computer" or "このcomputer".
+ * The OS name is a label, not a code: `deviceName()` returns "device" when it cannot tell,
+ * so French/Japanese copy says "votre appareil" or "このデバイス", never an English word.
  */
 export const deviceLabel = (device: string, locale: Locale): string =>
-  device === "computer" ? COMPUTER_LABEL[locale === "pseudo" ? "en" : locale] : device;
+  device === "device" ? DEVICE_LABEL[locale === "pseudo" ? "en" : locale] : device;

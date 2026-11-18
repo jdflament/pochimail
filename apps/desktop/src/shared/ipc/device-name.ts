@@ -9,4 +9,4 @@ const DEVICE_BY_OS: Readonly<Record<string, DeviceName>> = {
 
 /** Unknown, empty or non-string OS input yields the neutral name, never "undefined". */
 export const deviceNameFromOS = (os: unknown): DeviceName =>
-  typeof os === "string" ? (DEVICE_BY_OS[os.toLowerCase()] ?? "computer") : "computer";
+  typeof os === "string" ? (DEVICE_BY_OS[os.toLowerCase()] ?? "device") : "device";

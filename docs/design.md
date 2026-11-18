@@ -67,7 +67,7 @@ Button (primary charcoal, secondary outline, ghost), Switch, Checkbox card, Radi
 Never animate: layout jumps, decorative loops, pulsing indicators, skeleton shimmer longer than needed. With `prefers-reduced-motion`, every motion becomes an instant cross-fade and the mascot holds still.
 
 ## Writing
-- Device name is dynamic: use `{device}` (Mac / PC / computer) in every string, e.g. "Sorting privately on this {device}". Designs show "Mac" because macOS ships first.
+- Device name is dynamic: use `{device}` (Mac / PC / device) in every string, e.g. "Sorting privately on this {device}". Designs show "Mac" because macOS ships first.
 - Use realistic mock data in designs and fixtures, never placeholder tokens.
 - "email / emails", never "mails". "Pochi" or "I" for the assistant.
 - Screen titles are functional ("Overview", "Newsletters"), never greetings.
