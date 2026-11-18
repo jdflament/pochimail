@@ -50,6 +50,21 @@ export const messages = {
   "overview.catch.title": entry("Catch what matters", []),
   "overview.clean.title": entry("Clean up", []),
   "summary.from": entry("From Pochi · {date, date, long} · on this {device}", ["date", "device"]),
+  "summary.title": entry("While you were away", []),
+  "summary.sentence": entry(
+    "{count, plural, one {I sorted # new email.} other {I sorted # new emails.}} Nothing was deleted.",
+    ["count"],
+  ),
+  "summary.figure.sorted": entry("sorted", []),
+  "summary.figure.review": entry("to review", []),
+  "summary.figure.free": entry("to free", []),
+  "summary.tidy": entry("Keep it tidy", []),
+  "summary.tidy.weekly": entry("Weekly", []),
+  "summary.tidy.daily": entry("Daily", []),
+  "summary.later": entry("Later", []),
+  "summary.reviewCount": entry("{count, plural, one {Review # email} other {Review # emails}}", [
+    "count",
+  ]),
 
   "shell.loading": entry("Starting…", []),
   "shell.error.title": entry("Something went wrong", []),
