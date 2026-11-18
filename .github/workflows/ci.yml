@@ -2,7 +2,9 @@ name: CI
 
 on:
   pull_request:
+  # Feature-branch pushes are covered by pull_request; only run push CI on main (avoids double runs).
   push:
+    branches: [main]
 
 permissions:
   contents: read
