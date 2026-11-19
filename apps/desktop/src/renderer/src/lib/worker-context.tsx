@@ -1,6 +1,6 @@
 import { t } from "@pochimail/ui/i18n/format.ts";
 import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
-import type { RpcClient } from "../../../shared/ipc/client.ts";
+import type { RpcClient } from "#shared/ipc/client.ts";
 import { connectWorker } from "./worker.ts";
 
 type WorkerState =

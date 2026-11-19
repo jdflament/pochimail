@@ -1,5 +1,5 @@
 import type { MessageKey } from "@pochimail/ui/i18n/messages.ts";
-import type { OutputOf } from "../../../../shared/ipc/contract.ts";
+import type { OutputOf } from "#shared/ipc/contract.ts";
 
 export type OverviewData = OutputOf<"overview.get">;
 type Cleanable = OverviewData["cleanable"][number]["category"];

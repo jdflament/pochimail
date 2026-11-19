@@ -6,7 +6,7 @@ import userEvent from "@testing-library/user-event";
 import type * as React from "react";
 import { act } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { EventOf } from "../../../../shared/ipc/contract.ts";
+import type { EventOf } from "#shared/ipc/contract.ts";
 import {
   minutesUntil,
   noRequiredStates,

@@ -1,4 +1,4 @@
-import type { EventOf } from "../../../../shared/ipc/contract.ts";
+import type { EventOf } from "#shared/ipc/contract.ts";
 
 /** Worker events (parsed by the IPC contract) plus the two sign-in events the renderer raises itself. */
 export type RequiredStateEvent =

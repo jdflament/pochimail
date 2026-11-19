@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import type { EventOf } from "../../../../shared/ipc/contract.ts";
+import type { EventOf } from "#shared/ipc/contract.ts";
 import { queryKeys } from "../../lib/query/keys.ts";
 import { useWorkerClient } from "../../lib/worker-context.tsx";
 

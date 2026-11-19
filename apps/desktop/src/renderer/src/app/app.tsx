@@ -2,7 +2,7 @@ import { Toaster } from "@pochimail/ui/components/sonner";
 import { type QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "@tanstack/react-router";
 import { useMemo } from "react";
-import type { RpcClient } from "../../../shared/ipc/client.ts";
+import type { RpcClient } from "#shared/ipc/client.ts";
 import { AppEventsBridge } from "../lib/app-events-bridge.tsx";
 import { AppErrorBoundary } from "../lib/error-boundary.tsx";
 import { OptimisticActionProvider } from "../lib/optimistic-context.tsx";
