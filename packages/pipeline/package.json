@@ -1,0 +1,36 @@
+{
+  "name": "@pochimail/pipeline",
+  "private": true,
+  "version": "0.0.0",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "exports": {
+    "./concurrency": "./src/concurrency.ts",
+    "./event-batching": "./src/event-batching.ts",
+    "./event-bus": "./src/event-bus.ts",
+    "./in-memory-event-bus": "./src/in-memory-event-bus.ts",
+    "./job-queue": "./src/job-queue.ts",
+    "./job-runner": "./src/job-runner.ts",
+    "./outbox": "./src/outbox.ts",
+    "./outbox-relay": "./src/outbox-relay.ts",
+    "./pipeline-types": "./src/pipeline-types.ts",
+    "./power-monitor": "./src/power-monitor.ts",
+    "./retry": "./src/retry.ts",
+    "./scheduler": "./src/scheduler.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc",
+    "lint": "biome check .",
+    "knip": "knip",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@pochimail/typescript-config": "workspace:*",
+    "typescript": "7.0.2",
+    "vitest": "5.1.0"
+  },
+  "dependencies": {
+    "@pochimail/kernel": "workspace:*",
+    "@pochimail/logger": "workspace:*"
+  }
+}

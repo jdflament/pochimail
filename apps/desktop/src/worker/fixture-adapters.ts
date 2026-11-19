@@ -1,11 +1,12 @@
-import type { Clock } from "@pochimail/core/clock";
 import type { Account } from "@pochimail/core/domain/account";
-import type { Timer } from "@pochimail/core/events/batching";
-import { AccountId, WorkspaceId } from "@pochimail/core/ids";
-import type { Logger } from "@pochimail/core/logger";
+import { AccountId } from "@pochimail/core/ids";
 import type { Classifier } from "@pochimail/core/ports/ai";
 import type { DeviceName } from "@pochimail/core/ports/platform";
-import { unwrap } from "@pochimail/core/result";
+import type { Clock } from "@pochimail/kernel/clock";
+import { WorkspaceId } from "@pochimail/kernel/ids";
+import { unwrap } from "@pochimail/kernel/result";
+import type { Logger } from "@pochimail/logger/logger";
+import type { Timer } from "@pochimail/pipeline/event-batching";
 import { createFixtureMailProvider } from "@pochimail/testing/fixture-mailbox/fixture-mail-provider";
 import { FIXTURE_NOW, generateMailbox } from "@pochimail/testing/fixture-mailbox/generator";
 import { createInMemoryJobQueue } from "@pochimail/testing/in-memory-job-queue";

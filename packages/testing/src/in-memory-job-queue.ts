@@ -1,8 +1,8 @@
-import type { Clock } from "@pochimail/core/clock";
-import { type ErrorCode, StorageError } from "@pochimail/core/errors";
-import type { WorkspaceId } from "@pochimail/core/ids";
-import type { Job, JobQueue } from "@pochimail/core/ports/job-queue";
-import { err, ok } from "@pochimail/core/result";
+import type { Clock } from "@pochimail/kernel/clock";
+import { type ErrorCode, StorageError } from "@pochimail/kernel/errors";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { err, ok } from "@pochimail/kernel/result";
+import type { Job, JobQueue } from "@pochimail/pipeline/job-queue";
 import { createFaults, type Faults } from "./faults.ts";
 
 export interface DeadLetter {

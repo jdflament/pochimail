@@ -1,4 +1,4 @@
-import type { Clock } from "@pochimail/core/clock";
+import type { Clock } from "@pochimail/kernel/clock";
 
 export type FakeClock = Clock & { advance(ms: number): void; set(date: Date): void };
 

@@ -1,6 +1,6 @@
 import { RateLimited } from "@pochimail/core/errors";
 import { AccountId } from "@pochimail/core/ids";
-import { unwrap } from "@pochimail/core/result";
+import { unwrap } from "@pochimail/kernel/result";
 import { type Check, check, registerContract } from "@pochimail/testing/contract";
 import { createFakeClock, type FakeClock } from "@pochimail/testing/fake-clock";
 import { expect } from "vitest";

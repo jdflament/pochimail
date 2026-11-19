@@ -1,6 +1,6 @@
 import type { StoredSignal } from "@pochimail/core/domain/mail";
 import type { MessageId } from "@pochimail/core/ids";
-import { ok, unwrap } from "@pochimail/core/result";
+import { ok, unwrap } from "@pochimail/kernel/result";
 import { expect } from "vitest";
 import { type Check, check, registerContract } from "./contract.ts";
 import { WS_A, WS_B } from "./fixtures.ts";

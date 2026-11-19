@@ -1,12 +1,14 @@
-import type { Clock } from "../clock.ts";
+import type { Clock } from "@pochimail/kernel/clock";
+import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
+import type { Cancelled, StorageError } from "@pochimail/kernel/errors";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { ok } from "@pochimail/kernel/result";
 import type { Category } from "../domain/category.ts";
 import type { Digest } from "../domain/digest.ts";
-import type { Cancelled, NotFound, StorageError } from "../errors.ts";
+import type { NotFound } from "../errors.ts";
 import type { DomainEventOf } from "../events/catalog.ts";
-import type { AccountId, MessageId, WorkspaceId } from "../ids.ts";
-import type { AsyncResult, CancelSignal } from "../ports/common.ts";
+import type { AccountId, MessageId } from "../ids.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
-import { ok } from "../result.ts";
 import { evaluateSignals } from "./detect-signals.ts";
 
 const PAGE = 200;

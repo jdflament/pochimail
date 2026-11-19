@@ -57,6 +57,9 @@
     "zod": "4.6.7"
   },
   "dependencies": {
+    "@pochimail/kernel": "workspace:*",
+    "@pochimail/logger": "workspace:*",
+    "@pochimail/pipeline": "workspace:*",
     "better-sqlite3-multiple-ciphers": "13.1.1"
   },
   "main": "./out/main/index.js"

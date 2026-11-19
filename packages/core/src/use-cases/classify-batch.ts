@@ -1,15 +1,17 @@
-import type { Clock } from "../clock.ts";
+import type { Clock } from "@pochimail/kernel/clock";
+import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
+import type { Cancelled, StorageError } from "@pochimail/kernel/errors";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { ok } from "@pochimail/kernel/result";
 import { categorySchema } from "../domain/category.ts";
 import { confidenceSchema } from "../domain/common.ts";
 import { DERIVED_SNIPPET_MAX_CHARS, type DerivedMessage } from "../domain/derived.ts";
 import type { Message } from "../domain/mail.ts";
-import type { Cancelled, NotFound, StorageError } from "../errors.ts";
+import type { NotFound } from "../errors.ts";
 import type { DomainEventOf } from "../events/catalog.ts";
-import type { MessageId, WorkspaceId } from "../ids.ts";
+import type { MessageId } from "../ids.ts";
 import type { AiError, Classification, Classifier } from "../ports/ai.ts";
-import type { AsyncResult, CancelSignal } from "../ports/common.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
-import { ok } from "../result.ts";
 
 export interface ClassifyBatchDeps {
   readonly uow: UnitOfWork;

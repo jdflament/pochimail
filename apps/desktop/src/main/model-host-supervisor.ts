@@ -1,5 +1,5 @@
-import type { Timer } from "@pochimail/core/events/batching";
-import type { Logger } from "@pochimail/core/logger";
+import type { Logger } from "@pochimail/logger/logger";
+import type { Timer } from "@pochimail/pipeline/event-batching";
 import type { MessageChannelMain, MessagePortMain } from "electron";
 import { hostPongSchema } from "../shared/model-host-protocol.ts";
 

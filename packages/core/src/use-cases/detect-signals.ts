@@ -1,14 +1,16 @@
-import type { Clock } from "../clock.ts";
+import type { Clock } from "@pochimail/kernel/clock";
+import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
+import type { Cancelled, StorageError } from "@pochimail/kernel/errors";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { err, ok } from "@pochimail/kernel/result";
 import type { Account } from "../domain/account.ts";
 import type { Category, SignalKind } from "../domain/category.ts";
 import type { Message, StoredSignal } from "../domain/mail.ts";
-import type { Cancelled, NotFound, StorageError } from "../errors.ts";
+import type { NotFound } from "../errors.ts";
 import type { DomainEventOf } from "../events/catalog.ts";
-import type { AccountId, MessageId, WorkspaceId } from "../ids.ts";
-import type { AsyncResult, CancelSignal } from "../ports/common.ts";
+import type { AccountId, MessageId } from "../ids.ts";
 import type { ReadRepositories } from "../ports/repositories.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
-import { err, ok } from "../result.ts";
 
 const DAY_MS = 86_400_000;
 /** A thread we answered stays quiet this long before it counts as "waiting on them". */

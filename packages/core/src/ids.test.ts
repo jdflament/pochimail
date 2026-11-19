@@ -1,6 +1,6 @@
-import { AccountId, MessageId } from "@pochimail/core/ids";
-import { unwrap } from "@pochimail/core/result";
+import { unwrap } from "@pochimail/kernel/result";
 import { expect, it } from "vitest";
+import { AccountId, MessageId } from "./ids.ts";
 
 declare function loadAccount(id: AccountId): void;
 

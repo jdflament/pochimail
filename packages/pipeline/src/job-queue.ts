@@ -1,6 +1,6 @@
-import type { Cancelled, ErrorCode, StorageError } from "../errors.ts";
-import type { WorkspaceId } from "../ids.ts";
-import type { AsyncResult, CancelSignal } from "./common.ts";
+import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
+import type { Cancelled, ErrorCode, StorageError } from "@pochimail/kernel/errors";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
 
 export interface JobRequest {
   readonly type: string;

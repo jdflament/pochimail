@@ -1,6 +1,6 @@
-import type { Timer } from "@pochimail/core/events/batching";
-import { createLogger } from "@pochimail/core/logger";
 import { DEFAULT_APP_SETTINGS } from "@pochimail/core/ports/settings-store";
+import { createLogger } from "@pochimail/logger/logger";
+import type { Timer } from "@pochimail/pipeline/event-batching";
 import { demoScale } from "../shared/demo.ts";
 import type { Handlers } from "../shared/ipc/server.ts";
 import { serveRpc } from "../shared/ipc/server.ts";

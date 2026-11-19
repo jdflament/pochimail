@@ -1,15 +1,8 @@
-import type { Cancelled, StorageError } from "../errors.ts";
-import type { WorkspaceId } from "../ids.ts";
-import type { Result } from "../result.ts";
-import type { AsyncResult, CancelSignal } from "./common.ts";
-import type { BusEvent } from "./event-bus.ts";
-import type { JobRequest } from "./job-queue.ts";
+import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
+import type { Cancelled, StorageError } from "@pochimail/kernel/errors";
+import type { Result } from "@pochimail/kernel/result";
+import type { OutboxEntry } from "@pochimail/pipeline/outbox";
 import type { ReadRepositories, WriteRepositories } from "./repositories.ts";
-
-/** What a transaction produces besides rows: an event for the bus, or a job for the queue. */
-export type OutboxEntry =
-  | { readonly kind: "event"; readonly event: BusEvent }
-  | { readonly kind: "job"; readonly workspaceId: WorkspaceId; readonly job: JobRequest };
 
 export interface OutboxWriter {
   append(entry: OutboxEntry): AsyncResult<void, StorageError>;

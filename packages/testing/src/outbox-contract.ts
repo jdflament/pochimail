@@ -1,11 +1,13 @@
-import { StorageError } from "@pochimail/core/errors";
-import type { TopicId, WorkspaceId } from "@pochimail/core/ids";
-import { createOutboxRelay } from "@pochimail/core/jobs/outbox-relay";
-import type { BusEvent, EventBus } from "@pochimail/core/ports/event-bus";
-import type { JobQueue } from "@pochimail/core/ports/job-queue";
-import type { OutboxStore } from "@pochimail/core/ports/outbox";
-import type { OutboxEntry, UnitOfWork } from "@pochimail/core/ports/unit-of-work";
-import { err, ok, unwrap } from "@pochimail/core/result";
+import type { TopicId } from "@pochimail/core/ids";
+import type { UnitOfWork } from "@pochimail/core/ports/unit-of-work";
+import { StorageError } from "@pochimail/kernel/errors";
+import type { EventEnvelope } from "@pochimail/kernel/event";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { err, ok, unwrap } from "@pochimail/kernel/result";
+import type { EventBus } from "@pochimail/pipeline/event-bus";
+import type { JobQueue } from "@pochimail/pipeline/job-queue";
+import type { OutboxEntry, OutboxStore } from "@pochimail/pipeline/outbox";
+import { createOutboxRelay } from "@pochimail/pipeline/outbox-relay";
 import { describe, expect, it } from "vitest";
 import { sampleEvent } from "./event-samples.ts";
 
@@ -27,7 +29,7 @@ const never = new AbortController().signal;
 /** A bus that records what it was asked to publish and can be told to "crash" on one event. */
 function recordingBus(crashOn?: string) {
   const published: string[] = [];
-  const bus: EventBus<BusEvent> = {
+  const bus: EventBus<EventEnvelope> = {
     async publish(e) {
       if (e.id === crashOn) throw new Error("process died");
       published.push(e.id);
@@ -121,7 +123,7 @@ export function runOutboxContract(
         return ok(undefined);
       });
       const published: string[] = [];
-      const bus: EventBus<BusEvent> = {
+      const bus: EventBus<EventEnvelope> = {
         async publish(e) {
           if (e.id === "evt-1") return err({ code: "event.invalid" } as never);
           published.push(e.id);

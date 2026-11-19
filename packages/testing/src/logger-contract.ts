@@ -1,4 +1,4 @@
-import type { Logger, LogRecord, LogSink } from "@pochimail/core/logger";
+import type { Logger, LogRecord, LogSink } from "@pochimail/logger/logger";
 import { describe, expect, it } from "vitest";
 
 /**

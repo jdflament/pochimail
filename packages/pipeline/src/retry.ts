@@ -1,7 +1,7 @@
-import type { Clock } from "../clock.ts";
-import type { ErrorCode, StorageError } from "../errors.ts";
-import type { AsyncResult } from "../ports/common.ts";
-import type { Job, JobQueue } from "../ports/job-queue.ts";
+import type { Clock } from "@pochimail/kernel/clock";
+import type { AsyncResult } from "@pochimail/kernel/common";
+import type { ErrorCode, StorageError } from "@pochimail/kernel/errors";
+import type { Job, JobQueue } from "./job-queue.ts";
 
 export interface RetryPolicy {
   /** Attempts (claims) allowed before the job is dead-lettered. */

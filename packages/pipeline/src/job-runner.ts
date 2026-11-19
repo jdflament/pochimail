@@ -1,88 +1,15 @@
-import type { Clock } from "../clock.ts";
-import type { DomainError, ErrorCode, StorageError } from "../errors.ts";
-import type { AccountId, WorkspaceId } from "../ids.ts";
-import type { AsyncResult, CancelSignal } from "../ports/common.ts";
-import type { JobQueue } from "../ports/job-queue.ts";
-import type { SyncCursor } from "../ports/mail-provider.ts";
-import type { CursorRepository } from "../ports/repositories.ts";
-import { err, ok } from "../result.ts";
-import { nackJob, type RetryPolicy } from "./retry.ts";
-
-/**
- * One step of the pipeline (e.g. parse, classify, detect signals). Items are handled one by one;
- * `concurrency` caps how many items this stage works on at once.
- *
- * Stages must be idempotent: a failed item is re-run from its failing stage by the retry
- * worker, and a crash before a cursor commit replays that batch.
- */
-export interface Stage<In, Out> {
-  readonly name: string;
-  readonly concurrency: number;
-  process(item: In): AsyncResult<Out, DomainError>;
-}
-
-export interface SourceBatch<T> {
-  readonly items: readonly T[];
-  /** Only its `token` is kept; stored under the pipeline's scope. Persisted once every item of this batch left the last stage (or went to the retry queue). */
-  readonly nextCursor: SyncCursor;
-  readonly hasMore: boolean;
-}
-
-/** Same shape as `MailProvider.sync`, minus provider specifics. */
-export type PipelineSource<T> = (
-  cursor: SyncCursor | null,
-  signal: CancelSignal,
-) => AsyncResult<SourceBatch<T>, DomainError>;
-
-export interface PipelineOptions<T> {
-  /** Names the retry job type (`<name>.retry`) and the cursor scope: unique per pipeline. */
-  readonly name: string;
-  readonly workspaceId: WorkspaceId;
-  readonly accountId: AccountId;
-  readonly source: PipelineSource<T>;
-  readonly cursors: CursorRepository;
-  readonly queue: JobQueue;
-  readonly clock: Clock;
-  readonly random: () => number;
-  /** Stable identity of an item; dedupes its retry job. */
-  readonly itemKey: (item: T) => string;
-  /** Batches fetched but not yet committed, i.e. the memory bound. Default 2. */
-  readonly maxInFlightBatches?: number;
-  readonly retryPolicy?: RetryPolicy;
-}
-
-export interface RunReport {
-  /** `paused`: the signal aborted; everything fetched so far was finished and committed. */
-  readonly status: "completed" | "paused";
-  readonly batches: number;
-  /** Items that went through every stage. */
-  readonly processed: number;
-  /** Items handed to the retry queue. */
-  readonly deferred: number;
-}
-
-export interface RetryReport {
-  readonly succeeded: number;
-  readonly retried: number;
-  readonly deadLettered: number;
-}
-
-export interface Pipeline {
-  /**
-   * Streams batches source → stages with at most `maxInFlightBatches` uncommitted batches, so a
-   * slow stage stops the source from fetching. Resumes from the persisted cursor. Aborting
-   * `signal` pauses at a batch boundary: nothing new is fetched, in-flight batches finish and
-   * commit, so a later `run` neither loses nor repeats an item.
-   */
-  run(signal: CancelSignal): AsyncResult<RunReport, StorageError | DomainError>;
-  /** Re-runs deferred items from their failing stage; failures back off or dead-letter. */
-  drainRetries(signal: CancelSignal): AsyncResult<RetryReport, StorageError>;
-}
-
-export interface PipelineBuilder<T> {
-  stage<Out>(stage: Stage<T, Out>): PipelineBuilder<Out>;
-  build(): Pipeline;
-}
+import type { CancelSignal } from "@pochimail/kernel/common";
+import type { DomainError, ErrorCode, StorageError } from "@pochimail/kernel/errors";
+import { err, ok } from "@pochimail/kernel/result";
+import { Gate, Queue } from "./concurrency.ts";
+import type {
+  Pipeline,
+  PipelineBuilder,
+  PipelineCursor,
+  PipelineOptions,
+  Stage,
+} from "./pipeline-types.ts";
+import { nackJob } from "./retry.ts";
 
 type AnyStage = Stage<never, unknown>;
 
@@ -104,67 +31,9 @@ function builder<T>(options: PipelineOptions<unknown>, stages: readonly AnyStage
   };
 }
 
-class Gate {
-  private free: number;
-  private waiters: ((granted: boolean) => void)[] = [];
-  private closed = false;
-  constructor(permits: number) {
-    this.free = permits;
-  }
-  acquire(signal: CancelSignal): Promise<boolean> {
-    if (signal.aborted || this.closed) return Promise.resolve(false);
-    if (this.free > 0) {
-      this.free -= 1;
-      return Promise.resolve(true);
-    }
-    return new Promise((resolve) => {
-      const onAbort = () => {
-        this.waiters = this.waiters.filter((w) => w !== wake);
-        resolve(false);
-      };
-      const wake = (granted: boolean) => {
-        signal.removeEventListener("abort", onAbort);
-        resolve(granted);
-      };
-      this.waiters.push(wake);
-      signal.addEventListener("abort", onAbort, { once: true });
-    });
-  }
-  release(): void {
-    const next = this.waiters.shift();
-    if (next) next(true);
-    else this.free += 1;
-  }
-  close(): void {
-    this.closed = true;
-    for (const w of this.waiters.splice(0)) w(false);
-  }
-}
-
-class Queue<V> {
-  private items: V[] = [];
-  private takers: ((v: V | undefined) => void)[] = [];
-  private closed = false;
-  push(v: V): void {
-    const taker = this.takers.shift();
-    if (taker) taker(v);
-    else this.items.push(v);
-  }
-  take(): Promise<V | undefined> {
-    const v = this.items.shift();
-    if (v !== undefined) return Promise.resolve(v);
-    if (this.closed) return Promise.resolve(undefined);
-    return new Promise((resolve) => this.takers.push(resolve));
-  }
-  close(): void {
-    this.closed = true;
-    for (const t of this.takers.splice(0)) t(undefined);
-  }
-}
-
 interface InFlight {
   readonly seq: number;
-  readonly cursor: SyncCursor;
+  readonly cursor: PipelineCursor;
   items: unknown[];
 }
 
@@ -209,11 +78,7 @@ function buildPipeline(options: PipelineOptions<unknown>, stages: readonly AnySt
 
   return {
     async run(signal) {
-      const cursorResult = await options.cursors.get(
-        options.workspaceId,
-        options.accountId,
-        options.name,
-      );
+      const cursorResult = await options.cursors.get(options.name);
       if (!cursorResult.ok) return err(cursorResult.error);
       let cursor = cursorResult.value;
 
@@ -244,7 +109,7 @@ function buildPipeline(options: PipelineOptions<unknown>, stages: readonly AnySt
       const commitReady = async () => {
         for (let next = finished.get(nextToCommit); next; next = finished.get(nextToCommit)) {
           finished.delete(nextToCommit);
-          const w = await options.cursors.set(options.workspaceId, options.accountId, next.cursor);
+          const w = await options.cursors.set(next.cursor);
           if (!w.ok) {
             stop(w.error);
             settle();

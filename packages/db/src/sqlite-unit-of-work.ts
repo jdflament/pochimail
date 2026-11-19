@@ -1,12 +1,12 @@
-import type { Clock } from "@pochimail/core/clock";
 import { workspaceIdSchema } from "@pochimail/core/domain/common";
-import { Cancelled, StorageError } from "@pochimail/core/errors";
-import type { CancelSignal } from "@pochimail/core/ports/common";
-import type { BusEvent } from "@pochimail/core/ports/event-bus";
-import type { JobRequest } from "@pochimail/core/ports/job-queue";
-import type { OutboxRecord, OutboxStore } from "@pochimail/core/ports/outbox";
-import type { OutboxEntry, Transaction, UnitOfWork } from "@pochimail/core/ports/unit-of-work";
-import { err, ok, type Result } from "@pochimail/core/result";
+import type { Transaction, UnitOfWork } from "@pochimail/core/ports/unit-of-work";
+import type { Clock } from "@pochimail/kernel/clock";
+import type { CancelSignal } from "@pochimail/kernel/common";
+import { Cancelled, StorageError } from "@pochimail/kernel/errors";
+import type { EventEnvelope } from "@pochimail/kernel/event";
+import { err, ok, type Result } from "@pochimail/kernel/result";
+import type { JobRequest } from "@pochimail/pipeline/job-queue";
+import type { OutboxEntry, OutboxRecord, OutboxStore } from "@pochimail/pipeline/outbox";
 import { z } from "zod";
 import { exclusiveResult, type Storage } from "./open-storage.ts";
 import { accountIdOf, guardPayload } from "./payload-guard.ts";
@@ -36,7 +36,7 @@ const outboxRow = z.object({
 
 function parseEntry(kind: "event" | "job", payload: string): OutboxEntry {
   const json: unknown = JSON.parse(payload);
-  if (kind === "event") return { kind, event: eventPayload.parse(json) as BusEvent };
+  if (kind === "event") return { kind, event: eventPayload.parse(json) as EventEnvelope };
   const parsed = jobPayload.parse(json);
   const job: JobRequest = {
     type: parsed.job.type,

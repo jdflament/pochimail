@@ -5,12 +5,13 @@ import {
   type SignalKind,
 } from "@pochimail/core/domain/category";
 import type { Message } from "@pochimail/core/domain/mail";
-import { AccountId, MessageId, WorkspaceId } from "@pochimail/core/ids";
+import { AccountId, MessageId } from "@pochimail/core/ids";
 import type { Classifier } from "@pochimail/core/ports/ai";
-import { unwrap } from "@pochimail/core/result";
 import { ClassifyBatch } from "@pochimail/core/use-cases/classify-batch";
 import { DetectSignals } from "@pochimail/core/use-cases/detect-signals";
 import { RunIncrementalSync } from "@pochimail/core/use-cases/run-incremental-sync";
+import { WorkspaceId } from "@pochimail/kernel/ids";
+import { unwrap } from "@pochimail/kernel/result";
 import { createFakeClock } from "../fake-clock.ts";
 import { createFixtureMailProvider } from "../fixture-mailbox/fixture-mail-provider.ts";
 import { FIXTURE_NOW, type GeneratedMailbox } from "../fixture-mailbox/generator.ts";

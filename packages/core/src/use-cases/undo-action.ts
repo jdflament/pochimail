@@ -1,12 +1,13 @@
-import type { Clock } from "../clock.ts";
+import type { Clock } from "@pochimail/kernel/clock";
+import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
+import { Cancelled, type DomainError, type StorageError } from "@pochimail/kernel/errors";
+import type { IdGenerator } from "@pochimail/kernel/id-generator";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { unwrap } from "@pochimail/kernel/result";
 import type { ActionLog } from "../domain/action.ts";
-import { Cancelled, type DomainError, type StorageError } from "../errors.ts";
-import { type ActionId, ActionLogId as makeLogId, type WorkspaceId } from "../ids.ts";
-import type { AsyncResult, CancelSignal } from "../ports/common.ts";
-import type { IdGenerator } from "../ports/id-generator.ts";
+import { type ActionId, ActionLogId as makeLogId } from "../ids.ts";
 import type { MailProvider } from "../ports/mail-provider.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
-import { unwrap } from "../result.ts";
 import { recordEntry } from "./record-entry.ts";
 
 export interface UndoActionDeps {

@@ -1,8 +1,9 @@
+import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
+import type { Cancelled } from "@pochimail/kernel/errors";
 import type { Command } from "../domain/action.ts";
 import type { IncomingMessage } from "../domain/mail.ts";
-import type { Cancelled, ProviderError } from "../errors.ts";
+import type { ProviderError } from "../errors.ts";
 import type { MessageId } from "../ids.ts";
-import type { AsyncResult, CancelSignal } from "./common.ts";
 
 /** Gmail organizes with labels; Graph and IMAP with folders. */
 export const ORGANIZATION_MODELS = ["labels", "folders"] as const;

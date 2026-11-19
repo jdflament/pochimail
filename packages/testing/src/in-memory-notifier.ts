@@ -1,6 +1,6 @@
-import type { StorageError } from "@pochimail/core/errors";
 import type { Notification, Notifier } from "@pochimail/core/ports/notifier";
-import { err, ok } from "@pochimail/core/result";
+import type { StorageError } from "@pochimail/kernel/errors";
+import { err, ok } from "@pochimail/kernel/result";
 import { createFaults, type Faults } from "./faults.ts";
 
 export interface InMemoryNotifier extends Notifier {

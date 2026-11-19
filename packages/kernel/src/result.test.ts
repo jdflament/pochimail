@@ -1,18 +1,17 @@
-import { type ProviderError, RateLimited } from "@pochimail/core/errors";
-import { andThen, err, mapResult, ok, type Result } from "@pochimail/core/result";
 import { expect, it } from "vitest";
+import { StorageError } from "./errors.ts";
+import { andThen, err, mapResult, ok, type Result } from "./result.ts";
 
 // Guards: forgetting the failure branch must not compile, and expected failures are values.
-it("narrows exhaustively and carries typed provider errors without throwing", () => {
-  const fetchPage = (): Result<number, ProviderError> =>
-    err(new RateLimited({ retryAfterMs: 500 }));
+it("narrows exhaustively and carries typed errors without throwing", () => {
+  const fetchPage = (): Result<number, StorageError> => err(new StorageError("disk full"));
   const result = andThen(
     mapResult(fetchPage(), (n) => n + 1),
     (n) => ok(String(n)),
   );
   if (result.ok) throw new Error("expected Err");
-  expect(result.error.code).toBe("provider.rate_limited");
-  expect(result.error instanceof RateLimited && result.error.retryAfterMs).toBe(500);
+  expect(result.error.code).toBe("storage.failed");
+  expect(result.error instanceof StorageError && result.error.message).toBe("disk full");
   // @ts-expect-error `value` does not exist before narrowing on `ok`
   void result.value;
 });

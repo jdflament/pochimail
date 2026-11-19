@@ -1,7 +1,7 @@
 import { AsyncLocalStorage } from "node:async_hooks";
 import { closeSync, openSync, readSync } from "node:fs";
-import { StorageError } from "@pochimail/core/errors";
-import { err, ok, type Result } from "@pochimail/core/result";
+import { StorageError } from "@pochimail/kernel/errors";
+import { err, ok, type Result } from "@pochimail/kernel/result";
 import Database from "better-sqlite3-multiple-ciphers";
 import { loadMigrations, type Migration, migrate } from "./migrator.ts";
 

@@ -1,4 +1,4 @@
-import type { PowerMonitor, PowerState } from "@pochimail/core/ports/power-monitor";
+import type { PowerMonitor, PowerState } from "@pochimail/pipeline/power-monitor";
 import { expect } from "vitest";
 import { type Check, check, registerContract } from "./contract.ts";
 

@@ -1,4 +1,4 @@
-import { err, ok, type Result } from "@pochimail/core/result";
+import { err, ok, type Result } from "@pochimail/kernel/result";
 import { z } from "zod";
 import { SECRET_FAILURES, SecretStoreError } from "../secret-error.ts";
 import type { Transport } from "./transport.ts";

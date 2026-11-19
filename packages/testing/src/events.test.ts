@@ -1,13 +1,14 @@
-import { createEventBatcher } from "@pochimail/core/events/batching";
-import { createInMemoryEventBus } from "@pochimail/core/events/bus";
-import { createLogger } from "@pochimail/core/logger";
+import { parseDomainEvent } from "@pochimail/core/events/catalog";
+import { createLogger } from "@pochimail/logger/logger";
+import { createEventBatcher } from "@pochimail/pipeline/event-batching";
+import { createInMemoryEventBus } from "@pochimail/pipeline/in-memory-event-bus";
 import { describe, expect, it } from "vitest";
 import { eventBusContract } from "./event-bus-contract.ts";
 import { sampleEvent } from "./event-samples.ts";
 import { createFakeTimer } from "./fake-timer.ts";
 
 eventBusContract(({ logger, timer, handlerTimeoutMs }) =>
-  createInMemoryEventBus({ logger, timer, handlerTimeoutMs }),
+  createInMemoryEventBus({ parse: parseDomainEvent, logger, timer, handlerTimeoutMs }),
 );
 
 describe("event batcher", () => {
@@ -49,6 +50,7 @@ describe("event batcher", () => {
 describe("sample events", () => {
   it("stay valid against the catalog (samples must not drift from the schema)", async () => {
     const bus = createInMemoryEventBus({
+      parse: parseDomainEvent,
       logger: createLogger({ sink: { write: () => {} } }),
       timer: createFakeTimer(),
     });

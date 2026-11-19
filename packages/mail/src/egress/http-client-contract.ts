@@ -1,6 +1,6 @@
 import { AccountId } from "@pochimail/core/ids";
-import { createLogger, type Logger } from "@pochimail/core/logger";
-import { unwrap } from "@pochimail/core/result";
+import { unwrap } from "@pochimail/kernel/result";
+import { createLogger, type Logger } from "@pochimail/logger/logger";
 import { type Check, check, registerContract } from "@pochimail/testing/contract";
 import { expect } from "vitest";
 import { BlockedSocketError, egressPolicy, type HostAllowlist } from "./allowlist.ts";

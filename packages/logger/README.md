@@ -8,7 +8,7 @@ One structured logger with redaction, used by every process. Privacy-critical: i
 - `createLogger` and its sinks; redaction of strings, records, errors and stacks.
 
 ## May import
-Nothing of ours.
+`@pochimail/kernel` only (error codes and the log-safe id shape).
 
 ## Must not contain
 - Anything that is not logging.

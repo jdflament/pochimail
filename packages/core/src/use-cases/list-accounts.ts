@@ -1,7 +1,7 @@
+import type { AsyncResult } from "@pochimail/kernel/common";
+import type { StorageError } from "@pochimail/kernel/errors";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
 import type { Account } from "../domain/account.ts";
-import type { StorageError } from "../errors.ts";
-import type { WorkspaceId } from "../ids.ts";
-import type { AsyncResult } from "../ports/common.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
 
 /** Connected accounts of a workspace. */

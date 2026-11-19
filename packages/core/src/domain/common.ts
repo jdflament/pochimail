@@ -1,3 +1,5 @@
+import { WorkspaceId } from "@pochimail/kernel/ids";
+import type { Result } from "@pochimail/kernel/result";
 import { z } from "zod";
 import {
   AccountId,
@@ -8,9 +10,7 @@ import {
   SuggestionId,
   ThreadId,
   TopicId,
-  WorkspaceId,
 } from "../ids.ts";
-import type { Result } from "../result.ts";
 
 /** Bumped when a persisted entity's shape changes; adapters migrate on read. */
 export const SCHEMA_VERSION = 1;

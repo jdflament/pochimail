@@ -1,6 +1,6 @@
 import { CATEGORIES } from "@pochimail/core/domain/category";
 import type { Classifier } from "@pochimail/core/ports/ai";
-import { ok } from "@pochimail/core/result";
+import { ok } from "@pochimail/kernel/result";
 
 /**
  * Wraps a classifier and moves every `every`-th answer to the next category. It stands in for a

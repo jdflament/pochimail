@@ -1,5 +1,5 @@
+import type { ErrorCode } from "@pochimail/kernel/errors";
 import type { ActionLog } from "../domain/action.ts";
-import type { ErrorCode } from "../errors.ts";
 import type { DomainEventOf } from "../events/catalog.ts";
 
 type ActionEventType = "ActionApplied" | "ActionFailed" | "ActionUndone";

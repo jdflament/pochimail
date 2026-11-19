@@ -1,4 +1,4 @@
-import type { ID_PREFIXES } from "../ids.ts";
+import type { ID_PREFIXES } from "./ids.ts";
 
 export type IdPrefix = (typeof ID_PREFIXES)[number];
 

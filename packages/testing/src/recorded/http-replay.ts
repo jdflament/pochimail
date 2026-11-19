@@ -1,4 +1,4 @@
-import type { Clock } from "@pochimail/core/clock";
+import type { Clock } from "@pochimail/kernel/clock";
 import { z } from "zod";
 import { assertScrubbed } from "./scrub.ts";
 

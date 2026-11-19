@@ -1,11 +1,12 @@
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { StorageError } from "@pochimail/core/errors";
-import type { WorkspaceId } from "@pochimail/core/ids";
-import { createOutboxRelay } from "@pochimail/core/jobs/outbox-relay";
-import type { BusEvent, EventBus } from "@pochimail/core/ports/event-bus";
-import { err, ok, unwrap } from "@pochimail/core/result";
+import { StorageError } from "@pochimail/kernel/errors";
+import type { EventEnvelope } from "@pochimail/kernel/event";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { err, ok, unwrap } from "@pochimail/kernel/result";
+import type { EventBus } from "@pochimail/pipeline/event-bus";
+import { createOutboxRelay } from "@pochimail/pipeline/outbox-relay";
 import { failingChecks } from "@pochimail/testing/contract";
 import { sampleEvent } from "@pochimail/testing/event-samples";
 import { createFakeClock } from "@pochimail/testing/fake-clock";
@@ -96,7 +97,7 @@ runPipelineContract(() => {
 const ws = "w-1" as WorkspaceId;
 const recordingBus = () => {
   const published: string[] = [];
-  const bus: EventBus<BusEvent> = {
+  const bus: EventBus<EventEnvelope> = {
     async publish(e) {
       published.push(e.id);
       return ok(undefined);

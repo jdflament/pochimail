@@ -1,8 +1,8 @@
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { err, ok, type Result } from "@pochimail/kernel/result";
 import type { Command } from "../domain/action.ts";
 import type { Category } from "../domain/category.ts";
 import { type PolicyDenialReason, PolicyDenied } from "../errors.ts";
-import type { WorkspaceId } from "../ids.ts";
-import { err, ok, type Result } from "../result.ts";
 import {
   AUTOPILOT_CONFIDENCE_THRESHOLD,
   AUTOPILOT_ELIGIBLE,

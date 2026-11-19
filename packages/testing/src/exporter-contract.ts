@@ -1,6 +1,6 @@
-import type { WorkspaceId } from "@pochimail/core/ids";
 import type { Exporter } from "@pochimail/core/ports/exporter";
-import { unwrap } from "@pochimail/core/result";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { unwrap } from "@pochimail/kernel/result";
 import { expect } from "vitest";
 import { type Check, check, registerContract } from "./contract.ts";
 

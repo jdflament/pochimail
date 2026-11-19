@@ -1,10 +1,11 @@
+import type { AsyncResult } from "@pochimail/kernel/common";
+import type { StorageError } from "@pochimail/kernel/errors";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { ok } from "@pochimail/kernel/result";
 import type { IncomingMessage } from "../domain/mail.ts";
-import type { StorageError } from "../errors.ts";
 import type { DomainEventOf } from "../events/catalog.ts";
-import type { AccountId, MessageId, WorkspaceId } from "../ids.ts";
-import type { AsyncResult } from "../ports/common.ts";
+import type { AccountId, MessageId } from "../ids.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
-import { ok } from "../result.ts";
 import { sanitizeIncoming } from "./run-incremental-sync.ts";
 
 export interface StoreMessagesDeps {

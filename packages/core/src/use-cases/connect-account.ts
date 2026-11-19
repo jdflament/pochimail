@@ -1,13 +1,15 @@
-import type { Clock } from "../clock.ts";
+import type { Clock } from "@pochimail/kernel/clock";
+import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
+import { Cancelled, type StorageError } from "@pochimail/kernel/errors";
+import type { IdGenerator } from "@pochimail/kernel/id-generator";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { err, ok } from "@pochimail/kernel/result";
 import { type Account, accountSchema, type ProviderKind } from "../domain/account.ts";
-import { Cancelled, InvalidStateError, type StorageError } from "../errors.ts";
+import { InvalidStateError } from "../errors.ts";
 import type { DomainEventOf } from "../events/catalog.ts";
-import { AccountId, type WorkspaceId } from "../ids.ts";
-import type { AsyncResult, CancelSignal } from "../ports/common.ts";
-import type { IdGenerator } from "../ports/id-generator.ts";
+import { AccountId } from "../ids.ts";
 import type { SecretStore } from "../ports/secret-store.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
-import { err, ok } from "../result.ts";
 import { accountStateEvent } from "./account-state.ts";
 
 export interface ConnectAccountDeps {

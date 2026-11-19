@@ -1,10 +1,12 @@
-import type { Clock } from "../clock.ts";
+import type { Clock } from "@pochimail/kernel/clock";
+import type { AsyncResult } from "@pochimail/kernel/common";
+import type { StorageError } from "@pochimail/kernel/errors";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { ok } from "@pochimail/kernel/result";
 import type { Category } from "../domain/category.ts";
-import type { NotFound, StorageError } from "../errors.ts";
-import type { AccountId, WorkspaceId } from "../ids.ts";
-import type { AsyncResult } from "../ports/common.ts";
+import type { NotFound } from "../errors.ts";
+import type { AccountId } from "../ids.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
-import { ok } from "../result.ts";
 import { ListAccounts } from "./list-accounts.ts";
 import { SummarizeMailbox } from "./summarize-mailbox.ts";
 

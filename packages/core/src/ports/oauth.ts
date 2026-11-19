@@ -1,6 +1,7 @@
+import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
+import type { Cancelled, StorageError } from "@pochimail/kernel/errors";
 import type { ProviderKind } from "../domain/account.ts";
-import type { AuthExpired, Cancelled, Offline, ProviderError, StorageError } from "../errors.ts";
-import type { AsyncResult, CancelSignal } from "./common.ts";
+import type { AuthExpired, Offline, ProviderError } from "../errors.ts";
 
 /**
  * A short-lived bearer token. Lives in memory only: it is never written to a row, the secret

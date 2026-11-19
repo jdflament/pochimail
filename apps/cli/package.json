@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@pochimail/core": "workspace:*",
+    "@pochimail/kernel": "workspace:*",
     "@pochimail/testing": "workspace:*"
   }
 }

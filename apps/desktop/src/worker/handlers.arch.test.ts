@@ -14,7 +14,8 @@ describe("worker architecture", () => {
         path === "@pochimail/core/ids" ||
         path === "@pochimail/core/domain/account" ||
         path === "@pochimail/core/events/catalog" ||
-        path === "@pochimail/core/ports/event-bus" ||
+        path === "@pochimail/kernel/ids" ||
+        path === "@pochimail/pipeline/event-bus" ||
         path === "@pochimail/core/ports/platform" ||
         path === "../shared/ipc/contract.ts" ||
         path === "../shared/ipc/server.ts";

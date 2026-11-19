@@ -10,11 +10,12 @@ import {
   threadSchema,
   topicSchema,
 } from "@pochimail/core/domain/mail";
-import { NotFound, StorageError } from "@pochimail/core/errors";
+import { NotFound } from "@pochimail/core/errors";
 import type { Page } from "@pochimail/core/ports/common";
 import type { SyncCursor } from "@pochimail/core/ports/mail-provider";
 import type { MessageQuery } from "@pochimail/core/ports/repositories";
-import { err, ok, type Result } from "@pochimail/core/result";
+import { StorageError } from "@pochimail/kernel/errors";
+import { err, ok, type Result } from "@pochimail/kernel/result";
 import type { Database } from "better-sqlite3-multiple-ciphers";
 import { z } from "zod";
 
@@ -24,7 +25,6 @@ import { z } from "zod";
 type Row = Record<string, unknown>;
 type Done<T> = Result<T, StorageError>;
 type Found<T> = Result<T, StorageError | NotFound>;
-
 /** Runs `run`, turning a thrown failure (SQL, bad row, bad cursor) into a `StorageError`. */
 function guard<T>(run: () => T): Done<T> {
   try {

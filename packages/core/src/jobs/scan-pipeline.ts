@@ -1,19 +1,20 @@
-import type { Clock } from "../clock.ts";
+import type { Clock } from "@pochimail/kernel/clock";
+import type { CancelSignal } from "@pochimail/kernel/common";
+import type { DomainError } from "@pochimail/kernel/errors";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { err, ok } from "@pochimail/kernel/result";
+import type { JobQueue } from "@pochimail/pipeline/job-queue";
+import { createPipeline } from "@pochimail/pipeline/job-runner";
+import type { CursorStore, Pipeline, Stage } from "@pochimail/pipeline/pipeline-types";
+import type { RetryPolicy } from "@pochimail/pipeline/retry";
 import type { IncomingMessage } from "../domain/mail.ts";
-import type { DomainError } from "../errors.ts";
-import type { AccountId, MessageId, WorkspaceId } from "../ids.ts";
+import type { AccountId, MessageId } from "../ids.ts";
 import type { Classifier } from "../ports/ai.ts";
-import type { CancelSignal } from "../ports/common.ts";
-import type { JobQueue } from "../ports/job-queue.ts";
 import type { MailProvider, SyncCursor } from "../ports/mail-provider.ts";
-import type { CursorRepository } from "../ports/repositories.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
-import { err, ok } from "../result.ts";
 import { ClassifyBatch } from "../use-cases/classify-batch.ts";
 import { DetectSignals } from "../use-cases/detect-signals.ts";
 import { StoreMessages } from "../use-cases/store-messages.ts";
-import { createPipeline, type Pipeline, type Stage } from "./pipeline.ts";
-import type { RetryPolicy } from "./retry.ts";
 
 export const SCAN_PIPELINE_NAME = "scan";
 
@@ -57,9 +58,9 @@ export function createScanPipeline(deps: ScanPipelineDeps): Pipeline {
     removeEventListener: () => {},
   };
 
-  const cursors: CursorRepository = {
-    get: (ws, account, scope) => uow.reads.cursors.get(ws, account, scope),
-    set: (ws, account, cursor) => uow.run((tx) => tx.repositories.cursors.set(ws, account, cursor)),
+  const cursors: CursorStore = {
+    get: (scope) => uow.reads.cursors.get(workspaceId, accountId, scope),
+    set: (cursor) => uow.run((tx) => tx.repositories.cursors.set(workspaceId, accountId, cursor)),
   };
 
   const sync: Stage<Fetched, Stored> = {
@@ -94,7 +95,6 @@ export function createScanPipeline(deps: ScanPipelineDeps): Pipeline {
   return createPipeline<Fetched>({
     name: SCAN_PIPELINE_NAME,
     workspaceId,
-    accountId,
     cursors,
     queue: deps.queue,
     clock: deps.clock,

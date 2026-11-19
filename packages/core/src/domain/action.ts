@@ -1,6 +1,7 @@
+import { ERROR_CODES } from "@pochimail/kernel/errors";
+import { err, ok, type Result } from "@pochimail/kernel/result";
 import { z } from "zod";
-import { ERROR_CODES, InvalidStateError, POLICY_DENIAL_REASONS } from "../errors.ts";
-import { err, ok, type Result } from "../result.ts";
+import { InvalidStateError, POLICY_DENIAL_REASONS } from "../errors.ts";
 import {
   accountIdSchema,
   actionIdSchema,

@@ -1,6 +1,6 @@
 import { AiUnavailable } from "@pochimail/core/errors";
-import { createLogger } from "@pochimail/core/logger";
 import type { Classifier } from "@pochimail/core/ports/ai";
+import { createLogger } from "@pochimail/logger/logger";
 import { createFakeEmbedder, createFakeLlmProvider } from "@pochimail/testing/fake-ai";
 import { createFakeTimer } from "@pochimail/testing/fake-timer";
 import { generateMailbox } from "@pochimail/testing/fixture-mailbox/generator";

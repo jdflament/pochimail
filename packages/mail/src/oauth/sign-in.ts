@@ -6,8 +6,8 @@ import {
   SignInCancelled,
 } from "@pochimail/core/errors";
 import type { AutonomyLevel } from "@pochimail/core/policies/autonomy";
-import type { AsyncResult, CancelSignal } from "@pochimail/core/ports/common";
-import { err, ok } from "@pochimail/core/result";
+import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
+import { err, ok } from "@pochimail/kernel/result";
 import { type FetchLike, postForm } from "./http.ts";
 import { openLoopbackReceiver, SIGN_IN_TIMEOUT_MS } from "./loopback.ts";
 import { createPkce, randomToken } from "./pkce.ts";

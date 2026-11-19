@@ -5,7 +5,7 @@ import type { Category } from "@pochimail/core/domain/category";
 import type { IncomingMessage } from "@pochimail/core/domain/mail";
 import { AiUnavailable, type ProviderError } from "@pochimail/core/errors";
 import type { AccountId, MessageId } from "@pochimail/core/ids";
-import { ok, unwrap } from "@pochimail/core/result";
+import { ok, unwrap } from "@pochimail/kernel/result";
 import { derivedContract, makeDerived } from "@pochimail/testing/derived-contract";
 import { digestStateContract } from "@pochimail/testing/digest-state-contract";
 import { entityRoundTripContract } from "@pochimail/testing/entity-contract";

@@ -1,4 +1,4 @@
-import { StorageError } from "@pochimail/core/errors";
+import { StorageError } from "@pochimail/kernel/errors";
 
 export const SECRET_FAILURES = [
   /** The OS cannot protect the value (no keychain, or Linux basic_text without the user's choice). Nothing was written. */

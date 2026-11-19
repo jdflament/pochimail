@@ -1,5 +1,6 @@
+import type { WorkspaceId } from "@pochimail/kernel/ids";
 import type { DomainEventOf } from "../events/catalog.ts";
-import type { AccountId, WorkspaceId } from "../ids.ts";
+import type { AccountId } from "../ids.ts";
 
 export type AccountState = DomainEventOf<"AccountStateChanged">["payload"]["state"];
 

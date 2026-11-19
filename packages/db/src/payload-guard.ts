@@ -1,5 +1,5 @@
-import { StorageError } from "@pochimail/core/errors";
-import { err, ok, type Result } from "@pochimail/core/result";
+import { StorageError } from "@pochimail/kernel/errors";
+import { err, ok, type Result } from "@pochimail/kernel/result";
 
 /** Outbox and job payloads carry ids, cursors and enums, never mail content (D11, ADR 0009). */
 const MAX_PAYLOAD_BYTES = 16 * 1024;

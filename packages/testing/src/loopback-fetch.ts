@@ -1,4 +1,4 @@
-import type { CancelSignal } from "@pochimail/core/ports/common";
+import type { CancelSignal } from "@pochimail/kernel/common";
 
 export interface LoopbackFetchInit {
   readonly method: "POST" | "GET";

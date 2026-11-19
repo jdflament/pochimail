@@ -1,5 +1,5 @@
-import { StorageError } from "@pochimail/core/errors";
-import { err } from "@pochimail/core/result";
+import { StorageError } from "@pochimail/kernel/errors";
+import { err } from "@pochimail/kernel/result";
 import { createFakeClock } from "./fake-clock.ts";
 import { createInMemoryJobQueue } from "./in-memory-job-queue.ts";
 import { createInMemoryUnitOfWork } from "./in-memory-store.ts";

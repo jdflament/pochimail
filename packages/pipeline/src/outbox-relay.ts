@@ -1,13 +1,14 @@
-import type { StorageError } from "../errors.ts";
-import type { AsyncResult, CancelSignal } from "../ports/common.ts";
-import type { BusEvent, EventBus } from "../ports/event-bus.ts";
-import type { JobQueue } from "../ports/job-queue.ts";
-import type { OutboxStore } from "../ports/outbox.ts";
-import { err, ok } from "../result.ts";
+import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
+import type { StorageError } from "@pochimail/kernel/errors";
+import type { EventEnvelope } from "@pochimail/kernel/event";
+import { err, ok } from "@pochimail/kernel/result";
+import type { EventBus } from "./event-bus.ts";
+import type { JobQueue } from "./job-queue.ts";
+import type { OutboxStore } from "./outbox.ts";
 
 export interface OutboxRelayDeps {
   readonly store: OutboxStore;
-  readonly bus: EventBus<BusEvent>;
+  readonly bus: EventBus<EventEnvelope>;
   readonly queue: JobQueue;
   /** Rows read per round trip. Default 100. */
   readonly batchSize?: number;

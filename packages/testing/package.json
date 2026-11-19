@@ -89,6 +89,9 @@
     "vitest": "5.1.0"
   },
   "dependencies": {
+    "@pochimail/kernel": "workspace:*",
+    "@pochimail/logger": "workspace:*",
+    "@pochimail/pipeline": "workspace:*",
     "zod": "4.6.7"
   }
 }
