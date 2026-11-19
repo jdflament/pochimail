@@ -6,7 +6,7 @@ import { SignalRow } from "@pochimail/ui/components/signal-row";
 import { Skeleton } from "@pochimail/ui/components/skeleton";
 import { StatusStrip } from "@pochimail/ui/components/status-strip";
 import { StorageBar } from "@pochimail/ui/components/storage-bar";
-import { getLocale, t } from "@pochimail/ui/i18n/format.ts";
+import { type T, useLocale, useT } from "@pochimail/ui/i18n/i18n-provider.tsx";
 import { deviceLabel } from "@pochimail/ui/i18n/locale.ts";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
@@ -15,13 +15,14 @@ import { useWorkerClient } from "../../lib/worker-context.tsx";
 import { cleanSplit, overviewView, RECOMMENDATION_COPY } from "./overview-figures.ts";
 import { type ScanStatus, useScanStatus } from "./use-scan-status.ts";
 
-const scanStatusLine = (scan: ScanStatus): string => {
+const scanStatusLine = (scan: ScanStatus, t: T): string => {
   if (scan.paused) return t("overview.scan.paused");
   if (scan.total === null) return t("overview.scan.progressNoTotal", { processed: scan.processed });
   return t("overview.scan.progress", { processed: scan.processed, total: scan.total });
 };
 
 export function OverviewPage() {
+  const t = useT();
   const client = useWorkerClient();
   const navigate = useNavigate();
   const { account } = useSearch({ strict: false });
@@ -42,7 +43,7 @@ export function OverviewPage() {
   );
   const scan = useScanStatus(scopedAccounts.map((a) => a.id));
 
-  const locale = getLocale();
+  const locale = useLocale();
   const device = deviceLabel(deviceName.data ?? "device", locale);
   const data = overview.data;
   const review = (category: Category) =>
@@ -62,7 +63,7 @@ export function OverviewPage() {
         <StatusStrip
           progress={scan.percent}
           headline={t("overview.sorting", { device })}
-          status={scanStatusLine(scan)}
+          status={scanStatusLine(scan, t)}
         >
           <Button variant="secondary" size="sm" onClick={scan.paused ? scan.resume : scan.pause}>
             {scan.paused ? t("overview.resume") : t("overview.pause")}

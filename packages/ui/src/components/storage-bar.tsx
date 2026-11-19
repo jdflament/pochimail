@@ -1,5 +1,5 @@
 import { useMotionEnabled } from "@pochimail/ui/hooks/use-motion";
-import { t } from "@pochimail/ui/i18n/format.ts";
+import { useT } from "@pochimail/ui/i18n/i18n-provider.tsx";
 import { MOTION, MOTION_EASE } from "@pochimail/ui/lib/motion";
 import { cn } from "@pochimail/ui/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
@@ -34,6 +34,7 @@ type StorageBarProps = Omit<React.ComponentProps<"div">, "children"> & {
 };
 
 function StorageBar({ className, segments, summary, ...props }: StorageBarProps) {
+  const t = useT();
   const motion = useMotionEnabled();
   // Fills once on mount (keep segment, then the hatched one 140ms later); later value changes (after a cleanup) glide the same way.
   const [settled, setSettled] = React.useState(!motion);

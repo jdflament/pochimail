@@ -1,7 +1,7 @@
 import { Button } from "@pochimail/ui/components/button";
 import { EmptyState } from "@pochimail/ui/components/empty-state";
 import { StatusLine } from "@pochimail/ui/components/status-line";
-import { t } from "@pochimail/ui/i18n/format.ts";
+import { useT } from "@pochimail/ui/i18n/i18n-provider.tsx";
 
 // The required states (brief §6): each composes the one EmptyState with its pose, copy and exactly
 // one primary action. Only a state that needs the user to act now (reconnect) is an alert; the rest announce politely.
@@ -9,6 +9,7 @@ type Handler = { onAction: () => void };
 type WithSecondary = Handler & { onSecondary: () => void };
 
 function SignInCancelledState({ onAction, onSecondary }: WithSecondary) {
+  const t = useT();
   return (
     <EmptyState
       role="status"
@@ -23,6 +24,7 @@ function SignInCancelledState({ onAction, onSecondary }: WithSecondary) {
 
 /** Always mounted so assistive tech announces the change; empty (hidden) while online. */
 function OfflineStatusLine({ offline, onAction }: Handler & { offline: boolean }) {
+  const t = useT();
   return (
     <StatusLine>
       {offline ? (
@@ -43,6 +45,7 @@ function NeedsReconnectState({
   onAction,
   onSecondary,
 }: WithSecondary & { provider: string }) {
+  const t = useT();
   return (
     <EmptyState
       role="alert"
@@ -56,6 +59,7 @@ function NeedsReconnectState({
 }
 
 function ModelDownloadFailedState({ onAction, onSecondary }: WithSecondary) {
+  const t = useT();
   return (
     <EmptyState
       role="status"
@@ -73,6 +77,7 @@ function RateLimitState({
   minutes,
   onAction,
 }: Handler & { provider: string; minutes: number }) {
+  const t = useT();
   return (
     <EmptyState
       role="status"
@@ -85,6 +90,7 @@ function RateLimitState({
 }
 
 function EmptyCategoryState({ onAction }: Handler) {
+  const t = useT();
   return (
     <EmptyState
       role="status"
@@ -98,6 +104,7 @@ function EmptyCategoryState({ onAction }: Handler) {
 
 /** No mockup (decided 2026-11-18): copy and pose derived from the empty category state. */
 function NothingToDoState({ onAction }: Handler) {
+  const t = useT();
   return (
     <EmptyState
       role="status"
@@ -110,6 +117,7 @@ function NothingToDoState({ onAction }: Handler) {
 }
 
 function UpdateReadyState({ version, onAction, onSecondary }: WithSecondary & { version: string }) {
+  const t = useT();
   return (
     <EmptyState
       role="status"

@@ -30,7 +30,7 @@ import {
   SidebarMenuLabel,
   SidebarProvider,
 } from "@pochimail/ui/components/sidebar";
-import { getLocale, t } from "@pochimail/ui/i18n/format.ts";
+import { useLocale, useT } from "@pochimail/ui/i18n/i18n-provider.tsx";
 import type { MessageKey } from "@pochimail/ui/i18n/messages.ts";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, Outlet, useNavigate, useRouterState, useSearch } from "@tanstack/react-router";
@@ -132,6 +132,8 @@ function useRefreshCategoriesWhileScanning(accounts: readonly { id: string }[]) 
  * the account switcher. The account selection lives in the router (`?account=`); counts follow it.
  */
 export function AppFrame() {
+  const t = useT();
+  const locale = useLocale();
   const client = useWorkerClient();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
@@ -161,7 +163,6 @@ export function AppFrame() {
       },
     });
   useRefreshCategoriesWhileScanning(accountList);
-  const locale = getLocale();
 
   return (
     <SidebarProvider>

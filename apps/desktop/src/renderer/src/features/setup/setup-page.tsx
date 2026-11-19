@@ -9,7 +9,7 @@ import { CheckboxCard } from "@pochimail/ui/components/checkbox-card";
 import { RadioCard } from "@pochimail/ui/components/radio-card";
 import { RadioGroup } from "@pochimail/ui/components/radio-group";
 import { SpeechBubble } from "@pochimail/ui/components/speech-bubble";
-import { t } from "@pochimail/ui/i18n/format.ts";
+import { useT } from "@pochimail/ui/i18n/i18n-provider.tsx";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { LockIcon } from "lucide-react";
@@ -21,6 +21,7 @@ type Choice = Pick<AppSettings, "autonomy" | "capabilities">;
 
 /** Setup: two plain questions and one button (brief §2, §7 item 3). The answers are saved, then the first scan starts. */
 export function SetupPage() {
+  const t = useT();
   const client = useWorkerClient();
   const settings = useQuery({
     queryKey: queryKeys.settings(),
@@ -49,6 +50,7 @@ export function SetupPage() {
 }
 
 function SetupForm({ initial }: { initial: Choice }) {
+  const t = useT();
   const client = useWorkerClient();
   const queryClient = useQueryClient();
   const navigate = useNavigate();

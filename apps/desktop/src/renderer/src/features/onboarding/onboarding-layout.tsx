@@ -1,5 +1,5 @@
 import { Mascot } from "@pochimail/ui/components/mascot";
-import { t } from "@pochimail/ui/i18n/format.ts";
+import { useT } from "@pochimail/ui/i18n/i18n-provider.tsx";
 import { cn } from "@pochimail/ui/lib/utils";
 import { Outlet, useRouter, useRouterState } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
@@ -12,6 +12,7 @@ const ONBOARDING_PATHS = ["/welcome", "/connect", "/setup"] as const;
  * step indicator keep their place and only the content below slides in (docs/design.md, Screen to screen).
  */
 export function OnboardingLayout() {
+  const t = useT();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const index = (ONBOARDING_PATHS as readonly string[]).indexOf(pathname);
   const current = Math.max(index, 0) + 1;

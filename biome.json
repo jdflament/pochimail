@@ -224,6 +224,40 @@
           }
         }
       }
+    },
+    {
+      "includes": ["apps/desktop/src/renderer/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "@pochimail/ui/i18n/format.ts": {
+                    "importNames": ["t", "getLocale"],
+                    "message": "Renderer code reads the language through useT() and useLocale() (I18nProvider); the global t() is for non-React code."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "apps/desktop/src/renderer/**/*.test.ts",
+        "apps/desktop/src/renderer/**/*.test.tsx",
+        "apps/desktop/src/renderer/**/*.stories.tsx"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": "off"
+          }
+        }
+      }
     }
   ]
 }

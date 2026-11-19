@@ -1,4 +1,4 @@
-import { t } from "@pochimail/ui/i18n/format.ts";
+import { useT } from "@pochimail/ui/i18n/i18n-provider.tsx";
 import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
 import type { RpcClient } from "../../../shared/ipc/client.ts";
 import { connectWorker } from "./worker.ts";
@@ -24,6 +24,7 @@ export function WorkerClientProvider({
   /** When supplied, skips the preload port handshake (useful for tests and stories with a fake IPC). */
   client?: RpcClient | Promise<RpcClient> | undefined;
 }) {
+  const t = useT();
   const [state, setState] = useState<WorkerState>({ status: "connecting" });
 
   useEffect(() => {
