@@ -1,6 +1,10 @@
 import { EventEmitter } from "node:events";
+import { join } from "node:path";
 import { describe, expect, it, vi } from "vitest";
 import { createAppTray, trayImageFile } from "./tray.ts";
+
+/** The expected path, built the way the code builds it, so the test holds on Windows too. */
+const imageAt = (file: string) => join("/res/tray", file);
 
 const setup = (platform: NodeJS.Platform, dark: boolean) => {
   const theme = Object.assign(new EventEmitter(), { shouldUseDarkColors: dark });
@@ -37,10 +41,10 @@ describe("tray image", () => {
     "on %s a dark theme uses the white-glyph image and a light theme the black-glyph one",
     (platform, whiteGlyph, blackGlyph) => {
       const { theme, images } = setup(platform, true);
-      expect(images).toEqual([`/res/tray/${whiteGlyph}`]);
+      expect(images).toEqual([imageAt(whiteGlyph)]);
       theme.shouldUseDarkColors = false;
       theme.emit("updated");
-      expect(images).toEqual([`/res/tray/${whiteGlyph}`, `/res/tray/${blackGlyph}`]);
+      expect(images).toEqual([imageAt(whiteGlyph), imageAt(blackGlyph)]);
     },
   );
 
@@ -49,7 +53,7 @@ describe("tray image", () => {
     const { theme, images } = setup("darwin", true);
     theme.shouldUseDarkColors = false;
     theme.emit("updated");
-    expect(images).toEqual(["/res/tray/trayTemplate.png"]);
+    expect(images).toEqual([imageAt("trayTemplate.png")]);
     expect(trayImageFile("darwin", false)).toBe("trayTemplate.png");
   });
 
