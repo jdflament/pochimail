@@ -1,6 +1,5 @@
 import { cn } from "@pochimail/ui/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
-import { Slot } from "radix-ui";
 import type * as React from "react";
 
 const ledgerBarVariants = cva("h-1.5 w-32 shrink-0 overflow-hidden rounded-full bg-muted", {
@@ -22,7 +21,6 @@ const ledgerBarVariants = cva("h-1.5 w-32 shrink-0 overflow-hidden rounded-full 
 
 type LedgerRowProps = Omit<React.ComponentProps<"li">, "children"> &
   VariantProps<typeof ledgerBarVariants> & {
-    asChild?: boolean;
     label: React.ReactNode;
     /** Number of emails; formatted with `locale`. */
     count: number;
@@ -35,7 +33,6 @@ type LedgerRowProps = Omit<React.ComponentProps<"li">, "children"> &
 
 function LedgerRow({
   className,
-  asChild = false,
   label,
   count,
   size,
@@ -44,12 +41,11 @@ function LedgerRow({
   locale,
   ...props
 }: LedgerRowProps) {
-  const Comp = asChild ? Slot.Root : "li";
   const pct = share === undefined ? undefined : Math.round(Math.min(1, Math.max(0, share)) * 100);
 
   return (
-    <Comp data-slot="ledger-row" className={cn("@container list-none", className)} {...props}>
-      <div className="flex min-h-8 items-baseline gap-3 py-1.5 text-[15px]">
+    <li data-slot="ledger-row" className={cn("@container list-none", className)} {...props}>
+      <div className="flex min-h-8 items-baseline gap-3 py-1.5 text-body">
         <span data-slot="ledger-label" className="min-w-0 break-words font-medium">
           {label}
         </span>
@@ -64,7 +60,7 @@ function LedgerRow({
         {size ? (
           <span
             data-slot="ledger-size"
-            className="shrink-0 text-sm text-muted-foreground tabular-nums"
+            className="shrink-0 text-ui text-muted-foreground tabular-nums"
           >
             {size}
           </span>
@@ -74,13 +70,13 @@ function LedgerRow({
             aria-hidden="true"
             data-slot="ledger-bar"
             data-share={pct}
-            className={cn(ledgerBarVariants({ tone }), "hidden self-center @[760px]:block")}
+            className={cn(ledgerBarVariants({ tone }), "hidden self-center @tablet:block")}
           >
             <span className="block h-full rounded-full" style={{ width: `${pct}%` }} />
           </span>
         )}
       </div>
-    </Comp>
+    </li>
   );
 }
 

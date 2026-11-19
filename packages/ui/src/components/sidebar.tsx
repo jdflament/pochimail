@@ -16,8 +16,8 @@ import * as React from "react";
  *   760-959   icon rail, content in a rounded panel
  *   560-759   icon rail, edge to edge (the ledger drops its bar, secondary hints hide)
  *   < 560     top bar (SidebarHeader) + bottom tabs (the nav); the content never remounts.
- * Tailwind's `@max-[N]` means "narrower than N", so `@max-[560px]` pairs with `@min-[560px]` with no gap.
- * Page content hides its own secondary hints with `@max-[760px]:hidden`.
+ * The widths are the named containers in theme.css. `@max-phone` means "narrower than phone", so it pairs with
+ * `@min-phone` with no gap. Page content hides its own secondary hints with `@max-tablet:hidden`.
  */
 
 const SIDEBAR_BREAKPOINTS = { full: 960, rail: 760, tabs: 560 } as const;
@@ -68,7 +68,7 @@ function SidebarLayout({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sidebar-layout"
       className={cn(
-        "grid h-full min-h-0 grid-cols-[4.5rem_minmax(0,1fr)] bg-background text-foreground @min-[960px]:grid-cols-[16rem_minmax(0,1fr)] @max-[560px]:grid-cols-[minmax(0,1fr)] @max-[560px]:grid-rows-[auto_minmax(0,1fr)_auto]",
+        "grid h-full min-h-0 grid-cols-[4.5rem_minmax(0,1fr)] bg-background text-foreground @min-desktop:grid-cols-[16rem_minmax(0,1fr)] @max-phone:grid-cols-[minmax(0,1fr)] @max-phone:grid-rows-[auto_minmax(0,1fr)_auto]",
         className,
       )}
       {...props}
@@ -81,7 +81,7 @@ function Sidebar({ className, ...props }: React.ComponentProps<"aside">) {
     <aside
       data-slot="sidebar"
       className={cn(
-        "flex min-h-0 flex-col bg-sidebar text-sidebar-foreground border-e border-border @max-[560px]:contents",
+        "flex min-h-0 flex-col bg-sidebar text-sidebar-foreground border-e border-border @max-phone:contents",
         className,
       )}
       {...props}
@@ -94,7 +94,7 @@ function SidebarHeader({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sidebar-header"
       className={cn(
-        "flex flex-col gap-3 p-3 @max-[560px]:row-start-1 @max-[560px]:flex-row @max-[560px]:items-center @max-[560px]:justify-between @max-[560px]:border-b @max-[560px]:border-border @max-[560px]:bg-sidebar",
+        "flex flex-col gap-3 p-3 @max-phone:row-start-1 @max-phone:flex-row @max-phone:items-center @max-phone:justify-between @max-phone:border-b @max-phone:border-border @max-phone:bg-sidebar",
         className,
       )}
       {...props}
@@ -107,7 +107,7 @@ function SidebarBrand({ className, ...props }: React.ComponentProps<"span">) {
   return (
     <span
       data-slot="sidebar-brand"
-      className={cn("px-2 font-semibold text-[17px] @min-[560px]:@max-[960px]:hidden", className)}
+      className={cn("px-2 font-semibold text-section @min-phone:@max-desktop:hidden", className)}
       {...props}
     />
   );
@@ -119,7 +119,7 @@ function SidebarContent({ className, ...props }: React.ComponentProps<"nav">) {
     <nav
       data-slot="sidebar-content"
       className={cn(
-        "flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-3 py-2 @max-[560px]:row-start-3 @max-[560px]:flex-none @max-[560px]:flex-row @max-[560px]:items-stretch @max-[560px]:justify-around @max-[560px]:gap-0 @max-[560px]:overflow-visible @max-[560px]:border-t @max-[560px]:border-border @max-[560px]:bg-sidebar @max-[560px]:p-1",
+        "flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-3 py-2 @max-phone:row-start-3 @max-phone:flex-none @max-phone:flex-row @max-phone:items-stretch @max-phone:justify-around @max-phone:gap-0 @max-phone:overflow-visible @max-phone:border-t @max-phone:border-border @max-phone:bg-sidebar @max-phone:p-1",
         className,
       )}
       {...props}
@@ -129,11 +129,7 @@ function SidebarContent({ className, ...props }: React.ComponentProps<"nav">) {
 
 function SidebarFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
-    <div
-      data-slot="sidebar-footer"
-      className={cn("p-3 @max-[560px]:hidden", className)}
-      {...props}
-    />
+    <div data-slot="sidebar-footer" className={cn("p-3 @max-phone:hidden", className)} {...props} />
   );
 }
 
@@ -141,7 +137,7 @@ function SidebarGroup({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="sidebar-group"
-      className={cn("flex flex-col gap-1 @max-[560px]:contents", className)}
+      className={cn("flex flex-col gap-1 @max-phone:contents", className)}
       {...props}
     />
   );
@@ -152,7 +148,7 @@ function SidebarGroupLabel({ className, ...props }: React.ComponentProps<"h2">) 
     <h2
       data-slot="sidebar-group-label"
       className={cn(
-        "px-2 pt-2 pb-1 font-semibold text-[12px] text-muted-foreground uppercase tracking-[0.06em] @max-[960px]:hidden",
+        "px-2 pt-2 pb-1 font-semibold text-overline text-muted-foreground uppercase tracking-overline @max-desktop:hidden",
         className,
       )}
       {...props}
@@ -164,18 +160,18 @@ function SidebarMenu({ className, ...props }: React.ComponentProps<"ul">) {
   return (
     <ul
       data-slot="sidebar-menu"
-      className={cn("m-0 flex list-none flex-col gap-0.5 p-0 @max-[560px]:contents", className)}
+      className={cn("m-0 flex list-none flex-col gap-0.5 p-0 @max-phone:contents", className)}
       {...props}
     />
   );
 }
 
-const sidebarMenuItemVariants = cva("list-none @max-[560px]:flex-1", {
+const sidebarMenuItemVariants = cva("list-none @max-phone:flex-1", {
   variants: {
     // "wide" items (categories, topics) only exist in the full sidebar; "always" items survive to the tabs.
     reach: {
       always: "",
-      wide: "@max-[960px]:hidden",
+      wide: "@max-desktop:hidden",
     },
   },
   defaultVariants: { reach: "always" },
@@ -196,7 +192,7 @@ function SidebarMenuItem({
 }
 
 const sidebarMenuButtonVariants = cva(
-  "flex min-h-9 w-full items-center gap-3 rounded-[10px] px-2 text-start text-[15px] outline-hidden transition-colors duration-(--duration-press) hover:bg-background/60 focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-[current=page]:bg-background aria-[current=page]:font-medium aria-disabled:opacity-60 aria-disabled:hover:bg-transparent [&_svg]:size-[18px] [&_svg]:shrink-0 @max-[960px]:justify-center @max-[560px]:min-h-12 @max-[560px]:flex-col @max-[560px]:justify-center @max-[560px]:gap-0.5 @max-[560px]:px-1 @max-[560px]:text-[12px]",
+  "flex min-h-9 w-full items-center gap-3 rounded-md px-2 text-start text-body outline-hidden transition-colors duration-(--duration-press) hover:bg-background/60 focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-[current=page]:bg-background aria-[current=page]:font-medium aria-disabled:opacity-60 aria-disabled:hover:bg-transparent [&_svg]:size-4.5 [&_svg]:shrink-0 @max-desktop:justify-center @max-phone:min-h-12 @max-phone:flex-col @max-phone:justify-center @max-phone:gap-0.5 @max-phone:px-1 @max-phone:text-overline",
   {
     variants: {
       tone: {
@@ -252,7 +248,7 @@ function SidebarMenuLabel({ className, ...props }: React.ComponentProps<"span">)
     <span
       data-slot="sidebar-menu-label"
       className={cn(
-        "min-w-0 flex-1 truncate @min-[560px]:@max-[960px]:sr-only @max-[560px]:flex-none",
+        "min-w-0 flex-1 truncate @min-phone:@max-desktop:sr-only @max-phone:flex-none",
         className,
       )}
       {...props}
@@ -266,7 +262,7 @@ function SidebarMenuBadge({ className, ...props }: React.ComponentProps<"span">)
     <span
       data-slot="sidebar-menu-badge"
       className={cn(
-        "shrink-0 text-[13px] text-muted-foreground tabular-nums @max-[960px]:hidden",
+        "shrink-0 text-caption text-muted-foreground tabular-nums @max-desktop:hidden",
         className,
       )}
       {...props}
@@ -281,7 +277,7 @@ function SidebarInset({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="sidebar-inset"
       className={cn(
         // >= 760px the content sits in a rounded panel; below it, it runs edge to edge.
-        "min-h-0 min-w-0 overflow-y-auto @min-[760px]:m-2 @min-[760px]:ms-0 @min-[760px]:rounded-2xl @min-[760px]:bg-card @max-[560px]:row-start-2",
+        "min-h-0 min-w-0 overflow-y-auto @min-tablet:m-2 @min-tablet:ms-0 @min-tablet:rounded-2xl @min-tablet:bg-card @max-phone:row-start-2",
         className,
       )}
       {...props}

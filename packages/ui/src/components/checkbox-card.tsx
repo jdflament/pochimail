@@ -31,13 +31,13 @@ function CheckboxCard({ className, title, description, id, ...props }: CheckboxC
         {...props}
       />
       <span className="flex min-w-0 flex-col gap-1">
-        <span id={titleId} className="text-[15px] font-semibold break-words">
+        <span id={titleId} className="text-body font-semibold break-words">
           {title}
         </span>
         {description ? (
           <span
             id={descriptionId}
-            className="text-sm leading-snug break-words text-muted-foreground"
+            className="text-ui leading-snug break-words text-muted-foreground"
           >
             {description}
           </span>

@@ -40,7 +40,7 @@ export const ShowPochiOff: Story = {
       <MascotProvider showPochi={false}>
         <div className="flex items-center gap-2 border border-dashed border-border p-2">
           <Story />
-          <span className="text-sm text-muted-foreground">Layout space remains.</span>
+          <span className="text-ui text-muted-foreground">Layout space remains.</span>
         </div>
       </MascotProvider>
     ),

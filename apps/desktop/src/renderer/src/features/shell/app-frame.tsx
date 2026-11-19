@@ -174,7 +174,7 @@ export function AppFrame() {
               <AccountSwitcherTrigger aria-label={`${t("switcher.menu")}: ${currentLabel}`}>
                 <UsersIcon aria-hidden="true" />
                 <AccountSwitcherLabel>{currentLabel}</AccountSwitcherLabel>
-                <ChevronDownIcon aria-hidden="true" className="@min-[560px]:@max-[960px]:hidden" />
+                <ChevronDownIcon aria-hidden="true" className="@min-phone:@max-desktop:hidden" />
               </AccountSwitcherTrigger>
               <AccountSwitcherContent>
                 <DropdownMenuLabel>{t("switcher.menu")}</DropdownMenuLabel>

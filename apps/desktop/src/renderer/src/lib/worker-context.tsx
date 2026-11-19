@@ -43,7 +43,7 @@ export function WorkerClientProvider({
 
   if (state.status === "connecting") {
     return (
-      <div className="flex min-h-screen items-center justify-center text-sm text-foreground-tertiary">
+      <div className="flex min-h-screen items-center justify-center text-ui text-foreground-tertiary">
         {t("shell.loading")}
       </div>
     );

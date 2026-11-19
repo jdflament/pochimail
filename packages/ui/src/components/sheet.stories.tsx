@@ -34,7 +34,7 @@ const SummarySheet = ({
     </SheetTrigger>
     <SheetContent container={container}>
       <SheetHeader>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-ui text-muted-foreground">
           {t("summary.from", { date: "2026-11-19T12:00:00Z", device: "Mac" })}
         </p>
         <SheetTitle>{t("summary.title")}</SheetTitle>
@@ -48,7 +48,7 @@ const SummarySheet = ({
         ].map(([figure, label]) => (
           <div key={label}>
             <dd className="font-display text-3xl tabular-nums">{figure}</dd>
-            <dt className="text-sm text-muted-foreground">{label}</dt>
+            <dt className="text-ui text-muted-foreground">{label}</dt>
           </div>
         ))}
       </dl>
@@ -77,7 +77,7 @@ function PhoneFrame(args: React.ComponentProps<typeof Sheet>) {
   return (
     <div
       ref={setFrame}
-      className="relative h-[640px] w-[390px] overflow-hidden border"
+      className="relative h-160 w-97.5 overflow-hidden border"
       style={{ contain: "layout paint" }}
     >
       {frame ? <SummarySheet {...args} container={frame} /> : null}
