@@ -1,33 +1,9 @@
-import { mkdtempSync, rmSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
 import type { IncomingMessage } from "@pochimail/core/domain/mail";
 import { ok, unwrap } from "@pochimail/kernel/result";
 import { makeIncomingMessage } from "@pochimail/testing/fixtures";
-import { afterEach, expect } from "vitest";
-import { openStorage, type Storage } from "../open-storage.ts";
+import { expect } from "vitest";
 import { createSqliteUnitOfWork } from "../sqlite-unit-of-work.ts";
-
-const dirs: string[] = [];
-const opened: Storage[] = [];
-function open(): Storage {
-  const dir = mkdtempSync(join(tmpdir(), "pochimail-repos-"));
-  dirs.push(dir);
-  const storage = unwrap(openStorage(join(dir, "pochimail.db"), Buffer.alloc(32, 3)));
-  opened.push(storage);
-  return storage;
-}
-afterEach(() => {
-  for (const s of opened.splice(0)) {
-    try {
-      s.close();
-    } catch {
-      // already closed by the test
-    }
-  }
-  for (const d of dirs.splice(0))
-    rmSync(d, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
-});
+import { key, open } from "./storage.ts";
 
 const TABLE_KEYS: Record<string, string> = {
   account: "accounts",
@@ -44,7 +20,7 @@ const TABLE_KEYS: Record<string, string> = {
 
 /** Every committed row of every table and the outbox, as plain data. */
 export function harness() {
-  const storage = open();
+  const storage = open(undefined, key(3));
   const sqlite = createSqliteUnitOfWork(storage);
   const committedOutbox = async () =>
     unwrap(await sqlite.outboxStore.pending(100_000)).map((r) => r.entry);

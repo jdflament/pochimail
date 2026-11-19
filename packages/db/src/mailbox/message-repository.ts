@@ -1,4 +1,9 @@
-import { CATEGORIES, type Category, categorySchema } from "@pochimail/core/domain/category";
+import {
+  CATEGORIES,
+  type Category,
+  categorySchema,
+  DEFAULT_CATEGORY,
+} from "@pochimail/core/domain/category";
 import type { IncomingMessage } from "@pochimail/core/domain/mail";
 import { NotFound } from "@pochimail/core/errors";
 import type { MessageQuery } from "@pochimail/core/ports/repositories";
@@ -10,7 +15,6 @@ import { CHUNK, find, guard, sqlHelpers } from "../shared/sql.ts";
 import { countRow, text } from "../shared/values.ts";
 import { MESSAGE_COLUMNS, messageOf } from "./message-row.ts";
 
-const DEFAULT_CATEGORY: Category = "notifications";
 const categoryCountRow = z.object({ category: categorySchema, value: z.number() });
 
 /** Repository over one connection. */
