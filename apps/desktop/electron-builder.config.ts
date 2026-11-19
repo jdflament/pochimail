@@ -31,6 +31,8 @@ const config: Configuration = {
   asarUnpack: ["**/node_modules/better-sqlite3-multiple-ciphers/prebuilds/*.node"],
   extraMetadata: { homepage },
   asar: true,
+  // The tray images load from the app's resources folder, outside app.asar.
+  extraResources: [{ from: "resources/tray", to: "tray" }],
   // Native modules (SQLite driver, node-llama-cpp, onnxruntime-node) are rebuilt for Electron per OS and CPU here.
   npmRebuild: true,
   afterPack: async (context) => {
@@ -43,6 +45,7 @@ const config: Configuration = {
   },
   mac: {
     category: "public.app-category.productivity",
+    icon: "build/icon.icns",
     target: [
       { target: "dmg", arch: "universal" },
       { target: "zip", arch: "universal" },
@@ -52,8 +55,13 @@ const config: Configuration = {
     files: [`!${driverPrebuilds}/!(darwin-*).node`],
     x64ArchFiles: "**/prebuilds/darwin-*.node",
   },
-  win: { target: [{ target: "nsis", arch: "x64" }], files: onlyPrebuild("win32") },
+  win: {
+    icon: "build/icon.ico",
+    target: [{ target: "nsis", arch: "x64" }],
+    files: onlyPrebuild("win32"),
+  },
   linux: {
+    icon: "build/icons",
     executableName: linuxExecutableName,
     category: "Office",
     maintainer: "Pochimail contributors <noreply@users.noreply.github.com>",
