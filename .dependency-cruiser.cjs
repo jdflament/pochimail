@@ -26,8 +26,7 @@ module.exports = {
     {
       name: "kernel-is-base",
       severity: "error",
-      comment:
-        "kernel holds the few types every domain shares; it imports nothing of ours (ADR 0015).",
+      comment: "kernel holds the few types every domain shares; it imports nothing of ours (ADR 0015).",
       from: { path: "^packages/kernel/src/" },
       to: { path: "^(packages|apps)/", pathNot: "^packages/kernel/src/" },
     },
@@ -42,8 +41,7 @@ module.exports = {
     {
       name: "workflows-only-orchestrate",
       severity: "error",
-      comment:
-        "workflows turns events into commands across domains. It never touches adapters, pipeline, ui or apps.",
+      comment: "workflows turns events into commands across domains. It never touches adapters, pipeline, ui or apps.",
       from: { path: "^packages/workflows/src/", pathNot: NOT_SHIPPED },
       to: { path: `^apps/|^packages/(${ADAPTERS}|ui|pipeline|testing)/` },
     },
@@ -76,8 +74,7 @@ module.exports = {
     {
       name: "only-mail-adapters-use-net",
       severity: "error",
-      comment:
-        "net is the network exit for mail providers; other packages have no reason to call the network.",
+      comment: "net is the network exit for mail providers; other packages have no reason to call the network.",
       from: { path: "^packages/(?!gmail/|graph/|net/)[^/]+/src/" },
       to: { path: "^packages/net/src/" },
     },
@@ -95,20 +92,14 @@ module.exports = {
         "A domain's in-memory adapters and contract suites (src/testing) are for tests, the testing package and dev-only entries; never shipped code.",
       from: {
         path: "^(packages|apps)/",
-        pathNot: [
-          NOT_SHIPPED,
-          "^packages/testing/",
-          `^packages/(${DOMAINS})/src/testing/`,
-          DEV_ONLY_ENTRIES,
-        ],
+        pathNot: [NOT_SHIPPED, "^packages/testing/", `^packages/(${DOMAINS})/src/testing/`, DEV_ONLY_ENTRIES],
       },
       to: { path: `^packages/(${DOMAINS})/src/testing/` },
     },
     {
       name: "no-circular",
       severity: "error",
-      comment:
-        "A cycle means two modules are one responsibility split badly. Extract the shared part.",
+      comment: "A cycle means two modules are one responsibility split badly. Extract the shared part.",
       from: {},
       to: { circular: true },
     },
@@ -123,33 +114,23 @@ module.exports = {
     {
       name: "legacy-core-npm-allowlist",
       severity: "error",
-      comment:
-        "core may only use zod. Anything else is an adapter concern and belongs behind a port.",
+      comment: "core may only use zod. Anything else is an adapter concern and belongs behind a port.",
       from: { path: "^packages/core/src/" },
-      to: {
-        dependencyTypes: ["npm", "npm-dev", "npm-peer", "npm-optional"],
-        pathNot: "node_modules/zod/",
-      },
+      to: { dependencyTypes: ["npm", "npm-dev", "npm-peer", "npm-optional"], pathNot: "node_modules/zod/" },
     },
     {
       name: "domains-npm-allowlist",
       severity: "error",
       comment:
         "A domain may only use zod from npm. Anything else is an adapter concern and belongs behind a port. Tests and src/testing (contract suites) may use test tooling.",
-      from: {
-        path: `^packages/(${DOMAINS})/src/`,
-        pathNot: [NOT_SHIPPED, `^packages/(${DOMAINS})/src/testing/`],
-      },
-      to: {
-        dependencyTypes: ["npm", "npm-dev", "npm-peer", "npm-optional"],
-        pathNot: "node_modules/zod/",
-      },
+      from: { path: `^packages/(${DOMAINS})/src/`, pathNot: [NOT_SHIPPED, `^packages/(${DOMAINS})/src/testing/`] },
+      to: { dependencyTypes: ["npm", "npm-dev", "npm-peer", "npm-optional"], pathNot: "node_modules/zod/" },
     },
     {
       name: "legacy-adapters-depend-on-core-only",
       severity: "error",
       comment:
-        "db, mail and ai implement core ports. They never import each other or the UI: the composition root (apps) wires them together. They may use the logger and pipeline.",
+        "db, mail and ai implement core ports. They never import each other or the UI: the composition root (apps) wires them together. They may use the logger.",
       from: { path: "^packages/(db|mail|ai)/src/" },
       to: {
         path: "^(packages|apps)/",
@@ -157,7 +138,8 @@ module.exports = {
         pathNot: [
           "^packages/core/src/",
           "^packages/$1/src/",
-          "^packages/(logger|pipeline)/src/",
+          "^packages/logger/src/",
+          "^packages/pipeline/src/", // governed by adapters-use-only-pipeline-ports and db-uses-only-pipeline-ports
           "^packages/testing/",
           `^packages/(${DOMAINS}|kernel|net)/src/`,
         ],
@@ -184,10 +166,7 @@ module.exports = {
       severity: "error",
       comment:
         "Fixtures and contracts are for tests and developers only and must not reach release builds. Shipped code that needs a fixture goes through one listed dev-only entry.",
-      from: {
-        path: "^(packages|apps)/",
-        pathNot: [NOT_SHIPPED, "^packages/testing/", DEV_ONLY_ENTRIES],
-      },
+      from: { path: "^(packages|apps)/", pathNot: [NOT_SHIPPED, "^packages/testing/", DEV_ONLY_ENTRIES] },
       to: { path: "^packages/testing/" },
     },
     {
@@ -227,8 +206,7 @@ module.exports = {
     {
       name: "preload-is-tiny",
       severity: "error",
-      comment:
-        "The preload bridge may only use shared/ contracts: every import widens the attack surface.",
+      comment: "The preload bridge may only use shared/ contracts: every import widens the attack surface.",
       from: { path: "^apps/desktop/src/preload/" },
       to: { path: "^apps/desktop/src/(?!shared/|preload/)" },
     },
