@@ -1,0 +1,53 @@
+[
+  {
+    "type": "dependency",
+    "from": "packages/mail/src/egress/http-client-contract.ts",
+    "to": "packages/testing/src/contract.ts",
+    "unresolvedTo": "@pochimail/testing/contract",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "testing-only-in-tests"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "packages/mail/src/egress/rate-limit-contract.ts",
+    "to": "packages/testing/src/contract.ts",
+    "unresolvedTo": "@pochimail/testing/contract",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "testing-only-in-tests"
+    }
+  },
+  {
+    "type": "dependency",
+    "from": "packages/mail/src/egress/rate-limit-contract.ts",
+    "to": "packages/testing/src/fake-clock.ts",
+    "unresolvedTo": "@pochimail/testing/fake-clock",
+    "dependencyTypes": [
+      "aliased",
+      "aliased-tsconfig",
+      "aliased-tsconfig-paths",
+      "local",
+      "import"
+    ],
+    "rule": {
+      "severity": "error",
+      "name": "testing-only-in-tests"
+    }
+  }
+]

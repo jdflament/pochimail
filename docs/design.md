@@ -1,87 +1,79 @@
-# Pochimail — design system
+# Design system
 
-Source of truth for visual and interaction decisions. Tokens live in `packages/ui/src/styles/` (`tokens.json` source, `tokens.css`, `theme.css`). Screens in `docs/design/screens/` are the reference for layout.
+Tokens live in `packages/ui/src/styles/` (`tokens.json` is the source, then `tokens.css`, `theme.css`). Reference screens are in `docs/design/screens/`; the light desktop ones are canonical, the rest show theme and layout only. A screen that differs from its reference is rejected.
 
 ## Direction
-Modern, calm and sober, with an **editorial signature**: screens read like a well-typeset document written by someone, not a dashboard of cards. Typography, hairline rules and open space do the structuring. The mascot is the only warm, playful element.
+Calm, sober, editorial: screens read like a typeset document, not a dashboard of cards. Typography, hairline rules and open space structure the page. The mascot is the only warm element.
+- Ledgers (rows, dotted leaders, tabular numbers), never stat tiles. Containers only where content needs one (summary sheet, list blocks).
+- **Catch what matters**: people waiting on you, deadlines, things to remember. Old conversations never count as "waiting on you".
+- **Clean up** is a list of recommendations ordered by impact, each a sentence ("Unsubscribe from 120 newsletters"), a one-line reason and one "Review" button. Space you can free by deleting is shown apart from email you can archive ([ADR 0012](adr/0012-delete-moves-to-trash-with-approval.md)). What the storage bar shows is **open for the maintainer**; do not invent a meaning.
+- **Summary** is a plain sheet from Pochi over the current screen, never a page: "From Pochi · date", a title, one sentence, three figures, one next step, Keep it tidy choices. It shows only what is new. Bottom sheet on phones.
+- **Saved attachments** go to the user's own storage ([ADR 0010](adr/0010-saved-attachments-go-to-user-storage.md)).
+- **Review lists** (proposed, maintainer to confirm): Pochimail may label the concerned emails in the provider and open that filtered list in the user's mail app.
+- Only categories that contain email are shown; once [ADR 0016](adr/0016-fixed-types-and-automatic-topics.md) is accepted, types and topics.
 
-- Data is shown as **ledgers** (rows with dotted leaders, tabular numbers), not stat tiles.
-- **Catch what matters** covers things to do and things to remember (reminders), not only replies: people waiting on you, deadlines, tasks/commitments and things to keep in mind (decided 2026-11-19). Signals weigh email dates: old conversations never count as "waiting on you" (D15; only recent threads whose last message is from a real person to you, with a configurable age window set in M3).
-- **Clean up = recommendations**: figures are emails archived (and those that could be archived), attachments saved (count and size) and newsletters unsubscribed — archiving does not free mailbox space, so there is no "GB you can free" headline. Sentences are actions ("Save 412 attachments (1.2 GB)", "Unsubscribe from 120 newsletters", "Archive 9,206 promotions"), ordered by impact, each with a one-line reason and one "Review" button. The storage bar is **OPEN for the maintainer** (what it shows, or drop it); do not invent a meaning. No color coding in content.
-- **Saved attachments** are written to the user's own storage, not kept inside Pochimail (decided 2026-11-19). The user chooses **local or drive**; Pochimail picks a starting folder in it and tidies everything there. File naming is one setting with a sensible default: keep original names, or let Pochimail name files smartly / organize by date ([ADR 0010](adr/0010-saved-attachments-go-to-user-storage.md), Accepted).
-- **Review lists (proposed, maintainer to confirm):** alongside the in-app metadata list, Pochimail can flag/label the concerned emails in the provider (e.g. "Pochimail/Waiting", "Pochimail/To do") and "Review" opens that filtered list in the user's mail app; this needs label/category write scopes and is reversible.
-- Containers only where content needs one (the summary sheet, list blocks). No cards inside cards.
-- Summaries are a **plain sheet from Pochi over the current screen** (never a separate page), built on the existing Dialog/Sheet primitives: small Pochi icon + "From Pochi · date", title, one sentence, three figures (emails archived, attachments saved, newsletters unsubscribed), one next step, Keep it tidy choices. Show only what is new; the Overview holds the details. Bottom sheet on phones.
+## Tokens
+- Use the tokens as-is; never hard-code a color. Light and dark, text pairs at least 4.5:1, graphics at least 3:1.
+- Values live in [tokens.json](../packages/ui/src/styles/tokens.json) (light and dark); do not copy them here.
+- Color never codes content; type colors are reserved for rare charts, always with a label.
+- Radius: 6, 10 (controls), 12 (buttons), 16 (cards, panels), pill. 4px spacing grid. Targets 32px, 36px sidebar items, 44px primary buttons.
 
 ## Typography
-| Role | Font | Size / weight | Use |
-|---|---|---|---|
-| Display | Newsreader | 40px / 450, -0.02em | Welcome, summary title |
-| Title (h1) | Newsreader | 32px / 450, -0.02em | Every screen title |
-| Figure | Newsreader | 34px / 450 | Large numbers in ledgers |
-| Section (h2) | Instrument Sans | 17px / 600 | Every section title |
-| Body | Instrument Sans | 15px / 400, 1.5 | Paragraphs |
-| UI | Instrument Sans | 14px / 500 | Buttons, list items |
-| Caption | Instrument Sans | 13px / 400 | Secondary info |
-| Overline | Instrument Sans | 12px / 600, +0.06em, uppercase | Sidebar group labels only |
+Two families only, self-hosted, upright (never an italic display serif): **Newsreader** for display, titles and figures, **Instrument Sans** for everything else. Japanese falls back to Hiragino Sans or Noto Sans JP. Tabular numbers for counts.
 
-Rules: one h1 per screen, then h2s, never skipped. Upright serif only (never italic display). Two families maximum. Tabular numbers for counts. Fonts are self-hosted (`packages/ui/src/fonts/`), never loaded from Google at runtime. Japanese falls back to Hiragino Sans / Noto Sans JP.
+| Role | Size / weight |
+|---|---|
+| Display (Newsreader) | 40 / 450 |
+| h1, one per screen (Newsreader) | 32 / 450 |
+| Figure (Newsreader) | 34 / 450 |
+| h2 | 17 / 600 |
+| Body | 15 / 400 |
+| UI | 14 / 500 |
+| Caption | 13 / 400 |
+| Overline, sidebar groups only | 12 / 600, uppercase |
 
-## Color
-Light (default) and dark themes, all text pairs ≥ 4.5:1, graphic elements ≥ 3:1. See `packages/ui/src/styles/tokens.css`.
+## Responsive layout
+The window is resizable, minimum 720×560. One markup, restyled by width, never separate mobile markup.
+- 960px and up: full sidebar.
+- 760–960px: sidebar becomes an icon rail (Overview, Documents, Activity, Settings, account switcher).
+- Below 760px: frame goes edge to edge; the ledger drops its proportional bar.
+- Below 560px (phone, companion): top bar, bottom tab bar, single column, summary as a bottom sheet.
 
-| Token | Light | Dark |
-|---|---|---|
-| background | #F3F4F5 | #121315 |
-| surface | #FFFFFF | #1A1C1F |
-| sidebar | #EEF0F2 | #16181A |
-| muted | #EDEFF1 | #24272B |
-| border | #E3E5E8 | #2A2D32 |
-| text | #15171A | #EEF0F2 |
-| text secondary | #5C6169 | #A4A9B0 |
-| text tertiary | #686D75 | #8C9199 |
-| primary (button) | #15171A / white text | #EEF0F2 / #121315 text |
+## Components
+shadcn/ui wrapped, not forked, in `packages/ui`: button, switch, checkbox and radio cards, pill radio group, recommendation, ledger and signal rows, status strip, speech bubble, account switcher, sidebar, sheet, empty state, sonner toast with Undo. Only these exist; screen-specific pieces live in the app.
 
-Category colors (reserved for rare charts; screens use monochrome icons, never color coding): People #4E6A8A · Records #8A6A4E · Purchases & travel #B07820 · Sign-ins & security #7C7F86 · Notifications #5A817B · Newsletters #C04F72 · Promotions #9C6E95 (dark variants in tokens). Always paired with a label.
+## Interaction and accessibility
+Real `button`, `a`, `input`, switch, checkbox and radio, reachable by keyboard with a visible `focus-visible`. One `h1` per screen, headings never skipped. Progress uses `role="status"` with `aria-live="polite"`. Never color alone. Copy survives French and Japanese expansion ("Archive 12,940"); ellipsis plus tooltip for long names.
 
-## Shape and space
-Radius: 6 (small), 10 (controls), 12 (buttons), 16 (cards/panels), pill. Spacing on a 4px grid (8, 12, 16, 20, 24, 32, 40, 48). Targets: 32px minimum, 36px sidebar items, 44px primary buttons.
-
-## Components (shadcn/ui in `packages/ui`)
-Button (primary charcoal, secondary outline, ghost), Switch, Checkbox card, Radio card, Pill radio group, Recommendation row (action, reason, Review), Storage bar (OPEN for the maintainer — see above), Ledger row (label, leader, count, size), Signal row (big figure + text + Review), Status strip (2px progress + status line), Speech bubble (mascot), Account switcher, Sidebar item, Empty/error state, sonner toast + action. Follow shadcn conventions (CVA variants, `data-slot`, `asChild`, focus-visible) and composition over boolean props.
+## Anti-patterns
+No cards inside cards, icon-tile stacks, numbered section labels, eyebrow chips, thin borders with wide shadows, beige "AI" palettes, pulsing dots, generic spinners (use skeletons and real progress), gradients, emoji.
 
 ## Motion
-150ms press/hover, 220ms panels and toasts, ease-out `cubic-bezier(0.22, 1, 0.36, 1)`. Pressed buttons scale to 0.98. Numbers count up when results arrive (600ms). No looping or pulsing UI animation. Everything respects `prefers-reduced-motion`.
+150ms press and hover, 220ms panels and toasts, easing `cubic-bezier(0.22, 1, 0.36, 1)`, pressed buttons scale to 0.98. No looping animation except Pochi's breathing. Timings live in `packages/ui/src/lib/motion.ts`, pinned by a test to `screens/source/Motion.dc.html`, the source of truth. Reduced motion and Settings › Animations off share one rule: instant opacity cross-fades, final values shown, mascot still. The system setting always wins.
 
-## Motion catalog (see the "Motion & transitions" board on the canvas)
-| Moment | Motion | Timing |
-|---|---|---|
-| Live progress | Progress line glides; each new finding slides up 8px and fades in, replacing the previous one | 600ms width, 220ms text |
-| Numbers arrive | Counts roll up once from 0 when results land, then stay still | 600ms, ease-out cubic |
-| Storage settles | **OPEN for the maintainer** (tied to the storage bar: what it shows, or drop it) — do not implement an invented meaning | 700ms, +140ms |
-| Clean up, then undo | Row folds away (height + fade) instead of vanishing; dark undo toast rises from below for 5s; Undo unfolds the row | 260ms fold, 220ms toast |
-| Pochi at rest | Slow breathing (scale 1 → 1.012 wide / 1.025 tall, from the base) and blinks | 4.2s breathing loop, 5.3s blink loop |
-| Pochi finds something | Squish, bounce up 14px, settle | 620ms |
-| Summary arrives | Standard sheet enter: scrim fades in and the plain sheet slides in over the Overview; no stamp landing, overshoot or rotation | ~250ms, one easing (`cubic-bezier(0.22, 1, 0.36, 1)`) |
-| Choices respond | Checkmark draws itself; ring and background cross-fade; switch thumb glides | 150–220ms |
-| Screen to screen | Mascot stays; content slides in 16px from the right; step indicator stretches to the active step | 220–240ms |
-| Panels and menus | Fade + 4px scale-up from the trigger | 220ms |
-
-Implementation: timings and easing live in `packages/ui/src/lib/motion.ts` (pinned to the board by a test); `MotionProvider` owns Settings › Appearance › Animations (Pochi reads it, nothing else writes it), and `useMotionEnabled` / `CountUp` / `undoToast` are the shared helpers. Reduced motion and Animations off share one rule set in `globals.css`.
-
-Never animate: layout jumps, decorative loops, pulsing indicators, skeleton shimmer longer than needed. With `prefers-reduced-motion`, every motion becomes an instant (~120ms) opacity cross-fade (no transforms, numbers show their final value) and the mascot holds still.
+## Motion catalog
+| Moment | Motion |
+|---|---|
+| Live progress | Line glides (600ms); each finding slides up 8px and fades in |
+| Numbers arrive | Count up once from 0 (600ms) |
+| Storage settles | Open for the maintainer, tied to the storage bar; do not implement an invented meaning |
+| Clean up, then undo | Row folds away (260ms); dark Undo toast for 5s; Undo unfolds the row |
+| Pochi at rest | Breathing 1 → 1.012 wide / 1.025 tall (4.2s), blink (5.3s) |
+| Pochi finds something | Squish, bounce up 14px, settle (620ms) |
+| Summary arrives | Scrim fades, sheet slides in (about 250ms); no stamp, overshoot or rotation |
+| Choices respond | Checkmark draws itself; switch thumb glides (150–220ms) |
+| Screen to screen | Mascot stays; content slides in 16px (220–240ms) |
+| Panels and menus | Fade and 4px scale-up from the trigger (220ms) |
 
 ## Writing
-- Device name is dynamic: use `{device}` (Mac / PC / device) in every string, e.g. "Sorting privately on this {device}". Designs show "Mac" because macOS ships first.
-- Use realistic mock data in designs and fixtures, never placeholder tokens.
-- "email / emails", never "mails". "Pochi" or "I" for the assistant.
-- Screen titles are functional ("Overview", "Newsletters"), never greetings.
-- Short action labels that survive French/Japanese expansion ("Archive 12,940", "Unsubscribe 120").
-- "Review" opens a list, "Undo" reverses, "View summary" opens the summary sheet.
-- Every state (error, empty, offline, update) has one primary action and plain words.
+- "email/emails", never "mails". "Pochi" or "I" for the assistant. "Review" opens a list, "Undo" reverses, "View summary" opens the sheet. Screen titles are functional ("Overview"), never greetings.
+- Always reassure about privacy and reversibility where data is read or changed. One primary action per state.
+- Use `{device}` (Mac, PC, device), never "Mac". Realistic mock data, never placeholders like "[X]".
+- Every empty, error, offline and update state, and every motion, is a feature with its own tests. Required states: sign-in cancelled, offline (a status line, never a pop-up), account needs reconnecting, model download failed (rules fallback), rate limit (auto-resume), empty list, update ready.
 
-## Anti-patterns (Impeccable checklist)
-No cards inside cards, icon-tile stacks, numbered section labels, eyebrow chips, thin borders with wide shadows, beige "AI" palettes, pulsing dots, generic spinners, gradients in UI, emoji.
+## Pochi
+A soft plush felt envelope: puffy body, stitched flap seam, two glossy bead eyes, no mouth. Cream by default; charcoal for dark mode; stone and sage exist. Poses: default, happy, reading (glasses), saving (paperclip), sleepy, oops, night. Final art is a 3D render; the PNGs are placeholders behind a `Mascot` component with a `pose` prop.
 
-## Required states
-Sign-in cancelled · Offline (paused, resumes) · Account needs reconnecting · Model download failed (rules fallback) · Provider rate limit (auto-resume) · Empty category · Update ready (restart now / what's new). See `screens/06-states.png`.
+Pochi mirrors the real app state through events, one pose at a time: curious at Welcome, patient while the browser sign-in runs, happy on success, calm when cancelled ("I didn't get access to anything"), reading while sorting, found on discoveries, happy at the summary and after a cleanup ("You can undo it anytime"), sleepy when paused or offline, oops on errors with one small shrink.
+
+Animation is Rive (a state machine over layered renders) with a static PNG fallback. It plays only when visible, pauses on battery saver and when the window is hidden, and is static under reduced motion. Settings lets people turn Animations off or hide Pochi everywhere.

@@ -1,60 +1,27 @@
 # 0002 — Electron process model and IPC streaming
 
-Status: Accepted (2026-11-17, maintainer, M0-15; transport: in-house typed RPC, not tRPC) · Brief: §5.3 › Live UI updates, §5.4, §5.10 › Electron hardening · Research: M0-14
+Status: Accepted (2026-11-17)
 
 ## Context
-The UI must stay instant while a 100k-message sync and model inference run. Mail data must never reach a context that can be compromised by email content.
+The UI must stay instant while a 100k-message sync and model inference run. Mail data must never reach a context that email content could compromise.
 
 ## Decision
-- **main**: windows, lifecycle, tray/menu bar, login item, native notifications, OS integration, update checks, session network filter. Holds no mail data.
-- **worker**: one `utilityProcess` running the composition root (core + db + mail + ai adapters + job workers). Owns the database.
-- **model host**: a second `utilityProcess` for `node-llama-cpp` (and embeddings), so a model crash or OOM never takes the worker down; the worker talks to it through the `LlmProvider`/`Embedder` ports. Main supervises it (`main/model-host-supervisor.ts`: ping, restart with back-off, a new private port per restart); the worker's client waits for the new port and re-sends in-flight requests, so a host crash does not interrupt a scan (M4-02).
-- **renderer**: React 19 SPA (electron-vite, Vite), TanStack Router/Query/Virtual/Table, React Compiler on. No Node access.
-- **Transport**: main creates a `MessageChannelMain` and hands one port to the worker and one to the renderer (through the preload). **Renderer ↔ worker traffic bypasses main.** The preload exposes only `connectWorker(): MessagePort`-style capabilities plus a few OS calls (open external mail app link, show in Finder, choose folder) via `contextBridge`.
-- **Protocol**: a typed RPC + subscription layer with **zod schemas shared by both sides** (`apps/desktop/src/shared/ipc/`). Queries/mutations validate input and output; subscriptions stream domain events and progress. **Choice (M0-14): in-house typed RPC + subscription layer** over the MessagePort, ~300 lines, same shape as tRPC. See "IPC transport research (M0-14)".
-- **Renderer data**: TanStack Query caches updated from event subscriptions (no polling); optimistic mutations reconciled on `ActionApplied` / `ActionFailed`.
-- **Hardening**: contextIsolation, sandbox, no nodeIntegration, `webSecurity`, strict CSP (no remote, no inline scripts), navigation and `window.open` blocked, permission requests denied by default, Electron Fuses (RunAsNode off, cookie encryption on, ASAR integrity on, only-load-app-from-asar), Electron kept on a supported major.
-- **Untrusted HTML** (only if a preview ever needs it): sandboxed `<iframe sandbox>` with its own CSP, remote images blocked, no preload.
-
-## Implementation notes (M0-09)
-- Skeleton in `apps/desktop`: `electron-vite` 6, Electron 45, React 19 + React Compiler (`@vitejs/plugin-react` 6 with `@rolldown/plugin-babel`), TanStack Router (code-based, memory history because the renderer loads from `file://`).
-- The page requests the worker port through `window.pochimail.requestWorkerPort()`; the preload forwards the `MessagePort` main created with `window.postMessage`. After that, renderer and worker talk directly.
-- CSP is injected into `index.html` at build time from `src/shared/csp.ts` (strict in production, relaxed for the Vite dev server only). The production CSP has no `unsafe-inline` at all (React style props set styles through CSSOM, which CSP does not block).
-- The session request filter (`src/main/security.ts`) has an empty host allowlist and logs the blocked host only.
-- Fuses are defined in `src/main/fuses.ts` and applied at packaging (M0-10) by `apps/desktop/packaging/apply-fuses.ts`, an electron-builder `afterPack` hook (skipped for the per-arch slices of the macOS universal build; the merged app is flipped). `pnpm package:smoke` reads the fuses back from the packaged binary. `GrantFileProtocolExtraPrivileges` is left at its default while the renderer loads from `file://`.
-- Electronegativity's last release is from 2023, so the baseline is enforced by a checklist test (`src/main/security.test.ts`).
-
-## Implementation notes (M4-01)
-- Production layer in `apps/desktop/src/shared/ipc/`: `contract.ts` (zod schemas for queries, mutations, subscriptions: `accounts`, `scan`, `overview`, `digest`, `settings`, `app.state`; names and shapes only, handlers in M4-02), `protocol.ts` (wire messages, typed `RpcError` codes), `server.ts` (worker), `client.ts` (renderer), `batcher.ts` (50 ms flush, max batch 500, ack window of 2, per-key coalescing), `transport.ts`. It replaces the M0-09 echo and the M0-14 benchmark file.
-- Validation: the client checks input before posting and output/events on receipt; the worker checks input, output and each emitted event. Failures are `RpcError` with a stable code (`BAD_INPUT`, `BAD_OUTPUT`, `NOT_IMPLEMENTED`, `HANDLER_FAILED`, `TIMEOUT`, `CLOSED`); handler error messages are never forwarded. A batch envelope is validated once, each payload by its topic schema.
-- Closing the port stops every subscription and the batcher on both sides; pending calls reject with `CLOSED`.
-- Preload (`src/preload/preload.ts`) exposes exactly `requestWorkerPort`, `openMailAppLink` (`mailto:` and `message:` only), `showInFinder`, `chooseFolder`, each validated before `ipcRenderer.invoke`. Main registers only those three handlers (`src/main/os-calls.ts`) and refuses senders that are not the app page. Nothing mail related goes through main.
-- `rpc.contract.ts` exports `describeRpcContract(name, connect)` so any transport pair or adapter runs the same behaviour suite. The M0-14 timing assertions (`POCHI_BENCH=1`) were dropped with the prototype; the lossless slow-consumer check is now a real test.
-
-## IPC transport research (M0-14)
-**Adapters checked (2026-11-17, `npm view` and package contents):**
-- `electron-trpc` 1.0.0 (maintained, peers `@trpc/*` ^11.10): built on `ipcMain`/`ipcRenderer` and `contextBridge`. No MessagePort or `utilityProcess` code, so every message passes through a main-process handler. That contradicts "renderer ↔ worker traffic bypasses main" and puts mail data in main.
-- `trpc-electron` 0.1.2 (last release January 2025) and `electron-trpc-experimental` 1.0.0-alpha.1 (alpha, June 2025): same `ipcMain`/`ipcRenderer` model, and less maintained.
-- No maintained adapter targets MessagePort between a renderer and a `utilityProcess`.
-
-**Decision: in-house typed RPC + subscriptions.** Adopting tRPC would also add `@trpc/server`/`@trpc/client` (supply chain, [AGENTS.md §6](../../AGENTS.md)) and a custom link for little gain. Keep the shape (procedures with zod input/output, subscriptions) so tRPC stays a possible later swap. The M0-09 echo RPC is the starting point.
-
-**Event streaming with backpressure (benchmark):** the worker buffers events and posts one `batch` message per 50 ms flush. At most 2 batches are unacknowledged; the renderer acks after processing each batch, and while the limit is reached the worker keeps buffering (coalescing into larger batches) instead of posting. Order is preserved and nothing is dropped. Each batch is validated once with zod.
-Prototype: `apps/desktop/src/shared/ipc/batching.bench.test.ts`, a benchmark (the batcher lives in the test file; the production layer comes in a later ticket). The default test run only checks lossless in-order delivery; timing assertions run with `POCHI_BENCH=1`. Node `MessageChannel`, 5 runs on one machine (Apple Silicon, Node 26):
-
-| Scenario | Events | Messages | p95 latency | Max buffered |
-|---|---|---|---|---|
-| 1000 events/s for 3 s, fast consumer | 3000, all in order | 100–112 (about 35/s, vs 1000 unbatched) | 47 ms | 50–84 |
-| 1000 events/s for 2 s, consumer takes 120 ms per batch | 2000, all in order | 34 | 185 ms | 73 |
-
-Rules for the production layer: flush every 50 ms or at a max batch size; ack-gated in-flight window of 2; events that are only the latest state (progress) are coalesced per key before posting; subscription teardown on port close. Caveat: measured in Node, not across real Electron processes; re-check in the E2E suite (M0-10).
+- **main**: windows, lifecycle, tray or menu bar, login item, notifications, OS calls, update checks, the session network filter. It holds no mail data.
+- **worker**: one `utilityProcess` running the composition root (domains, workflows, adapters, job workers). It owns the database.
+- **model host**: a second `utilityProcess` for `node-llama-cpp` and embeddings, so a model crash never takes the worker down. Main supervises it (ping, restart with back-off, a new private port per restart); the worker re-sends in-flight requests.
+- **renderer**: React 19 SPA (electron-vite, TanStack, React Compiler). No Node access.
+- **Transport**: main creates a `MessageChannelMain` and gives one port to the worker and one to the renderer through the preload. Renderer and worker traffic bypasses main.
+- **Preload**: exposes `requestWorkerPort` and a few OS calls (`openMailAppLink` for `mailto:` and `message:` only, `showInFinder`, `chooseFolder`), each validated; main refuses senders that are not the app page. Nothing mail-related goes through main.
+- **Protocol**: an in-house typed RPC and subscription layer over the port, with zod schemas shared by both sides in `apps/desktop/src/shared/ipc/`.
+- **Streaming**: the worker flushes batched events every 50 ms (max batch 500), with at most 2 unacknowledged batches; latest-state events (progress) are coalesced per key. Nothing is dropped.
+- **Renderer data**: TanStack Query caches updated from events, no polling; optimistic mutations are reconciled on `ActionApplied` or `ActionFailed`.
+- **Untrusted HTML**, if ever shown, only in a sandboxed iframe with its own CSP, no remote images and no preload.
+- **Hardening**: contextIsolation, sandbox, no nodeIntegration, `webSecurity`, strict CSP without `unsafe-inline`, navigation and `window.open` blocked, permissions denied by default, Fuses (RunAsNode off, cookie encryption on, ASAR integrity on, only-load-from-asar) applied at packaging, Electron on a supported major. A checklist test enforces it.
 
 ## Consequences
-- Every IPC message is schema-validated twice (cheap at our volumes; batch events).
-- The worker can be restarted by main without losing state (jobs are persistent, ADR 0003).
+Every message is schema-validated on both sides. Main can restart the worker without losing state, because jobs are persistent ([ADR 0003](0003-hexagonal-core-events-outbox.md)).
 
-## Alternatives
-Everything in main (blocks UI, bigger attack surface) · Node worker_threads only (no process isolation for native crashes) · `ipcRenderer.invoke` through main (extra hop, main becomes a bottleneck).
-
-## To verify
-Current Electron major and `utilityProcess` + `MessagePortMain` APIs; maintained tRPC/Electron adapters; React Compiler + Vite plugin status.
+## Alternatives considered
+- `electron-trpc` and forks: built on `ipcMain`, so every message passes through main; no maintained adapter targets MessagePort between a renderer and a `utilityProcess`; adds a supply-chain dependency.
+- Everything in main: blocks the UI, larger attack surface.
+- `worker_threads` only: no isolation from native crashes.
