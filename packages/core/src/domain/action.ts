@@ -17,10 +17,12 @@ import {
   suggestionIdSchema,
 } from "./common.ts";
 
-/** There is deliberately no delete kind: mail is archived, never deleted (brief §2). */
+/** Delete means move to Trash (`trash`, restored by `untrash`): there is no permanent delete (ADR 0012). */
 export const ACTION_KINDS = [
   "archive",
   "unarchive",
+  "trash",
+  "untrash",
   "apply-label",
   "remove-label",
   "mark-handled",
@@ -70,6 +72,8 @@ export function inverseOf(command: Command): Command | null {
     "remove-label": "apply-label",
     "mark-handled": "unmark-handled",
     "unmark-handled": "mark-handled",
+    trash: "untrash",
+    untrash: "trash",
   } as const;
   if (command.kind === "unsubscribe") return null;
   return { ...command, kind: swap[command.kind] };

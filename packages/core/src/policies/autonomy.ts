@@ -17,13 +17,15 @@ export const PROTECTED_CATEGORIES: readonly Category[] = ["people"];
 /**
  * Every action kind must be classified: `Record<ActionKind, …>` makes a new kind fail typecheck
  * until someone decides whether Autopilot may ever apply it. Brief §2 allows only unsubscribe
- * and archive; undo and local bookkeeping kinds always wait for the user.
+ * and archive; trash (ADR 0012), undo and local bookkeeping kinds always wait for the user.
  */
 export const AUTOPILOT_ELIGIBLE: Record<ActionKind, boolean> = {
   archive: true,
   unsubscribe: true,
   "apply-label": false,
   unarchive: false,
+  trash: false,
+  untrash: false,
   "remove-label": false,
   "mark-handled": false,
   "unmark-handled": false,

@@ -198,6 +198,9 @@ function applyEffect(state: Entry["state"], command: Command): boolean {
       return flag("archived", true);
     case "unarchive":
       return flag("archived", false);
+    case "trash":
+    case "untrash":
+      return false; // the fixture mailbox keeps no Trash
     case "mark-handled":
       return flag("handled", true);
     case "unmark-handled":
