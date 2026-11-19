@@ -1,43 +1,50 @@
-# Pochimail — product context
+# Product
 
-> App: Pochimail · Mascot/assistant: Pochi (from pochi-bukuro ポチ袋, the small Japanese gift envelope) · getpochimail.com. Read this before any design or product work (Impeccable reads `docs/product.md` too).
+Pochimail is a private assistant that gives you the big picture of your email accounts, flags what needs you, clears clutter and saves your documents. Everything runs on your computer. Pochi (from *pochi-bukuro* ポチ袋, the small Japanese gift envelope) is the assistant; the site is getpochimail.com.
 
-## One line
-A private assistant that gives you the big picture of your email accounts, flags what needs you, clears the clutter and saves your documents. Everything runs on your Mac.
+## What it is, and is not
+- **Is**: an overview and cleanup assistant for one or several Gmail and Outlook / Microsoft 365 accounts. Other providers (IMAP) come in v1.1 ([ADR 0011](adr/0011-v1-providers-google-and-microsoft.md)).
+- **Is not**: a mail client. Nobody reads or writes email in Pochimail; a single email opens in the user's mail app.
+- **Users**: non-technical people with years of email across accounts who want to stop missing what matters, free space, find documents and trust that nothing is lost.
 
-**Product definition (decided 2026-11-19):** Pochimail is an assistant that helps you tidy your mailboxes, keep what matters (newsletters, emails, attachments) and guides you to stay organized by setting things up for you, such as tags/labels in your mail provider.
-
-## What Pochimail is, and is not
-- **Is:** an overview and cleanup assistant for one or several existing accounts (Gmail, Outlook, Yahoo, iCloud, any IMAP mailbox).
-- **Is not:** a mail client. People never read or write email in Pochimail. Any single email opens in their usual mail app.
-
-## Users
-Non-technical people with years of email across several accounts. They want to stop missing what matters, free space, find their documents, and trust that nothing is lost. Teams come later (handover when someone leaves).
-
-## Jobs (what the user picks at setup, any combination)
-1. **Catch what matters** — things to do and things to remember (reminders), not only replies: people waiting on you, threads waiting on others, deadlines, tasks/commitments, things to keep in mind. Signals weigh email dates: old conversations never count as "waiting on you" (D15).
-2. **Declutter** — unsubscribe, archive old notifications, codes, shipping updates, promotions.
-3. **Organize** — categories and topics applied as real labels (Gmail labels, Outlook categories); guide to organize: Pochimail proposes and, on approval, sets up tags/labels/folders in the provider (reversible, logged).
-4. **Save documents** — find invoices, contracts, IDs, payslips… and write them to the user's own storage (decided 2026-11-19): the user chooses local or drive; Pochimail picks a starting folder there and tidies it. Naming is one setting: keep original names or let Pochimail name files smartly / organize by date (ADR 0010).
+## Jobs (chosen at setup, any combination)
+1. **Catch what matters**: people waiting on you, threads waiting on others, deadlines, important senders.
+2. **Declutter**: unsubscribe, archive old notifications, delete what is useless.
+3. **Organize**: types and topics applied as real provider labels.
+4. **Save documents**: invoices, contracts, IDs, payslips, saved to a folder the user chooses ([ADR 0010](adr/0010-saved-attachments-go-to-user-storage.md)).
 
 ## Autonomy (one choice)
-- **Just look** — read-only.
-- **Suggest** (default) — prepares, the user approves each step.
-- **Autopilot** — only high-confidence, low-risk actions, then a summary with undo.
+- **Just look**: read-only.
+- **Suggest** (default): prepares; the user approves each step.
+- **Autopilot**: only high-confidence, low-risk actions, then a summary with undo. Never deletes, never acts on People.
 
-Invariants in every mode: nothing is ever deleted; email from real people (People) is never touched without approval; every action is logged and undoable.
+## Invariants in every mode
+- Nothing is deleted without your OK. Deleted emails go to the Trash, and you can undo.
+- Email from real people is never selected for cleanup without approval ([ADR 0012](adr/0012-delete-moves-to-trash-with-approval.md)).
+- Every batch is previewed, every action is logged and undoable. Unsubscribe is the exception and the UI says so first ([ADR 0013](adr/0013-unsubscribe-suggested-user-decides.md)).
 
 ## Mail model
-- **7 categories** (exactly one per email): People · Records · Purchases & travel · Sign-ins & security · Notifications · Newsletters · Promotions. *Suspicious* is a flag, not a category. Only categories that contain emails are shown.
+- **7 categories**, one per email: People, Records, Purchases & travel, Sign-ins & security, Notifications, Newsletters, Promotions. *Suspicious* is a flag. ADR 0016 (Proposed) replaces them with five types plus automatic topics. Only categories that contain email are shown.
 - **Topics** (any number, user-editable): Job search, Work, Finance, Home, Health, Travel, Family, Projects…
-- **Signals** (computed): Needs a reply · Waiting on them · Important sender · Has a document · Time-sensitive · Old and never opened.
+- **Signals** (computed): needs a reply, waiting on them, important sender, has a document, time-sensitive, old and never opened.
+- Classification is local, cheapest first: rules, then calibrated decision heads, then a small local LLM ([ADR 0006](adr/0006-local-ai-runtimes-and-models.md)). It learns from the user's corrections, on the device.
 
 ## Principles
-1. Local-first: no server, no cloud AI, no telemetry by default.
+1. Local first: no server, no cloud AI, no telemetry by default.
 2. The assistant proposes, the user decides.
-3. Safe by default: archive, never delete; preview; undo.
-4. Never block the user: background work with live progress.
+3. Safe by default: preview, protect people, log, undo.
+4. Never block the user: background work with live progress, usable while sorting, usable offline with the last synced data.
 5. Privacy is the first message wherever data is processed.
 
+## Flow
+Welcome → Connect (Google, Microsoft) → Set up (two questions: what to help with, how much to do) → Overview while sorting → a Summary sheet when the first scan ends → the everyday loop: notification or menu bar → Overview → Review → act → Undo. Other screens: Documents, Activity and undo, Settings, Autopilot summary, menu-bar popover. Keep it tidy runs the same loop on a cadence: as it arrives, daily, weekly or only when asked.
+
+## Scope
+- **v1**: macOS first, then Windows and Linux; light and dark; keyboard shortcuts; WCAG AA; multiple accounts with a unified view and per-account filters.
+- **Out of v1**: reading or composing mail, permanent deletion, mobile, any cloud AI, Teams, IMAP providers.
+- **v1.x**: IMAP accounts (v1.1), an optional notification relay, rclone export, custom rules.
+- **v2**: natural-language search, a mobile companion, encrypted device sync through the user's own drive.
+- **Teams** (later): shared workspaces and handover when someone leaves. v1 shows a disabled "Teams · Soon" item and keeps `workspaceId` on every entity.
+
 ## Voice
-Pochi speaks in the first person, briefly and warmly: "Here's what I found", "I haven't changed anything yet". Plain language, no jargon. Always reassures about privacy and reversibility.
+Pochi speaks in the first person, briefly and warmly: "Here's what I found", "I haven't changed anything yet". Plain language, no jargon. Rules for wording are in [design.md](design.md).

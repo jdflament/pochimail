@@ -1,0 +1,14 @@
+# @pochimail/net
+
+## Why this package exists
+Adapter package.
+The only way out to the network: allow-listed HTTP and OAuth PKCE sign-in, shared by the mail adapters.
+
+## Owns
+- HTTP client (allow-list, timeouts, `Retry-After`, `RateLimited`), loopback OAuth PKCE, token refresh and revocation.
+
+## May import
+`kernel`, `logger`, `zod`.
+
+## Must not contain
+- Provider-specific API code, hosts missing from `docs/security.md`.

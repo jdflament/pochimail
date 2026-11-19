@@ -1,39 +1,27 @@
-# Contributing to Pochimail
+# Contributing
 
-Keep it light: this is a solo-maintained project with agent help. Read [AGENTS.md](AGENTS.md) first; it holds the full rules and links to the brief sections they come from. For current progress and work items, see [docs/status.md](docs/status.md) and [docs/tickets/](docs/tickets/).
+Read [ARCHITECTURE.md](ARCHITECTURE.md) and [AGENTS.md](AGENTS.md) first. Each package and app has its own short `AGENTS.md` with the rules for that area, and a README saying what it owns. Any coding agent that supports AGENTS.md picks them up; do not add tool-specific instruction files.
 
 ## Setup
-Requirements: Node and pnpm at the versions pinned in `.nvmrc` and the `packageManager` field of `package.json`.
-
+Node and pnpm versions are pinned in `.nvmrc` and `package.json`.
 ```sh
 pnpm install
-pnpm check      # typecheck + test today; lint, knip and manypkg join in M0-04
-pnpm test
+pnpm check                                # what CI runs
+pnpm --filter @pochimail/desktop dev      # the app
+POCHIMAIL_DEMO=1 pnpm --filter @pochimail/desktop dev   # fixture mailbox, no account
 ```
 
-CI: a pull request runs the Linux gate for fast feedback (macOS and Windows show as skipped); the merge queue and `main` run the full gate on all three OSes.
-
-`pnpm install` also downloads the Electron binary. Electron 45 ships no install hook, and pnpm runs no dependency build script unless `pnpm-workspace.yaml` lists it under `allowBuilds`, so the binary comes from the `postinstall` script of `apps/desktop` (`install-electron`); the `allowBuilds` entry for `electron` stays for Electron versions that bring a hook back. Start the app with `pnpm --filter @pochimail/desktop dev` (the root has no `dev` script), and if it fails with Electron's "failed to install correctly" error, rerun `pnpm --filter @pochimail/desktop exec install-electron`.
-
-Scripts are defined at the repository root and run through Turborepo. If a command above is missing, the scaffold is still in progress: see `package.json`.
-
-## Your own OAuth client IDs
-Official builds use the project's verified Google and Microsoft client IDs. **Forks and local development builds must register their own** and pass them through environment variables or local config. Never hard-code or commit them.
-
-- Google: create an OAuth client (Desktop app) in Google Cloud and enable the Gmail API. Use test users until verified.
-- Microsoft: register a public client app in Microsoft Entra (redirect `http://127.0.0.1`).
-- Set the variables named in [ADR 0007](docs/adr/0007-oauth-credentials-scopes.md) (e.g. `POCHIMAIL_GOOGLE_CLIENT_ID`) in a local, git-ignored env file.
-- Generic IMAP accounts need no client ID (app password or provider OAuth).
+## Real accounts
+Use your own OAuth clients in a git-ignored env file (names in [ADR 0007](docs/adr/0007-oauth-credentials-scopes.md)); never commit them.
+- Google: Desktop OAuth client, Gmail API enabled, yourself as test user.
+- Microsoft: public client app in Entra, redirect `http://127.0.0.1`.
 
 ## Workflow
-- Work comes from the GitHub Project "Pochimail v1" (converted to issues when started). One issue → one branch (`<type>/<issue-number>-<slug>`) → one PR that closes it.
-- **Conventional Commits**: `feat(core): add suggestion policy`, `fix(mail): handle expired history id`, `docs: …`, `chore: …`.
-- Add tests that guard a real failure, keep CI green (typecheck, lint, test, build, knip, eval), and update docs or ADRs when behavior or architecture changes.
-- **Branch protection applies to admins too**: no direct pushes to `main`. Every change lands through a PR and the merge queue (`gh pr merge --squash --auto`), which runs the full gate on macOS, Windows and Linux; never bypass it with `--admin`.
-- Squash merge only.
-- Never include real email content, addresses or secrets in issues, fixtures or screenshots.
+1. Pick an [issue](https://github.com/pochimail/pochimail/issues) (`good first issue` to start) and comment before working. No issue yet? Open one.
+2. Post your plan in the issue (AGENTS.md rule 2).
+3. Branch, code, run `pnpm check`, open a PR with the template.
 
-## Licensing
-Contributions are accepted under AGPL-3.0. There is no CLA; once outside contributors arrive, commits will need a DCO sign-off (`git commit -s`). The name, logo and mascot are not part of the code license: see [TRADEMARKS.md](TRADEMARKS.md).
+Never put real email, addresses or secrets anywhere in the repository.
 
-Security issues: see [SECURITY.md](SECURITY.md), not public issues.
+## License
+AGPL-3.0. A DCO sign-off (`git commit -s`) is required once outside contributors arrive. Name, logo and mascot: [TRADEMARKS.md](TRADEMARKS.md). Security reports: [SECURITY.md](SECURITY.md).

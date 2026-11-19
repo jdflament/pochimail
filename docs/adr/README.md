@@ -1,18 +1,23 @@
 # Architecture decision records
 
-One file per decision, numbered. Status: Proposed → Accepted (0001–0008 accepted 2026-11-17, 0009 on 2026-11-18, 0010 on 2026-11-19) → (Superseded by NNNN). Changing an accepted ADR needs the maintainer's approval (brief §10) and updates `docs/plan.md`, affected issues and `AGENTS.md` in the same PR.
+One file per decision. An accepted ADR wins over any rule; changing one needs the maintainer's approval.
 
-| # | Title | Status |
+| # | Decision | Status |
 |---|---|---|
-| 0001 | Monorepo layout and package manager | Accepted (2026-11-17) |
-| 0002 | Electron process model and IPC streaming | Accepted (2026-11-17) |
-| 0003 | Hexagonal core, event bus, outbox and job queue | Accepted (2026-11-17) |
-| 0004 | Incremental sync, wake-ups and the IMAP connector | Accepted (2026-11-17) |
-| 0005 | Local storage and encryption at rest | Accepted (2026-11-17) |
-| 0006 | Local AI runtimes and model selection | Accepted (2026-11-17) |
-| 0007 | OAuth, credentials and scopes | Accepted (2026-11-17) |
-| 0008 | Notifications and privacy | Accepted (2026-11-17) |
-| 0009 | Store metadata, not mail | Accepted (2026-11-18) |
-| 0010 | Saved attachments go to user storage | Accepted (2026-11-19, maintainer decision) |
+| 0001 | Monorepo and package manager | Accepted; amended 0015 |
+| 0002 | Electron processes and IPC | Accepted |
+| 0003 | Hexagonal domains, events, outbox | Accepted; amended 0015 |
+| 0004 | Incremental sync and wake-ups | Accepted; amended 0011 |
+| 0005 | Local storage and encryption | Accepted; amended 0014 |
+| 0006 | Local AI runtimes, models | Accepted |
+| 0007 | OAuth, credentials and scopes | Accepted |
+| 0008 | Notifications and privacy | Accepted |
+| 0009 | Store metadata, not mail | Superseded by 0014 |
+| 0010 | Saved attachments in user storage | Accepted |
+| 0011 | v1 providers: Google, Microsoft | Accepted |
+| 0012 | Delete to Trash, with approval | Accepted |
+| 0013 | Unsubscribe: user decides | Accepted |
+| 0014 | Store reports, not mail | Accepted |
+| 0015 | Bounded-context packages, gates | Accepted |
+| 0016 | Fixed types, automatic topics | Proposed |
 
-Template: Context · Decision · Consequences · Alternatives considered · To verify (items a research issue must confirm before acceptance).
