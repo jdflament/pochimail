@@ -1,10 +1,10 @@
-import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { build, type UserConfig } from "vite";
+import { dirname, join } from "node:path";
+import { build } from "vite";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import storybookConfig from "../../../../../../../packages/ui/.storybook/main.ts";
 import electronViteConfig from "../../../../../electron.vite.config.ts";
+import { galleryDefine } from "../../../../shared/gallery-build.ts";
 
 afterEach(() => vi.unstubAllEnvs());
 
@@ -53,17 +53,30 @@ describe("dev gallery in built renderers", () => {
   }, 120_000);
 });
 
+/** The workspace root: the nearest parent holding pnpm-workspace.yaml. */
+const workspaceRoot = (from: string): string => {
+  for (let dir = from; ; dir = dirname(dir)) {
+    if (existsSync(join(dir, "pnpm-workspace.yaml"))) return dir;
+    if (dirname(dir) === dir) throw new Error("no pnpm-workspace.yaml above the test");
+  }
+};
+
 describe("Storybook builds of the renderer", () => {
   // Guards: stories mounting the real router failing with "__X__ is not defined" because only
   // electron-vite and Vitest define the renderer's compile-time globals (the Onboarding stories, #157).
-  it("define every compile-time global the renderer declares", async () => {
+  it("define every compile-time global the renderer declares, with the value the app uses", () => {
+    const root = workspaceRoot(import.meta.dirname);
     const declared = readFileSync(join(import.meta.dirname, "../../env.d.ts"), "utf8")
       .split("\n")
       .flatMap((line) => /^declare const (__\w+__):/.exec(line)?.[1] ?? []);
     expect(declared).toContain("__POCHIMAIL_GALLERY__");
-    const viteFinal = storybookConfig.viteFinal;
-    if (viteFinal === undefined) throw new Error("the Storybook config has no viteFinal");
-    const { define } = (await viteFinal({}, { configType: "DEVELOPMENT" } as never)) as UserConfig;
-    for (const name of declared) expect(Object.keys(define ?? {}), name).toContain(name);
+    // Storybook's config lives in packages/ui and must not import apps/desktop, so read it as text.
+    const config = readFileSync(join(root, "packages/ui/.storybook/main.ts"), "utf8");
+    const defined = Object.fromEntries(
+      [...config.matchAll(/(__\w+__):\s*"([^"]*)"/g)].map(([, name, value]) => [name, value]),
+    );
+    for (const name of declared) expect(Object.keys(defined), name).toContain(name);
+    // The gallery is on in Storybook: the value is the one galleryDefine(true) gives the app.
+    expect(defined).toEqual(galleryDefine(true));
   });
 });
