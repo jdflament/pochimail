@@ -19,5 +19,5 @@ One file per decision. An accepted ADR wins over any rule; changing one needs ap
 | 0013 | Unsubscribe: user decides | Accepted |
 | 0014 | Store reports, not mail | Accepted |
 | 0015 | Bounded-context packages, gates | Accepted |
-| 0016 | Fixed types, automatic topics | Proposed |
+| 0016 | Fixed types, automatic topics | Accepted |
 
