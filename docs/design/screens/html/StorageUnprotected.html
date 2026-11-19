@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Storage, without protection</title>
+
+</head>
+<body>
+
+
+
+
+<style>@font-face{font-family:'Newsreader';src:url('../../fonts/ttf/Newsreader[opsz,wght].ttf');font-weight:200 800}
+@font-face{font-family:'Instrument Sans';src:url('../../fonts/ttf/InstrumentSans[wdth,wght].ttf');font-weight:400 700}
+body{margin:0;background:#E6E8EB}
+a{color:#15171A}a:hover{color:#000000}
+button:focus-visible,a:focus-visible{outline:2px solid #15171A;outline-offset:2px}
+
+@media (max-width: 960px){.nav{flex:0 0 68px!important;max-width:68px!important;padding:14px 8px!important}.nav .lbl,.nav .cnt,.nav .navh,.nav .acctxt,.nav .acchev{display:none!important}.nav a,.nav span[aria-disabled],.nav button{justify-content:center!important;padding:0!important}.nav button{height:40px!important}.main{padding:18px 24px 28px!important}.pad{padding-left:24px!important;padding-right:24px!important}.cgap{gap:32px!important}}
+@media (max-width: 760px){.frame{padding:0!important}.win{border-radius:0!important;box-shadow:none!important}.lrow{grid-template-columns:minmax(0,1fr) 52px auto!important}.lbar,.hint{display:none!important}.sheetwrap{padding:16px 10px 28px!important}.sheet{padding:28px 22px!important}}
+@media (max-width: 560px){.frame{min-height:100vh!important}.tl{display:none!important}.nav{display:none!important}.mhead,.tabbar{display:flex!important}.main{padding:12px 16px 0!important;gap:20px!important}.pad{padding:8px 16px 24px!important}.bubrow{flex-direction:column!important;text-align:center}.disp{font-size:32px!important}.ttl{font-size:28px!important}.fig{font-size:28px!important}.sigrow{grid-template-columns:44px minmax(0,1fr) auto!important}.statusbtns{margin-left:0!important;width:100%}.statusbtns>*{flex:1;justify-content:center}}
+@media (max-width: 960px){.nav .catitem,.nav .topitem,.nav .addtopic{display:none!important}}
+@media (max-width: 560px){.chrome-app{display:none!important}}
+.sechead{flex-wrap:wrap}
+@media (min-width: 961px){.nav{min-width:229.53px}}
+@media (max-width: 560px){.scrim{align-items:flex-end!important;padding:0!important;position:fixed!important}.sumsheet{position:relative!important;top:0!important;max-width:none!important;border-radius:20px 20px 0 0!important;padding:20px 18px 24px!important;gap:16px!important}.figs{gap:6px!important}.figs>div{padding:10px 12px!important}.figs span:first-child{font-size:22px!important}.disp{font-size:32px!important}}
+.rv-pane{display:flex}.rv-inprev{display:none!important}
+@media (max-width: 760px){.rv-body{grid-template-columns:minmax(0,1fr)!important}.rv-pane{display:none!important}.rv-inprev{display:flex!important}.rv-bar{flex-wrap:wrap}}
+@media (max-width: 560px){.rv-row{grid-template-columns:20px minmax(0,1fr)!important}.rv-size{display:none!important}.rv-urow{grid-template-columns:20px minmax(0,1fr) auto!important}.rv-bar>*{flex:1 1 100%}.rv-bar a{width:100%;box-sizing:border-box}.rv-title{font-size:28px!important}.rv-board{grid-template-columns:minmax(0,1fr)!important}.rv-boardwrap{padding:24px 16px!important}}
+</style>
+
+<div class="frame" style="width: 100%; min-height: 760px; box-sizing: border-box; padding: 24px; background: #E6E8EB; font-family: 'Instrument Sans', sans-serif; color: #15171A; display: flex">
+<div class="win" style="position: relative; flex: 1; min-width: 0; border-radius: 16px; background: #F3F4F5; box-shadow: 0 0 0 1px rgba(0,0,0,0.06), 0 20px 50px rgba(0,0,0,0.08); display: flex; flex-direction: column; overflow: hidden">
+<div style="display: flex; align-items: center; height: 44px; padding: 0 18px; gap: 8px; "><span class="tl" style="width: 12px; height: 12px; border-radius: 99px; background: #FF5F57"></span><span class="tl" style="width: 12px; height: 12px; border-radius: 99px; background: #FEBC2E"></span><span class="tl" style="width: 12px; height: 12px; border-radius: 99px; background: #28C840"></span><div role="img" aria-label="Step 1 of 3" style="margin: 0 auto; display: flex; gap: 6px; align-items: center"><span style="width: 20px; height: 6px; border-radius: 99px; background: #15171A"></span><span style="width: 6px; height: 6px; border-radius: 99px; background: #E3E5E8"></span><span style="width: 6px; height: 6px; border-radius: 99px; background: #E3E5E8"></span></div><span style="width: 52px"></span></div>
+<div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 16px 48px 48px; gap: 18px" class="pad">
+<svg width="240" height="204" viewBox="0 0 400 340" role="img" aria-label="Pochi, a cream felt envelope mascot"><defs>
+<filter id="fzw1" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="3" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="12" xChannelSelector="R" yChannelSelector="G" result="d"></feDisplacementMap><feTurbulence type="fractalNoise" baseFrequency="2.4" numOctaves="3" seed="11" result="f"></feTurbulence><feDiffuseLighting in="f" surfaceScale="4.5" lighting-color="#FFFFFF" result="lit"><feDistantLight azimuth="235" elevation="50"></feDistantLight></feDiffuseLighting><feComposite in="lit" in2="d" operator="in" result="li"></feComposite><feComposite in="d" in2="li" operator="arithmetic" k1="0.85" k2="0.3" k3="0" k4="0"></feComposite></filter>
+<filter id="frw1" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="5" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<radialGradient id="ltw1" cx="0.32" cy="0.2" r="0.7"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.42"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></radialGradient>
+<radialGradient id="aow1" cx="0.5" cy="0.42" r="0.62"><stop offset="0.55" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.32"></stop></radialGradient>
+<linearGradient id="dkw1" x1="0" y1="0" x2="0" y2="1"><stop offset="0.6" stop-color="#000000" stop-opacity="0"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.3"></stop></linearGradient>
+<radialGradient id="bbw1" cx="0.4" cy="0.35" r="0.75"><stop offset="0" stop-color="#4A4744"></stop><stop offset="1" stop-color="#0A0A0A"></stop></radialGradient>
+<radialGradient id="bww1" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#CFCAC0"></stop></radialGradient>
+<linearGradient id="mtw1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E6E6E6"></stop><stop offset="0.5" stop-color="#8E8E8E"></stop><stop offset="1" stop-color="#D2D2D2"></stop></linearGradient>
+<filter id="fqw1" x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency="2.2" numOctaves="2" seed="21" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="40" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+<filter id="sbw1" x="-30%" y="-100%" width="160%" height="300%"><feGaussianBlur stdDeviation="9"></feGaussianBlur></filter>
+<filter id="esw1" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"></feGaussianBlur></filter>
+<filter id="smw1" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+</defs>
+<ellipse cx="200" cy="306" rx="132" ry="13" fill="#000000" opacity="0.35" filter="url(#sbw1)"></ellipse>
+<ellipse cx="200" cy="300" rx="96" ry="6" fill="#000000" opacity="0.35" filter="url(#esw1)"></ellipse>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.28" filter="url(#fqw1)"></path><path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0" opacity="0.6" filter="url(#frw1)"></path>
+<g filter="url(#fzw1)">
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="#E8DFD0"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#aow1)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#ltw1)"></path>
+<path d="M62 164 Q52 74 152 72 L248 72 Q348 74 338 164 L340 226 Q342 302 248 302 L152 302 Q58 302 60 226 Z" fill="url(#dkw1)"></path>
+<path d="M84 106 Q200 216 316 106" fill="none" stroke="#000000" stroke-opacity="0.35" stroke-width="12" stroke-linecap="round" filter="url(#smw1)"></path>
+<path d="M84 104 Q200 212 316 104" fill="none" stroke="#B8AA94" stroke-width="5" stroke-linecap="round"></path>
+<path d="M90 118 Q200 224 310 118" fill="none" stroke="#FFFFFF" stroke-opacity="0.3" stroke-width="8" stroke-linecap="round" filter="url(#esw1)"></path>
+</g>
+<g><rect x="140" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#esw1)"></rect><rect x="144" y="190" width="20" height="34" rx="10.0" fill="url(#bbw1)"></rect><ellipse cx="150.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="157.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g><g><rect x="232" y="193" width="28" height="40" rx="14.0" fill="#000000" opacity="0.35" filter="url(#esw1)"></rect><rect x="236" y="190" width="20" height="34" rx="10.0" fill="url(#bbw1)"></rect><ellipse cx="242.8" cy="198.16" rx="3.5999999999999996" ry="4.42" fill="#FFFFFF" opacity="0.95"></ellipse><ellipse cx="249.2" cy="216.52" rx="1.7999999999999998" ry="1.7000000000000002" fill="#FFFFFF" opacity="0.45"></ellipse></g>
+</svg>
+<h1 class="disp" style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 450; letter-spacing: -0.02em; font-size: 40px; line-height: 1.1">Clean up your email.<br>Keep what matters.</h1>
+<p style="margin: 0; max-width: 480px; font-size: 16px; line-height: 1.55; color: #5C6169">Pochimail is a private assistant for the email accounts you already have. It flags what needs you, clears the clutter and saves your documents. Your email never leaves this Mac.</p>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 6px">
+<a href="Connect.html" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 20px; border-radius: 12px; text-decoration: none; font-size: 15px; font-weight: 500; background: #15171A; color: #FFFFFF; min-width: 220px">Get started</a>
+<span style="font-size: 13px; color: #686D75">Free and open source</span>
+</div>
+</div>
+<div class="scrim" style="position: absolute; inset: 0; z-index: 5; background: rgba(21,23,26,0.32); display: flex; justify-content: center; align-items: flex-start; padding: 64px 24px 24px; box-sizing: border-box">
+<div role="dialog" aria-modal="true" aria-labelledby="su" class="sumsheet" style="position: sticky; top: 64px; width: 100%; max-width: 480px; box-sizing: border-box; padding: 28px 32px 26px; background: #FFFFFF; border-radius: 18px; box-shadow: 0 0 0 1px rgba(0,0,0,0.06), 0 24px 60px rgba(0,0,0,0.18); display: flex; flex-direction: column; gap: 20px; color: #15171A">
+<div style="display: flex; flex-direction: column; gap: 8px"><h2 id="su" class="disp" style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-weight: 450; letter-spacing: -0.02em; font-size: 32px; line-height: 1.1">Store without protection?</h2><p style="margin: 0; font-size: 15px; line-height: 1.5; color: #5C6169">I will keep the data on this computer unlocked. You can still choose a passphrase instead.</p></div>
+<ul style="margin: 0; padding: 0; list-style: none; border-bottom: 1px solid #E3E5E8"><li style="display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-top: 1px solid #E3E5E8"><span style="padding-top: 2px; flex: none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"></circle><path d="M10.8 12.2L20 3M17 6l3 3"></path></svg></span><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 600">What stays open</span><span style="font-size: 14px; line-height: 1.5; color: #5C6169">Anyone who can read your files can read what I keep on this computer: senders, dates and how I sorted your email.</span></span></li><li style="display: flex; gap: 12px; align-items: flex-start; padding: 12px 0; border-top: 1px solid #E3E5E8"><span style="padding-top: 2px; flex: none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg></span><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 600">What is not affected</span><span style="font-size: 14px; line-height: 1.5; color: #5C6169">Your emails stay with your provider, and the files you saved to your own storage stay where they are.</span></span></li></ul>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px"><a href="#" style="display: inline-flex; align-items: center; justify-content: center; height: 44px; padding: 0 20px; border-radius: 12px; background: #15171A; color: #FFFFFF; text-decoration: none; font-size: 14px; font-weight: 500; ">Use a passphrase</a><a href="#" style="display: inline-flex; align-items: center; height: 44px; padding: 0 14px; border-radius: 10px; color: #15171A; text-decoration: none; font-size: 14px; font-weight: 500; box-shadow: inset 0 0 0 1px #E3E5E8">Store without protection</a></div></div></div>
+</div>
+</div>
+
+
+</body>
+</html>
