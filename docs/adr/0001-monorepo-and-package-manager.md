@@ -3,7 +3,7 @@
 Status: Accepted (2026-11-17) · Amended by [0015](0015-bounded-context-packages-and-quality-gates.md) (package layout)
 
 ## Context
-One desktop app now, a mobile companion later, shared domain code. Midday is the structural reference, create-t3-turbo the reference for `packages/ui` with shadcn.
+One desktop app now, a mobile companion later, shared domain code.
 
 ## Decision
 - **Turborepo + pnpm workspaces.** pnpm over Bun because electron-builder, `@electron/rebuild` and native modules (`node-llama-cpp`, SQLite, `onnxruntime-node`) are best supported with Node and pnpm. Keep pnpm's default `node-linker`; use `hoisted` only if packaging fails without it.
