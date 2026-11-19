@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { createRpcClient } from "../../shared/ipc/client.ts";
-import { serveRpc } from "../../shared/ipc/server.ts";
-import { fromDomPort } from "../../shared/ipc/transport.ts";
+import { createRpcClient } from "#shared/ipc/client.ts";
+import { serveRpc } from "#shared/ipc/server.ts";
+import { fromDomPort } from "#shared/ipc/transport.ts";
 import { App } from "./app/app.tsx";
 
 afterEach(cleanup);

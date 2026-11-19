@@ -1,9 +1,9 @@
 import { QueryClient } from "@tanstack/react-query";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createRpcClient } from "../../../../shared/ipc/client.ts";
-import type { EventOf } from "../../../../shared/ipc/contract.ts";
-import { serveRpc } from "../../../../shared/ipc/server.ts";
-import { fromDomPort } from "../../../../shared/ipc/transport.ts";
+import { createRpcClient } from "#shared/ipc/client.ts";
+import type { EventOf } from "#shared/ipc/contract.ts";
+import { serveRpc } from "#shared/ipc/server.ts";
+import { fromDomPort } from "#shared/ipc/transport.ts";
 import { createOptimisticActionRegistry } from "./optimistic.ts";
 import { subscribeAppEvents } from "./worker-events.ts";
 

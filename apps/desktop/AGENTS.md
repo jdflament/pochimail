@@ -5,3 +5,4 @@
 - Secrets only through the keychain. Never render remote content, follow links in email or open attachments.
 - Platform code sits behind a port with one adapter per OS.
 - `@pochimail/testing` only through the listed dev-only entries.
+- Import shared code through `#shared/*`, never `../../` paths.

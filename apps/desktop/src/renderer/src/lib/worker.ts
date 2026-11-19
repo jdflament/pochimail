@@ -1,5 +1,5 @@
-import { createRpcClient, type RpcClient } from "../../../shared/ipc/client.ts";
-import { fromDomPort } from "../../../shared/ipc/transport.ts";
+import { createRpcClient, type RpcClient } from "#shared/ipc/client.ts";
+import { fromDomPort } from "#shared/ipc/transport.ts";
 
 let connection: Promise<RpcClient> | undefined;
 

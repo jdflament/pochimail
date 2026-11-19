@@ -7,7 +7,7 @@ import {
   Outlet,
   redirect,
 } from "@tanstack/react-router";
-import type { RpcClient } from "../../shared/ipc/client.ts";
+import type { RpcClient } from "#shared/ipc/client.ts";
 import { ActivityPage } from "./features/activity/activity-page.tsx";
 import { CategoryPage } from "./features/category/category-page.tsx";
 import { ConnectPage } from "./features/connect/connect-page.tsx";

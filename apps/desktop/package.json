@@ -4,6 +4,9 @@
   "version": "0.0.0",
   "license": "AGPL-3.0-only",
   "type": "module",
+  "imports": {
+    "#shared/*": "./src/shared/*"
+  },
   "exports": {
     "./package-info": "./src/package-info.ts",
     "./shared/i18n/screen-copy": "./src/shared/i18n/screen-copy.ts",

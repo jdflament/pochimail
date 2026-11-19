@@ -1,5 +1,5 @@
 import { useEffect, useReducer } from "react";
-import type { RpcClient } from "../../../../shared/ipc/client.ts";
+import type { RpcClient } from "#shared/ipc/client.ts";
 import {
   noRequiredStates,
   type RequiredStateEvent,

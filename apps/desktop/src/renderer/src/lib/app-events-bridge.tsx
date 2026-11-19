@@ -2,7 +2,7 @@ import { toast } from "@pochimail/ui/components/sonner";
 import { t } from "@pochimail/ui/i18n/format.ts";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
-import type { RpcClient } from "../../../shared/ipc/client.ts";
+import type { RpcClient } from "#shared/ipc/client.ts";
 import { useOptimisticRegistry } from "./optimistic-context.tsx";
 import { subscribeAppEvents } from "./query/worker-events.ts";
 

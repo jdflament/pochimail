@@ -1,5 +1,5 @@
-import type { RpcClient } from "../../../../shared/ipc/client.ts";
-import type { EventOf } from "../../../../shared/ipc/contract.ts";
+import type { RpcClient } from "#shared/ipc/client.ts";
+import type { EventOf } from "#shared/ipc/contract.ts";
 import type { OptimisticActionRegistry } from "./optimistic.ts";
 
 const INITIAL_BACKOFF_MS = 250;
