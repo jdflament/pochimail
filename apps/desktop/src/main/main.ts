@@ -3,17 +3,21 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createLogger } from "@pochimail/logger/logger";
+import { t } from "@pochimail/ui/i18n/format.ts";
+import { localeFromLanguages } from "@pochimail/ui/i18n/locale.ts";
 import {
   app,
   BrowserWindow,
   dialog,
   ipcMain,
+  Menu,
   MessageChannelMain,
   nativeImage,
   nativeTheme,
   safeStorage,
   session,
   shell,
+  Tray,
   utilityProcess,
 } from "electron";
 import { demoScale } from "../shared/demo.ts";
@@ -28,6 +32,7 @@ import {
   webPreferences,
 } from "./security.ts";
 import { keyProtection, loadOrCreateDatabaseKey } from "./storage-key.ts";
+import { createAppTray } from "./tray.ts";
 import { linkWorkerOnEveryLoad } from "./worker-link.ts";
 import { bootWorker } from "./worker-start.ts";
 
@@ -239,6 +244,39 @@ void app.whenReady().then(() => {
     appDataDirs: () => [app.getPath("userData")],
   });
   createWindow();
+  const locale = localeFromLanguages(app.getPreferredSystemLanguages());
+  // Packaged: the images ship as extra resources next to app.asar (electron-builder.config.ts).
+  const trayImages = app.isPackaged
+    ? join(process.resourcesPath, "tray")
+    : join(import.meta.dirname, "../../resources/tray");
+  const appTray = createAppTray({
+    platform: process.platform,
+    imagesDir: trayImages,
+    theme: nativeTheme,
+    createTray: (image) => new Tray(image),
+    imageFromPath: (path, template) => {
+      const image = nativeImage.createFromPath(path);
+      image.setTemplateImage(template);
+      return image;
+    },
+    buildMenu: (items) => Menu.buildFromTemplate([...items]),
+    labels: {
+      tooltip: t("nav.brand", undefined, { locale }),
+      open: t("tray.open", undefined, { locale }),
+      quit: t("tray.quit", undefined, { locale }),
+    },
+    openApp: () => {
+      const [window] = BrowserWindow.getAllWindows();
+      if (window === undefined) createWindow();
+      else {
+        if (window.isMinimized()) window.restore();
+        window.show();
+        window.focus();
+      }
+    },
+    quit: () => app.quit(),
+  });
+  app.on("will-quit", appTray.dispose);
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });

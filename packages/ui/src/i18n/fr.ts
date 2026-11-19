@@ -111,6 +111,9 @@ export const fr = {
     [],
   ),
 
+  "tray.open": entry("Ouvrir Pochimail", []),
+  "tray.quit": entry("Quitter Pochimail", []),
+
   "welcome.headline": entry("Faites le tri dans vos emails. Gardez l’essentiel.", []),
   "welcome.description": entry(
     "Pochimail est un assistant privé pour les comptes email que vous avez déjà. Il repère ce qui a besoin de vous, fait le tri dans l’encombrement et enregistre vos documents. Vos emails ne quittent jamais votre {device}.",
