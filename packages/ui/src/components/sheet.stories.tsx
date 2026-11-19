@@ -77,7 +77,7 @@ function PhoneFrame(args: React.ComponentProps<typeof Sheet>) {
   return (
     <div
       ref={setFrame}
-      className="relative h-[640px] w-[390px] overflow-hidden border"
+      className="relative h-160 w-97.5 overflow-hidden border"
       style={{ contain: "layout paint" }}
     >
       {frame ? <SummarySheet {...args} container={frame} /> : null}

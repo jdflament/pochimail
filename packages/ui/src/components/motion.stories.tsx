@@ -29,7 +29,7 @@ const meta = {
   decorators: [
     (Story, { args }) => (
       <MotionProvider animations={args["animations"] as boolean}>
-        <div className="w-[420px] max-w-full">
+        <div className="w-105 max-w-full">
           <Story />
         </div>
       </MotionProvider>

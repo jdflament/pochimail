@@ -19,7 +19,7 @@ export function WelcomePage() {
 
   return (
     <>
-      <h1 className="text-balance text-[40px] leading-tight">{t("welcome.headline")}</h1>
+      <h1 className="text-balance text-display leading-tight">{t("welcome.headline")}</h1>
       {/* Held invisible until the device name resolves, so the copy never flips from "device" to "Mac". */}
       <p
         className={cn(
@@ -29,7 +29,7 @@ export function WelcomePage() {
       >
         {t("welcome.description", { device })}
       </p>
-      <Button asChild size="lg" className="mt-8 w-full max-w-[26rem]">
+      <Button asChild size="lg" className="mt-8 w-full max-w-104">
         <Link to="/connect">{t("welcome.cta")}</Link>
       </Button>
       <p className="mt-4 text-sm text-foreground-tertiary">{t("welcome.openSource")}</p>

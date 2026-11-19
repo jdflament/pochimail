@@ -87,8 +87,8 @@ it("sizes by container query on one layer: bottom below 560px, centred from 560p
   const content = screen.getByRole("dialog");
   expect(layer?.classList.contains("@container")).toBe(true);
   expect(layer?.contains(content)).toBe(true);
-  expect(content.className).toContain("@max-[559px]:rounded-t-2xl");
-  expect(content.className).toContain("@min-[560px]:self-center");
+  expect(content.className).toContain("@max-phone:rounded-t-2xl");
+  expect(content.className).toContain("@min-phone:self-center");
 });
 
 it("mounts inside a given container (guards a sheet that cannot be framed in stories and tests)", async () => {

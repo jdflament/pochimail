@@ -27,7 +27,7 @@ function Section({
           >
             {/* Dev-only label: the story's export name, deliberately outside the i18n catalog. */}
             <h3 className="mb-3 text-sm text-muted-foreground">{entry.name}</h3>
-            <div className="max-w-[420px]">{entry.render()}</div>
+            <div className="max-w-105">{entry.render()}</div>
           </li>
         ))}
       </ul>

@@ -22,7 +22,7 @@ export const AllLocales: Story = {
   render: () => (
     <div className="flex flex-wrap items-start gap-6 p-6">
       {PREVIEWS.map(({ locale, label }) => (
-        <section key={locale} className="w-[320px] max-w-full">
+        <section key={locale} className="w-80 max-w-full">
           <h2 className="mb-2 text-sm font-medium text-muted-foreground">{label}</h2>
           <PseudoLocalePreview locale={locale} />
         </section>

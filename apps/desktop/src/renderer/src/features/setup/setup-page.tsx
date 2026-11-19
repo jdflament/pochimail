@@ -158,7 +158,7 @@ function SetupForm({ initial }: { initial: Choice }) {
         <Button
           type="submit"
           size="lg"
-          className="w-full max-w-[26rem]"
+          className="w-full max-w-104"
           disabled={start.isPending || noneChosen}
           aria-describedby={noneChosen ? "setup-none" : undefined}
         >

@@ -83,10 +83,7 @@ function Frame({
                 <AccountSwitcherTrigger aria-label={`Account: ${current}`}>
                   <UsersIcon aria-hidden="true" />
                   <AccountSwitcherLabel>{current}</AccountSwitcherLabel>
-                  <ChevronDownIcon
-                    aria-hidden="true"
-                    className="@min-[560px]:@max-[960px]:hidden"
-                  />
+                  <ChevronDownIcon aria-hidden="true" className="@min-phone:@max-desktop:hidden" />
                 </AccountSwitcherTrigger>
                 <AccountSwitcherContent>
                   <DropdownMenuLabel>Account</DropdownMenuLabel>

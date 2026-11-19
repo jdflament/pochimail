@@ -17,7 +17,7 @@ export default {
   title: "States/Required states",
   decorators: [
     (Story: () => React.ReactElement) => (
-      <div className="w-[340px] max-w-full p-6">
+      <div className="w-85 max-w-full p-6">
         <Story />
       </div>
     ),

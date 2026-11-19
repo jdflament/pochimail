@@ -84,7 +84,7 @@ it("storage bar names every segment in its label and legend", () => {
 it("ledger bar is hidden until the row is 760px wide and reflects the share", () => {
   const html = renderToStaticMarkup(<LedgerRow label="Newsletters" count={10410} share={0.62} />);
   expect(html).toContain("hidden");
-  expect(html).toContain("@[760px]:block");
+  expect(html).toContain("@tablet:block");
   expect(html).toContain("width:62%");
   expect(renderToStaticMarkup(<LedgerRow label="People" count={3} />)).not.toContain("ledger-bar");
 });

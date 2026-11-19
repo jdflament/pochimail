@@ -42,13 +42,13 @@ function SheetOverlay({
 const sheetContentClass = cn(
   "pointer-events-auto relative grid max-h-full min-w-0 gap-4 overflow-y-auto bg-background p-6 text-foreground shadow-lg outline-none",
   // Below 560px: bottom sheet.
-  "@max-[559px]:w-full @max-[559px]:rounded-t-2xl @max-[559px]:pb-[max(1.5rem,env(safe-area-inset-bottom))]",
+  "@max-phone:w-full @max-phone:rounded-t-2xl @max-phone:pb-[max(1.5rem,env(safe-area-inset-bottom))]",
   // From 560px: centred sheet.
-  "@min-[560px]:m-4 @min-[560px]:w-full @min-[560px]:max-w-lg @min-[560px]:self-center @min-[560px]:rounded-2xl",
+  "@min-phone:m-4 @min-phone:w-full @min-phone:max-w-lg @min-phone:self-center @min-phone:rounded-2xl",
 );
 /** Enter/exit slides; under reduced motion or Animations off globals.css zeroes the slide distance, leaving a short opacity cross-fade. */
 const sheetMotionClass =
-  "@max-[559px]:data-[state=closed]:animate-sheet-bottom-out @max-[559px]:data-[state=open]:animate-sheet-bottom-in @min-[560px]:data-[state=closed]:animate-sheet-out @min-[560px]:data-[state=open]:animate-sheet-in";
+  "@max-phone:data-[state=closed]:animate-sheet-bottom-out @max-phone:data-[state=open]:animate-sheet-bottom-in @min-phone:data-[state=closed]:animate-sheet-out @min-phone:data-[state=open]:animate-sheet-in";
 
 type SheetContentProps = React.ComponentProps<typeof SheetPrimitive.Content> & {
   /** Where to mount the sheet; defaults to the document body (the whole window). */
@@ -98,7 +98,7 @@ function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sheet-footer"
       className={cn(
-        "flex flex-col-reverse gap-2 @min-[560px]:flex-row @min-[560px]:justify-end",
+        "flex flex-col-reverse gap-2 @min-phone:flex-row @min-phone:justify-end",
         className,
       )}
       {...props}

@@ -7,7 +7,7 @@ const meta = {
   component: EmptyState,
   decorators: [
     (Story) => (
-      <div className="w-[300px] max-w-full p-6">
+      <div className="w-75 max-w-full p-6">
         <Story />
       </div>
     ),

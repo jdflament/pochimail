@@ -163,7 +163,7 @@ export function OverviewPage() {
             ) : (
               <>
                 <p className="flex flex-wrap items-baseline gap-x-3">
-                  <span className="font-display text-[34px] leading-none font-[450] tabular-nums">
+                  <span className="font-display text-figure leading-none font-title tabular-nums">
                     {cleanableTotal.toLocaleString(locale)}
                   </span>
                   <span className="text-muted-foreground">

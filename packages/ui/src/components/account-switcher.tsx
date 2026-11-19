@@ -13,7 +13,7 @@ import type * as React from "react";
 const ALL_ACCOUNTS = "__all__";
 
 const accountSwitcherTriggerVariants = cva(
-  "flex min-h-10 min-w-0 items-center gap-2 rounded-[10px] px-3 text-start text-[15px] outline-hidden focus-visible:ring-[3px] focus-visible:ring-ring/50 @max-[960px]:justify-center @max-[960px]:px-0 @min-[560px]:@max-[960px]:w-full [&_svg]:size-[18px] [&_svg]:shrink-0",
+  "flex min-h-10 min-w-0 items-center gap-2 rounded-md px-3 text-start text-body outline-hidden focus-visible:ring-[3px] focus-visible:ring-ring/50 @max-desktop:justify-center @max-desktop:px-0 @min-phone:@max-desktop:w-full [&_svg]:size-4.5 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -58,7 +58,7 @@ function AccountSwitcherLabel({ className, ...props }: React.ComponentProps<"spa
     <span
       data-slot="account-switcher-label"
       className={cn(
-        "min-w-0 flex-1 truncate font-medium @min-[560px]:@max-[960px]:sr-only",
+        "min-w-0 flex-1 truncate font-medium @min-phone:@max-desktop:sr-only",
         className,
       )}
       {...props}

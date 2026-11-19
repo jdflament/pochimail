@@ -37,11 +37,11 @@ function EmptyState({
       {...props}
     >
       <Mascot pose={pose} size="sm" />
-      <h2 id={titleId} className="m-0 text-[17px] font-semibold break-words">
+      <h2 id={titleId} className="m-0 text-section font-semibold break-words">
         {title}
       </h2>
       {description ? (
-        <p className="m-0 max-w-[260px] text-sm leading-normal break-words text-muted-foreground">
+        <p className="m-0 max-w-65 text-sm leading-normal break-words text-muted-foreground">
           {description}
         </p>
       ) : null}

@@ -52,7 +52,7 @@ function StorageBar({ className, segments, summary, ...props }: StorageBarProps)
 
   return (
     <div data-slot="storage-bar" className={cn("flex flex-col gap-3", className)} {...props}>
-      <div role="img" aria-label={description} className="flex h-3 gap-[3px]">
+      <div role="img" aria-label={description} className="flex h-3 gap-0.75">
         {segments.map((s, i) => (
           <span
             key={s.id}
@@ -68,7 +68,7 @@ function StorageBar({ className, segments, summary, ...props }: StorageBarProps)
             }}
             className={cn(
               segmentVariants({ pattern: s.pattern }),
-              "rounded-[3px]",
+              "rounded-bar",
               i === 0 && "rounded-l-full",
               i === segments.length - 1 && "rounded-r-full",
             )}
@@ -77,7 +77,7 @@ function StorageBar({ className, segments, summary, ...props }: StorageBarProps)
       </div>
       <ul
         data-slot="storage-legend"
-        className="m-0 flex list-none flex-wrap gap-x-[18px] gap-y-1.5 p-0 text-[13px] text-muted-foreground"
+        className="m-0 flex list-none flex-wrap gap-x-4.5 gap-y-1.5 p-0 text-caption text-muted-foreground"
       >
         {segments.map((s) => (
           <li key={s.id} className="flex items-center gap-1.5">
@@ -85,7 +85,7 @@ function StorageBar({ className, segments, summary, ...props }: StorageBarProps)
               aria-hidden="true"
               className={cn(
                 segmentVariants({ pattern: s.pattern }),
-                "size-2.5 shrink-0 rounded-[3px]",
+                "size-2.5 shrink-0 rounded-bar",
               )}
             />
             <span className="break-words">

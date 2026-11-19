@@ -1,11 +1,9 @@
 import { Button } from "@pochimail/ui/components/button";
 import { MOTION, MOTION_FADE_EASE, transition } from "@pochimail/ui/lib/motion";
 import { cn } from "@pochimail/ui/lib/utils";
-import { Slot } from "radix-ui";
 import type * as React from "react";
 
 type RecommendationRowProps = Omit<React.ComponentProps<"li">, "children"> & {
-  asChild?: boolean;
   /** What Pochi proposes, as a sentence. */
   sentence: React.ReactNode;
   /** Why, in one line. */
@@ -20,7 +18,6 @@ type RecommendationRowProps = Omit<React.ComponentProps<"li">, "children"> & {
 
 function RecommendationRow({
   className,
-  asChild = false,
   sentence,
   reason,
   size,
@@ -30,10 +27,8 @@ function RecommendationRow({
   style,
   ...props
 }: RecommendationRowProps) {
-  const Comp = asChild ? Slot.Root : "li";
-
   return (
-    <Comp
+    <li
       data-slot="recommendation-row"
       data-folded={folded ? "true" : undefined}
       style={{
@@ -49,22 +44,22 @@ function RecommendationRow({
       className={cn(
         // Real height transition (not a max-height guess): `interpolate-size` lets height animate between auto and 0.
         "h-auto overflow-hidden [interpolate-size:allow-keywords]",
-        "@container grid list-none grid-cols-[minmax(0,1fr)_auto] items-center gap-x-[18px] gap-y-1 py-3.5 @[560px]:grid-cols-[minmax(0,1fr)_auto_auto]",
+        "@container grid list-none grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4.5 gap-y-1 py-3.5 @phone:grid-cols-[minmax(0,1fr)_auto_auto]",
         className,
         folded && "h-0 py-0 opacity-0",
       )}
       {...props}
     >
       <span className="flex min-w-0 flex-col gap-0.5">
-        <span className="break-words text-[15px] font-medium">{sentence}</span>
+        <span className="break-words text-body font-medium">{sentence}</span>
         {reason ? (
-          <span className="break-words text-[13px] text-muted-foreground">{reason}</span>
+          <span className="break-words text-caption text-muted-foreground">{reason}</span>
         ) : null}
       </span>
       {size ? (
         <span
           data-slot="recommendation-size"
-          className="col-start-1 row-start-2 text-sm whitespace-nowrap text-muted-foreground tabular-nums @[560px]:col-start-auto @[560px]:row-start-auto"
+          className="col-start-1 row-start-2 text-sm whitespace-nowrap text-muted-foreground tabular-nums @phone:col-start-auto @phone:row-start-auto"
         >
           {size}
         </span>
@@ -73,12 +68,12 @@ function RecommendationRow({
         variant="ghost"
         size="sm"
         data-slot="recommendation-review"
-        className="col-start-2 row-start-1 bg-accent @[560px]:col-start-auto @[560px]:row-start-auto"
+        className="col-start-2 row-start-1 bg-accent @phone:col-start-auto @phone:row-start-auto"
         onClick={onReview}
       >
         {reviewLabel}
       </Button>
-    </Comp>
+    </li>
   );
 }
 

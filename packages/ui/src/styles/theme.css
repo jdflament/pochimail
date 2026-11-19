@@ -56,10 +56,37 @@
   --ease-out: var(--ease-out);
 }
 
+/* One design scale (docs/design.md: Typography, Shape and space). Components use these names, never `text-[15px]`
+   or `@max-[560px]`. Type steps set the size only; line height stays with the component. */
+@theme {
+  --text-overline: 12px;
+  --text-caption: 13px;
+  --text-ui: 14px;
+  --text-body: 15px;
+  --text-section: 17px;
+  --text-title-sm: 28px;
+  --text-title: 32px;
+  --text-figure: 34px;
+  --text-display: 40px;
+
+  --font-weight-title: 450;
+  --tracking-title: -0.02em;
+  --tracking-overline: 0.06em;
+
+  --radius-bar: 3px;
+  --radius-check: 4px;
+
+  /* Named container widths: `@max-phone:`, `@min-desktop:`, `@tablet:`. "Narrower than" pairs with "from" with no gap. */
+  --container-narrow: 480px;
+  --container-phone: 560px;
+  --container-tablet: 760px;
+  --container-desktop: 960px;
+}
+
 @layer base {
   * { @apply border-border; }
   body { @apply bg-background text-foreground font-sans antialiased; font-feature-settings: "tnum" 0; }
-  h1 { font-family: var(--font-display); font-weight: 450; letter-spacing: -0.02em; }
+  h1 { font-family: var(--font-display); font-weight: var(--font-weight-title); letter-spacing: var(--tracking-title); }
   .tabular { font-variant-numeric: tabular-nums; }
   :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 }

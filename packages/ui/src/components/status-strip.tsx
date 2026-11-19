@@ -36,14 +36,14 @@ function StatusStrip({
           }}
         />
       </div>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5 text-[13px] text-muted-foreground">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5 text-caption text-muted-foreground">
         <div
           role="status"
           aria-live="polite"
           className="flex flex-1 flex-wrap items-center gap-x-4 gap-y-2.5"
         >
           <span className="flex items-center gap-1.5 font-medium text-foreground">
-            <LockIcon aria-hidden="true" className="size-[15px] shrink-0" />
+            <LockIcon aria-hidden="true" className="size-3.75 shrink-0" />
             {headline}
           </span>
           <span className="tabular-nums">{pct}%</span>

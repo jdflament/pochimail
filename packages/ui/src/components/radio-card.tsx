@@ -33,7 +33,7 @@ function RadioCard({ className, title, description, badge, id, ...props }: Radio
         {...props}
       />
       <span className="flex min-w-0 flex-col gap-1">
-        <span className="flex flex-wrap items-center gap-2 text-[15px] font-semibold">
+        <span className="flex flex-wrap items-center gap-2 text-body font-semibold">
           <span id={titleId} className="break-words">
             {title}
           </span>

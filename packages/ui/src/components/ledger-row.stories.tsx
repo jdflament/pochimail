@@ -21,7 +21,7 @@ type Story = StoryObj<typeof meta>;
 export const WithBar: Story = {
   decorators: [
     (Story) => (
-      <div className="w-[860px]">
+      <div className="w-215">
         <Story />
       </div>
     ),

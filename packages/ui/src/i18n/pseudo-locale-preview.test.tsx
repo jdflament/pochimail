@@ -5,7 +5,7 @@ import { PseudoLocalePreview } from "./pseudo-locale-preview.tsx";
 describe("pseudo-locale story (P13)", () => {
   it("keeps long accented copy inside wrapping elements (guards overflow when copy expands)", () => {
     const { container } = render(
-      <div className="w-[320px]">
+      <div className="w-80">
         <PseudoLocalePreview />
       </div>,
     );

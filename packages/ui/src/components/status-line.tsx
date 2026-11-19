@@ -13,7 +13,7 @@ function StatusLine({ className, children, ...props }: StatusLineProps) {
       data-slot="status-line"
       role="status"
       className={cn(
-        "flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px] text-muted-foreground",
+        "flex flex-wrap items-center gap-x-4 gap-y-2 text-caption text-muted-foreground",
         children && "border-y border-border py-2.5",
         className,
       )}
