@@ -42,6 +42,7 @@ The window is resizable, minimum 720×560. One markup, restyled by width, never 
 
 ## Components
 shadcn/ui wrapped, not forked, in `packages/ui`: button, switch, checkbox and radio cards, pill radio group, recommendation, ledger and signal rows, status strip, speech bubble, account switcher, sidebar, sheet, empty state, sonner toast with Undo. Only these exist; screen-specific pieces live in the app.
+Text field (passphrase, rename): 44px high, 10px radius, 1px border, body text; focus is a 2px ring in the primary color.
 
 ## Interaction and accessibility
 Real `button`, `a`, `input`, switch, checkbox and radio, reachable by keyboard with a visible `focus-visible`. One `h1` per screen, headings never skipped. Progress uses `role="status"` with `aria-live="polite"`. Never color alone. Copy survives French and Japanese expansion ("Archive 12,940"); ellipsis plus tooltip for long names.
