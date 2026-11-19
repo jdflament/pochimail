@@ -8,7 +8,6 @@ import { StatusStrip } from "@pochimail/ui/components/status-strip";
 import { StorageBar } from "@pochimail/ui/components/storage-bar";
 import { getLocale, t } from "@pochimail/ui/i18n/format.ts";
 import { deviceLabel } from "@pochimail/ui/i18n/locale.ts";
-import type { MessageKey } from "@pochimail/ui/i18n/messages.ts";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { queryKeys } from "../../lib/query/keys.ts";

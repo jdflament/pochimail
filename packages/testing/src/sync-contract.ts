@@ -52,7 +52,7 @@ export interface SyncHarness {
 const live = () => new AbortController().signal;
 const CREDENTIALS = "fake-refresh-token-do-not-store-in-rows";
 
-function useCases(h: SyncHarness) {
+function cases(h: SyncHarness) {
   return {
     connect: new ConnectAccount({ uow: h.uow, secrets: h.secrets, clock: h.clock, ids: h.ids }),
     sync: new RunIncrementalSync({ uow: h.uow, provider: h.provider, clock: h.clock }),
@@ -62,7 +62,7 @@ function useCases(h: SyncHarness) {
 
 async function connected(h: SyncHarness): Promise<Account> {
   const outcome = unwrap(
-    await useCases(h).connect.execute(
+    await cases(h).connect.execute(
       {
         workspaceId: WS_A,
         provider: "gmail",
@@ -98,7 +98,7 @@ export const syncChecks: readonly Check<SyncHarness>[] = [
   check(
     "connecting the same account twice keeps one account, one AccountConnected event and the latest credentials (guards duplicates on retry)",
     async (h) => {
-      const { connect } = useCases(h);
+      const { connect } = cases(h);
       const request = {
         workspaceId: WS_A,
         provider: "gmail",
@@ -130,7 +130,7 @@ export const syncChecks: readonly Check<SyncHarness>[] = [
     "a second sync after new mail fetches only the delta (guards re-downloading the whole mailbox)",
     async (h) => {
       const account = await connected(h);
-      const { sync } = useCases(h);
+      const { sync } = cases(h);
       await h.deliver(...[1, 2, 3].map((n) => mail(account, n)));
       const first = unwrap(
         await sync.execute({ workspaceId: WS_A, accountId: account.id }, live()),
@@ -148,7 +148,7 @@ export const syncChecks: readonly Check<SyncHarness>[] = [
     "every synced message has its thread with matching counts, and replaying a batch adds no duplicate (guards orphan messages and double-counted threads)",
     async (h) => {
       const account = await connected(h);
-      const { sync } = useCases(h);
+      const { sync } = cases(h);
       const shared = { threadId: "thr-shared" as ThreadId };
       const batch = [mail(account, 1, shared), mail(account, 2), mail(account, 3, shared)];
       await h.deliver(...batch);
@@ -197,7 +197,7 @@ export const syncChecks: readonly Check<SyncHarness>[] = [
       expect(await storedIds(h, account)).not.toHaveLength(5);
 
       const resumed = unwrap(
-        await useCases(h).sync.execute({ workspaceId: WS_A, accountId: account.id }, live()),
+        await cases(h).sync.execute({ workspaceId: WS_A, accountId: account.id }, live()),
       );
       expect(resumed.status).toBe("completed");
       expect(await storedIds(h, account)).toEqual([1, 2, 3, 4, 5].map((n) => `msg-${n}`));
@@ -208,7 +208,7 @@ export const syncChecks: readonly Check<SyncHarness>[] = [
     "RateLimited pauses the account and queues a resume at the provider's retry time, keeping committed batches (guards a hammered provider and lost progress)",
     async (h) => {
       const account = await connected(h);
-      const { sync } = useCases(h);
+      const { sync } = cases(h);
       await h.deliver(...[1, 2, 3].map((n) => mail(account, n)));
       h.failNextSync(new RateLimited({ retryAfterMs: 30_000 }));
       const startedAt = h.clock.now().getTime();
@@ -242,7 +242,7 @@ export const syncChecks: readonly Check<SyncHarness>[] = [
       const account = await connected(h);
       h.failNextSync(new AuthExpired());
       const outcome = unwrap(
-        await useCases(h).sync.execute({ workspaceId: WS_A, accountId: account.id }, live()),
+        await cases(h).sync.execute({ workspaceId: WS_A, accountId: account.id }, live()),
       );
       expect(outcome.status).toBe("needs-reauth");
       expect((await events(h, "AccountStateChanged")).at(-1)?.payload).toMatchObject({
@@ -255,7 +255,7 @@ export const syncChecks: readonly Check<SyncHarness>[] = [
     async (h) => {
       const account = await connected(h);
       await h.deliver(mail(account, 1), mail(account, 2, { workspaceId: WS_B }));
-      unwrap(await useCases(h).sync.execute({ workspaceId: WS_A, accountId: account.id }, live()));
+      unwrap(await cases(h).sync.execute({ workspaceId: WS_A, accountId: account.id }, live()));
       expect(await storedIds(h, account)).toEqual(["msg-1"]);
     },
   ),
@@ -263,7 +263,7 @@ export const syncChecks: readonly Check<SyncHarness>[] = [
     "classifying records the ground-truth category and one event per message, and an unavailable classifier changes nothing (guards partial writes)",
     async (h) => {
       const account = await connected(h);
-      const { sync, classify } = useCases(h);
+      const { sync, classify } = cases(h);
       await h.deliver(...[1, 2, 3].map((n) => mail(account, n)));
       h.labels.set("msg-1", "newsletters");
       h.labels.set("msg-2", "records");
@@ -287,7 +287,7 @@ export const syncChecks: readonly Check<SyncHarness>[] = [
     "a synced and classified message leaves no body in any repository (follows proposed D11)",
     async (h) => {
       const account = await connected(h);
-      const { sync, classify } = useCases(h);
+      const { sync, classify } = cases(h);
       const BODY = "SECRET-BODY-TEXT-0001";
       const ATTACHMENT = "SECRET-ATTACHMENT-0002";
       // A careless adapter hands over the whole body as the snippet, plus fields we never model.
