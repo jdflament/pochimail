@@ -9,16 +9,16 @@
     "./model/message": "./src/model/message.ts",
     "./model/sender-stats": "./src/model/sender-stats.ts",
     "./model/thread": "./src/model/thread.ts",
+    "./policies/sanitize-incoming": "./src/policies/sanitize-incoming.ts",
     "./ports/cursor-repository": "./src/ports/cursor-repository.ts",
     "./ports/mail-reader": "./src/ports/mail-reader.ts",
     "./ports/message-repository": "./src/ports/message-repository.ts",
     "./ports/sender-repository": "./src/ports/sender-repository.ts",
     "./ports/thread-repository": "./src/ports/thread-repository.ts",
     "./ports/unit-of-work": "./src/ports/unit-of-work.ts",
-    "./use-cases/sanitize-incoming": "./src/use-cases/sanitize-incoming.ts",
+    "./testing/*": "./src/testing/*.ts",
     "./use-cases/store-messages": "./src/use-cases/store-messages.ts",
-    "./use-cases/upsert-threads": "./src/use-cases/upsert-threads.ts",
-    "./testing/*": "./src/testing/*.ts"
+    "./use-cases/upsert-threads": "./src/use-cases/upsert-threads.ts"
   },
   "scripts": {
     "typecheck": "tsc",

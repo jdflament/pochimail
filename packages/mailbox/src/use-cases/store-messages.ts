@@ -4,8 +4,8 @@ import type { AccountId, MessageId, WorkspaceId } from "@pochimail/kernel/ids";
 import { ok } from "@pochimail/kernel/result";
 import type { MessagesUpserted } from "../events.ts";
 import type { IncomingMessage } from "../model/message.ts";
+import { sanitizeIncoming } from "../policies/sanitize-incoming.ts";
 import type { MailboxUnitOfWork } from "../ports/unit-of-work.ts";
-import { sanitizeIncoming } from "./sanitize-incoming.ts";
 
 export interface StoreMessagesDeps {
   readonly uow: MailboxUnitOfWork;

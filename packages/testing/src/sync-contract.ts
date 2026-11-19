@@ -19,7 +19,7 @@ import type { ThreadId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
 import { type Check, check, registerContract } from "@pochimail/kernel/testing/contract";
 import type { IncomingMessage } from "@pochimail/mailbox/model/message";
-import { MAX_SNIPPET_CHARS } from "@pochimail/mailbox/use-cases/sanitize-incoming";
+import { MAX_SNIPPET_CHARS } from "@pochimail/mailbox/policies/sanitize-incoming";
 import type { OutboxEntry } from "@pochimail/pipeline/outbox";
 import { expect } from "vitest";
 import { makeIncomingMessage, WS_A, WS_B } from "./fixtures.ts";

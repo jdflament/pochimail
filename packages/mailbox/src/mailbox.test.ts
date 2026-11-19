@@ -1,5 +1,7 @@
+// Guards: a message body, a foreign account's mail or a phantom event reaching storage, and a repository that loses labels, sequence or cursors.
 import { unwrap } from "@pochimail/kernel/result";
 import { describe, expect, it } from "vitest";
+import { MAX_SNIPPET_CHARS } from "./policies/sanitize-incoming.ts";
 import { createInMemoryMailbox } from "./testing/in-memory-mailbox.ts";
 import {
   ACCOUNT_1,
@@ -7,7 +9,6 @@ import {
   makeIncoming,
   WS_A,
 } from "./testing/mailbox-repository-contract.ts";
-import { MAX_SNIPPET_CHARS } from "./use-cases/sanitize-incoming.ts";
 import { StoreMessages } from "./use-cases/store-messages.ts";
 
 mailboxRepositoryContract(() => createInMemoryMailbox());

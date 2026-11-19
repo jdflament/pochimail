@@ -11,9 +11,9 @@ import {
 } from "@pochimail/kernel/errors";
 import type { AccountId, WorkspaceId } from "@pochimail/kernel/ids";
 import { ok } from "@pochimail/kernel/result";
+import { sanitizeIncoming } from "@pochimail/mailbox/policies/sanitize-incoming";
 import type { SyncCursor } from "@pochimail/mailbox/ports/mail-reader";
-import { sanitizeIncoming } from "@pochimail/mailbox/use-cases/sanitize-incoming";
-import { upsertThreads } from "@pochimail/mailbox/use-cases/upsert-threads";
+import { UpsertThreads } from "@pochimail/mailbox/use-cases/upsert-threads";
 import type { JobRequest } from "@pochimail/pipeline/job-queue";
 import type { DomainEvent, DomainEventOf, DomainEventType } from "../events/catalog.ts";
 import type { MailProvider } from "../ports/mail-provider.ts";
@@ -160,7 +160,7 @@ export class RunIncrementalSync {
       const committed = await uow.run(async (tx) => {
         const rows = await tx.repositories.messages.upsertMany(keep);
         if (!rows.ok) return rows;
-        const threads = await upsertThreads(tx, keep);
+        const threads = await new UpsertThreads().execute(tx, keep);
         if (!threads.ok) return threads;
         const saved = await tx.repositories.cursors.set(workspaceId, accountId, nextCursor);
         if (!saved.ok) return saved;

@@ -2,11 +2,13 @@
 
 ## Why this package exists
 Domain package.
-Knowing what is in each mailbox: incremental sync into the minimal message record of ADR 0014.
+Knowing what is in each mailbox: sync into the minimal message record of ADR 0014.
 
 ## Owns
-- `MessageRecord` (ids, size, date, flags), sync cursors, incremental and full sync, live header fetch for display.
-- Ports: mail reader (delta, headers), message and cursor repositories. Events: messages synced.
+- `IncomingMessage`, `Message` (the label is an opaque string), `Thread`, `SenderStats`, sync cursors.
+- Ports: `MailReader` (sync, body on demand), message, thread, sender and cursor repositories, `MailboxUnitOfWork`.
+- `StoreMessages`, `UpsertThreads`, the incoming-message sanitizer, and the `MessagesUpserted` and `SyncBatchFetched` events.
+- An in-memory adapter and contract suites under `./testing/*`.
 
 ## May import
 `@pochimail/kernel`, `zod`.

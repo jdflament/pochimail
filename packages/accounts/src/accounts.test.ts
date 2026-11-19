@@ -1,3 +1,4 @@
+// Guards: a credential left in a row or on the device, a missing lifecycle event, or one account's failure pausing the others.
 import type { IdGenerator } from "@pochimail/kernel/id-generator";
 import type { WorkspaceId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
