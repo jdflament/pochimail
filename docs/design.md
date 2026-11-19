@@ -56,7 +56,7 @@ No cards inside cards, icon-tile stacks, numbered section labels, eyebrow chips,
 |---|---|
 | Live progress | Line glides (600ms); each finding slides up 8px and fades in |
 | Numbers arrive | Count up once from 0 (600ms) |
-| Storage settles | The bar shows what stays against what can be deleted ([ADR 0012](adr/0012-delete-moves-to-trash-with-approval.md)); settles once when sizes arrive, 700ms |
+| Storage settles | The bar shows what stays against what can be deleted ([ADR 0012](adr/0012-delete-moves-to-trash-with-approval.md)) |
 | Clean up, then undo | Row folds away (260ms); dark Undo toast for 5s; Undo unfolds the row |
 | Pochi at rest | Breathing 1 → 1.012 wide / 1.025 tall (4.2s), blink (5.3s) |
 | Pochi finds something | Squish, bounce up 14px, settle (620ms) |
