@@ -1,10 +1,11 @@
+import { StorageError } from "@pochimail/kernel/errors";
+import { err, ok } from "@pochimail/kernel/result";
+import type { OutboxEntry } from "@pochimail/pipeline/outbox";
 import type { ActionLog } from "../domain/action.ts";
 import { inverseOf } from "../domain/action.ts";
-import { StorageError } from "../errors.ts";
 import type { MailProvider, MailProviderCapabilities } from "../ports/mail-provider.ts";
 import type { ReadRepositories, WriteRepositories } from "../ports/repositories.ts";
-import type { OutboxEntry, Transaction, UnitOfWork } from "../ports/unit-of-work.ts";
-import { err, ok } from "../result.ts";
+import type { Transaction, UnitOfWork } from "../ports/unit-of-work.ts";
 import { type ActionHarness, describeActionUseCases } from "./action-contract.ts";
 
 function memoryHarness(capabilities: MailProviderCapabilities): ActionHarness {

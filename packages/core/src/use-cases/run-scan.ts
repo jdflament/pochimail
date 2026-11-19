@@ -1,9 +1,9 @@
-import { type DomainError, StorageError } from "../errors.ts";
+import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
+import { type DomainError, StorageError } from "@pochimail/kernel/errors";
+import { err, ok } from "@pochimail/kernel/result";
 import type { DomainEventOf } from "../events/catalog.ts";
 import { createScanPipeline, type ScanPipelineDeps } from "../jobs/scan-pipeline.ts";
-import type { AsyncResult, CancelSignal } from "../ports/common.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
-import { err, ok } from "../result.ts";
 import { BuildDigest } from "./build-digest.ts";
 
 export interface RunScanDeps extends Omit<ScanPipelineDeps, "onBatchProcessed"> {

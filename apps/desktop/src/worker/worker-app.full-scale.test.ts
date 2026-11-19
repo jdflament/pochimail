@@ -1,5 +1,5 @@
-import { createLogger } from "@pochimail/core/logger";
 import { SummarizeMailbox } from "@pochimail/core/use-cases/summarize-mailbox";
+import { createLogger } from "@pochimail/logger/logger";
 import { createFakeTimer } from "@pochimail/testing/fake-timer";
 import {
   generateMailbox,

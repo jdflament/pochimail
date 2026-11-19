@@ -1,4 +1,4 @@
-import type { Unsubscribe } from "./common.ts";
+import type { Unsubscribe } from "@pochimail/kernel/common";
 
 export const THERMAL_STATES = ["nominal", "fair", "serious", "critical"] as const;
 export type ThermalState = (typeof THERMAL_STATES)[number];

@@ -1,14 +1,7 @@
-import type { Clock } from "@pochimail/core/clock";
 import type { Account } from "@pochimail/core/domain/account";
-import type { Timer } from "@pochimail/core/events/batching";
-import { createInMemoryEventBus } from "@pochimail/core/events/bus";
-import type { WorkspaceId } from "@pochimail/core/ids";
-import { createOutboxRelay } from "@pochimail/core/jobs/outbox-relay";
-import type { Logger } from "@pochimail/core/logger";
+import { parseDomainEvent } from "@pochimail/core/events/catalog";
 import type { Classifier } from "@pochimail/core/ports/ai";
-import type { JobQueue } from "@pochimail/core/ports/job-queue";
 import type { MailProvider } from "@pochimail/core/ports/mail-provider";
-import type { OutboxStore } from "@pochimail/core/ports/outbox";
 import type { DeviceName } from "@pochimail/core/ports/platform";
 import type { SettingsStore } from "@pochimail/core/ports/settings-store";
 import type { UnitOfWork } from "@pochimail/core/ports/unit-of-work";
@@ -19,6 +12,14 @@ import { ListAccounts } from "@pochimail/core/use-cases/list-accounts";
 import { ManageSettings } from "@pochimail/core/use-cases/manage-settings";
 import { RunScan } from "@pochimail/core/use-cases/run-scan";
 import { ScanRunner } from "@pochimail/core/use-cases/scan-runner";
+import type { Clock } from "@pochimail/kernel/clock";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import type { Logger } from "@pochimail/logger/logger";
+import type { Timer } from "@pochimail/pipeline/event-batching";
+import { createInMemoryEventBus } from "@pochimail/pipeline/in-memory-event-bus";
+import type { JobQueue } from "@pochimail/pipeline/job-queue";
+import type { OutboxStore } from "@pochimail/pipeline/outbox";
+import { createOutboxRelay } from "@pochimail/pipeline/outbox-relay";
 import type { Handlers } from "../shared/ipc/server.ts";
 import { createHandlers } from "./handlers.ts";
 
@@ -53,7 +54,11 @@ export interface WorkerApp {
 /** The worker's composition root: core use cases wired to the adapters it is given, behind the typed IPC handlers. */
 export function createWorkerApp(adapters: WorkerAdapters): WorkerApp {
   const { uow, workspaceId, clock } = adapters;
-  const bus = createInMemoryEventBus({ logger: adapters.logger, timer: adapters.timer });
+  const bus = createInMemoryEventBus({
+    parse: parseDomainEvent,
+    logger: adapters.logger,
+    timer: adapters.timer,
+  });
   const relay = createOutboxRelay({ store: adapters.outboxStore, bus, queue: adapters.queue });
 
   // One drain at a time, so a row is never delivered twice by two overlapping drains.

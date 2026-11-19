@@ -207,6 +207,9 @@ importers:
       '@pochimail/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@pochimail/kernel':
+        specifier: workspace:*
+        version: link:../../packages/kernel
       '@pochimail/testing':
         specifier: workspace:*
         version: link:../../packages/testing
@@ -229,6 +232,15 @@ importers:
 
   apps/desktop:
     dependencies:
+      '@pochimail/kernel':
+        specifier: workspace:*
+        version: link:../../packages/kernel
+      '@pochimail/logger':
+        specifier: workspace:*
+        version: link:../../packages/logger
+      '@pochimail/pipeline':
+        specifier: workspace:*
+        version: link:../../packages/pipeline
       better-sqlite3-multiple-ciphers:
         specifier: 13.1.1
         version: 13.1.1
@@ -353,6 +365,12 @@ importers:
 
   packages/core:
     dependencies:
+      '@pochimail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@pochimail/pipeline':
+        specifier: workspace:*
+        version: link:../pipeline
       zod:
         specifier: 4.6.7
         version: 4.6.7
@@ -372,6 +390,12 @@ importers:
       '@pochimail/core':
         specifier: workspace:*
         version: link:../core
+      '@pochimail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@pochimail/pipeline':
+        specifier: workspace:*
+        version: link:../pipeline
       better-sqlite3-multiple-ciphers:
         specifier: 13.1.1
         version: 13.1.1
@@ -395,11 +419,48 @@ importers:
         specifier: 5.1.0
         version: 5.1.0(@types/node@26.6.6)(jsdom@31.0.1(@noble/hashes@1.8.0))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
 
+  packages/kernel:
+    devDependencies:
+      '@pochimail/typescript-config':
+        specifier: workspace:*
+        version: link:../../tooling/typescript
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: 5.1.0
+        version: 5.1.0(@types/node@26.6.6)(jsdom@31.0.1(@noble/hashes@1.8.0))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+
+  packages/logger:
+    dependencies:
+      '@pochimail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+    devDependencies:
+      '@pochimail/typescript-config':
+        specifier: workspace:*
+        version: link:../../tooling/typescript
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: 5.1.0
+        version: 5.1.0(@types/node@26.6.6)(jsdom@31.0.1(@noble/hashes@1.8.0))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+
   packages/mail:
     dependencies:
       '@pochimail/core':
         specifier: workspace:*
         version: link:../core
+      '@pochimail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@pochimail/logger':
+        specifier: workspace:*
+        version: link:../logger
+      '@pochimail/pipeline':
+        specifier: workspace:*
+        version: link:../pipeline
       zod:
         specifier: 4.6.7
         version: 4.6.7
@@ -420,8 +481,36 @@ importers:
         specifier: 5.1.0
         version: 5.1.0(@types/node@26.6.6)(jsdom@31.0.1(@noble/hashes@1.8.0))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
 
+  packages/pipeline:
+    dependencies:
+      '@pochimail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@pochimail/logger':
+        specifier: workspace:*
+        version: link:../logger
+    devDependencies:
+      '@pochimail/typescript-config':
+        specifier: workspace:*
+        version: link:../../tooling/typescript
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: 5.1.0
+        version: 5.1.0(@types/node@26.6.6)(jsdom@31.0.1(@noble/hashes@1.8.0))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+
   packages/testing:
     dependencies:
+      '@pochimail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@pochimail/logger':
+        specifier: workspace:*
+        version: link:../logger
+      '@pochimail/pipeline':
+        specifier: workspace:*
+        version: link:../pipeline
       zod:
         specifier: 4.6.7
         version: 4.6.7

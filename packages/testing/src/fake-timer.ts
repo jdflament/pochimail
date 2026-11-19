@@ -1,4 +1,4 @@
-import type { Timer } from "@pochimail/core/events/batching";
+import type { Timer } from "@pochimail/pipeline/event-batching";
 
 export type FakeTimer = Timer & { advance(ms: number): void };
 

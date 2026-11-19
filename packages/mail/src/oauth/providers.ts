@@ -1,7 +1,7 @@
 import type { ProviderKind } from "@pochimail/core/domain/account";
 import { MissingClientConfig } from "@pochimail/core/errors";
 import type { AutonomyLevel } from "@pochimail/core/policies/autonomy";
-import { err, ok, type Result } from "@pochimail/core/result";
+import { err, ok, type Result } from "@pochimail/kernel/result";
 
 /**
  * The two OAuth providers of v1 (ADR 0007). Yahoo, iCloud and other IMAP accounts use app

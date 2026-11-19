@@ -1,24 +1,22 @@
-import { EventError } from "../errors.ts";
-import type { Logger } from "../logger.ts";
-import type { Unsubscribe } from "../ports/common.ts";
-import {
-  DEFAULT_HANDLER_TIMEOUT_MS,
-  type EventBus,
-  type EventBusOptions,
-} from "../ports/event-bus.ts";
-import { err, ok } from "../result.ts";
-import type { Timer } from "./batching.ts";
-import { type DomainEvent, type DomainEventType, domainEventSchema } from "./catalog.ts";
+import type { Unsubscribe } from "@pochimail/kernel/common";
+import { EventError } from "@pochimail/kernel/errors";
+import type { EventEnvelope } from "@pochimail/kernel/event";
+import { err, ok } from "@pochimail/kernel/result";
+import type { Logger } from "@pochimail/logger/logger";
+import type { Timer } from "./event-batching.ts";
+import { DEFAULT_HANDLER_TIMEOUT_MS, type EventBus, type EventBusOptions } from "./event-bus.ts";
 
-export type InMemoryEventBusOptions = EventBusOptions & {
+export type InMemoryEventBusOptions<E extends EventEnvelope> = EventBusOptions & {
+  /** Validates untrusted input against the owner's event catalog; `undefined` rejects it. */
+  readonly parse: (input: unknown) => E | undefined;
   /** Handler failures are logged through this (redacting) Logger, never a raw sink. */
   readonly logger: Logger;
   readonly timer: Timer;
 };
 
 type Subscriber = {
-  readonly types: ReadonlySet<DomainEventType> | "all";
-  readonly handler: (event: DomainEvent) => void | Promise<void>;
+  readonly types: ReadonlySet<string> | "all";
+  readonly handler: (event: EventEnvelope) => void | Promise<void>;
   active: boolean;
   /** Tail of this subscriber's queue: keeps its own events in publish order. */
   tail: Promise<void>;
@@ -26,8 +24,10 @@ type Subscriber = {
 
 const TIMED_OUT = Symbol("timed out");
 
-/** Implements the M1-03 `EventBus` port over the typed catalog. `publish` re-validates untrusted input. */
-export function createInMemoryEventBus(options: InMemoryEventBusOptions): EventBus<DomainEvent> {
+/** Implements the M1-03 `EventBus` port over the owner's typed catalog. `publish` re-validates untrusted input. */
+export function createInMemoryEventBus<E extends EventEnvelope>(
+  options: InMemoryEventBusOptions<E>,
+): EventBus<E> {
   const timeoutMs = options.handlerTimeoutMs ?? DEFAULT_HANDLER_TIMEOUT_MS;
   const subscribers = new Set<Subscriber>();
 
@@ -39,7 +39,7 @@ export function createInMemoryEventBus(options: InMemoryEventBusOptions): EventB
     }
   }
 
-  async function deliver(subscriber: Subscriber, event: DomainEvent): Promise<void> {
+  async function deliver(subscriber: Subscriber, event: EventEnvelope): Promise<void> {
     // Checked at delivery time: an unsubscribe also cancels events still queued.
     if (!subscriber.active) return;
     let cancel = () => {};
@@ -70,9 +70,8 @@ export function createInMemoryEventBus(options: InMemoryEventBusOptions): EventB
 
   return {
     async publish(input: unknown) {
-      const parsed = domainEventSchema.safeParse(input);
-      if (!parsed.success) return err(new EventError());
-      const event = parsed.data;
+      const event = options.parse(input);
+      if (!event) return err(new EventError());
       const pending: Promise<void>[] = [];
       for (const subscriber of [...subscribers]) {
         if (subscriber.types !== "all" && !subscriber.types.has(event.type)) continue;
@@ -83,7 +82,7 @@ export function createInMemoryEventBus(options: InMemoryEventBusOptions): EventB
       return ok(undefined);
     },
     subscribe(type, handler) {
-      return add(new Set<DomainEventType>([type]), handler as Subscriber["handler"]);
+      return add(new Set<string>([type]), handler as Subscriber["handler"]);
     },
   };
 }

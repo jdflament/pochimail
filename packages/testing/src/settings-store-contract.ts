@@ -1,10 +1,10 @@
-import type { WorkspaceId } from "@pochimail/core/ids";
 import {
   type AppSettings,
   DEFAULT_APP_SETTINGS,
   type SettingsStore,
 } from "@pochimail/core/ports/settings-store";
-import { unwrap } from "@pochimail/core/result";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { unwrap } from "@pochimail/kernel/result";
 import { expect } from "vitest";
 import { type Check, check, registerContract } from "./contract.ts";
 

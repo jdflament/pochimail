@@ -1,5 +1,5 @@
-import type { CancelSignal } from "@pochimail/core/ports/common";
-import type { Scheduler } from "@pochimail/core/ports/scheduler";
+import type { CancelSignal } from "@pochimail/kernel/common";
+import type { Scheduler } from "@pochimail/pipeline/scheduler";
 import type { FakeClock } from "./fake-clock.ts";
 
 export interface FakeScheduler extends Scheduler {

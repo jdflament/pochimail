@@ -1,20 +1,15 @@
-import type { Clock } from "../clock.ts";
+import type { Clock } from "@pochimail/kernel/clock";
+import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
+import { Cancelled, type DomainError, type StorageError } from "@pochimail/kernel/errors";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { ok } from "@pochimail/kernel/result";
+import type { JobRequest } from "@pochimail/pipeline/job-queue";
 import { type IncomingMessage, incomingMessageSchema, type Thread } from "../domain/mail.ts";
-import {
-  AuthExpired,
-  Cancelled,
-  type DomainError,
-  type NotFound,
-  RateLimited,
-  type StorageError,
-} from "../errors.ts";
+import { AuthExpired, type NotFound, RateLimited } from "../errors.ts";
 import type { DomainEvent, DomainEventOf, DomainEventType } from "../events/catalog.ts";
-import type { AccountId, WorkspaceId } from "../ids.ts";
-import type { AsyncResult, CancelSignal } from "../ports/common.ts";
-import type { JobRequest } from "../ports/job-queue.ts";
+import type { AccountId } from "../ids.ts";
 import type { MailProvider, SyncCursor } from "../ports/mail-provider.ts";
 import type { Transaction, UnitOfWork } from "../ports/unit-of-work.ts";
-import { ok } from "../result.ts";
 import { type AccountState, accountStateEvent } from "./account-state.ts";
 
 /** Job type enqueued to resume a rate-limited sync; a worker maps it back to this use case. */

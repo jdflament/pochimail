@@ -1,0 +1,28 @@
+{
+  "name": "@pochimail/kernel",
+  "private": true,
+  "version": "0.0.0",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "exports": {
+    "./clock": "./src/clock.ts",
+    "./common": "./src/common.ts",
+    "./errors": "./src/errors.ts",
+    "./event": "./src/event.ts",
+    "./id-generator": "./src/id-generator.ts",
+    "./ids": "./src/ids.ts",
+    "./result": "./src/result.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc",
+    "lint": "biome check .",
+    "knip": "knip",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@pochimail/typescript-config": "workspace:*",
+    "typescript": "7.0.2",
+    "vitest": "5.1.0"
+  },
+  "dependencies": {}
+}

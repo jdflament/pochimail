@@ -1,8 +1,9 @@
+import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
+import type { Cancelled } from "@pochimail/kernel/errors";
 import type { Category } from "../domain/category.ts";
 import type { IncomingMessage } from "../domain/mail.ts";
-import type { AiUnavailable, Cancelled } from "../errors.ts";
+import type { AiUnavailable } from "../errors.ts";
 import type { MessageId } from "../ids.ts";
-import type { AsyncResult, CancelSignal } from "./common.ts";
 
 export type AiError = AiUnavailable | Cancelled;
 

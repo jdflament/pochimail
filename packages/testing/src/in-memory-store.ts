@@ -9,14 +9,16 @@ import type {
   Thread,
   Topic,
 } from "@pochimail/core/domain/mail";
-import { Cancelled, NotFound, StorageError } from "@pochimail/core/errors";
-import type { WorkspaceId } from "@pochimail/core/ids";
-import type { AsyncResult, CancelSignal, Page, PageRequest } from "@pochimail/core/ports/common";
+import { NotFound } from "@pochimail/core/errors";
+import type { Page, PageRequest } from "@pochimail/core/ports/common";
 import type { SyncCursor } from "@pochimail/core/ports/mail-provider";
-import type { OutboxRecord, OutboxStore } from "@pochimail/core/ports/outbox";
 import type { ReadRepositories, WriteRepositories } from "@pochimail/core/ports/repositories";
-import type { OutboxEntry, Transaction, UnitOfWork } from "@pochimail/core/ports/unit-of-work";
-import { err, ok, type Result } from "@pochimail/core/result";
+import type { Transaction, UnitOfWork } from "@pochimail/core/ports/unit-of-work";
+import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
+import { Cancelled, StorageError } from "@pochimail/kernel/errors";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { err, ok, type Result } from "@pochimail/kernel/result";
+import type { OutboxEntry, OutboxRecord, OutboxStore } from "@pochimail/pipeline/outbox";
 import { createFaults, type Faults } from "./faults.ts";
 
 interface Data {

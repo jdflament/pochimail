@@ -51,12 +51,27 @@ module.exports = {
       name: "adapters-are-independent",
       severity: "error",
       comment:
-        "An adapter implements domain ports. It never imports another adapter (gmail and graph may use net), workflows, pipeline, ui or apps.",
+        "An adapter implements domain ports. It never imports another adapter (gmail and graph may use net), workflows, ui or apps. Pipeline is covered by adapters-use-only-pipeline-ports.",
       from: { path: `^packages/(${ADAPTERS})/src/`, pathNot: NOT_SHIPPED },
       to: {
-        path: `^apps/|^packages/(${ADAPTERS}|workflows|pipeline|ui|testing)/`,
+        path: `^apps/|^packages/(${ADAPTERS}|workflows|ui|testing)/`,
         pathNot: ["^packages/$1/src/", "^packages/net/src/"],
       },
+    },
+    {
+      name: "adapters-use-only-pipeline-ports",
+      severity: "error",
+      comment:
+        "Only db may import pipeline, and only the JobQueue and OutboxStore ports it implements (job-queue.ts, outbox.ts). No adapter runs pipeline code.",
+      from: { path: `^packages/(${ADAPTERS})/src/`, pathNot: [NOT_SHIPPED, "^packages/db/src/"] },
+      to: { path: "^packages/pipeline/src/" },
+    },
+    {
+      name: "db-uses-only-pipeline-ports",
+      severity: "error",
+      comment: "db implements pipeline's JobQueue and OutboxStore ports and nothing else of pipeline.",
+      from: { path: "^packages/db/src/", pathNot: NOT_SHIPPED },
+      to: { path: "^packages/pipeline/src/", pathNot: "^packages/pipeline/src/(job-queue|outbox)\\.ts$" },
     },
     {
       name: "only-mail-adapters-use-net",
@@ -103,7 +118,7 @@ module.exports = {
       comment:
         "Transitional until packages/core is split into domains (ADR 0015); delete this rule with the package.",
       from: { path: "^packages/core/src/" },
-      to: { path: "^(packages|apps)/", pathNot: "^packages/core/src/" },
+      to: { path: "^(packages|apps)/", pathNot: "^packages/(core|kernel|pipeline)/src/" },
     },
     {
       name: "legacy-core-npm-allowlist",
@@ -134,7 +149,7 @@ module.exports = {
       name: "legacy-adapters-depend-on-core-only",
       severity: "error",
       comment:
-        "db, mail, ai and pipeline implement core ports. They never import each other or the UI: the composition root (apps) wires them together. They may use the logger.",
+        "db, mail and ai implement core ports. They never import each other or the UI: the composition root (apps) wires them together. They may use the logger and pipeline.",
       from: { path: "^packages/(db|mail|ai)/src/" },
       to: {
         path: "^(packages|apps)/",
@@ -142,19 +157,19 @@ module.exports = {
         pathNot: [
           "^packages/core/src/",
           "^packages/$1/src/",
-          "^packages/logger/src/",
+          "^packages/(logger|pipeline)/src/",
           "^packages/testing/",
           `^packages/(${DOMAINS}|kernel|net)/src/`,
         ],
       },
     },
     {
-      name: "logger-is-standalone",
+      name: "logger-depends-only-on-kernel",
       severity: "error",
       comment:
-        "The logger and its redaction are privacy-critical and used by every process; they depend on nothing of ours so they can be tested exhaustively on their own (ADR 0015).",
+        "The logger and its redaction are privacy-critical and used by every process; they depend only on kernel (its error codes and id shape) so they can be tested exhaustively on their own (ADR 0015).",
       from: { path: "^packages/logger/src/" },
-      to: { path: "^(packages|apps)/", pathNot: "^packages/logger/src/" },
+      to: { path: "^(packages|apps)/", pathNot: "^packages/(logger|kernel)/src/" },
     },
     {
       name: "ui-is-presentational",

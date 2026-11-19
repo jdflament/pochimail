@@ -1,4 +1,4 @@
-import type { CancelSignal } from "@pochimail/core/ports/common";
+import type { CancelSignal } from "@pochimail/kernel/common";
 import { egressPolicy } from "../egress/allowlist.ts";
 import { createHttpClient, type HttpClient, type HttpClientError } from "../egress/http-client.ts";
 

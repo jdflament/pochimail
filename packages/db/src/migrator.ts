@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync } from "node:fs";
-import { StorageError } from "@pochimail/core/errors";
-import { err, ok, type Result } from "@pochimail/core/result";
+import { StorageError } from "@pochimail/kernel/errors";
+import { err, ok, type Result } from "@pochimail/kernel/result";
 import type { Database } from "better-sqlite3-multiple-ciphers";
 
 export interface Migration {

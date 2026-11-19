@@ -1,7 +1,7 @@
-import type { StorageError } from "../errors.ts";
-import type { WorkspaceId } from "../ids.ts";
+import type { AsyncResult } from "@pochimail/kernel/common";
+import type { StorageError } from "@pochimail/kernel/errors";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
 import { AUTONOMY_LEVELS, type AutonomyLevel } from "../policies/autonomy.ts";
-import type { AsyncResult } from "./common.ts";
 
 /** Workspace-wide preferences the Settings screen edits. Defaults are the safe ones: suggest only, counts-only notifications. */
 export interface AppSettings {

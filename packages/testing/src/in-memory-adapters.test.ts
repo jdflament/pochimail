@@ -1,6 +1,7 @@
-import { Offline, RateLimited, StorageError } from "@pochimail/core/errors";
-import type { WorkspaceId } from "@pochimail/core/ids";
-import { ok } from "@pochimail/core/result";
+import { Offline, RateLimited } from "@pochimail/core/errors";
+import { StorageError } from "@pochimail/kernel/errors";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { ok } from "@pochimail/kernel/result";
 import { describe, expect, it } from "vitest";
 import { classifierContract, embedderContract, llmProviderContract } from "./ai-contract.ts";
 import { blobStoreContract } from "./blob-store-contract.ts";

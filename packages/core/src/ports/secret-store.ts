@@ -1,5 +1,5 @@
-import type { StorageError } from "../errors.ts";
-import type { AsyncResult } from "./common.ts";
+import type { AsyncResult } from "@pochimail/kernel/common";
+import type { StorageError } from "@pochimail/kernel/errors";
 
 /** OS keychain. Values (tokens, keys) never reach a log or a file. */
 export interface SecretStore {

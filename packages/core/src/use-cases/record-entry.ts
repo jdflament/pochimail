@@ -1,6 +1,6 @@
+import type { AsyncResult } from "@pochimail/kernel/common";
+import type { Cancelled, ErrorCode, StorageError } from "@pochimail/kernel/errors";
 import type { ActionLog } from "../domain/action.ts";
-import type { Cancelled, ErrorCode, StorageError } from "../errors.ts";
-import type { AsyncResult } from "../ports/common.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
 import { actionEvent } from "./action-events.ts";
 

@@ -1,3 +1,4 @@
+import { ERROR_CODES } from "@pochimail/kernel/errors";
 import { z } from "zod";
 import { providerKindSchema } from "../domain/account.ts";
 import { ACTION_KINDS } from "../domain/action.ts";
@@ -13,7 +14,6 @@ import {
   timestampSchema,
   workspaceIdSchema,
 } from "../domain/common.ts";
-import { ERROR_CODES } from "../errors.ts";
 
 /**
  * Payloads carry IDs, enums and counts only: never subjects, addresses or bodies (AGENTS §5).
@@ -111,3 +111,9 @@ export const domainEventSchema = z.discriminatedUnion("type", [
 export type DomainEvent = z.infer<typeof domainEventSchema>;
 export type DomainEventType = DomainEvent["type"];
 export type DomainEventOf<T extends DomainEventType> = Extract<DomainEvent, { type: T }>;
+
+/** Validates untrusted input; the bus takes this as its `parse`. */
+export function parseDomainEvent(input: unknown): DomainEvent | undefined {
+  const parsed = domainEventSchema.safeParse(input);
+  return parsed.success ? parsed.data : undefined;
+}

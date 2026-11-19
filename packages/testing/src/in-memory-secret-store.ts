@@ -1,6 +1,6 @@
-import type { StorageError } from "@pochimail/core/errors";
 import type { SecretStore } from "@pochimail/core/ports/secret-store";
-import { err, ok } from "@pochimail/core/result";
+import type { StorageError } from "@pochimail/kernel/errors";
+import { err, ok } from "@pochimail/kernel/result";
 import { createFaults, type Faults } from "./faults.ts";
 
 export interface InMemorySecretStore extends SecretStore {

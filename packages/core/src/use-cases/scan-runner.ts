@@ -1,9 +1,11 @@
+import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
+import type { StorageError } from "@pochimail/kernel/errors";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { err, ok, type Result } from "@pochimail/kernel/result";
 import type { Account } from "../domain/account.ts";
-import { InvalidStateError, NotFound, type StorageError } from "../errors.ts";
-import type { AccountId, WorkspaceId } from "../ids.ts";
-import type { AsyncResult, CancelSignal } from "../ports/common.ts";
+import { InvalidStateError, NotFound } from "../errors.ts";
+import type { AccountId } from "../ids.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
-import { err, ok, type Result } from "../result.ts";
 import type { RunScan } from "./run-scan.ts";
 
 export type ScanJobStatus = "running" | "paused" | "completed" | "cancelled" | "failed";

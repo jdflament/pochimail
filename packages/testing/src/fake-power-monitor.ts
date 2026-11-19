@@ -1,4 +1,4 @@
-import type { PowerMonitor, PowerState } from "@pochimail/core/ports/power-monitor";
+import type { PowerMonitor, PowerState } from "@pochimail/pipeline/power-monitor";
 
 export interface FakePowerMonitor extends PowerMonitor {
   /** Changes part of the state and tells listeners if anything changed. */

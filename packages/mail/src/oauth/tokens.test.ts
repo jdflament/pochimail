@@ -1,6 +1,7 @@
-import { Cancelled, Offline, StorageError } from "@pochimail/core/errors";
+import { Offline } from "@pochimail/core/errors";
 import type { SecretStore } from "@pochimail/core/ports/secret-store";
-import { err } from "@pochimail/core/result";
+import { Cancelled, StorageError } from "@pochimail/kernel/errors";
+import { err } from "@pochimail/kernel/result";
 import { createFakeClock } from "@pochimail/testing/fake-clock";
 import { startFakeOAuthServer } from "@pochimail/testing/fake-oauth-server";
 import { createInMemorySecretStore } from "@pochimail/testing/in-memory-secret-store";

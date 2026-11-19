@@ -1,4 +1,4 @@
-import type { CancelSignal, Unsubscribe } from "./common.ts";
+import type { CancelSignal, Unsubscribe } from "@pochimail/kernel/common";
 
 /** Runs background work. Each task receives a signal that aborts when its schedule is cancelled. */
 export interface Scheduler {

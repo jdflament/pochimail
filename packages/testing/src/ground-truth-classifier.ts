@@ -1,7 +1,8 @@
 import type { Category } from "@pochimail/core/domain/category";
-import { AiUnavailable, Cancelled } from "@pochimail/core/errors";
+import { AiUnavailable } from "@pochimail/core/errors";
 import type { AiError, Classification, Classifier } from "@pochimail/core/ports/ai";
-import { err, ok } from "@pochimail/core/result";
+import { Cancelled } from "@pochimail/kernel/errors";
+import { err, ok } from "@pochimail/kernel/result";
 import { createFaults, type Faults } from "./faults.ts";
 
 export interface GroundTruthClassifier extends Classifier {

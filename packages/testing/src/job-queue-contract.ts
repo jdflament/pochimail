@@ -1,6 +1,6 @@
-import type { WorkspaceId } from "@pochimail/core/ids";
-import type { JobQueue } from "@pochimail/core/ports/job-queue";
-import { unwrap } from "@pochimail/core/result";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { unwrap } from "@pochimail/kernel/result";
+import type { JobQueue } from "@pochimail/pipeline/job-queue";
 import { expect } from "vitest";
 import { type Check, check, registerContract } from "./contract.ts";
 import type { FakeClock } from "./fake-clock.ts";

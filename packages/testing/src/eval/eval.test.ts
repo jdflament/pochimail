@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import type { Category } from "@pochimail/core/domain/category";
 import type { Classifier } from "@pochimail/core/ports/ai";
-import { ok } from "@pochimail/core/result";
+import { ok } from "@pochimail/kernel/result";
 import { describe, expect, it } from "vitest";
 import { generateMailbox } from "../fixture-mailbox/generator.ts";
 import { readMailbox } from "../fixture-mailbox/mailbox-reader.ts";

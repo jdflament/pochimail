@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import type { BlobStore } from "@pochimail/core/ports/blob-store";
-import { unwrap } from "@pochimail/core/result";
+import { unwrap } from "@pochimail/kernel/result";
 import { expect } from "vitest";
 import { type Check, check, registerContract } from "./contract.ts";
 

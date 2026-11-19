@@ -1,5 +1,5 @@
-import type { Logger } from "@pochimail/core/logger";
-import { err, ok, type Result } from "@pochimail/core/result";
+import { err, ok, type Result } from "@pochimail/kernel/result";
+import type { Logger } from "@pochimail/logger/logger";
 import { canonicalHost, type HostAllowlist } from "./allowlist.ts";
 
 export interface HttpRequest {

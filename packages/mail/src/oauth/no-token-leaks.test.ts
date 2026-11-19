@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { createLogger } from "@pochimail/core/logger";
 import { accountSecretKey, ConnectAccount } from "@pochimail/core/use-cases/connect-account";
+import { createLogger } from "@pochimail/logger/logger";
 import { createFakeClock } from "@pochimail/testing/fake-clock";
 import { startFakeOAuthServer } from "@pochimail/testing/fake-oauth-server";
 import { WS_A } from "@pochimail/testing/fixtures";

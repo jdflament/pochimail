@@ -1,5 +1,5 @@
-import { createLogger, type LogRecord } from "@pochimail/core/logger";
-import { err, ok } from "@pochimail/core/result";
+import { err, ok } from "@pochimail/kernel/result";
+import { createLogger, type LogRecord } from "@pochimail/logger/logger";
 import { describe, expect, it } from "vitest";
 import { DatabaseKeyError } from "./storage-key.ts";
 import { bootWorker } from "./worker-start.ts";

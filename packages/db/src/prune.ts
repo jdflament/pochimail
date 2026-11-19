@@ -1,6 +1,6 @@
-import type { Clock } from "@pochimail/core/clock";
-import { StorageError } from "@pochimail/core/errors";
-import { err, ok, type Result } from "@pochimail/core/result";
+import type { Clock } from "@pochimail/kernel/clock";
+import { StorageError } from "@pochimail/kernel/errors";
+import { err, ok, type Result } from "@pochimail/kernel/result";
 import { exclusiveResult, type Storage } from "./open-storage.ts";
 
 export interface PruneReport {

@@ -1,5 +1,5 @@
-import { createLogger } from "@pochimail/core/logger";
 import type { Classifier } from "@pochimail/core/ports/ai";
+import { createLogger } from "@pochimail/logger/logger";
 import { createFakeClassifier } from "@pochimail/testing/fake-ai";
 import { createFakeClock } from "@pochimail/testing/fake-clock";
 import { createFakeMailProvider } from "@pochimail/testing/fake-mail-provider";

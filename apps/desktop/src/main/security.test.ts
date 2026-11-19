@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { FuseV1Options } from "@electron/fuses";
 import { AccountId } from "@pochimail/core/ids";
-import { unwrap } from "@pochimail/core/result";
+import { unwrap } from "@pochimail/kernel/result";
 import { BlockedSocketError, egressPolicy } from "@pochimail/mail/egress/allowlist";
 import { BlockedHostError, createHttpClient } from "@pochimail/mail/egress/http-client";
 import type { WebContents } from "electron";

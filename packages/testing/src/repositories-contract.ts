@@ -1,6 +1,6 @@
 import type { AccountId, ActionId, MessageId, TopicId } from "@pochimail/core/ids";
 import type { Page } from "@pochimail/core/ports/common";
-import { ok, unwrap } from "@pochimail/core/result";
+import { ok, unwrap } from "@pochimail/kernel/result";
 import { expect } from "vitest";
 import { type Check, check, registerContract } from "./contract.ts";
 import { makeDerived } from "./derived-contract.ts";

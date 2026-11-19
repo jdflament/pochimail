@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
-import type { Logger } from "@pochimail/core/logger";
-import { err, ok, type Result } from "@pochimail/core/result";
+import { err, ok, type Result } from "@pochimail/kernel/result";
+import type { Logger } from "@pochimail/logger/logger";
 import { SecretStoreError } from "../shared/secret-error.ts";
 import { writeFileAtomic } from "./atomic-write.ts";
 import { type KeyProtection, type KeyVault, keyProtection } from "./storage-key.ts";

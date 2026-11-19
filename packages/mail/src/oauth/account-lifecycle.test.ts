@@ -1,11 +1,12 @@
 import type { Account } from "@pochimail/core/domain/account";
-import { AuthExpired, Cancelled } from "@pochimail/core/errors";
+import { AuthExpired } from "@pochimail/core/errors";
 import { domainEventSchema } from "@pochimail/core/events/catalog";
-import type { OutboxEntry } from "@pochimail/core/ports/unit-of-work";
 import { accountSecretKey, ConnectAccount } from "@pochimail/core/use-cases/connect-account";
 import { MarkAccountNeedsReauth } from "@pochimail/core/use-cases/mark-account-needs-reauth";
 import { RemoveAccount } from "@pochimail/core/use-cases/remove-account";
 import { RunIncrementalSync } from "@pochimail/core/use-cases/run-incremental-sync";
+import { Cancelled } from "@pochimail/kernel/errors";
+import type { OutboxEntry } from "@pochimail/pipeline/outbox";
 import { createFakeClock } from "@pochimail/testing/fake-clock";
 import { createFakeMailProvider } from "@pochimail/testing/fake-mail-provider";
 import { startFakeOAuthServer } from "@pochimail/testing/fake-oauth-server";

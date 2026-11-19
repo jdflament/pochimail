@@ -1,7 +1,8 @@
 import { createHash } from "node:crypto";
-import { Cancelled, NotFound, type StorageError } from "@pochimail/core/errors";
+import { NotFound } from "@pochimail/core/errors";
 import type { BlobStore } from "@pochimail/core/ports/blob-store";
-import { err, ok } from "@pochimail/core/result";
+import { Cancelled, type StorageError } from "@pochimail/kernel/errors";
+import { err, ok } from "@pochimail/kernel/result";
 import { createFaults, type Faults } from "./faults.ts";
 
 export interface InMemoryBlobStore extends BlobStore {

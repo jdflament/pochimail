@@ -2,7 +2,7 @@ import { randomBytes } from "node:crypto";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createLogger } from "@pochimail/core/logger";
+import { createLogger } from "@pochimail/logger/logger";
 import {
   app,
   BrowserWindow,

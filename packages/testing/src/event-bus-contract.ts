@@ -1,6 +1,6 @@
 import type { DomainEvent } from "@pochimail/core/events/catalog";
-import { createLogger, type LogRecord } from "@pochimail/core/logger";
-import type { EventBus } from "@pochimail/core/ports/event-bus";
+import { createLogger, type LogRecord } from "@pochimail/logger/logger";
+import type { EventBus } from "@pochimail/pipeline/event-bus";
 import { describe, expect, it } from "vitest";
 import { sampleClassified, sampleEvent } from "./event-samples.ts";
 import { createFakeTimer, type FakeTimer } from "./fake-timer.ts";

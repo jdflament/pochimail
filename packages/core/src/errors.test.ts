@@ -1,17 +1,14 @@
+import { Cancelled, DomainError, EventError, StorageError } from "@pochimail/kernel/errors";
+import { expect, it } from "vitest";
 import {
   AiUnavailable,
   AuthExpired,
-  Cancelled,
   Conflict,
-  DomainError,
-  EventError,
   NotFound,
   Offline,
   ProviderError,
   RateLimited,
-  StorageError,
-} from "@pochimail/core/errors";
-import { expect, it } from "vitest";
+} from "./errors.ts";
 
 // Guards: callers branch on stable codes; renaming a class or message must not change them.
 it("exposes stable codes and a shared hierarchy for every provider failure", () => {

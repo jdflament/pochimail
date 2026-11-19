@@ -1,19 +1,8 @@
-import type { EventError } from "../errors.ts";
-import type { WorkspaceId } from "../ids.ts";
-import type { AsyncResult, Unsubscribe } from "./common.ts";
+import type { AsyncResult, Unsubscribe } from "@pochimail/kernel/common";
+import type { EventError } from "@pochimail/kernel/errors";
+import type { EventEnvelope } from "@pochimail/kernel/event";
 
-/**
- * The least the bus needs to know about an event; the typed catalog (M1-04) refines it.
- * Events carry IDs and enums only, never subjects, addresses or bodies.
- * `id` lets handlers be idempotent under at-least-once delivery.
- */
-export interface BusEvent {
-  readonly id: string;
-  readonly type: string;
-  readonly workspaceId: WorkspaceId;
-}
-
-export type EventHandler<E extends BusEvent> = (event: E) => Promise<void> | void;
+export type EventHandler<E extends EventEnvelope> = (event: E) => Promise<void> | void;
 
 export interface EventBusOptions {
   /** Per-handler time limit; a handler still running after it counts as failed. Default 30 000. */
@@ -36,7 +25,7 @@ export const DEFAULT_HANDLER_TIMEOUT_MS = 30_000;
  *   **handlers must be idempotent** (key on `event.id`).
  * - `subscribe` returns an `Unsubscribe`; calling it more than once is harmless.
  */
-export interface EventBus<E extends BusEvent = BusEvent> {
+export interface EventBus<E extends EventEnvelope = EventEnvelope> {
   publish(event: E): AsyncResult<void, EventError>;
   subscribe<T extends E["type"]>(
     type: T,

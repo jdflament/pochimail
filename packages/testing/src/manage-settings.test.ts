@@ -1,7 +1,7 @@
-import type { WorkspaceId } from "@pochimail/core/ids";
 import type { AppSettings, SettingsStore } from "@pochimail/core/ports/settings-store";
-import { unwrap } from "@pochimail/core/result";
 import { ManageSettings } from "@pochimail/core/use-cases/manage-settings";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { unwrap } from "@pochimail/kernel/result";
 import { expect, it } from "vitest";
 
 const WS = "ws-1" as WorkspaceId;

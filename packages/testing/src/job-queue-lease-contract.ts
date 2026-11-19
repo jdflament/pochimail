@@ -1,8 +1,8 @@
-import type { ErrorCode } from "@pochimail/core/errors";
-import type { WorkspaceId } from "@pochimail/core/ids";
-import { nackJob, type RetryPolicy } from "@pochimail/core/jobs/retry";
-import type { Job, JobQueue } from "@pochimail/core/ports/job-queue";
-import { unwrap } from "@pochimail/core/result";
+import type { ErrorCode } from "@pochimail/kernel/errors";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { unwrap } from "@pochimail/kernel/result";
+import type { Job, JobQueue } from "@pochimail/pipeline/job-queue";
+import { nackJob, type RetryPolicy } from "@pochimail/pipeline/retry";
 import { describe, expect, it } from "vitest";
 import type { FakeClock } from "./fake-clock.ts";
 

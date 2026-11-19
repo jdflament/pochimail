@@ -1,5 +1,5 @@
-import type { Logger } from "@pochimail/core/logger";
-import type { Result } from "@pochimail/core/result";
+import type { Result } from "@pochimail/kernel/result";
+import type { Logger } from "@pochimail/logger/logger";
 import type { MessageChannelMain, MessagePortMain } from "electron";
 import { serveOpenBrowser } from "../shared/ipc/open-browser.ts";
 import { serveSecrets } from "../shared/ipc/secrets.ts";

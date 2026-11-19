@@ -1,10 +1,12 @@
-import { type DomainError, Offline, StorageError } from "@pochimail/core/errors";
-import type { AccountId, WorkspaceId } from "@pochimail/core/ids";
-import { createPipeline, type PipelineSource, type Stage } from "@pochimail/core/jobs/pipeline";
-import type { RetryPolicy } from "@pochimail/core/jobs/retry";
-import type { JobQueue } from "@pochimail/core/ports/job-queue";
+import { Offline } from "@pochimail/core/errors";
+import type { AccountId } from "@pochimail/core/ids";
 import type { CursorRepository } from "@pochimail/core/ports/repositories";
-import { err, ok, unwrap } from "@pochimail/core/result";
+import { type DomainError, StorageError } from "@pochimail/kernel/errors";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { err, ok, unwrap } from "@pochimail/kernel/result";
+import type { JobQueue } from "@pochimail/pipeline/job-queue";
+import { createPipeline, type PipelineSource, type Stage } from "@pochimail/pipeline/job-runner";
+import type { RetryPolicy } from "@pochimail/pipeline/retry";
 import { describe, expect, it } from "vitest";
 import type { FakeClock } from "./fake-clock.ts";
 
@@ -62,9 +64,11 @@ export function runPipelineContract(
       let b = createPipeline<string>({
         name: "sync",
         workspaceId: ws,
-        accountId: account,
         source,
-        cursors: h.cursors,
+        cursors: {
+          get: (scope) => h.cursors.get(ws, account, scope),
+          set: (cursor) => h.cursors.set(ws, account, cursor),
+        },
         queue: h.queue,
         clock: h.clock,
         random: () => 0,

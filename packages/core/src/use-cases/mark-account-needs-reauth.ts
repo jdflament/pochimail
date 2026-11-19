@@ -1,9 +1,11 @@
-import type { Clock } from "../clock.ts";
-import { Cancelled, type NotFound, type StorageError } from "../errors.ts";
-import type { AccountId, WorkspaceId } from "../ids.ts";
-import type { AsyncResult, CancelSignal } from "../ports/common.ts";
+import type { Clock } from "@pochimail/kernel/clock";
+import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
+import { Cancelled, type StorageError } from "@pochimail/kernel/errors";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { err, ok } from "@pochimail/kernel/result";
+import type { NotFound } from "../errors.ts";
+import type { AccountId } from "../ids.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
-import { err, ok } from "../result.ts";
 import { accountStateEvent } from "./account-state.ts";
 
 export interface MarkAccountNeedsReauthDeps {

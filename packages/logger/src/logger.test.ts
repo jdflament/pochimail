@@ -1,5 +1,5 @@
-import { createLogger } from "@pochimail/core/logger";
 import { expect, it } from "vitest";
+import { createLogger } from "./logger.ts";
 
 // The full leak contract runs in packages/testing (core cannot depend on it without a cycle).
 // Guards: a logger built with only a sink must not be able to emit raw fields.

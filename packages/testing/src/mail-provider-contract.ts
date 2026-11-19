@@ -2,7 +2,7 @@ import type { Command } from "@pochimail/core/domain/action";
 import type { IncomingMessage } from "@pochimail/core/domain/mail";
 import type { MessageId } from "@pochimail/core/ids";
 import type { MailProvider, SyncCursor } from "@pochimail/core/ports/mail-provider";
-import { unwrap } from "@pochimail/core/result";
+import { unwrap } from "@pochimail/kernel/result";
 import { expect } from "vitest";
 import { type Check, check, registerContract } from "./contract.ts";
 import { makeIncomingMessage } from "./fixtures.ts";

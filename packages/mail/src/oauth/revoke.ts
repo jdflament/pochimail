@@ -1,8 +1,9 @@
 import type { ProviderKind } from "@pochimail/core/domain/account";
-import { Cancelled, Offline, ProviderFailed } from "@pochimail/core/errors";
-import type { AsyncResult, CancelSignal } from "@pochimail/core/ports/common";
+import { Offline, ProviderFailed } from "@pochimail/core/errors";
 import type { TokenRevoker } from "@pochimail/core/ports/oauth";
-import { err, ok } from "@pochimail/core/result";
+import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
+import { Cancelled } from "@pochimail/kernel/errors";
+import { err, ok } from "@pochimail/kernel/result";
 import { type FetchLike, postForm } from "./http.ts";
 import { OAUTH_PROVIDER_CONFIGS, type OAuthProviderConfig } from "./providers.ts";
 

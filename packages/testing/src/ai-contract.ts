@@ -1,6 +1,6 @@
 import { CATEGORIES } from "@pochimail/core/domain/category";
 import type { Classifier, Embedder, LlmProvider } from "@pochimail/core/ports/ai";
-import { unwrap } from "@pochimail/core/result";
+import { unwrap } from "@pochimail/kernel/result";
 import { expect } from "vitest";
 import { type Check, check, registerContract } from "./contract.ts";
 import { makeIncomingMessage } from "./fixtures.ts";

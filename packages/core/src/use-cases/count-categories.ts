@@ -1,7 +1,8 @@
+import type { AsyncResult } from "@pochimail/kernel/common";
+import type { StorageError } from "@pochimail/kernel/errors";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
 import type { Category } from "../domain/category.ts";
-import type { StorageError } from "../errors.ts";
-import type { AccountId, WorkspaceId } from "../ids.ts";
-import type { AsyncResult } from "../ports/common.ts";
+import type { AccountId } from "../ids.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
 
 /** Counts only: emails per category for the selected accounts, from one aggregate read (the sidebar's numbers). */

@@ -9,8 +9,8 @@ import type {
   SuggestionId,
   ThreadId,
   TopicId,
-  WorkspaceId,
 } from "@pochimail/core/ids";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
 
 // Fake data only: every address is on example.com and every text is invented.
 

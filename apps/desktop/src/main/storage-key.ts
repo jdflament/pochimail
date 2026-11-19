@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
-import { err, ok, type Result } from "@pochimail/core/result";
+import { err, ok, type Result } from "@pochimail/kernel/result";
 import { writeFileAtomic } from "./atomic-write.ts";
 
 /** The slice of Electron's async `safeStorage` we use (the sync calls are deprecated); injectable so the key policy is testable without Electron. */

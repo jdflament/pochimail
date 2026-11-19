@@ -1,10 +1,10 @@
-import type { StorageError } from "@pochimail/core/errors";
 import {
   type AppSettings,
   DEFAULT_APP_SETTINGS,
   type SettingsStore,
 } from "@pochimail/core/ports/settings-store";
-import { err, ok } from "@pochimail/core/result";
+import type { StorageError } from "@pochimail/kernel/errors";
+import { err, ok } from "@pochimail/kernel/result";
 import { createFaults, type Faults } from "./faults.ts";
 
 export interface InMemorySettingsStore extends SettingsStore {

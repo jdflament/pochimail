@@ -1,9 +1,9 @@
 import { randomUUID } from "node:crypto";
-import type { Clock } from "@pochimail/core/clock";
 import { workspaceIdSchema } from "@pochimail/core/domain/common";
-import { ERROR_CODES, type ErrorCode, StorageError } from "@pochimail/core/errors";
-import type { Job, JobQueue } from "@pochimail/core/ports/job-queue";
-import { err, ok } from "@pochimail/core/result";
+import type { Clock } from "@pochimail/kernel/clock";
+import { ERROR_CODES, type ErrorCode, StorageError } from "@pochimail/kernel/errors";
+import { err, ok } from "@pochimail/kernel/result";
+import type { Job, JobQueue } from "@pochimail/pipeline/job-queue";
 import { z } from "zod";
 import { exclusiveResult, type Storage } from "./open-storage.ts";
 import { accountIdOf, guardPayload } from "./payload-guard.ts";

@@ -1,4 +1,3 @@
-import type { Clock } from "@pochimail/core/clock";
 import type { Account } from "@pochimail/core/domain/account";
 import type { Category } from "@pochimail/core/domain/category";
 import type { IncomingMessage } from "@pochimail/core/domain/mail";
@@ -7,11 +6,9 @@ import { AiUnavailable, AuthExpired, RateLimited } from "@pochimail/core/errors"
 import type { DomainEvent } from "@pochimail/core/events/catalog";
 import type { ThreadId } from "@pochimail/core/ids";
 import type { Classifier } from "@pochimail/core/ports/ai";
-import type { IdGenerator } from "@pochimail/core/ports/id-generator";
 import type { MailProvider } from "@pochimail/core/ports/mail-provider";
 import type { SecretStore } from "@pochimail/core/ports/secret-store";
-import type { OutboxEntry, UnitOfWork } from "@pochimail/core/ports/unit-of-work";
-import { unwrap } from "@pochimail/core/result";
+import type { UnitOfWork } from "@pochimail/core/ports/unit-of-work";
 import { ClassifyBatch } from "@pochimail/core/use-cases/classify-batch";
 import { ConnectAccount } from "@pochimail/core/use-cases/connect-account";
 import {
@@ -19,6 +16,10 @@ import {
   MAX_SNIPPET_CHARS,
   RunIncrementalSync,
 } from "@pochimail/core/use-cases/run-incremental-sync";
+import type { Clock } from "@pochimail/kernel/clock";
+import type { IdGenerator } from "@pochimail/kernel/id-generator";
+import { unwrap } from "@pochimail/kernel/result";
+import type { OutboxEntry } from "@pochimail/pipeline/outbox";
 import { expect } from "vitest";
 import { type Check, check, registerContract } from "./contract.ts";
 import { makeIncomingMessage, WS_A, WS_B } from "./fixtures.ts";

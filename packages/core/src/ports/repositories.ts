@@ -1,3 +1,6 @@
+import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
+import type { StorageError } from "@pochimail/kernel/errors";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
 import type { Account } from "../domain/account.ts";
 import type { ActionLog, Suggestion } from "../domain/action.ts";
 import type { Category } from "../domain/category.ts";
@@ -10,7 +13,7 @@ import type {
   Thread,
   Topic,
 } from "../domain/mail.ts";
-import type { NotFound, StorageError } from "../errors.ts";
+import type { NotFound } from "../errors.ts";
 import type {
   AccountId,
   ActionId,
@@ -19,9 +22,8 @@ import type {
   SuggestionId,
   ThreadId,
   TopicId,
-  WorkspaceId,
 } from "../ids.ts";
-import type { AsyncResult, CancelSignal, Page, PageRequest } from "./common.ts";
+import type { Page, PageRequest } from "./common.ts";
 import type { SyncCursor } from "./mail-provider.ts";
 
 // Every method takes the workspaceId first: all reads and writes are workspace-scoped (AGENTS §3).

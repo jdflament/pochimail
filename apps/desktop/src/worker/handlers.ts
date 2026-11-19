@@ -1,7 +1,6 @@
 import type { Account } from "@pochimail/core/domain/account";
 import type { DomainEvent } from "@pochimail/core/events/catalog";
-import { AccountId, type WorkspaceId } from "@pochimail/core/ids";
-import type { EventBus } from "@pochimail/core/ports/event-bus";
+import { AccountId } from "@pochimail/core/ids";
 import type { DeviceName } from "@pochimail/core/ports/platform";
 import type { CountCategories } from "@pochimail/core/use-cases/count-categories";
 import type { GetOverview } from "@pochimail/core/use-cases/get-overview";
@@ -9,6 +8,8 @@ import type { LatestDigest } from "@pochimail/core/use-cases/latest-digest";
 import type { ListAccounts } from "@pochimail/core/use-cases/list-accounts";
 import type { ManageSettings } from "@pochimail/core/use-cases/manage-settings";
 import type { ScanRunner } from "@pochimail/core/use-cases/scan-runner";
+import type { WorkspaceId } from "@pochimail/kernel/ids";
+import type { EventBus } from "@pochimail/pipeline/event-bus";
 import type { EventOf, OutputOf } from "../shared/ipc/contract.ts";
 import type { Handlers } from "../shared/ipc/server.ts";
 

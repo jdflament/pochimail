@@ -1,6 +1,6 @@
 import { RateLimited } from "@pochimail/core/errors";
 import { AccountId } from "@pochimail/core/ids";
-import { unwrap } from "@pochimail/core/result";
+import { unwrap } from "@pochimail/kernel/result";
 import { createFakeClock } from "@pochimail/testing/fake-clock";
 import { generateMailbox } from "@pochimail/testing/fixture-mailbox/generator";
 import { readMailbox } from "@pochimail/testing/fixture-mailbox/mailbox-reader";

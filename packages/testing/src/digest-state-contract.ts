@@ -1,5 +1,5 @@
 import type { AccountId } from "@pochimail/core/ids";
-import { ok, unwrap } from "@pochimail/core/result";
+import { ok, unwrap } from "@pochimail/kernel/result";
 import { expect } from "vitest";
 import { type Check, check, registerContract } from "./contract.ts";
 import { ACCOUNT_1, WS_A, WS_B } from "./fixtures.ts";

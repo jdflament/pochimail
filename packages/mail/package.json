@@ -26,6 +26,9 @@
   },
   "dependencies": {
     "@pochimail/core": "workspace:*",
+    "@pochimail/kernel": "workspace:*",
+    "@pochimail/logger": "workspace:*",
+    "@pochimail/pipeline": "workspace:*",
     "zod": "4.6.7"
   },
   "devDependencies": {
