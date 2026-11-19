@@ -17,7 +17,7 @@
     "typecheck": "tsc",
     "lint": "biome check .",
     "knip": "knip",
-    "test": "vitest run"
+    "test": "vitest run --no-file-parallelism"
   },
   "devDependencies": {
     "@pochimail/testing": "workspace:*",
