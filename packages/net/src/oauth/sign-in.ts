@@ -1,12 +1,12 @@
-import type { ProviderKind } from "@pochimail/core/domain/account";
 import {
   type InvalidCallback,
   type MissingClientConfig,
-  ProviderFailed,
   SignInCancelled,
-} from "@pochimail/core/errors";
+} from "@pochimail/accounts/errors";
+import type { ProviderKind } from "@pochimail/accounts/model/account";
 import type { AutonomyLevel } from "@pochimail/core/policies/autonomy";
 import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
+import { ProviderFailed } from "@pochimail/kernel/errors";
 import { err, ok } from "@pochimail/kernel/result";
 import { type FetchLike, postForm } from "./http.ts";
 import { openLoopbackReceiver, SIGN_IN_TIMEOUT_MS } from "./loopback.ts";

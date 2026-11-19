@@ -1,19 +1,17 @@
 import type { Clock } from "@pochimail/kernel/clock";
 import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
-import { Cancelled, type StorageError } from "@pochimail/kernel/errors";
-import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { Cancelled, type NotFound, type StorageError } from "@pochimail/kernel/errors";
+import type { AccountId, WorkspaceId } from "@pochimail/kernel/ids";
 import { err, ok } from "@pochimail/kernel/result";
-import type { Account } from "../domain/account.ts";
-import type { NotFound } from "../errors.ts";
-import type { AccountId } from "../ids.ts";
+import { accountStateEvent } from "../events.ts";
+import type { Account } from "../model/account.ts";
 import type { TokenRevoker } from "../ports/oauth.ts";
 import type { SecretStore } from "../ports/secret-store.ts";
-import type { UnitOfWork } from "../ports/unit-of-work.ts";
-import { accountStateEvent } from "./account-state.ts";
+import type { AccountsUnitOfWork } from "../ports/unit-of-work.ts";
 import { accountSecretKey } from "./connect-account.ts";
 
 export interface RemoveAccountDeps {
-  readonly uow: UnitOfWork;
+  readonly uow: AccountsUnitOfWork;
   readonly secrets: SecretStore;
   readonly revoker: TokenRevoker;
   readonly clock: Clock;
@@ -71,7 +69,7 @@ export class RemoveAccount {
     const removed = await uow.run(async (tx) => {
       const row = await tx.repositories.accounts.remove(workspaceId, accountId);
       if (!row.ok) return row;
-      return tx.outbox.append({ kind: "event", event: state });
+      return tx.events.append([state]);
     }, signal);
     return removed.ok ? ok({ account, remoteRevoked }) : removed;
   }

@@ -1,4 +1,4 @@
-import { AccountId } from "@pochimail/core/ids";
+import { AccountId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
 import { describe, expect, it } from "vitest";
 import { BlockedSocketError, createHostAllowlist, egressPolicy } from "./allowlist.ts";

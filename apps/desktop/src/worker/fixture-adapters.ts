@@ -1,9 +1,8 @@
-import type { Account } from "@pochimail/core/domain/account";
-import { AccountId } from "@pochimail/core/ids";
+import type { Account } from "@pochimail/accounts/model/account";
 import type { Classifier } from "@pochimail/core/ports/ai";
 import type { DeviceName } from "@pochimail/core/ports/platform";
 import type { Clock } from "@pochimail/kernel/clock";
-import { WorkspaceId } from "@pochimail/kernel/ids";
+import { AccountId, WorkspaceId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
 import type { Logger } from "@pochimail/logger/logger";
 import type { Timer } from "@pochimail/pipeline/event-batching";

@@ -1,7 +1,7 @@
-import type { Account } from "@pochimail/core/domain/account";
+import type { Account } from "@pochimail/accounts/model/account";
 import type { Action } from "@pochimail/core/domain/action";
-import type { Category } from "@pochimail/core/domain/category";
-import { AccountId, ActionId } from "@pochimail/core/ids";
+import { type Category, categoryOf } from "@pochimail/core/domain/category";
+import { ActionId } from "@pochimail/core/ids";
 import { createScanPipeline } from "@pochimail/core/jobs/scan-pipeline";
 import type { Classifier } from "@pochimail/core/ports/ai";
 import type { UnitOfWork } from "@pochimail/core/ports/unit-of-work";
@@ -10,7 +10,7 @@ import { ProposeSuggestions } from "@pochimail/core/use-cases/propose-suggestion
 import { type MailboxSummary, SummarizeMailbox } from "@pochimail/core/use-cases/summarize-mailbox";
 import { UndoAction, type UndoOutcome } from "@pochimail/core/use-cases/undo-action";
 import type { IdGenerator } from "@pochimail/kernel/id-generator";
-import { WorkspaceId } from "@pochimail/kernel/ids";
+import { AccountId, WorkspaceId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
 import { runEval } from "@pochimail/testing/eval/harness";
 import type { EvalReport } from "@pochimail/testing/eval/report";
@@ -170,7 +170,7 @@ export async function runScenario(options: ScenarioOptions): Promise<ScenarioRes
       else archiveCount += 1;
       const categories: Category[] = [];
       for (const id of s.command.messageIds)
-        categories.push(unwrap(await uow.reads.messages.get(workspaceId, id)).category);
+        categories.push(categoryOf(unwrap(await uow.reads.messages.get(workspaceId, id))));
       items.push({
         categories,
         confidence: s.confidence,

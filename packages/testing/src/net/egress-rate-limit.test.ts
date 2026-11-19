@@ -1,9 +1,10 @@
-import { Offline, RateLimited } from "@pochimail/core/errors";
+import { createInMemorySecretStore } from "@pochimail/accounts/testing/in-memory-secret-store";
+import { ConnectAccount } from "@pochimail/accounts/use-cases/connect-account";
 import type { DomainEvent } from "@pochimail/core/events/catalog";
-import { AccountId } from "@pochimail/core/ids";
 import type { MailProvider } from "@pochimail/core/ports/mail-provider";
-import { ConnectAccount } from "@pochimail/core/use-cases/connect-account";
 import { RunIncrementalSync } from "@pochimail/core/use-cases/run-incremental-sync";
+import { Offline, RateLimited } from "@pochimail/kernel/errors";
+import { AccountId } from "@pochimail/kernel/ids";
 import { err, ok, unwrap } from "@pochimail/kernel/result";
 import { type HttpClient, RequestCancelledError } from "@pochimail/net/egress/http-client";
 import {
@@ -13,7 +14,6 @@ import {
 } from "@pochimail/net/egress/rate-limit";
 import { createFakeMailProvider } from "@pochimail/testing/fake-mail-provider";
 import { makeIncomingMessage, WS_A } from "@pochimail/testing/fixtures";
-import { createInMemorySecretStore } from "@pochimail/testing/in-memory-secret-store";
 import { createInMemoryUnitOfWork } from "@pochimail/testing/in-memory-store";
 import { registerRateLimitContract } from "@pochimail/testing/rate-limit-contract";
 import { afterEach, describe, expect, it, vi } from "vitest";

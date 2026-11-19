@@ -1,4 +1,4 @@
-import { threadSchema } from "@pochimail/core/domain/mail";
+import { threadSchema } from "@pochimail/mailbox/model/thread";
 import type { Database } from "better-sqlite3-multiple-ciphers";
 import type { z } from "zod";
 import { find, guard, type Row, sqlHelpers } from "../shared/sql.ts";

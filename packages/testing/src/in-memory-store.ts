@@ -1,25 +1,21 @@
-import type { Account } from "@pochimail/core/domain/account";
+import type { Account } from "@pochimail/accounts/model/account";
 import type { ActionLog, Suggestion } from "@pochimail/core/domain/action";
-import { CATEGORIES, type Category, DEFAULT_CATEGORY } from "@pochimail/core/domain/category";
+import { CATEGORIES, DEFAULT_CATEGORY } from "@pochimail/core/domain/category";
 import type { DerivedMessage } from "@pochimail/core/domain/derived";
-import type {
-  Message,
-  SenderStats,
-  StoredSignal,
-  Thread,
-  Topic,
-} from "@pochimail/core/domain/mail";
-import { NotFound } from "@pochimail/core/errors";
-import type { Page, PageRequest } from "@pochimail/core/ports/common";
-import type { SyncCursor } from "@pochimail/core/ports/mail-provider";
+import type { StoredSignal, Topic } from "@pochimail/core/domain/mail";
 import type { ReadRepositories, WriteRepositories } from "@pochimail/core/ports/repositories";
 import type { Transaction, UnitOfWork } from "@pochimail/core/ports/unit-of-work";
-import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
-import { Cancelled, StorageError } from "@pochimail/kernel/errors";
+import type { AsyncResult, CancelSignal, Page, PageRequest } from "@pochimail/kernel/common";
+import { Cancelled, NotFound, StorageError } from "@pochimail/kernel/errors";
 import type { WorkspaceId } from "@pochimail/kernel/ids";
 import { err, ok, type Result } from "@pochimail/kernel/result";
+import { createFaults, type Faults } from "@pochimail/kernel/testing/faults";
+import type { Message } from "@pochimail/mailbox/model/message";
+import type { SenderStats } from "@pochimail/mailbox/model/sender-stats";
+import type { Thread } from "@pochimail/mailbox/model/thread";
+import type { SyncCursor } from "@pochimail/mailbox/ports/mail-reader";
 import type { OutboxEntry, OutboxRecord, OutboxStore } from "@pochimail/pipeline/outbox";
-import { createFaults, type Faults } from "./faults.ts";
+import { eventSinkOver } from "@pochimail/pipeline/outbox-event-sink";
 
 interface Data {
   accounts: Map<string, Account>;
@@ -190,12 +186,12 @@ export function createInMemoryUnitOfWork(): InMemoryUnitOfWork {
           }) as never,
         countByCategory: (ws, accountIds) =>
           guarded(() => {
-            const counts = Object.fromEntries(CATEGORIES.map((c) => [c, 0])) as Record<
-              Category,
-              number
-            >;
+            const counts: Record<string, number> = Object.fromEntries(
+              CATEGORIES.map((c) => [c, 0]),
+            );
             for (const m of data().messages.values())
-              if (m.workspaceId === ws && accountIds.includes(m.accountId)) counts[m.category] += 1;
+              if (m.workspaceId === ws && accountIds.includes(m.accountId))
+                counts[m.category] = (counts[m.category] ?? 0) + 1;
             return ok(counts);
           }) as never,
         latestSequence: (ws, acc) =>
@@ -433,16 +429,18 @@ export function createInMemoryUnitOfWork(): InMemoryUnitOfWork {
     const job = async (): Promise<Result<T, E | StorageError | Cancelled>> => {
       if (signal?.aborted) return err(new Cancelled());
       const draft = copy(committed);
+      const outbox: Transaction["outbox"] = {
+        append: async (entry) => {
+          const failure = fail();
+          if (failure) return err(failure);
+          draft.outbox.push(copy(entry));
+          return ok(undefined);
+        },
+      };
       const result = await work({
         repositories: writers(() => draft),
-        outbox: {
-          append: async (entry) => {
-            const failure = fail();
-            if (failure) return err(failure);
-            draft.outbox.push(copy(entry));
-            return ok(undefined);
-          },
-        },
+        outbox,
+        events: eventSinkOver(outbox),
       });
       if (signal?.aborted) return err(new Cancelled());
       if (result.ok) committed = draft;

@@ -1,5 +1,5 @@
-import { RateLimited } from "@pochimail/core/errors";
-import { AccountId } from "@pochimail/core/ids";
+import { RateLimited } from "@pochimail/kernel/errors";
+import { AccountId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
 import { BlockedSocketError, egressPolicy } from "@pochimail/net/egress/allowlist";
 import {

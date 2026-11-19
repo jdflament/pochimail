@@ -1,4 +1,4 @@
-import { InvalidCallback, SignInCancelled } from "@pochimail/core/errors";
+import { InvalidCallback, SignInCancelled } from "@pochimail/accounts/errors";
 import { expect, it } from "vitest";
 import { openLoopbackReceiver } from "./loopback.ts";
 

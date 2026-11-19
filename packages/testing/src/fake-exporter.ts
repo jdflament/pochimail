@@ -1,7 +1,7 @@
 import type { Exporter } from "@pochimail/core/ports/exporter";
 import { Cancelled, type StorageError } from "@pochimail/kernel/errors";
 import { err, ok } from "@pochimail/kernel/result";
-import { createFaults, type Faults } from "./faults.ts";
+import { createFaults, type Faults } from "@pochimail/kernel/testing/faults";
 
 export interface FakeExporter extends Exporter {
   readonly faults: Faults<StorageError>;

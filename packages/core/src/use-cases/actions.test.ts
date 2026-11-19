@@ -1,6 +1,7 @@
 import { StorageError } from "@pochimail/kernel/errors";
 import { err, ok } from "@pochimail/kernel/result";
 import type { OutboxEntry } from "@pochimail/pipeline/outbox";
+import { eventSinkOver } from "@pochimail/pipeline/outbox-event-sink";
 import type { ActionLog } from "../domain/action.ts";
 import { inverseOf } from "../domain/action.ts";
 import type { MailProvider, MailProviderCapabilities } from "../ports/mail-provider.ts";
@@ -29,9 +30,11 @@ function memoryHarness(capabilities: MailProviderCapabilities): ActionHarness {
     reads,
     async run(work) {
       const saved = { logs: [...logs], outbox: [...outbox] };
+      const writer = { append: async (e: OutboxEntry) => (outbox.push(e), ok(undefined)) };
       const tx = {
         repositories: { actionLog } as unknown as WriteRepositories,
-        outbox: { append: async (e: OutboxEntry) => (outbox.push(e), ok(undefined)) },
+        outbox: writer,
+        events: eventSinkOver(writer),
       } satisfies Transaction;
       const result = await work(tx);
       if (!result.ok) ({ logs, outbox } = saved);
@@ -48,7 +51,7 @@ function memoryHarness(capabilities: MailProviderCapabilities): ActionHarness {
       for (const command of commands) {
         const ids = command.messageIds.map(String);
         if (ids.some((id) => failing.has(id)))
-          return err(new (await import("../errors.ts")).Offline());
+          return err(new (await import("@pochimail/kernel/errors")).Offline());
         for (const id of ids) {
           if (command.kind === "archive") archived.add(id);
           if (command.kind === "unarchive") archived.delete(id);

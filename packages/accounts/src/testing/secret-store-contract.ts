@@ -1,7 +1,7 @@
-import type { SecretStore } from "@pochimail/core/ports/secret-store";
 import { ok, unwrap } from "@pochimail/kernel/result";
+import { type Check, check, registerContract } from "@pochimail/kernel/testing/contract";
 import { expect } from "vitest";
-import { type Check, check, registerContract } from "./contract.ts";
+import type { SecretStore } from "../ports/secret-store.ts";
 
 export const secretStoreChecks: readonly Check<SecretStore>[] = [
   check(

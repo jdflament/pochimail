@@ -5,7 +5,7 @@ import {
 } from "@pochimail/core/ports/settings-store";
 import type { StorageError } from "@pochimail/kernel/errors";
 import { err, ok } from "@pochimail/kernel/result";
-import { createFaults, type Faults } from "./faults.ts";
+import { createFaults, type Faults } from "@pochimail/kernel/testing/faults";
 
 export interface InMemorySettingsStore extends SettingsStore {
   readonly faults: Faults<StorageError>;

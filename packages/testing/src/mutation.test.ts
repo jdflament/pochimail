@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
 import type { BlobStore } from "@pochimail/core/ports/blob-store";
 import type { UnitOfWork } from "@pochimail/core/ports/unit-of-work";
+import { failingChecks } from "@pochimail/kernel/testing/contract";
 import { describe, expect, it } from "vitest";
 import { blobStoreChecks } from "./blob-store-contract.ts";
-import { failingChecks } from "./contract.ts";
 import { createFakeClock } from "./fake-clock.ts";
 import { createInMemoryBlobStore } from "./in-memory-blob-store.ts";
 import { createInMemoryJobQueue } from "./in-memory-job-queue.ts";

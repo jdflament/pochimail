@@ -12,7 +12,8 @@ describe("worker architecture", () => {
       const allowed =
         path.startsWith("@pochimail/core/use-cases/") ||
         path === "@pochimail/core/ids" ||
-        path === "@pochimail/core/domain/account" ||
+        path === "@pochimail/accounts/model/account" ||
+        path.startsWith("@pochimail/accounts/use-cases/") ||
         path === "@pochimail/core/events/catalog" ||
         path === "@pochimail/kernel/ids" ||
         path === "@pochimail/pipeline/event-bus" ||

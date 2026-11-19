@@ -1,6 +1,6 @@
-import { Offline } from "@pochimail/core/errors";
-import type { SecretStore } from "@pochimail/core/ports/secret-store";
-import { Cancelled, StorageError } from "@pochimail/kernel/errors";
+import type { SecretStore } from "@pochimail/accounts/ports/secret-store";
+import { createInMemorySecretStore } from "@pochimail/accounts/testing/in-memory-secret-store";
+import { Cancelled, Offline, StorageError } from "@pochimail/kernel/errors";
 import { err } from "@pochimail/kernel/result";
 import { egressPolicy } from "@pochimail/net/egress/allowlist";
 import { createHttpClient, type Fetch } from "@pochimail/net/egress/http-client";
@@ -8,7 +8,6 @@ import { createOAuthFetch, type FetchLike } from "@pochimail/net/oauth/http";
 import { oauthProviderConfig } from "@pochimail/net/oauth/providers";
 import { createAccessTokenSource } from "@pochimail/net/oauth/tokens";
 import { startFakeOAuthServer } from "@pochimail/testing/fake-oauth-server";
-import { createInMemorySecretStore } from "@pochimail/testing/in-memory-secret-store";
 import { loopbackFetch } from "@pochimail/testing/loopback-fetch";
 import { runOAuthTokenSourceContract } from "@pochimail/testing/oauth-token-source-contract";
 import { expect, it } from "vitest";

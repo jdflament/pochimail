@@ -1,7 +1,7 @@
-import type { OAuthTokenSource } from "@pochimail/core/ports/oauth";
-import type { SecretStore } from "@pochimail/core/ports/secret-store";
+import type { OAuthTokenSource } from "@pochimail/accounts/ports/oauth";
+import type { SecretStore } from "@pochimail/accounts/ports/secret-store";
+import { type Check, check, registerContract } from "@pochimail/kernel/testing/contract";
 import { afterAll, expect } from "vitest";
-import { type Check, check, registerContract } from "./contract.ts";
 import type { FakeClock } from "./fake-clock.ts";
 import type { FakeOAuthServer } from "./fake-oauth-server.ts";
 

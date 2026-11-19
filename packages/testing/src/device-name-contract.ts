@@ -1,6 +1,6 @@
 import { DEVICE_NAMES, type DeviceName } from "@pochimail/core/ports/platform";
+import { type Check, check, registerContract } from "@pochimail/kernel/testing/contract";
 import { expect } from "vitest";
-import { type Check, check, registerContract } from "./contract.ts";
 
 export type DeviceNameFor = (os: unknown) => DeviceName;
 

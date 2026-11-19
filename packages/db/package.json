@@ -27,8 +27,10 @@
     "vitest": "5.1.0"
   },
   "dependencies": {
+    "@pochimail/accounts": "workspace:*",
     "@pochimail/core": "workspace:*",
     "@pochimail/kernel": "workspace:*",
+    "@pochimail/mailbox": "workspace:*",
     "@pochimail/pipeline": "workspace:*",
     "better-sqlite3-multiple-ciphers": "13.1.1",
     "zod": "4.6.7"

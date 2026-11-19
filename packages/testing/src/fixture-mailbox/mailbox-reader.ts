@@ -1,4 +1,4 @@
-import { type IncomingMessage, incomingMessageSchema } from "@pochimail/core/domain/mail";
+import { type IncomingMessage, incomingMessageSchema } from "@pochimail/mailbox/model/message";
 import { decodeHeaderText, readContent, splitMbox } from "./mbox.ts";
 
 export interface FixtureMessage {

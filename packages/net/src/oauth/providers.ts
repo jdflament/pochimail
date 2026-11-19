@@ -1,5 +1,5 @@
-import type { ProviderKind } from "@pochimail/core/domain/account";
-import { MissingClientConfig } from "@pochimail/core/errors";
+import { MissingClientConfig } from "@pochimail/accounts/errors";
+import type { ProviderKind } from "@pochimail/accounts/model/account";
 import type { AutonomyLevel } from "@pochimail/core/policies/autonomy";
 import { err, ok, type Result } from "@pochimail/kernel/result";
 

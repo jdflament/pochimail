@@ -1,5 +1,5 @@
-import type { IncomingMessage } from "@pochimail/core/domain/mail";
 import { ok, unwrap } from "@pochimail/kernel/result";
+import type { IncomingMessage } from "@pochimail/mailbox/model/message";
 import { makeIncomingMessage } from "@pochimail/testing/fixtures";
 import { expect } from "vitest";
 import { createSqliteUnitOfWork } from "../sqlite-unit-of-work.ts";

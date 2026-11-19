@@ -35,6 +35,7 @@ describe("workspace rules (ADR 0001)", () => {
     const names = workspaces.map((dir) => manifest(dir).name).sort();
     expect(names).toEqual(
       [
+        "@pochimail/accounts",
         "@pochimail/ai",
         "@pochimail/ci",
         "@pochimail/cli",
@@ -45,6 +46,7 @@ describe("workspace rules (ADR 0001)", () => {
         "@pochimail/graph",
         "@pochimail/kernel",
         "@pochimail/logger",
+        "@pochimail/mailbox",
         "@pochimail/net",
         "@pochimail/pipeline",
         "@pochimail/testing",

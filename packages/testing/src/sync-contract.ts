@@ -1,27 +1,27 @@
-import type { Account } from "@pochimail/core/domain/account";
+import type { Account } from "@pochimail/accounts/model/account";
+import type { SecretStore } from "@pochimail/accounts/ports/secret-store";
+import { ConnectAccount } from "@pochimail/accounts/use-cases/connect-account";
 import type { Category } from "@pochimail/core/domain/category";
-import type { IncomingMessage } from "@pochimail/core/domain/mail";
-import type { ProviderError } from "@pochimail/core/errors";
-import { AiUnavailable, AuthExpired, RateLimited } from "@pochimail/core/errors";
+import { AiUnavailable } from "@pochimail/core/errors";
 import type { DomainEvent } from "@pochimail/core/events/catalog";
-import type { ThreadId } from "@pochimail/core/ids";
 import type { Classifier } from "@pochimail/core/ports/ai";
 import type { MailProvider } from "@pochimail/core/ports/mail-provider";
-import type { SecretStore } from "@pochimail/core/ports/secret-store";
 import type { UnitOfWork } from "@pochimail/core/ports/unit-of-work";
 import { ClassifyBatch } from "@pochimail/core/use-cases/classify-batch";
-import { ConnectAccount } from "@pochimail/core/use-cases/connect-account";
 import {
   INCREMENTAL_SYNC_JOB,
-  MAX_SNIPPET_CHARS,
   RunIncrementalSync,
 } from "@pochimail/core/use-cases/run-incremental-sync";
 import type { Clock } from "@pochimail/kernel/clock";
+import { AuthExpired, type ProviderError, RateLimited } from "@pochimail/kernel/errors";
 import type { IdGenerator } from "@pochimail/kernel/id-generator";
+import type { ThreadId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
+import { type Check, check, registerContract } from "@pochimail/kernel/testing/contract";
+import type { IncomingMessage } from "@pochimail/mailbox/model/message";
+import { MAX_SNIPPET_CHARS } from "@pochimail/mailbox/policies/sanitize-incoming";
 import type { OutboxEntry } from "@pochimail/pipeline/outbox";
 import { expect } from "vitest";
-import { type Check, check, registerContract } from "./contract.ts";
 import { makeIncomingMessage, WS_A, WS_B } from "./fixtures.ts";
 
 /**
@@ -318,7 +318,7 @@ export const syncChecks: readonly Check<SyncHarness>[] = [
   ),
 ];
 
-import { MessageId as MessageIdOf } from "@pochimail/core/ids";
+import { MessageId as MessageIdOf } from "@pochimail/kernel/ids";
 
 /** Registers the use-case suite over any stack; `make` returns a fresh, empty harness. */
 export function runSyncContract(make: () => SyncHarness | Promise<SyncHarness>): void {

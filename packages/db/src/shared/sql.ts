@@ -1,5 +1,4 @@
-import { NotFound } from "@pochimail/core/errors";
-import { StorageError } from "@pochimail/kernel/errors";
+import { NotFound, StorageError } from "@pochimail/kernel/errors";
 import { err, ok, type Result } from "@pochimail/kernel/result";
 import type { Database } from "better-sqlite3-multiple-ciphers";
 

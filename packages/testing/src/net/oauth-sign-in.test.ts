@@ -1,4 +1,5 @@
-import { MissingClientConfig, ProviderFailed, SignInCancelled } from "@pochimail/core/errors";
+import { MissingClientConfig, SignInCancelled } from "@pochimail/accounts/errors";
+import { ProviderFailed } from "@pochimail/kernel/errors";
 import type { FetchLike } from "@pochimail/net/oauth/http";
 import { type OAuthProviderConfig, oauthProviderConfig } from "@pochimail/net/oauth/providers";
 import { OAuthSignIn } from "@pochimail/net/oauth/sign-in";

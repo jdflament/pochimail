@@ -1,4 +1,4 @@
-import type { AccountId, MessageId } from "@pochimail/core/ids";
+import type { AccountId, MessageId } from "@pochimail/kernel/ids";
 import { ok, unwrap } from "@pochimail/kernel/result";
 import { createFakeClock } from "@pochimail/testing/fake-clock";
 import { ACCOUNT_1, makeAccount, makeActionLog, WS_A } from "@pochimail/testing/fixtures";

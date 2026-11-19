@@ -1,5 +1,5 @@
 import { connect, type Socket } from "node:net";
-import type { IncomingMessage } from "@pochimail/core/domain/mail";
+import type { IncomingMessage } from "@pochimail/mailbox/model/message";
 import { readMailbox } from "../fixture-mailbox/mailbox-reader.ts";
 import { quoteFromLines } from "../fixture-mailbox/mbox.ts";
 import type { MailboxIds } from "./http-wire.ts";

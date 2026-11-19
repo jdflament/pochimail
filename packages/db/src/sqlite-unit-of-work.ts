@@ -1,12 +1,13 @@
-import { workspaceIdSchema } from "@pochimail/core/domain/common";
 import type { Transaction, UnitOfWork } from "@pochimail/core/ports/unit-of-work";
 import type { Clock } from "@pochimail/kernel/clock";
 import type { CancelSignal } from "@pochimail/kernel/common";
 import { Cancelled, StorageError } from "@pochimail/kernel/errors";
 import type { EventEnvelope } from "@pochimail/kernel/event";
 import { err, ok, type Result } from "@pochimail/kernel/result";
+import { workspaceIdSchema } from "@pochimail/kernel/schemas";
 import type { JobRequest } from "@pochimail/pipeline/job-queue";
 import type { OutboxEntry, OutboxRecord, OutboxStore } from "@pochimail/pipeline/outbox";
+import { eventSinkOver } from "@pochimail/pipeline/outbox-event-sink";
 import { z } from "zod";
 import { exclusiveResult, type Storage } from "./open-storage.ts";
 import { accountIdOf, guardPayload } from "./payload-guard.ts";
@@ -72,34 +73,30 @@ export function createSqliteUnitOfWork(
     "INSERT INTO outbox (kind, workspace_id, payload, account_id) VALUES (?, ?, ?, ?)",
   );
 
-  const tx: Transaction = {
-    repositories: write,
-    outbox: {
-      async append(entry) {
-        try {
-          const guarded = guardPayload(
+  const outbox: Transaction["outbox"] = {
+    async append(entry) {
+      try {
+        const guarded = guardPayload(
+          entry.kind === "event" ? entry.event : { workspaceId: entry.workspaceId, job: entry.job },
+        );
+        if (!guarded.ok) return guarded;
+        insertOutbox.run(
+          entry.kind,
+          entry.kind === "event" ? entry.event.workspaceId : entry.workspaceId,
+          guarded.value,
+          accountIdOf(
             entry.kind === "event"
-              ? entry.event
-              : { workspaceId: entry.workspaceId, job: entry.job },
-          );
-          if (!guarded.ok) return guarded;
-          insertOutbox.run(
-            entry.kind,
-            entry.kind === "event" ? entry.event.workspaceId : entry.workspaceId,
-            guarded.value,
-            accountIdOf(
-              entry.kind === "event"
-                ? (entry.event as { payload?: unknown }).payload
-                : entry.job.payload,
-            ),
-          );
-          return ok(undefined);
-        } catch (cause) {
-          return err(new StorageError("Could not append to the outbox", { cause }));
-        }
-      },
+              ? (entry.event as { payload?: unknown }).payload
+              : entry.job.payload,
+          ),
+        );
+        return ok(undefined);
+      } catch (cause) {
+        return err(new StorageError("Could not append to the outbox", { cause }));
+      }
     },
   };
+  const tx: Transaction = { repositories: write, outbox, events: eventSinkOver(outbox) };
 
   const uow: UnitOfWork = {
     reads: read,

@@ -1,4 +1,4 @@
-import type { SecretStore } from "@pochimail/core/ports/secret-store";
+import type { SecretStore } from "@pochimail/accounts/ports/secret-store";
 import { z } from "zod";
 import { createBrowserOpener } from "../shared/ipc/open-browser.ts";
 import { createSecretsClient, type ProtectionState } from "../shared/ipc/secrets.ts";

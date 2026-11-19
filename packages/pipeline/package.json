@@ -12,6 +12,7 @@
     "./job-queue": "./src/job-queue.ts",
     "./job-runner": "./src/job-runner.ts",
     "./outbox": "./src/outbox.ts",
+    "./outbox-event-sink": "./src/outbox-event-sink.ts",
     "./outbox-relay": "./src/outbox-relay.ts",
     "./pipeline-types": "./src/pipeline-types.ts",
     "./power-monitor": "./src/power-monitor.ts",

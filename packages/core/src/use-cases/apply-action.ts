@@ -1,10 +1,10 @@
 import type { Clock } from "@pochimail/kernel/clock";
 import type { CancelSignal } from "@pochimail/kernel/common";
-import { Cancelled, type DomainError } from "@pochimail/kernel/errors";
+import { Cancelled, type DomainError, InvalidStateError } from "@pochimail/kernel/errors";
 import type { IdGenerator } from "@pochimail/kernel/id-generator";
 import { unwrap } from "@pochimail/kernel/result";
 import { type Action, type ActionLog, inverseOf } from "../domain/action.ts";
-import { InvalidStateError, type PolicyDenialReason, type PolicyDenied } from "../errors.ts";
+import type { PolicyDenialReason, PolicyDenied } from "../errors.ts";
 import type { ActionId, ActionLogId } from "../ids.ts";
 import { ActionLogId as makeLogId } from "../ids.ts";
 import { type AuthorizationContext, authorize } from "../policies/authorize.ts";

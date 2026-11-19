@@ -1,8 +1,7 @@
-import type { TopicId } from "@pochimail/core/ids";
 import type { UnitOfWork } from "@pochimail/core/ports/unit-of-work";
 import { StorageError } from "@pochimail/kernel/errors";
 import type { EventEnvelope } from "@pochimail/kernel/event";
-import type { WorkspaceId } from "@pochimail/kernel/ids";
+import type { TopicId, WorkspaceId } from "@pochimail/kernel/ids";
 import { err, ok, unwrap } from "@pochimail/kernel/result";
 import type { EventBus } from "@pochimail/pipeline/event-bus";
 import type { JobQueue } from "@pochimail/pipeline/job-queue";

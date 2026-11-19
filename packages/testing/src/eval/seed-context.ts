@@ -1,6 +1,8 @@
-import type { IncomingMessage, SenderStats, Thread } from "@pochimail/core/domain/mail";
-import { ThreadId } from "@pochimail/core/ids";
+import { ThreadId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
+import type { IncomingMessage } from "@pochimail/mailbox/model/message";
+import type { SenderStats } from "@pochimail/mailbox/model/sender-stats";
+import type { Thread } from "@pochimail/mailbox/model/thread";
 import { CORRESPONDENTS, VIP_COUNT } from "../fixture-mailbox/content.ts";
 import type { createInMemoryUnitOfWork } from "../in-memory-store.ts";
 

@@ -9,9 +9,14 @@
     "./common": "./src/common.ts",
     "./errors": "./src/errors.ts",
     "./event": "./src/event.ts",
+    "./event-schema": "./src/event-schema.ts",
+    "./event-sink": "./src/event-sink.ts",
     "./id-generator": "./src/id-generator.ts",
     "./ids": "./src/ids.ts",
-    "./result": "./src/result.ts"
+    "./result": "./src/result.ts",
+    "./schemas": "./src/schemas.ts",
+    "./testing/contract": "./src/testing/contract.ts",
+    "./testing/faults": "./src/testing/faults.ts"
   },
   "scripts": {
     "typecheck": "tsc",
@@ -24,5 +29,7 @@
     "typescript": "7.0.2",
     "vitest": "5.1.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "zod": "4.6.7"
+  }
 }

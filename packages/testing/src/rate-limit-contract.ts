@@ -1,6 +1,7 @@
-import { RateLimited } from "@pochimail/core/errors";
-import { AccountId } from "@pochimail/core/ids";
+import { RateLimited } from "@pochimail/kernel/errors";
+import { AccountId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
+import { type Check, check, registerContract } from "@pochimail/kernel/testing/contract";
 import {
   type HttpClient,
   type HttpResponse,
@@ -14,7 +15,6 @@ import {
   type Sleep,
 } from "@pochimail/net/egress/rate-limit";
 import { expect } from "vitest";
-import { type Check, check, registerContract } from "./contract.ts";
 import { createFakeClock, type FakeClock } from "./fake-clock.ts";
 
 export interface RateLimitHarnessDeps {

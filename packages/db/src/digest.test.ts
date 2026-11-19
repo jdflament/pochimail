@@ -1,4 +1,4 @@
-import type { AccountId } from "@pochimail/core/ids";
+import type { AccountId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
 import { ACCOUNT_1, WS_A } from "@pochimail/testing/fixtures";
 import { describe, expect, it } from "vitest";

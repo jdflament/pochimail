@@ -1,5 +1,10 @@
+import {
+  accountIdSchema,
+  schemaVersion,
+  timestampSchema,
+  workspaceIdSchema,
+} from "@pochimail/kernel/schemas";
 import { z } from "zod";
-import { accountIdSchema, schemaVersion, timestampSchema, workspaceIdSchema } from "./common.ts";
 
 export const PROVIDER_KINDS = ["gmail", "graph", "imap"] as const;
 export const providerKindSchema = z.enum(PROVIDER_KINDS);

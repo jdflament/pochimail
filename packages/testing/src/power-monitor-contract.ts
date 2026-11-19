@@ -1,6 +1,6 @@
+import { type Check, check, registerContract } from "@pochimail/kernel/testing/contract";
 import type { PowerMonitor, PowerState } from "@pochimail/pipeline/power-monitor";
 import { expect } from "vitest";
-import { type Check, check, registerContract } from "./contract.ts";
 
 export interface PowerMonitorHarness {
   readonly monitor: PowerMonitor;

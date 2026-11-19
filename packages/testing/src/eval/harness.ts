@@ -1,17 +1,17 @@
 import {
   CATEGORIES,
   type Category,
+  categoryOf,
   SIGNAL_KINDS,
   type SignalKind,
 } from "@pochimail/core/domain/category";
-import type { Message } from "@pochimail/core/domain/mail";
-import { AccountId, MessageId } from "@pochimail/core/ids";
 import type { Classifier } from "@pochimail/core/ports/ai";
 import { ClassifyBatch } from "@pochimail/core/use-cases/classify-batch";
 import { DetectSignals } from "@pochimail/core/use-cases/detect-signals";
 import { RunIncrementalSync } from "@pochimail/core/use-cases/run-incremental-sync";
-import { WorkspaceId } from "@pochimail/kernel/ids";
+import { AccountId, MessageId, WorkspaceId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
+import type { Message } from "@pochimail/mailbox/model/message";
 import { createFakeClock } from "../fake-clock.ts";
 import { createFixtureMailProvider } from "../fixture-mailbox/fixture-mail-provider.ts";
 import { FIXTURE_NOW, type GeneratedMailbox } from "../fixture-mailbox/generator.ts";
@@ -90,7 +90,7 @@ export async function runEval({ classifier, mailbox }: RunEvalOptions): Promise<
       for (const id of ids.slice(i, i + BATCH)) {
         if (unanswered.has(id)) continue;
         const stored = unwrap(await uow.reads.messages.get(workspaceId, unwrap(MessageId(id))));
-        predictedCategory.set(id, stored.category);
+        predictedCategory.set(id, categoryOf(stored));
       }
     }
     const signals = unwrap(

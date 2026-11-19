@@ -1,15 +1,14 @@
 import type { AsyncResult } from "@pochimail/kernel/common";
 import type { StorageError } from "@pochimail/kernel/errors";
-import type { WorkspaceId } from "@pochimail/kernel/ids";
+import type { AccountId, MessageId, WorkspaceId } from "@pochimail/kernel/ids";
 import { ok } from "@pochimail/kernel/result";
-import type { IncomingMessage } from "../domain/mail.ts";
-import type { DomainEventOf } from "../events/catalog.ts";
-import type { AccountId, MessageId } from "../ids.ts";
-import type { UnitOfWork } from "../ports/unit-of-work.ts";
-import { sanitizeIncoming } from "./run-incremental-sync.ts";
+import type { MessagesUpserted } from "../events.ts";
+import type { IncomingMessage } from "../model/message.ts";
+import { sanitizeIncoming } from "../policies/sanitize-incoming.ts";
+import type { MailboxUnitOfWork } from "../ports/unit-of-work.ts";
 
 export interface StoreMessagesDeps {
-  readonly uow: UnitOfWork;
+  readonly uow: MailboxUnitOfWork;
 }
 
 export interface StoreMessagesRequest {
@@ -42,8 +41,8 @@ export class StoreMessages {
         workspaceId: request.workspaceId,
         occurredAt: first?.receivedAt ?? new Date(0).toISOString(),
         payload: { accountId: request.accountId, count: keep.length },
-      } satisfies DomainEventOf<"MessagesUpserted">;
-      return tx.outbox.append({ kind: "event", event });
+      } satisfies MessagesUpserted;
+      return tx.events.append([event]);
     });
     if (!committed.ok) return committed;
     return ok(keep.map((m) => m.id));

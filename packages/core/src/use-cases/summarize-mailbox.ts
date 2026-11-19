@@ -1,11 +1,15 @@
 import type { Clock } from "@pochimail/kernel/clock";
 import type { AsyncResult } from "@pochimail/kernel/common";
-import type { StorageError } from "@pochimail/kernel/errors";
-import type { WorkspaceId } from "@pochimail/kernel/ids";
+import type { NotFound, StorageError } from "@pochimail/kernel/errors";
+import type { AccountId, MessageId, WorkspaceId } from "@pochimail/kernel/ids";
 import { ok } from "@pochimail/kernel/result";
-import { CATEGORIES, type Category, SIGNAL_KINDS, type SignalKind } from "../domain/category.ts";
-import type { NotFound } from "../errors.ts";
-import type { AccountId, MessageId } from "../ids.ts";
+import {
+  CATEGORIES,
+  type Category,
+  categoryOf,
+  SIGNAL_KINDS,
+  type SignalKind,
+} from "../domain/category.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
 import { evaluateSignals } from "./detect-signals.ts";
 
@@ -60,7 +64,7 @@ export class SummarizeMailbox {
         for (const m of page.value.items) {
           ids.push(m.id);
           received.set(m.id, m.receivedAt);
-          categories[m.category] += 1;
+          categories[categoryOf(m)] += 1;
         }
         cursor = page.value.nextCursor ?? undefined;
       } while (cursor !== undefined);

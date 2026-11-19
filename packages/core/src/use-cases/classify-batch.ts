@@ -1,15 +1,13 @@
 import type { Clock } from "@pochimail/kernel/clock";
 import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
-import type { Cancelled, StorageError } from "@pochimail/kernel/errors";
-import type { WorkspaceId } from "@pochimail/kernel/ids";
+import type { Cancelled, NotFound, StorageError } from "@pochimail/kernel/errors";
+import type { MessageId, WorkspaceId } from "@pochimail/kernel/ids";
 import { ok } from "@pochimail/kernel/result";
+import type { Message } from "@pochimail/mailbox/model/message";
 import { categorySchema } from "../domain/category.ts";
 import { confidenceSchema } from "../domain/common.ts";
 import { DERIVED_SNIPPET_MAX_CHARS, type DerivedMessage } from "../domain/derived.ts";
-import type { Message } from "../domain/mail.ts";
-import type { NotFound } from "../errors.ts";
 import type { DomainEventOf } from "../events/catalog.ts";
-import type { MessageId } from "../ids.ts";
 import type { AiError, Classification, Classifier } from "../ports/ai.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
 

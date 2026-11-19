@@ -1,4 +1,4 @@
-import { MissingClientConfig } from "@pochimail/core/errors";
+import { MissingClientConfig } from "@pochimail/accounts/errors";
 import { expect, it } from "vitest";
 import {
   clientIdFrom,

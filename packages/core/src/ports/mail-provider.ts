@@ -1,9 +1,7 @@
 import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
-import type { Cancelled } from "@pochimail/kernel/errors";
+import type { Cancelled, ProviderError } from "@pochimail/kernel/errors";
+import type { MailReader } from "@pochimail/mailbox/ports/mail-reader";
 import type { Command } from "../domain/action.ts";
-import type { IncomingMessage } from "../domain/mail.ts";
-import type { ProviderError } from "../errors.ts";
-import type { MessageId } from "../ids.ts";
 
 /** Gmail organizes with labels; Graph and IMAP with folders. */
 export const ORGANIZATION_MODELS = ["labels", "folders"] as const;
@@ -30,21 +28,6 @@ export interface MailProviderCapabilities {
   readonly unsubscribeSend: boolean;
 }
 
-/** Opaque, provider-specific position in a mailbox (history id, delta token, UID range). */
-export interface SyncCursor {
-  /** Distinguishes several cursors of one account (e.g. one Graph delta token per folder). */
-  readonly scope: string;
-  readonly token: string;
-}
-
-export interface SyncBatch {
-  readonly messages: readonly IncomingMessage[];
-  readonly nextCursor: SyncCursor;
-  readonly hasMore: boolean;
-  /** `true` when the stored cursor expired and this batch restarts from a full walk. */
-  readonly restarted: boolean;
-}
-
 /** What a command really did, so the action log can store an inverse for undo. */
 export interface AppliedCommand {
   readonly command: Command;
@@ -53,15 +36,11 @@ export interface AppliedCommand {
 
 export type MailProviderError = ProviderError | Cancelled;
 
-export interface MailProvider {
+export interface MailProvider extends MailReader<MailProviderError> {
   readonly capabilities: MailProviderCapabilities;
-  /** Headers and metadata only; bodies are fetched on demand. `null` cursor starts a backfill. */
-  sync(cursor: SyncCursor | null, signal: CancelSignal): AsyncResult<SyncBatch, MailProviderError>;
   /** Applies commands in order. Providers without `batchModify` may loop; callers chunk by capability. */
   applyCommands(
     commands: readonly Command[],
     signal: CancelSignal,
   ): AsyncResult<readonly AppliedCommand[], MailProviderError>;
-  /** Plain text body, fetched lazily. Never rendered as remote content. */
-  fetchBody(messageId: MessageId, signal: CancelSignal): AsyncResult<string, MailProviderError>;
 }

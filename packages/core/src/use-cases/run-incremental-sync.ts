@@ -1,23 +1,28 @@
+import { type AccountState, accountStateEvent } from "@pochimail/accounts/events";
 import type { Clock } from "@pochimail/kernel/clock";
 import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
-import { Cancelled, type DomainError, type StorageError } from "@pochimail/kernel/errors";
-import type { WorkspaceId } from "@pochimail/kernel/ids";
+import {
+  AuthExpired,
+  Cancelled,
+  type DomainError,
+  type NotFound,
+  RateLimited,
+  type StorageError,
+} from "@pochimail/kernel/errors";
+import type { AccountId, WorkspaceId } from "@pochimail/kernel/ids";
 import { ok } from "@pochimail/kernel/result";
+import { sanitizeIncoming } from "@pochimail/mailbox/policies/sanitize-incoming";
+import type { SyncCursor } from "@pochimail/mailbox/ports/mail-reader";
+import { UpsertThreads } from "@pochimail/mailbox/use-cases/upsert-threads";
 import type { JobRequest } from "@pochimail/pipeline/job-queue";
-import { type IncomingMessage, incomingMessageSchema, type Thread } from "../domain/mail.ts";
-import { AuthExpired, type NotFound, RateLimited } from "../errors.ts";
 import type { DomainEvent, DomainEventOf, DomainEventType } from "../events/catalog.ts";
-import type { AccountId } from "../ids.ts";
-import type { MailProvider, SyncCursor } from "../ports/mail-provider.ts";
-import type { Transaction, UnitOfWork } from "../ports/unit-of-work.ts";
-import { type AccountState, accountStateEvent } from "./account-state.ts";
+import type { MailProvider } from "../ports/mail-provider.ts";
+import type { UnitOfWork } from "../ports/unit-of-work.ts";
 
 /** Job type enqueued to resume a rate-limited sync; a worker maps it back to this use case. */
 export const INCREMENTAL_SYNC_JOB = "sync.incremental";
 export const DEFAULT_CURSOR_SCOPE = "inbox";
 export const DEFAULT_RATE_LIMIT_DELAY_MS = 60_000;
-/** Longest snippet kept. Providers may hand over more; a body must never be stored (D11). */
-export const MAX_SNIPPET_CHARS = 200;
 
 export interface RunIncrementalSyncDeps {
   readonly uow: UnitOfWork;
@@ -155,7 +160,7 @@ export class RunIncrementalSync {
       const committed = await uow.run(async (tx) => {
         const rows = await tx.repositories.messages.upsertMany(keep);
         if (!rows.ok) return rows;
-        const threads = await upsertThreads(tx, keep);
+        const threads = await new UpsertThreads().execute(tx, keep);
         if (!threads.ok) return threads;
         const saved = await tx.repositories.cursors.set(workspaceId, accountId, nextCursor);
         if (!saved.ok) return saved;
@@ -195,72 +200,4 @@ export class RunIncrementalSync {
     ]);
     return done.ok ? ok({ status: "completed", restarted, ...progress }) : done;
   }
-}
-
-/**
- * The provider is an untrusted boundary (zod): `parse` drops any field the schema does not know
- * (a smuggled `body`, `attachments`…), invalid or foreign-workspace messages are skipped, and
- * the snippet is cut to `MAX_SNIPPET_CHARS`. Only these headers and metadata reach a repository.
- */
-export function sanitizeIncoming(
-  message: IncomingMessage,
-  request: Pick<RunIncrementalSyncRequest, "workspaceId" | "accountId">,
-): IncomingMessage[] {
-  const parsed = incomingMessageSchema.safeParse(message);
-  if (!parsed.success) return [];
-  const m = parsed.data;
-  if (m.workspaceId !== request.workspaceId || m.accountId !== request.accountId) return [];
-  return [{ ...m, snippet: m.snippet.slice(0, MAX_SNIPPET_CHARS) }];
-}
-
-/**
- * Keeps one `Thread` per stored message's thread, in the same transaction as the batch. Message
- * ids stay in arrival order (the last one is the newest), so a replay or an out-of-order
- * batch never duplicates or reorders. Subject and ids only: no body (D11).
- */
-async function upsertThreads(
-  tx: Transaction,
-  messages: readonly IncomingMessage[],
-): AsyncResult<void, StorageError> {
-  const byThread = new Map<string, IncomingMessage[]>();
-  for (const m of messages) byThread.set(m.threadId, [...(byThread.get(m.threadId) ?? []), m]);
-
-  for (const added of byThread.values()) {
-    const first = added[0];
-    if (!first) continue;
-    const found = await tx.repositories.threads.get(first.workspaceId, first.threadId);
-    if (!found.ok && found.error.code !== "storage.not_found") return found;
-    const existing = found.ok ? found.value : null;
-
-    // Receipt time of every message in the thread, for ordering: known ones from the store.
-    const times = new Map<string, string>(added.map((m) => [m.id, m.receivedAt]));
-    for (const id of existing?.messageIds ?? []) {
-      if (times.has(id)) continue;
-      const row = await tx.repositories.messages.get(first.workspaceId, id);
-      if (!row.ok) {
-        if (row.error.code === "storage.not_found") continue;
-        return row;
-      }
-      times.set(id, row.value.receivedAt);
-    }
-    const ids = [...new Set([...(existing?.messageIds ?? []), ...added.map((m) => m.id)])];
-    ids.sort((a, b) => {
-      const ta = times.get(a) ?? "";
-      const tb = times.get(b) ?? "";
-      return ta < tb ? -1 : ta > tb ? 1 : a < b ? -1 : a > b ? 1 : 0;
-    });
-    const earliest = ids[0] === undefined ? undefined : added.find((m) => m.id === ids[0]);
-    const thread: Thread = {
-      schemaVersion: 1,
-      id: first.threadId,
-      workspaceId: first.workspaceId,
-      accountId: first.accountId,
-      subject: existing?.subject ?? (earliest ?? first).subject,
-      messageIds: ids as [Thread["messageIds"][number], ...Thread["messageIds"]],
-      lastMessageAt: times.get(ids.at(-1) ?? "") ?? first.receivedAt,
-    };
-    const saved = await tx.repositories.threads.upsert(thread);
-    if (!saved.ok) return saved;
-  }
-  return ok(undefined);
 }

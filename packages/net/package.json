@@ -22,6 +22,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@pochimail/accounts": "workspace:*",
     "@pochimail/core": "workspace:*",
     "@pochimail/kernel": "workspace:*",
     "@pochimail/logger": "workspace:*",

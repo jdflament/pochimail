@@ -181,7 +181,7 @@
         "packages/core/src/use-cases/apply-action.ts",
         "packages/core/src/use-cases/build-digest.ts",
         "packages/core/src/use-cases/classify-batch.ts",
-        "packages/core/src/use-cases/connect-account.ts",
+        "packages/accounts/src/use-cases/connect-account.ts",
         "packages/core/src/use-cases/detect-signals.ts",
         "packages/core/src/use-cases/propose-suggestions.ts",
         "packages/core/src/use-cases/run-incremental-sync.ts",

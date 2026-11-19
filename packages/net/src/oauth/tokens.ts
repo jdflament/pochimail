@@ -1,8 +1,11 @@
-import { AuthExpired, Offline, ProviderFailed } from "@pochimail/core/errors";
-import type { AccessToken, OAuthTokenError, OAuthTokenSource } from "@pochimail/core/ports/oauth";
-import type { SecretStore } from "@pochimail/core/ports/secret-store";
+import type {
+  AccessToken,
+  OAuthTokenError,
+  OAuthTokenSource,
+} from "@pochimail/accounts/ports/oauth";
+import type { SecretStore } from "@pochimail/accounts/ports/secret-store";
 import type { CancelSignal } from "@pochimail/kernel/common";
-import { Cancelled } from "@pochimail/kernel/errors";
+import { AuthExpired, Cancelled, Offline, ProviderFailed } from "@pochimail/kernel/errors";
 import { err, ok, type Result } from "@pochimail/kernel/result";
 import { type FetchLike, postForm } from "./http.ts";
 import type { OAuthProviderConfig } from "./providers.ts";

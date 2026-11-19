@@ -1,5 +1,6 @@
 import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
 import type { Cancelled, StorageError } from "@pochimail/kernel/errors";
+import type { EventSink } from "@pochimail/kernel/event-sink";
 import type { Result } from "@pochimail/kernel/result";
 import type { OutboxEntry } from "@pochimail/pipeline/outbox";
 import type { ReadRepositories, WriteRepositories } from "./repositories.ts";
@@ -12,6 +13,7 @@ export interface OutboxWriter {
 export interface Transaction {
   readonly repositories: WriteRepositories;
   readonly outbox: OutboxWriter;
+  readonly events: EventSink;
 }
 
 /**

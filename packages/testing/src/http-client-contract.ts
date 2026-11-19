@@ -1,5 +1,6 @@
-import { AccountId } from "@pochimail/core/ids";
+import { AccountId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
+import { type Check, check, registerContract } from "@pochimail/kernel/testing/contract";
 import { createLogger, type Logger } from "@pochimail/logger/logger";
 import {
   BlockedSocketError,
@@ -16,7 +17,6 @@ import {
   RequestTimeoutError,
 } from "@pochimail/net/egress/http-client";
 import { expect } from "vitest";
-import { type Check, check, registerContract } from "./contract.ts";
 
 export interface HttpClientHarness {
   readonly client: HttpClient;

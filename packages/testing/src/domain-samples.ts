@@ -1,4 +1,4 @@
-import { PROVIDER_KINDS } from "@pochimail/core/domain/account";
+import { PROVIDER_KINDS } from "@pochimail/accounts/model/account";
 import { ACTION_KINDS } from "@pochimail/core/domain/action";
 import { CATEGORIES, SIGNAL_KINDS } from "@pochimail/core/domain/category";
 

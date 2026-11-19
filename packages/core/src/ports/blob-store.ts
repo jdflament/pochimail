@@ -1,6 +1,5 @@
 import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
-import type { Cancelled, StorageError } from "@pochimail/kernel/errors";
-import type { NotFound } from "../errors.ts";
+import type { Cancelled, NotFound, StorageError } from "@pochimail/kernel/errors";
 
 export interface BlobRef {
   readonly sha256: string;

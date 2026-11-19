@@ -1,4 +1,5 @@
-import type { Account } from "@pochimail/core/domain/account";
+import type { Account } from "@pochimail/accounts/model/account";
+import { ListAccounts } from "@pochimail/accounts/use-cases/list-accounts";
 import { parseDomainEvent } from "@pochimail/core/events/catalog";
 import type { Classifier } from "@pochimail/core/ports/ai";
 import type { MailProvider } from "@pochimail/core/ports/mail-provider";
@@ -8,7 +9,6 @@ import type { UnitOfWork } from "@pochimail/core/ports/unit-of-work";
 import { CountCategories } from "@pochimail/core/use-cases/count-categories";
 import { GetOverview } from "@pochimail/core/use-cases/get-overview";
 import { LatestDigest } from "@pochimail/core/use-cases/latest-digest";
-import { ListAccounts } from "@pochimail/core/use-cases/list-accounts";
 import { ManageSettings } from "@pochimail/core/use-cases/manage-settings";
 import { RunScan } from "@pochimail/core/use-cases/run-scan";
 import { ScanRunner } from "@pochimail/core/use-cases/scan-runner";

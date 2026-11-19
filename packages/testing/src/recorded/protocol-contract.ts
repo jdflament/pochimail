@@ -1,6 +1,6 @@
-import type { IncomingMessage } from "@pochimail/core/domain/mail";
+import { type Check, check, registerContract } from "@pochimail/kernel/testing/contract";
+import type { IncomingMessage } from "@pochimail/mailbox/model/message";
 import { expect } from "vitest";
-import { type Check, check, registerContract } from "../contract.ts";
 
 // DEV/TEST ONLY.
 

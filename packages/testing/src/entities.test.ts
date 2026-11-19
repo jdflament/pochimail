@@ -1,12 +1,17 @@
-import { accountSchema } from "@pochimail/core/domain/account";
+import { accountSchema } from "@pochimail/accounts/model/account";
 import {
   actionLogSchema,
   actionSchema,
   createSuggestion,
   suggestionSchema,
 } from "@pochimail/core/domain/action";
-import { CATEGORIES, categorySchema, signalKindSchema } from "@pochimail/core/domain/category";
-import { incomingMessageSchema, messageSchema } from "@pochimail/core/domain/mail";
+import {
+  CATEGORIES,
+  categoryOf,
+  categorySchema,
+  signalKindSchema,
+} from "@pochimail/core/domain/category";
+import { incomingMessageSchema, messageSchema } from "@pochimail/mailbox/model/message";
 import { describe, expect, it } from "vitest";
 import { rng, sampleBuilders } from "./domain-samples.ts";
 import { entityRoundTripContract } from "./entity-contract.ts";
@@ -50,7 +55,7 @@ describe("fixed vocabularies", () => {
   it("rejects an unknown category on a message (including 'suspicious', which is a flag)", () => {
     expect(categorySchema.safeParse("suspicious").success).toBe(false);
     const m = { ...sampleBuilders.message(r), category: "spam" };
-    expect(messageSchema.safeParse(m).success).toBe(false);
+    expect(() => categoryOf(m)).toThrow();
   });
   it("has exactly 6 signal kinds", () => {
     expect(signalKindSchema.options).toHaveLength(6);

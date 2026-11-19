@@ -1,16 +1,21 @@
 import type { Command } from "@pochimail/core/domain/action";
-import type { IncomingMessage } from "@pochimail/core/domain/mail";
-import { Conflict, Offline, type ProviderError, RateLimited } from "@pochimail/core/errors";
 import type {
   AppliedCommand,
   MailProvider,
   MailProviderCapabilities,
   MailProviderError,
-  SyncCursor,
 } from "@pochimail/core/ports/mail-provider";
-import { Cancelled } from "@pochimail/kernel/errors";
+import {
+  Cancelled,
+  Conflict,
+  Offline,
+  type ProviderError,
+  RateLimited,
+} from "@pochimail/kernel/errors";
 import { err, ok } from "@pochimail/kernel/result";
-import { createFaults, type Faults } from "./faults.ts";
+import { createFaults, type Faults } from "@pochimail/kernel/testing/faults";
+import type { IncomingMessage } from "@pochimail/mailbox/model/message";
+import type { SyncCursor } from "@pochimail/mailbox/ports/mail-reader";
 
 export interface FakeMailProvider extends MailProvider {
   readonly faults: Faults<ProviderError>;
