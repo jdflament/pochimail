@@ -1,5 +1,5 @@
 import { toast } from "@pochimail/ui/components/sonner";
-import { t } from "@pochimail/ui/i18n/format.ts";
+import { useT } from "@pochimail/ui/i18n/i18n-provider.tsx";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import type { RpcClient } from "#shared/ipc/client.ts";
@@ -8,6 +8,7 @@ import { subscribeAppEvents } from "./query/worker-events.ts";
 
 /** Keeps the global app.events subscription active so optimistic mutations reconcile without polling. */
 export function AppEventsBridge({ client }: { client: RpcClient }) {
+  const t = useT();
   const registry = useOptimisticRegistry();
   const queryClient = useQueryClient();
   useEffect(
@@ -21,7 +22,7 @@ export function AppEventsBridge({ client }: { client: RpcClient }) {
           void queryClient.invalidateQueries({ queryKey: ["overview"] });
         },
       ),
-    [client, registry, queryClient],
+    [client, registry, queryClient, t],
   );
   return null;
 }

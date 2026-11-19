@@ -1,10 +1,12 @@
 import { Toaster } from "@pochimail/ui/components/sonner";
+import { I18nProvider } from "@pochimail/ui/i18n/i18n-provider.tsx";
 import { type QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "@tanstack/react-router";
 import { useMemo } from "react";
 import type { RpcClient } from "#shared/ipc/client.ts";
 import { AppEventsBridge } from "../lib/app-events-bridge.tsx";
 import { AppErrorBoundary } from "../lib/error-boundary.tsx";
+import { useAppLocale } from "../lib/locale.ts";
 import { OptimisticActionProvider } from "../lib/optimistic-context.tsx";
 import { createAppQueryClient } from "../lib/query/client.ts";
 import { createOptimisticActionRegistry } from "../lib/query/optimistic.ts";
@@ -33,6 +35,7 @@ export type AppProps = {
  * Accepts injectable dependencies so behaviour can be tested through this public entry point with fake IPC.
  */
 export function App(props: AppProps = {}) {
+  const locale = useAppLocale();
   const queryClient = useMemo(
     () => props.queryClient ?? createAppQueryClient(),
     [props.queryClient],
@@ -46,15 +49,17 @@ export function App(props: AppProps = {}) {
   }, [props.router, workerClient]);
 
   return (
-    <AppErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <OptimisticActionProvider registry={registry}>
-          <WorkerClientProvider client={workerClient}>
-            <AppShell router={router} />
-            <Toaster />
-          </WorkerClientProvider>
-        </OptimisticActionProvider>
-      </QueryClientProvider>
-    </AppErrorBoundary>
+    <I18nProvider locale={locale}>
+      <AppErrorBoundary>
+        <QueryClientProvider client={queryClient}>
+          <OptimisticActionProvider registry={registry}>
+            <WorkerClientProvider client={workerClient}>
+              <AppShell router={router} />
+              <Toaster />
+            </WorkerClientProvider>
+          </OptimisticActionProvider>
+        </QueryClientProvider>
+      </AppErrorBoundary>
+    </I18nProvider>
   );
 }

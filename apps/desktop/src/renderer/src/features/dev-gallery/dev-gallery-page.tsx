@@ -1,6 +1,6 @@
 import { MotionProvider } from "@pochimail/ui/components/motion-provider";
 import { Switch } from "@pochimail/ui/components/switch";
-import { t } from "@pochimail/ui/i18n/format.ts";
+import { useT } from "@pochimail/ui/i18n/i18n-provider.tsx";
 import { useEffect, useState } from "react";
 import { type GalleryEntry, motionEntries, stateEntries } from "./gallery-entries.tsx";
 
@@ -37,6 +37,7 @@ function Section({
 
 /** Dev/E2E only (router.tsx): every required state and motion moment, with theme and reduced-motion toggles. */
 export function DevGalleryPage() {
+  const t = useT();
   const [dark, setDark] = useState(() => document.documentElement.classList.contains("dark"));
   const [reduceMotion, setReduceMotion] = useState(false);
   useEffect(() => {

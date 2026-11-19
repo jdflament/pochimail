@@ -1,5 +1,5 @@
 import { Button } from "@pochimail/ui/components/button";
-import { getLocale, t } from "@pochimail/ui/i18n/format.ts";
+import { useLocale, useT } from "@pochimail/ui/i18n/i18n-provider.tsx";
 import { deviceLabel } from "@pochimail/ui/i18n/locale.ts";
 import { cn } from "@pochimail/ui/lib/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -8,12 +8,14 @@ import { queryKeys } from "../../lib/query/keys.ts";
 import { useWorkerClient } from "../../lib/worker-context.tsx";
 
 export function WelcomePage() {
+  const t = useT();
+  const locale = useLocale();
   const client = useWorkerClient();
   const deviceName = useQuery({
     queryKey: queryKeys.deviceName(),
     queryFn: () => client.call("device.name"),
   });
-  const device = deviceLabel(deviceName.data ?? "device", getLocale());
+  const device = deviceLabel(deviceName.data ?? "device", locale);
 
   return (
     <>

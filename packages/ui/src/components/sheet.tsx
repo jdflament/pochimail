@@ -1,4 +1,4 @@
-import { t } from "@pochimail/ui/i18n/format.ts";
+import { useT } from "@pochimail/ui/i18n/i18n-provider.tsx";
 import { cn } from "@pochimail/ui/lib/utils";
 import { XIcon } from "lucide-react";
 import { Dialog as SheetPrimitive } from "radix-ui";
@@ -56,6 +56,7 @@ type SheetContentProps = React.ComponentProps<typeof SheetPrimitive.Content> & {
 };
 
 function SheetContent({ className, children, container, ...props }: SheetContentProps) {
+  const t = useT();
   return (
     <SheetPrimitive.Portal container={container}>
       <SheetOverlay />

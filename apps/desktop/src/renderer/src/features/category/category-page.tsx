@@ -1,7 +1,8 @@
-import { t } from "@pochimail/ui/i18n/format.ts";
+import { useT } from "@pochimail/ui/i18n/i18n-provider.tsx";
 import { useParams } from "@tanstack/react-router";
 
 export function CategoryPage() {
+  const t = useT();
   const { categoryId } = useParams({ from: "/shell/category/$categoryId" });
   return (
     <main className="mx-auto max-w-2xl px-8 pt-16">
