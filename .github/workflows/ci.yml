@@ -45,6 +45,7 @@ jobs:
 
   check-windows:
     name: check (windows-latest)
+    if: github.event_name != 'pull_request'
     runs-on: windows-latest
     timeout-minutes: 20
     steps:
