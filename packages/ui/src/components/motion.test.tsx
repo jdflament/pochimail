@@ -6,6 +6,7 @@ import { Toaster, undoToast } from "@pochimail/ui/components/sonner";
 import { StatusStrip } from "@pochimail/ui/components/status-strip";
 import { StorageBar } from "@pochimail/ui/components/storage-bar";
 import { t } from "@pochimail/ui/i18n/format.ts";
+import { I18nProvider } from "@pochimail/ui/i18n/i18n-provider.tsx";
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -140,5 +141,22 @@ describe("with motion on", () => {
     await userEvent.dblClick(undo);
     expect(screen.getByText("24 emails archived")).toBeTruthy();
     expect(onUndo).toHaveBeenCalledTimes(1);
+  });
+
+  // Guards: an open undo toast keeping the old language after the language changes.
+  it("an open undo toast follows a language change", async () => {
+    const ui = (locale: "en" | "fr") => (
+      <I18nProvider locale={locale}>
+        <Toaster theme="dark" />
+      </I18nProvider>
+    );
+    const { rerender } = render(ui("en"));
+    act(() => {
+      undoToast("24 emails archived", vi.fn());
+    });
+    await screen.findAllByRole("button", { name: "Undo" });
+    rerender(ui("fr"));
+    expect((await screen.findAllByRole("button", { name: "Annuler" })).length).toBeGreaterThan(0);
+    expect(screen.queryAllByRole("button", { name: "Undo" })).toEqual([]);
   });
 });

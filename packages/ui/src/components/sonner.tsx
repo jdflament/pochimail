@@ -1,4 +1,4 @@
-import { t } from "@pochimail/ui/i18n/format.ts";
+import { useT } from "@pochimail/ui/i18n/i18n-provider.tsx";
 import { MOTION } from "@pochimail/ui/lib/motion";
 import { once } from "@pochimail/ui/lib/once";
 import { cn } from "@pochimail/ui/lib/utils";
@@ -32,11 +32,16 @@ function Toaster({ theme = "dark", className, ...props }: ToasterProps) {
   );
 }
 
+/** Rendered inside the Toaster, so an open toast follows a language change. */
+function UndoLabel() {
+  return useT()("action.undo");
+}
+
 /** The dark undo toast after a cleanup: lives 5s, Undo runs at most once. */
 function undoToast(message: string, onUndo: () => void) {
   return toast(message, {
     duration: MOTION.undoMs,
-    action: { label: t("action.undo"), onClick: once(onUndo) },
+    action: { label: <UndoLabel />, onClick: once(onUndo) },
   });
 }
 
