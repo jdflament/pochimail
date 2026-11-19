@@ -1,6 +1,6 @@
 import type { Account } from "@pochimail/core/domain/account";
 import type { ActionLog, Suggestion } from "@pochimail/core/domain/action";
-import { CATEGORIES, type Category } from "@pochimail/core/domain/category";
+import { CATEGORIES, type Category, DEFAULT_CATEGORY } from "@pochimail/core/domain/category";
 import type { DerivedMessage } from "@pochimail/core/domain/derived";
 import type {
   Message,
@@ -57,9 +57,6 @@ const emptyData = (): Data => ({
   digestSequence: new Map(),
   outbox: [],
 });
-
-/** A message that arrives unclassified is filed here until the classifier says otherwise. */
-const DEFAULT_CATEGORY = "notifications" as const;
 
 const key = (...parts: string[]) => parts.join("\u0000");
 const copy = <T>(value: T): T => structuredClone(value);

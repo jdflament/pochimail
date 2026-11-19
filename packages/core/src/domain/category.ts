@@ -13,6 +13,8 @@ export const CATEGORIES = [
 ] as const;
 export const categorySchema = z.enum(CATEGORIES);
 export type Category = z.infer<typeof categorySchema>;
+/** A message that arrives unclassified is filed here until the classifier says otherwise. */
+export const DEFAULT_CATEGORY: Category = "notifications";
 
 /** Phishing is a flag on top of any category, never a category (brief §3). */
 export const suspiciousFlagSchema = z.object({

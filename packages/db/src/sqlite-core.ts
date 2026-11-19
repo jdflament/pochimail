@@ -25,7 +25,6 @@ import { z } from "zod";
 type Row = Record<string, unknown>;
 type Done<T> = Result<T, StorageError>;
 type Found<T> = Result<T, StorageError | NotFound>;
-
 /** Runs `run`, turning a thrown failure (SQL, bad row, bad cursor) into a `StorageError`. */
 function guard<T>(run: () => T): Done<T> {
   try {

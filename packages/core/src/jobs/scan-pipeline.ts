@@ -4,12 +4,8 @@ import type { DomainError } from "@pochimail/kernel/errors";
 import type { WorkspaceId } from "@pochimail/kernel/ids";
 import { err, ok } from "@pochimail/kernel/result";
 import type { JobQueue } from "@pochimail/pipeline/job-queue";
-import {
-  type CursorStore,
-  createPipeline,
-  type Pipeline,
-  type Stage,
-} from "@pochimail/pipeline/job-runner";
+import { createPipeline } from "@pochimail/pipeline/job-runner";
+import type { CursorStore, Pipeline, Stage } from "@pochimail/pipeline/pipeline-types";
 import type { RetryPolicy } from "@pochimail/pipeline/retry";
 import type { IncomingMessage } from "../domain/mail.ts";
 import type { AccountId, MessageId } from "../ids.ts";
