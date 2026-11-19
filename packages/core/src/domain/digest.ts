@@ -1,12 +1,12 @@
-import { z } from "zod";
-import { categorySchema, signalKindSchema } from "./category.ts";
 import {
   accountIdSchema,
   messageIdSchema,
   schemaVersion,
   timestampSchema,
   workspaceIdSchema,
-} from "./common.ts";
+} from "@pochimail/kernel/schemas";
+import { z } from "zod";
+import { categorySchema, signalKindSchema } from "./category.ts";
 
 /**
  * The "what's new" summary (brief §7): only mail that arrived after `since`, never totals of

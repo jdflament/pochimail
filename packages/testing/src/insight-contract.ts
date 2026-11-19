@@ -1,7 +1,5 @@
 import type { SignalKind } from "@pochimail/core/domain/category";
 import type { DerivedMessage } from "@pochimail/core/domain/derived";
-import type { IncomingMessage } from "@pochimail/core/domain/mail";
-import type { MessageId } from "@pochimail/core/ids";
 import type { Classifier } from "@pochimail/core/ports/ai";
 import type { UnitOfWork } from "@pochimail/core/ports/unit-of-work";
 import { BuildDigest } from "@pochimail/core/use-cases/build-digest";
@@ -9,9 +7,11 @@ import { ClassifyBatch } from "@pochimail/core/use-cases/classify-batch";
 import { DetectSignals } from "@pochimail/core/use-cases/detect-signals";
 import { ProposeSuggestions } from "@pochimail/core/use-cases/propose-suggestions";
 import type { Clock } from "@pochimail/kernel/clock";
+import type { MessageId } from "@pochimail/kernel/ids";
 import { ok, unwrap } from "@pochimail/kernel/result";
+import { type Check, check, registerContract } from "@pochimail/kernel/testing/contract";
+import type { IncomingMessage } from "@pochimail/mailbox/model/message";
 import { expect } from "vitest";
-import { type Check, check, registerContract } from "./contract.ts";
 import { makeDerived } from "./derived-contract.ts";
 import {
   ACCOUNT_1,

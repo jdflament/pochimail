@@ -1,14 +1,9 @@
-import { accountSchema } from "@pochimail/core/domain/account";
+import { accountSchema } from "@pochimail/accounts/model/account";
 import { actionLogSchema, actionSchema, suggestionSchema } from "@pochimail/core/domain/action";
-import {
-  attachmentSchema,
-  incomingMessageSchema,
-  messageSchema,
-  senderStatsSchema,
-  signalSchema,
-  threadSchema,
-  topicSchema,
-} from "@pochimail/core/domain/mail";
+import { attachmentSchema, signalSchema, topicSchema } from "@pochimail/core/domain/mail";
+import { incomingMessageSchema, messageSchema } from "@pochimail/mailbox/model/message";
+import { senderStatsSchema } from "@pochimail/mailbox/model/sender-stats";
+import { threadSchema } from "@pochimail/mailbox/model/thread";
 import { describe, expect, it } from "vitest";
 import { rng, sampleBuilders } from "./domain-samples.ts";
 

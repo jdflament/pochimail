@@ -1,5 +1,5 @@
-import type { IncomingMessage } from "@pochimail/core/domain/mail";
-import { incomingMessageSchema } from "@pochimail/core/domain/mail";
+import type { IncomingMessage } from "@pochimail/mailbox/model/message";
+import { incomingMessageSchema } from "@pochimail/mailbox/model/message";
 import type { FixtureMessage } from "../fixture-mailbox/mailbox-reader.ts";
 import type { RecordedEntry, Recording } from "./http-replay.ts";
 

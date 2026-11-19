@@ -5,6 +5,10 @@ declare const brand: unique symbol;
 export type Brand<T, B extends string> = T & { readonly [brand]: B };
 
 export type WorkspaceId = Brand<string, "WorkspaceId">;
+export type AccountId = Brand<string, "AccountId">;
+export type MessageId = Brand<string, "MessageId">;
+export type ThreadId = Brand<string, "ThreadId">;
+export type TopicId = Brand<string, "TopicId">;
 
 const MAX_ID_LENGTH = 512;
 // Control characters (incl. NUL, newlines) never belong in an identifier or a log line.
@@ -26,6 +30,10 @@ export function makeId<T extends string>(kind: string) {
 }
 
 export const WorkspaceId = makeId<WorkspaceId>("WorkspaceId");
+export const AccountId = makeId<AccountId>("AccountId");
+export const MessageId = makeId<MessageId>("MessageId");
+export const ThreadId = makeId<ThreadId>("ThreadId");
+export const TopicId = makeId<TopicId>("TopicId");
 
 /**
  * Strict, log-safe shape of OUR OWN identifiers: `<prefix>_<ULID>` or `<prefix>_<UUID>`.

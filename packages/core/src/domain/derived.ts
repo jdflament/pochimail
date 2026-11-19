@@ -1,13 +1,13 @@
-import { z } from "zod";
-import { categorySchema } from "./category.ts";
 import {
   accountIdSchema,
-  confidenceSchema,
   messageIdSchema,
   schemaVersion,
   timestampSchema,
   workspaceIdSchema,
-} from "./common.ts";
+} from "@pochimail/kernel/schemas";
+import { z } from "zod";
+import { categorySchema } from "./category.ts";
+import { confidenceSchema } from "./common.ts";
 
 // PRIVATE MAIL DATA: `snippet` is a few characters of a message. Never log it.
 

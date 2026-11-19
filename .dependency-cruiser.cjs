@@ -60,7 +60,7 @@ module.exports = {
       name: "adapters-use-only-pipeline-ports",
       severity: "error",
       comment:
-        "Only db (the JobQueue and OutboxStore ports it implements: job-queue.ts, outbox.ts) and net (the pure retry backoff: retry.ts) may import pipeline, and only those files. No adapter runs pipeline code.",
+        "Only db (the JobQueue and OutboxStore ports it implements and the outbox-backed event sink: job-queue.ts, outbox.ts, outbox-event-sink.ts) and net (the pure retry backoff: retry.ts) may import pipeline, and only those files. No adapter runs pipeline code.",
       from: { path: `^packages/(${ADAPTERS})/src/`, pathNot: [NOT_SHIPPED, "^packages/(db|net)/src/"] },
       to: { path: "^packages/pipeline/src/" },
     },
@@ -74,9 +74,9 @@ module.exports = {
     {
       name: "db-uses-only-pipeline-ports",
       severity: "error",
-      comment: "db implements pipeline's JobQueue and OutboxStore ports and nothing else of pipeline.",
+      comment: "db implements pipeline's JobQueue and OutboxStore ports, builds its transaction's event sink over the outbox, and uses nothing else of pipeline.",
       from: { path: "^packages/db/src/", pathNot: NOT_SHIPPED },
-      to: { path: "^packages/pipeline/src/", pathNot: "^packages/pipeline/src/(job-queue|outbox)\\.ts$" },
+      to: { path: "^packages/pipeline/src/", pathNot: "^packages/pipeline/src/(job-queue|outbox|outbox-event-sink)\\.ts$" },
     },
     {
       name: "only-mail-adapters-use-net",
@@ -116,7 +116,7 @@ module.exports = {
       comment:
         "Transitional until packages/core is split into domains (ADR 0015); delete this rule with the package.",
       from: { path: "^packages/core/src/" },
-      to: { path: "^(packages|apps)/", pathNot: "^packages/(core|kernel|pipeline)/src/" },
+      to: { path: "^(packages|apps)/", pathNot: "^packages/(core|kernel|pipeline|accounts|mailbox)/src/" },
     },
     {
       name: "legacy-core-npm-allowlist",

@@ -1,10 +1,9 @@
+import type { Account } from "@pochimail/accounts/model/account";
 import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
 import type { StorageError } from "@pochimail/kernel/errors";
-import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { InvalidStateError, NotFound } from "@pochimail/kernel/errors";
+import type { AccountId, WorkspaceId } from "@pochimail/kernel/ids";
 import { err, ok, type Result } from "@pochimail/kernel/result";
-import type { Account } from "../domain/account.ts";
-import { InvalidStateError, NotFound } from "../errors.ts";
-import type { AccountId } from "../ids.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
 import type { RunScan } from "./run-scan.ts";
 

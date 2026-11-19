@@ -62,3 +62,52 @@ export class EventError extends DomainError {
     super("event.invalid", message);
   }
 }
+
+export class InvalidStateError extends DomainError {
+  constructor(message: string) {
+    super("domain.invalid_state", message);
+  }
+}
+
+/** Failures reported by (or while reaching) a mail provider. */
+export abstract class ProviderError extends DomainError {}
+
+export class RateLimited extends ProviderError {
+  readonly retryAfterMs: number | undefined;
+
+  constructor(options: { retryAfterMs?: number } = {}) {
+    super("provider.rate_limited", "Provider rate limit reached");
+    this.retryAfterMs = options.retryAfterMs;
+  }
+}
+
+export class Offline extends ProviderError {
+  constructor() {
+    super("provider.offline", "Provider is unreachable");
+  }
+}
+
+export class AuthExpired extends ProviderError {
+  constructor() {
+    super("provider.auth_expired", "Provider credentials expired");
+  }
+}
+
+export class Conflict extends ProviderError {
+  constructor(message = "Provider state changed since it was last read") {
+    super("provider.conflict", message);
+  }
+}
+
+/** The provider answered, but not acceptably (a rejected token exchange, an unexpected body). */
+export class ProviderFailed extends ProviderError {
+  constructor(message = "Provider request failed") {
+    super("provider.failed", message);
+  }
+}
+
+export class NotFound extends DomainError {
+  constructor(what: string) {
+    super("storage.not_found", `${what} not found`);
+  }
+}

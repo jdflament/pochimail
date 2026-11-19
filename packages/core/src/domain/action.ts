@@ -1,18 +1,20 @@
-import { ERROR_CODES } from "@pochimail/kernel/errors";
+import { ERROR_CODES, InvalidStateError } from "@pochimail/kernel/errors";
 import { err, ok, type Result } from "@pochimail/kernel/result";
-import { z } from "zod";
-import { InvalidStateError, POLICY_DENIAL_REASONS } from "../errors.ts";
 import {
   accountIdSchema,
+  messageIdSchema,
+  schemaVersion,
+  timestampSchema,
+  workspaceIdSchema,
+} from "@pochimail/kernel/schemas";
+import { z } from "zod";
+import { POLICY_DENIAL_REASONS } from "../errors.ts";
+import {
   actionIdSchema,
   actionLogIdSchema,
   confidenceSchema,
-  messageIdSchema,
   reasonsSchema,
-  schemaVersion,
   suggestionIdSchema,
-  timestampSchema,
-  workspaceIdSchema,
 } from "./common.ts";
 
 /** There is deliberately no delete kind: mail is archived, never deleted (brief §2). */

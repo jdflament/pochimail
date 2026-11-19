@@ -1,13 +1,11 @@
 import type { Clock } from "@pochimail/kernel/clock";
 import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
-import type { Cancelled, StorageError } from "@pochimail/kernel/errors";
-import type { WorkspaceId } from "@pochimail/kernel/ids";
+import type { Cancelled, NotFound, StorageError } from "@pochimail/kernel/errors";
+import type { AccountId, MessageId, WorkspaceId } from "@pochimail/kernel/ids";
 import { ok } from "@pochimail/kernel/result";
-import type { Category } from "../domain/category.ts";
+import { type Category, categoryOf } from "../domain/category.ts";
 import type { Digest } from "../domain/digest.ts";
-import type { NotFound } from "../errors.ts";
 import type { DomainEventOf } from "../events/catalog.ts";
-import type { AccountId, MessageId } from "../ids.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
 import { evaluateSignals } from "./detect-signals.ts";
 
@@ -75,7 +73,7 @@ export class BuildDigest {
       });
       if (!page.ok) return page;
       for (const m of page.value.items)
-        if (!byDate || m.receivedAt > since) fresh.push({ id: m.id, category: m.category });
+        if (!byDate || m.receivedAt > since) fresh.push({ id: m.id, category: categoryOf(m) });
       cursor = page.value.nextCursor ?? undefined;
     } while (cursor !== undefined);
 

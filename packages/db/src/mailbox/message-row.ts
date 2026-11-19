@@ -1,4 +1,4 @@
-import { type Message, messageSchema } from "@pochimail/core/domain/mail";
+import { type Message, messageSchema } from "@pochimail/mailbox/model/message";
 import type { Row } from "../shared/sql.ts";
 import { flag, json } from "../shared/values.ts";
 

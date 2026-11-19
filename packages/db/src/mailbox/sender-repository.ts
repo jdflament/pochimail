@@ -1,4 +1,4 @@
-import { senderStatsSchema } from "@pochimail/core/domain/mail";
+import { senderStatsSchema } from "@pochimail/mailbox/model/sender-stats";
 import type { Database } from "better-sqlite3-multiple-ciphers";
 import type { z } from "zod";
 import { decodeCursor, page } from "../shared/paging.ts";

@@ -49,9 +49,9 @@ Every workspace is `packages/<name>` or `apps/<name>`. Packages are of three kin
 6. **workflows** chain each step; **pipeline** runs them as jobs with batching, retries and an outbox.
 
 ## Start reading
-Today the domain code is still in `packages/core` ([ADR 0015](docs/adr/0015-bounded-context-packages-and-quality-gates.md) splits them).
-- Use case: `packages/core/src/use-cases/apply-action.ts`
-- A port and its contract suite: `packages/core/src/ports/mail-provider.ts` and `packages/testing/src/mail-provider-contract.ts`
+Accounts and mailbox live in their packages; the rest of the domain code is still in `packages/core` ([ADR 0015](docs/adr/0015-bounded-context-packages-and-quality-gates.md) splits them).
+- Use case: `packages/accounts/src/use-cases/connect-account.ts`
+- A port and its contract suite: `packages/accounts/src/ports/secret-store.ts` and `packages/accounts/src/testing/secret-store-contract.ts`
 - The scan flow: `packages/core/src/use-cases/run-scan.ts` and `packages/core/src/jobs/scan-pipeline.ts`
 - IPC: `apps/desktop/src/shared/ipc/`
 - Boundaries: `.dependency-cruiser.cjs`

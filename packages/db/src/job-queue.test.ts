@@ -1,5 +1,5 @@
 import { unwrap } from "@pochimail/kernel/result";
-import { failingChecks } from "@pochimail/testing/contract";
+import { failingChecks } from "@pochimail/kernel/testing/contract";
 import { unitOfWorkChecks } from "@pochimail/testing/unit-of-work-contract";
 import { describe, expect, it } from "vitest";
 import { queueHarness, sqliteUnitOfWorkHarness, ws } from "./test-support/storage.ts";

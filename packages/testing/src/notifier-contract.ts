@@ -1,6 +1,6 @@
 import type { Notification, Notifier } from "@pochimail/core/ports/notifier";
+import { type Check, check, registerContract } from "@pochimail/kernel/testing/contract";
 import { expect } from "vitest";
-import { type Check, check, registerContract } from "./contract.ts";
 
 export interface NotifierHarness {
   readonly notifier: Notifier;

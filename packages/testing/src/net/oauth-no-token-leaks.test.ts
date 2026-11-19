@@ -1,12 +1,12 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { accountSecretKey, ConnectAccount } from "@pochimail/core/use-cases/connect-account";
+import { createInMemorySecretStore } from "@pochimail/accounts/testing/in-memory-secret-store";
+import { accountSecretKey, ConnectAccount } from "@pochimail/accounts/use-cases/connect-account";
 import { createLogger } from "@pochimail/logger/logger";
 import { oauthProviderConfig } from "@pochimail/net/oauth/providers";
 import { OAuthSignIn } from "@pochimail/net/oauth/sign-in";
 import { startFakeOAuthServer } from "@pochimail/testing/fake-oauth-server";
 import { WS_A } from "@pochimail/testing/fixtures";
-import { createInMemorySecretStore } from "@pochimail/testing/in-memory-secret-store";
 import { createInMemoryUnitOfWork } from "@pochimail/testing/in-memory-store";
 import { loopbackFetch } from "@pochimail/testing/loopback-fetch";
 import { expect, it } from "vitest";

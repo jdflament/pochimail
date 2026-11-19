@@ -1,13 +1,11 @@
+import { ListAccounts } from "@pochimail/accounts/use-cases/list-accounts";
 import type { Clock } from "@pochimail/kernel/clock";
 import type { AsyncResult } from "@pochimail/kernel/common";
-import type { StorageError } from "@pochimail/kernel/errors";
-import type { WorkspaceId } from "@pochimail/kernel/ids";
+import type { NotFound, StorageError } from "@pochimail/kernel/errors";
+import type { AccountId, WorkspaceId } from "@pochimail/kernel/ids";
 import { ok } from "@pochimail/kernel/result";
 import type { Category } from "../domain/category.ts";
-import type { NotFound } from "../errors.ts";
-import type { AccountId } from "../ids.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
-import { ListAccounts } from "./list-accounts.ts";
 import { SummarizeMailbox } from "./summarize-mailbox.ts";
 
 /** Categories Pochi may propose to clean. People, records and purchases are never listed (brief §7 item 4). */

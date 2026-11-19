@@ -1,9 +1,10 @@
+import { createInMemorySecretStore } from "@pochimail/accounts/testing/in-memory-secret-store";
 import type { Category } from "@pochimail/core/domain/category";
-import { AiUnavailable, type ProviderError } from "@pochimail/core/errors";
+import { AiUnavailable } from "@pochimail/core/errors";
+import type { ProviderError } from "@pochimail/kernel/errors";
 import { createFakeClock } from "./fake-clock.ts";
 import { createFakeMailProvider } from "./fake-mail-provider.ts";
 import { createGroundTruthClassifier } from "./ground-truth-classifier.ts";
-import { createInMemorySecretStore } from "./in-memory-secret-store.ts";
 import { createInMemoryUnitOfWork } from "./in-memory-store.ts";
 import { runSyncContract } from "./sync-contract.ts";
 

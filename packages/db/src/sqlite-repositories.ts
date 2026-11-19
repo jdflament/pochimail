@@ -1,7 +1,7 @@
-import type { Message } from "@pochimail/core/domain/mail";
 import type { ReadRepositories, WriteRepositories } from "@pochimail/core/ports/repositories";
 import type { AsyncResult } from "@pochimail/kernel/common";
 import type { StorageError } from "@pochimail/kernel/errors";
+import type { Message } from "@pochimail/mailbox/model/message";
 import type { Database } from "better-sqlite3-multiple-ciphers";
 import { createAccountRepository } from "./accounts/account-repository.ts";
 import { createActionLogRepository } from "./actions/action-log-repository.ts";

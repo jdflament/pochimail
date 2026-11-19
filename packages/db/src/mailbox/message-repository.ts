@@ -4,10 +4,10 @@ import {
   categorySchema,
   DEFAULT_CATEGORY,
 } from "@pochimail/core/domain/category";
-import type { IncomingMessage } from "@pochimail/core/domain/mail";
-import { NotFound } from "@pochimail/core/errors";
-import type { MessageQuery } from "@pochimail/core/ports/repositories";
+import { NotFound } from "@pochimail/kernel/errors";
 import { err, ok } from "@pochimail/kernel/result";
+import type { IncomingMessage } from "@pochimail/mailbox/model/message";
+import type { MessageQuery } from "@pochimail/mailbox/ports/message-repository";
 import type { Database } from "better-sqlite3-multiple-ciphers";
 import { z } from "zod";
 import { decodeCursor, page } from "../shared/paging.ts";

@@ -1,4 +1,4 @@
-import type { SyncCursor } from "@pochimail/core/ports/mail-provider";
+import type { SyncCursor } from "@pochimail/mailbox/ports/mail-reader";
 import type { Database } from "better-sqlite3-multiple-ciphers";
 import { z } from "zod";
 import { guard, sqlHelpers } from "../shared/sql.ts";

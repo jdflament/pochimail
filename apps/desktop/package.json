@@ -28,9 +28,11 @@
   },
   "devDependencies": {
     "@electron/fuses": "2.1.3",
+    "@pochimail/accounts": "workspace:*",
     "@pochimail/core": "workspace:*",
     "@pochimail/kernel": "workspace:*",
     "@pochimail/logger": "workspace:*",
+    "@pochimail/mailbox": "workspace:*",
     "@pochimail/net": "workspace:*",
     "@pochimail/pipeline": "workspace:*",
     "@pochimail/testing": "workspace:*",

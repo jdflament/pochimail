@@ -1,4 +1,4 @@
-import type { Page } from "@pochimail/core/ports/common";
+import type { Page } from "@pochimail/kernel/common";
 import { z } from "zod";
 import type { Row } from "./sql.ts";
 

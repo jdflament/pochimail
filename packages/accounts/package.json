@@ -1,0 +1,36 @@
+{
+  "name": "@pochimail/accounts",
+  "private": true,
+  "version": "0.0.0",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "exports": {
+    "./errors": "./src/errors.ts",
+    "./events": "./src/events.ts",
+    "./model/account": "./src/model/account.ts",
+    "./ports/account-repository": "./src/ports/account-repository.ts",
+    "./ports/oauth": "./src/ports/oauth.ts",
+    "./ports/secret-store": "./src/ports/secret-store.ts",
+    "./ports/unit-of-work": "./src/ports/unit-of-work.ts",
+    "./use-cases/connect-account": "./src/use-cases/connect-account.ts",
+    "./use-cases/list-accounts": "./src/use-cases/list-accounts.ts",
+    "./use-cases/mark-account-needs-reauth": "./src/use-cases/mark-account-needs-reauth.ts",
+    "./use-cases/remove-account": "./src/use-cases/remove-account.ts",
+    "./testing/*": "./src/testing/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc",
+    "lint": "biome check .",
+    "knip": "knip",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@pochimail/kernel": "workspace:*",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@pochimail/typescript-config": "workspace:*",
+    "typescript": "7.0.2",
+    "vitest": "5.1.0"
+  }
+}

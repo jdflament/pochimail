@@ -1,15 +1,20 @@
 import type { Clock } from "@pochimail/kernel/clock";
 import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
-import type { Cancelled, InvalidIdError, StorageError } from "@pochimail/kernel/errors";
-import type { WorkspaceId } from "@pochimail/kernel/ids";
+import type {
+  Cancelled,
+  InvalidIdError,
+  InvalidStateError,
+  NotFound,
+  StorageError,
+} from "@pochimail/kernel/errors";
+import type { AccountId, WorkspaceId } from "@pochimail/kernel/ids";
 import { err, ok } from "@pochimail/kernel/result";
+import type { Message } from "@pochimail/mailbox/model/message";
 import { type Command, createSuggestion, type Suggestion } from "../domain/action.ts";
-import type { Category } from "../domain/category.ts";
+import { type Category, categoryOf } from "../domain/category.ts";
 import type { DerivedMessage } from "../domain/derived.ts";
-import type { Message } from "../domain/mail.ts";
-import type { InvalidStateError, NotFound } from "../errors.ts";
 import type { DomainEventOf } from "../events/catalog.ts";
-import { type AccountId, SuggestionId } from "../ids.ts";
+import { SuggestionId } from "../ids.ts";
 import { isActionKind, PROTECTED_CATEGORIES } from "../policies/autonomy.ts";
 import type { ReadRepositories } from "../ports/repositories.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
@@ -61,8 +66,8 @@ export class ProposeSuggestions {
     const proposals: Suggestion[] = [];
     for (const [sender, rows] of [...collected.value].sort(([a], [b]) => (a < b ? -1 : 1))) {
       if (rows.length < MIN_SENDER_MESSAGES) continue;
-      if (rows.some((r) => PROTECTED_CATEGORIES.includes(r.message.category))) continue;
-      if (!rows.every((r) => CLEANABLE.includes(r.message.category))) continue;
+      if (rows.some((r) => PROTECTED_CATEGORIES.includes(categoryOf(r.message)))) continue;
+      if (!rows.every((r) => CLEANABLE.includes(categoryOf(r.message)))) continue;
       const proposal = propose(rows);
       if (!proposal || !isActionKind(proposal.kind)) continue;
       const id = SuggestionId(`sug:${request.accountId}:${sender}:${proposal.kind}`);

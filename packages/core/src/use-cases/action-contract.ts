@@ -1,11 +1,11 @@
 import type { Clock } from "@pochimail/kernel/clock";
 import type { CancelSignal } from "@pochimail/kernel/common";
 import type { IdGenerator } from "@pochimail/kernel/id-generator";
-import { WorkspaceId } from "@pochimail/kernel/ids";
+import { MessageId, WorkspaceId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
 import { describe, expect, it } from "vitest";
 import type { Action, Command } from "../domain/action.ts";
-import { ActionId, MessageId } from "../ids.ts";
+import { ActionId } from "../ids.ts";
 import type { MailProvider } from "../ports/mail-provider.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
 import { ApplyAction, type ApplyActionItem } from "./apply-action.ts";

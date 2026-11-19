@@ -9,7 +9,6 @@
     "./ids": "./src/ids.ts",
     "./domain/common": "./src/domain/common.ts",
     "./domain/category": "./src/domain/category.ts",
-    "./domain/account": "./src/domain/account.ts",
     "./domain/mail": "./src/domain/mail.ts",
     "./domain/action": "./src/domain/action.ts",
     "./ports/ai": "./src/ports/ai.ts",
@@ -18,10 +17,8 @@
     "./ports/exporter": "./src/ports/exporter.ts",
     "./ports/mail-provider": "./src/ports/mail-provider.ts",
     "./ports/notifier": "./src/ports/notifier.ts",
-    "./ports/oauth": "./src/ports/oauth.ts",
     "./ports/platform": "./src/ports/platform.ts",
     "./ports/repositories": "./src/ports/repositories.ts",
-    "./ports/secret-store": "./src/ports/secret-store.ts",
     "./ports/unit-of-work": "./src/ports/unit-of-work.ts",
     "./policies/autonomy": "./src/policies/autonomy.ts",
     "./policies/authorize": "./src/policies/authorize.ts",
@@ -31,9 +28,6 @@
     "./use-cases/undo-action": "./src/use-cases/undo-action.ts",
     "./use-cases/action-events": "./src/use-cases/action-events.ts",
     "./use-cases/action-contract": "./src/use-cases/action-contract.ts",
-    "./use-cases/connect-account": "./src/use-cases/connect-account.ts",
-    "./use-cases/remove-account": "./src/use-cases/remove-account.ts",
-    "./use-cases/mark-account-needs-reauth": "./src/use-cases/mark-account-needs-reauth.ts",
     "./use-cases/run-incremental-sync": "./src/use-cases/run-incremental-sync.ts",
     "./use-cases/classify-batch": "./src/use-cases/classify-batch.ts",
     "./domain/derived": "./src/domain/derived.ts",
@@ -41,13 +35,11 @@
     "./use-cases/detect-signals": "./src/use-cases/detect-signals.ts",
     "./use-cases/propose-suggestions": "./src/use-cases/propose-suggestions.ts",
     "./use-cases/build-digest": "./src/use-cases/build-digest.ts",
-    "./use-cases/store-messages": "./src/use-cases/store-messages.ts",
     "./use-cases/summarize-mailbox": "./src/use-cases/summarize-mailbox.ts",
     "./jobs/scan-pipeline": "./src/jobs/scan-pipeline.ts",
     "./ports/settings-store": "./src/ports/settings-store.ts",
     "./use-cases/run-scan": "./src/use-cases/run-scan.ts",
     "./use-cases/scan-runner": "./src/use-cases/scan-runner.ts",
-    "./use-cases/list-accounts": "./src/use-cases/list-accounts.ts",
     "./use-cases/get-overview": "./src/use-cases/get-overview.ts",
     "./use-cases/latest-digest": "./src/use-cases/latest-digest.ts",
     "./use-cases/manage-settings": "./src/use-cases/manage-settings.ts"
@@ -64,7 +56,9 @@
     "vitest": "5.1.0"
   },
   "dependencies": {
+    "@pochimail/accounts": "workspace:*",
     "@pochimail/kernel": "workspace:*",
+    "@pochimail/mailbox": "workspace:*",
     "@pochimail/pipeline": "workspace:*",
     "zod": "4.6.7"
   }

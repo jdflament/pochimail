@@ -1,87 +1,21 @@
-import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
-import type { StorageError } from "@pochimail/kernel/errors";
-import type { WorkspaceId } from "@pochimail/kernel/ids";
-import type { Account } from "../domain/account.ts";
+import type {
+  AccountReader,
+  AccountRepository,
+} from "@pochimail/accounts/ports/account-repository";
+import type { AsyncResult, Page, PageRequest } from "@pochimail/kernel/common";
+import type { NotFound, StorageError } from "@pochimail/kernel/errors";
+import type { AccountId, MessageId, TopicId, WorkspaceId } from "@pochimail/kernel/ids";
+import type { CursorReader, CursorRepository } from "@pochimail/mailbox/ports/cursor-repository";
+import type { MessageReader, MessageRepository } from "@pochimail/mailbox/ports/message-repository";
+import type { SenderReader, SenderRepository } from "@pochimail/mailbox/ports/sender-repository";
+import type { ThreadReader, ThreadRepository } from "@pochimail/mailbox/ports/thread-repository";
 import type { ActionLog, Suggestion } from "../domain/action.ts";
-import type { Category } from "../domain/category.ts";
 import type { DerivedMessage } from "../domain/derived.ts";
-import type {
-  IncomingMessage,
-  Message,
-  SenderStats,
-  StoredSignal,
-  Thread,
-  Topic,
-} from "../domain/mail.ts";
-import type { NotFound } from "../errors.ts";
-import type {
-  AccountId,
-  ActionId,
-  ActionLogId,
-  MessageId,
-  SuggestionId,
-  ThreadId,
-  TopicId,
-} from "../ids.ts";
-import type { Page, PageRequest } from "./common.ts";
-import type { SyncCursor } from "./mail-provider.ts";
+import type { StoredSignal, Topic } from "../domain/mail.ts";
+import type { ActionId, ActionLogId, SuggestionId } from "../ids.ts";
 
 // Every method takes the workspaceId first: all reads and writes are workspace-scoped (AGENTS §3).
 // Each repository is split in a reader (usable anywhere) and a writer (only inside a UnitOfWork).
-
-export interface AccountReader {
-  get(ws: WorkspaceId, id: AccountId): AsyncResult<Account, StorageError | NotFound>;
-  list(ws: WorkspaceId): AsyncResult<readonly Account[], StorageError>;
-}
-export interface AccountWriter {
-  save(account: Account): AsyncResult<void, StorageError>;
-  /**
-   * Deletes the account and every row that belongs to it (messages, threads, derived data,
-   * signals, senders, suggestions, cursors, digest state). Nothing of another account changes.
-   * The action log is the append-only audit trail and stays.
-   */
-  remove(ws: WorkspaceId, id: AccountId): AsyncResult<void, StorageError>;
-}
-
-export interface MessageQuery extends PageRequest {
-  readonly accountId: AccountId;
-  readonly category?: Category;
-  readonly senderAddress?: string;
-  /** Only messages stored after this ingest sequence (see `latestSequence`). */
-  readonly afterSequence?: number;
-  /** Only messages stored up to and including this ingest sequence. */
-  readonly throughSequence?: number;
-}
-export interface MessageReader {
-  get(ws: WorkspaceId, id: MessageId): AsyncResult<Message, StorageError | NotFound>;
-  query(
-    ws: WorkspaceId,
-    query: MessageQuery,
-    signal?: CancelSignal,
-  ): AsyncResult<Page<Message>, StorageError>;
-  /**
-   * The ingest sequence of the last message stored for the account (0 when none). It grows with
-   * every first insert, whatever the message's own date, so "stored since" never misses late mail.
-   */
-  latestSequence(ws: WorkspaceId, accountId: AccountId): AsyncResult<number, StorageError>;
-  /** Emails per category over the given accounts, one aggregate read (every category present, 0 when empty). */
-  countByCategory(
-    ws: WorkspaceId,
-    accountIds: readonly AccountId[],
-  ): AsyncResult<Readonly<Record<Category, number>>, StorageError>;
-}
-export interface MessageWriter {
-  /** Inserts or updates by id; a re-run with the same input changes nothing (idempotent). */
-  upsertMany(
-    messages: readonly IncomingMessage[],
-    signal?: CancelSignal,
-  ): AsyncResult<void, StorageError>;
-  setCategory(
-    ws: WorkspaceId,
-    id: MessageId,
-    category: Category,
-  ): AsyncResult<void, StorageError | NotFound>;
-}
 
 export interface DerivedReader {
   get(ws: WorkspaceId, id: MessageId): AsyncResult<DerivedMessage, StorageError | NotFound>;
@@ -94,29 +28,6 @@ export interface DerivedReader {
 export interface DerivedWriter {
   /** One row per message: saving again replaces it, so a re-run changes nothing. */
   save(derived: DerivedMessage): AsyncResult<void, StorageError>;
-}
-
-export interface ThreadReader {
-  get(ws: WorkspaceId, id: ThreadId): AsyncResult<Thread, StorageError | NotFound>;
-}
-export interface ThreadWriter {
-  upsert(thread: Thread): AsyncResult<void, StorageError>;
-}
-
-export interface SenderReader {
-  get(
-    ws: WorkspaceId,
-    accountId: AccountId,
-    address: string,
-  ): AsyncResult<SenderStats, StorageError | NotFound>;
-  list(
-    ws: WorkspaceId,
-    accountId: AccountId,
-    page: PageRequest,
-  ): AsyncResult<Page<SenderStats>, StorageError>;
-}
-export interface SenderWriter {
-  upsert(stats: SenderStats): AsyncResult<void, StorageError>;
 }
 
 export interface SuggestionReader {
@@ -155,18 +66,6 @@ export interface TopicWriter {
   save(topic: Topic): AsyncResult<void, StorageError>;
 }
 
-export interface CursorReader {
-  /** `null` when no cursor is stored yet (start a backfill). */
-  get(
-    ws: WorkspaceId,
-    accountId: AccountId,
-    scope: string,
-  ): AsyncResult<SyncCursor | null, StorageError>;
-}
-export interface CursorWriter {
-  set(ws: WorkspaceId, accountId: AccountId, cursor: SyncCursor): AsyncResult<void, StorageError>;
-}
-
 export interface SignalReader {
   /** Stored signals of the given messages, sorted by message id then kind. */
   listForMessages(
@@ -202,15 +101,10 @@ export interface DigestStateWriter {
   ): AsyncResult<void, StorageError>;
 }
 
-export type AccountRepository = AccountReader & AccountWriter;
-export type MessageRepository = MessageReader & MessageWriter;
 export type DerivedRepository = DerivedReader & DerivedWriter;
-export type ThreadRepository = ThreadReader & ThreadWriter;
-export type SenderRepository = SenderReader & SenderWriter;
 export type SuggestionRepository = SuggestionReader & SuggestionWriter;
 export type ActionLogRepository = ActionLogReader & ActionLogWriter;
 export type TopicRepository = TopicReader & TopicWriter;
-export type CursorRepository = CursorReader & CursorWriter;
 export type SignalRepository = SignalReader & SignalWriter;
 export type DigestStateRepository = DigestStateReader & DigestStateWriter;
 

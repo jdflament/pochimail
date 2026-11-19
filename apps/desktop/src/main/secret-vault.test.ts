@@ -1,8 +1,8 @@
 import { existsSync, mkdtempSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { secretStoreContract } from "@pochimail/accounts/testing/secret-store-contract";
 import { createLogger, type LogRecord } from "@pochimail/logger/logger";
-import { secretStoreContract } from "@pochimail/testing/secret-store-contract";
 import { describe, expect, it } from "vitest";
 import { createSecretsClient, serveSecrets } from "../shared/ipc/secrets.ts";
 import { SecretStoreError } from "../shared/secret-error.ts";

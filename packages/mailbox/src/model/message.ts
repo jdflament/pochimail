@@ -1,0 +1,42 @@
+import {
+  accountIdSchema,
+  messageIdSchema,
+  schemaVersion,
+  threadIdSchema,
+  timestampSchema,
+  topicIdSchema,
+  workspaceIdSchema,
+} from "@pochimail/kernel/schemas";
+import { z } from "zod";
+
+// PRIVATE MAIL DATA: Message and Thread hold subjects, addresses and snippets.
+// Never log them, and never add their field names to the logger's safe-key allow-list.
+
+/** A fetched message before classification: no category yet. */
+export const incomingMessageSchema = z.object({
+  schemaVersion,
+  id: messageIdSchema,
+  workspaceId: workspaceIdSchema,
+  accountId: accountIdSchema,
+  threadId: threadIdSchema,
+  from: z.email(),
+  to: z.array(z.email()),
+  subject: z.string(),
+  snippet: z.string(),
+  receivedAt: timestampSchema,
+  hasListUnsubscribe: z.boolean(),
+  opened: z.boolean(),
+  topicIds: z.array(topicIdSchema),
+  /** A phishing flag the provider or a later stage raised; never a category. */
+  suspicious: z
+    .object({
+      reasons: z.array(z.string().min(1)).min(1),
+      confidence: z.number().min(0).max(1),
+    })
+    .optional(),
+});
+export type IncomingMessage = z.infer<typeof incomingMessageSchema>;
+
+/** A stored message: the label is opaque here, classification owns the closed set. */
+export const messageSchema = incomingMessageSchema.extend({ category: z.string() });
+export type Message = z.infer<typeof messageSchema>;

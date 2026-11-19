@@ -1,7 +1,7 @@
-import type { AccountId } from "@pochimail/core/ids";
+import type { AccountId } from "@pochimail/kernel/ids";
 import { ok, unwrap } from "@pochimail/kernel/result";
+import { type Check, check, registerContract } from "@pochimail/kernel/testing/contract";
 import { expect } from "vitest";
-import { type Check, check, registerContract } from "./contract.ts";
 import { ACCOUNT_1, WS_A, WS_B } from "./fixtures.ts";
 import type { UnitOfWorkHarness } from "./unit-of-work-contract.ts";
 

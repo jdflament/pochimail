@@ -1,9 +1,7 @@
-import { Offline } from "@pochimail/core/errors";
-import type { AccountId } from "@pochimail/core/ids";
-import type { CursorRepository } from "@pochimail/core/ports/repositories";
-import { type DomainError, StorageError } from "@pochimail/kernel/errors";
-import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { type DomainError, Offline, StorageError } from "@pochimail/kernel/errors";
+import type { AccountId, WorkspaceId } from "@pochimail/kernel/ids";
 import { err, ok, unwrap } from "@pochimail/kernel/result";
+import type { CursorRepository } from "@pochimail/mailbox/ports/cursor-repository";
 import type { JobQueue } from "@pochimail/pipeline/job-queue";
 import { createPipeline } from "@pochimail/pipeline/job-runner";
 import type { PipelineSource, Stage } from "@pochimail/pipeline/pipeline-types";

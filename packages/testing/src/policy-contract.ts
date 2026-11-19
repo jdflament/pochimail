@@ -1,14 +1,13 @@
 import { ACTION_KINDS, type Command } from "@pochimail/core/domain/action";
 import { CATEGORIES, type Category } from "@pochimail/core/domain/category";
 import type { PolicyDenied } from "@pochimail/core/errors";
-import { MessageId } from "@pochimail/core/ids";
 import type { Authorization, AuthorizationContext } from "@pochimail/core/policies/authorize";
 import {
   AUTONOMY_LEVELS,
   AUTOPILOT_CONFIDENCE_THRESHOLD,
   type AutonomyLevel,
 } from "@pochimail/core/policies/autonomy";
-import { WorkspaceId } from "@pochimail/kernel/ids";
+import { MessageId, WorkspaceId } from "@pochimail/kernel/ids";
 import type { Result } from "@pochimail/kernel/result";
 import { unwrap } from "@pochimail/kernel/result";
 import { describe, expect, it } from "vitest";

@@ -1,19 +1,17 @@
 import type { Clock } from "@pochimail/kernel/clock";
 import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
-import { Cancelled, type StorageError } from "@pochimail/kernel/errors";
+import { Cancelled, InvalidStateError, type StorageError } from "@pochimail/kernel/errors";
 import type { IdGenerator } from "@pochimail/kernel/id-generator";
 import type { WorkspaceId } from "@pochimail/kernel/ids";
+import { AccountId } from "@pochimail/kernel/ids";
 import { err, ok } from "@pochimail/kernel/result";
-import { type Account, accountSchema, type ProviderKind } from "../domain/account.ts";
-import { InvalidStateError } from "../errors.ts";
-import type { DomainEventOf } from "../events/catalog.ts";
-import { AccountId } from "../ids.ts";
+import { type AccountConnected, accountStateEvent } from "../events.ts";
+import { type Account, accountSchema, type ProviderKind } from "../model/account.ts";
 import type { SecretStore } from "../ports/secret-store.ts";
-import type { UnitOfWork } from "../ports/unit-of-work.ts";
-import { accountStateEvent } from "./account-state.ts";
+import type { AccountsUnitOfWork } from "../ports/unit-of-work.ts";
 
 export interface ConnectAccountDeps {
-  readonly uow: UnitOfWork;
+  readonly uow: AccountsUnitOfWork;
   readonly secrets: SecretStore;
   readonly clock: Clock;
   readonly ids: IdGenerator;
@@ -128,7 +126,7 @@ export class ConnectAccount {
       id: `account-connected:${account.id}`,
       type: "AccountConnected",
       payload: { accountId: account.id, provider: account.provider },
-    } satisfies DomainEventOf<"AccountConnected">;
+    } satisfies AccountConnected;
     const state = accountStateEvent({
       workspaceId: account.workspaceId,
       accountId: account.id,
@@ -139,9 +137,7 @@ export class ConnectAccount {
     const saved = await uow.run(async (tx) => {
       const row = await tx.repositories.accounts.save(account);
       if (!row.ok) return row;
-      const first = await tx.outbox.append({ kind: "event", event: connected });
-      if (!first.ok) return first;
-      return tx.outbox.append({ kind: "event", event: state });
+      return tx.events.append([connected, state]);
     }, signal);
     if (!saved.ok) {
       await secrets.remove(accountSecretKey(account));

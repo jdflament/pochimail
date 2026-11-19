@@ -1,16 +1,11 @@
-import type { Account } from "@pochimail/core/domain/account";
+import type { Account } from "@pochimail/accounts/model/account";
 import type { ActionLog, Suggestion } from "@pochimail/core/domain/action";
-import type { IncomingMessage, SenderStats, Thread, Topic } from "@pochimail/core/domain/mail";
-import type {
-  AccountId,
-  ActionId,
-  ActionLogId,
-  MessageId,
-  SuggestionId,
-  ThreadId,
-  TopicId,
-} from "@pochimail/core/ids";
-import type { WorkspaceId } from "@pochimail/kernel/ids";
+import type { Topic } from "@pochimail/core/domain/mail";
+import type { ActionId, ActionLogId, SuggestionId } from "@pochimail/core/ids";
+import type { AccountId, MessageId, ThreadId, TopicId, WorkspaceId } from "@pochimail/kernel/ids";
+import type { IncomingMessage } from "@pochimail/mailbox/model/message";
+import type { SenderStats } from "@pochimail/mailbox/model/sender-stats";
+import type { Thread } from "@pochimail/mailbox/model/thread";
 
 // Fake data only: every address is on example.com and every text is invented.
 

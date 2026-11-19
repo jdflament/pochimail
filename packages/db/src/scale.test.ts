@@ -1,7 +1,7 @@
 import type { Category } from "@pochimail/core/domain/category";
-import type { IncomingMessage } from "@pochimail/core/domain/mail";
-import type { MessageId } from "@pochimail/core/ids";
+import type { MessageId } from "@pochimail/kernel/ids";
 import { ok, unwrap } from "@pochimail/kernel/result";
+import type { IncomingMessage } from "@pochimail/mailbox/model/message";
 import { ACCOUNT_1, WS_A } from "@pochimail/testing/fixtures";
 import { describe, expect, it } from "vitest";
 import { harness, mail, put, sender } from "./test-support/harness.ts";

@@ -1,8 +1,8 @@
 import { createHash } from "node:crypto";
 import type { BlobStore } from "@pochimail/core/ports/blob-store";
 import { unwrap } from "@pochimail/kernel/result";
+import { type Check, check, registerContract } from "@pochimail/kernel/testing/contract";
 import { expect } from "vitest";
-import { type Check, check, registerContract } from "./contract.ts";
 
 const bytes = (...n: number[]) => new Uint8Array(n);
 

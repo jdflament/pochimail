@@ -1,0 +1,38 @@
+{
+  "name": "@pochimail/mailbox",
+  "private": true,
+  "version": "0.0.0",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "exports": {
+    "./events": "./src/events.ts",
+    "./model/message": "./src/model/message.ts",
+    "./model/sender-stats": "./src/model/sender-stats.ts",
+    "./model/thread": "./src/model/thread.ts",
+    "./ports/cursor-repository": "./src/ports/cursor-repository.ts",
+    "./ports/mail-reader": "./src/ports/mail-reader.ts",
+    "./ports/message-repository": "./src/ports/message-repository.ts",
+    "./ports/sender-repository": "./src/ports/sender-repository.ts",
+    "./ports/thread-repository": "./src/ports/thread-repository.ts",
+    "./ports/unit-of-work": "./src/ports/unit-of-work.ts",
+    "./use-cases/sanitize-incoming": "./src/use-cases/sanitize-incoming.ts",
+    "./use-cases/store-messages": "./src/use-cases/store-messages.ts",
+    "./use-cases/upsert-threads": "./src/use-cases/upsert-threads.ts",
+    "./testing/*": "./src/testing/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc",
+    "lint": "biome check .",
+    "knip": "knip",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@pochimail/kernel": "workspace:*",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@pochimail/typescript-config": "workspace:*",
+    "typescript": "7.0.2",
+    "vitest": "5.1.0"
+  }
+}

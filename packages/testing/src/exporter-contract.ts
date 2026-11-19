@@ -1,8 +1,8 @@
 import type { Exporter } from "@pochimail/core/ports/exporter";
 import type { WorkspaceId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
+import { type Check, check, registerContract } from "@pochimail/kernel/testing/contract";
 import { expect } from "vitest";
-import { type Check, check, registerContract } from "./contract.ts";
 
 const ws = "ws-export" as WorkspaceId;
 const live = () => new AbortController().signal;

@@ -1,10 +1,11 @@
 import type { Command } from "@pochimail/core/domain/action";
-import type { IncomingMessage } from "@pochimail/core/domain/mail";
-import type { MessageId } from "@pochimail/core/ids";
-import type { MailProvider, SyncCursor } from "@pochimail/core/ports/mail-provider";
+import type { MailProvider } from "@pochimail/core/ports/mail-provider";
+import type { MessageId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
+import { type Check, check, registerContract } from "@pochimail/kernel/testing/contract";
+import type { IncomingMessage } from "@pochimail/mailbox/model/message";
+import type { SyncCursor } from "@pochimail/mailbox/ports/mail-reader";
 import { expect } from "vitest";
-import { type Check, check, registerContract } from "./contract.ts";
 import { makeIncomingMessage } from "./fixtures.ts";
 
 export interface MailProviderHarness {

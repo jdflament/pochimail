@@ -1,4 +1,4 @@
-import type { AccountId } from "@pochimail/core/ids";
+import type { AccountId } from "@pochimail/kernel/ids";
 
 /** Lowercase and drop one trailing dot so DNS spellings cannot evade an exact match. */
 export const canonicalHost = (host: string): string => {

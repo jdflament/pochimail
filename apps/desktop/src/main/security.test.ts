@@ -2,7 +2,7 @@ import { EventEmitter } from "node:events";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { FuseV1Options } from "@electron/fuses";
-import { AccountId } from "@pochimail/core/ids";
+import { AccountId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
 import { BlockedSocketError, egressPolicy } from "@pochimail/net/egress/allowlist";
 import { BlockedHostError, createHttpClient } from "@pochimail/net/egress/http-client";

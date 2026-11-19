@@ -1,8 +1,9 @@
-import type { AccountId, ActionId, MessageId, TopicId } from "@pochimail/core/ids";
-import type { Page } from "@pochimail/core/ports/common";
+import type { ActionId } from "@pochimail/core/ids";
+import type { Page } from "@pochimail/kernel/common";
+import type { AccountId, MessageId, TopicId } from "@pochimail/kernel/ids";
 import { ok, unwrap } from "@pochimail/kernel/result";
+import { type Check, check, registerContract } from "@pochimail/kernel/testing/contract";
 import { expect } from "vitest";
-import { type Check, check, registerContract } from "./contract.ts";
 import { makeDerived } from "./derived-contract.ts";
 import {
   ACCOUNT_1,
@@ -20,7 +21,6 @@ import { makeSignal } from "./signal-repository-contract.ts";
 import type { UnitOfWorkHarness } from "./unit-of-work-contract.ts";
 
 type H = UnitOfWorkHarness;
-
 /** Writes through a committed transaction, the only way rows get in. */
 async function write(
   h: H,

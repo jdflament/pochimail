@@ -1,5 +1,5 @@
 import { CATEGORIES } from "@pochimail/core/domain/category";
-import { incomingMessageSchema } from "@pochimail/core/domain/mail";
+import { incomingMessageSchema } from "@pochimail/mailbox/model/message";
 import { z } from "zod";
 
 /**

@@ -1,7 +1,7 @@
 import type { CancelSignal } from "@pochimail/kernel/common";
+import { type Check, check, registerContract } from "@pochimail/kernel/testing/contract";
 import type { Scheduler } from "@pochimail/pipeline/scheduler";
 import { expect } from "vitest";
-import { type Check, check, registerContract } from "./contract.ts";
 
 export interface SchedulerHarness {
   readonly scheduler: Scheduler;

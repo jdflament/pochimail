@@ -1,5 +1,4 @@
 import { AiUnavailable } from "@pochimail/core/errors";
-import type { MessageId } from "@pochimail/core/ids";
 import type {
   AiError,
   Classification,
@@ -9,6 +8,7 @@ import type {
 } from "@pochimail/core/ports/ai";
 import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
 import { Cancelled } from "@pochimail/kernel/errors";
+import type { MessageId } from "@pochimail/kernel/ids";
 import { err, ok } from "@pochimail/kernel/result";
 import type { Timer } from "@pochimail/pipeline/event-batching";
 import type { z } from "zod";

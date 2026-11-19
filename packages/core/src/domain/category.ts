@@ -15,6 +15,9 @@ export const categorySchema = z.enum(CATEGORIES);
 export type Category = z.infer<typeof categorySchema>;
 /** A message that arrives unclassified is filed here until the classifier says otherwise. */
 export const DEFAULT_CATEGORY: Category = "notifications";
+/** Narrows a stored message's opaque label (the mailbox does not know the closed set). */
+export const categoryOf = (message: { readonly category: string }): Category =>
+  categorySchema.parse(message.category);
 
 /** Phishing is a flag on top of any category, never a category (brief §3). */
 export const suspiciousFlagSchema = z.object({

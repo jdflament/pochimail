@@ -1,7 +1,8 @@
 import { createServer, type Server, type ServerResponse } from "node:http";
 import type { Socket } from "node:net";
-import { InvalidCallback, ProviderFailed, SignInCancelled } from "@pochimail/core/errors";
+import { InvalidCallback, SignInCancelled } from "@pochimail/accounts/errors";
 import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
+import { ProviderFailed } from "@pochimail/kernel/errors";
 import { err, ok, type Result } from "@pochimail/kernel/result";
 
 /** The one path the provider may redirect to; anything else on the port is ignored. */

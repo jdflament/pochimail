@@ -1,7 +1,7 @@
-import type { ProviderKind } from "@pochimail/core/domain/account";
-import { RateLimited } from "@pochimail/core/errors";
-import type { AccountId } from "@pochimail/core/ids";
+import type { ProviderKind } from "@pochimail/accounts/model/account";
 import type { Clock } from "@pochimail/kernel/clock";
+import { RateLimited } from "@pochimail/kernel/errors";
+import type { AccountId } from "@pochimail/kernel/ids";
 import { err, ok, type Result } from "@pochimail/kernel/result";
 import { DEFAULT_RETRY_POLICY, type RetryPolicy, retryDelayMs } from "@pochimail/pipeline/retry";
 import {

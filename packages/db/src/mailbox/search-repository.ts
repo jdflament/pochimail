@@ -1,4 +1,4 @@
-import type { Message } from "@pochimail/core/domain/mail";
+import type { Message } from "@pochimail/mailbox/model/message";
 import type { Database } from "better-sqlite3-multiple-ciphers";
 import { guard, sqlHelpers } from "../shared/sql.ts";
 import { MESSAGE_COLUMNS, messageOf } from "./message-row.ts";

@@ -1,4 +1,4 @@
-import type { MessageId } from "@pochimail/core/ids";
+import type { MessageId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
 import { makeDerived } from "@pochimail/testing/derived-contract";
 import { ACCOUNT_1, makeSuggestion, makeThread, WS_A } from "@pochimail/testing/fixtures";

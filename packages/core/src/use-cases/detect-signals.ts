@@ -1,14 +1,13 @@
+import type { Account } from "@pochimail/accounts/model/account";
 import type { Clock } from "@pochimail/kernel/clock";
 import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
-import type { Cancelled, StorageError } from "@pochimail/kernel/errors";
-import type { WorkspaceId } from "@pochimail/kernel/ids";
+import type { Cancelled, NotFound, StorageError } from "@pochimail/kernel/errors";
+import type { AccountId, MessageId, WorkspaceId } from "@pochimail/kernel/ids";
 import { err, ok } from "@pochimail/kernel/result";
-import type { Account } from "../domain/account.ts";
-import type { Category, SignalKind } from "../domain/category.ts";
-import type { Message, StoredSignal } from "../domain/mail.ts";
-import type { NotFound } from "../errors.ts";
+import type { Message } from "@pochimail/mailbox/model/message";
+import { type Category, categoryOf, type SignalKind } from "../domain/category.ts";
+import type { StoredSignal } from "../domain/mail.ts";
 import type { DomainEventOf } from "../events/catalog.ts";
-import type { AccountId, MessageId } from "../ids.ts";
 import type { ReadRepositories } from "../ports/repositories.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
 
@@ -118,7 +117,7 @@ export async function evaluateSignals(
 
     const derived = await reads.derived.get(ws, id);
     if (!derived.ok && derived.error.code !== "storage.not_found") return derived;
-    const category = derived.ok ? derived.value.category : message.value.category;
+    const category = derived.ok ? derived.value.category : categoryOf(message.value);
     const text = `${message.value.subject} ${derived.ok ? derived.value.snippet : message.value.snippet}`;
 
     const stats = await reads.senders.get(ws, request.accountId, message.value.from);

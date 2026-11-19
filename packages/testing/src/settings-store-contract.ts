@@ -5,8 +5,8 @@ import {
 } from "@pochimail/core/ports/settings-store";
 import type { WorkspaceId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
+import { type Check, check, registerContract } from "@pochimail/kernel/testing/contract";
 import { expect } from "vitest";
-import { type Check, check, registerContract } from "./contract.ts";
 
 const WS_1 = "ws-1" as WorkspaceId;
 const WS_2 = "ws-2" as WorkspaceId;
