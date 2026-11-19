@@ -29,18 +29,18 @@ const setup = (platform: NodeJS.Platform, dark: boolean) => {
 };
 
 describe("tray image", () => {
-  // Guards: a Windows or Linux tray icon that stays dark on a dark panel (or light on a light one) after the system theme changes.
+  // Guards: a black glyph on a dark panel (or white on a light one), or an icon that keeps its old colour after the system theme changes. The supplied tray-light files hold the white glyph, tray-dark the black one.
   it.each([
-    ["win32", "tray-dark.ico", "tray-light.ico"],
-    ["linux", "tray-dark.png", "tray-light.png"],
+    ["win32", "tray-light.ico", "tray-dark.ico"],
+    ["linux", "tray-light.png", "tray-dark.png"],
   ] as const)(
-    "follows the system theme on %s and updates when it changes",
-    (platform, dark, light) => {
+    "on %s a dark theme uses the white-glyph image and a light theme the black-glyph one",
+    (platform, whiteGlyph, blackGlyph) => {
       const { theme, images } = setup(platform, true);
-      expect(images).toEqual([`/res/tray/${dark}`]);
+      expect(images).toEqual([`/res/tray/${whiteGlyph}`]);
       theme.shouldUseDarkColors = false;
       theme.emit("updated");
-      expect(images).toEqual([`/res/tray/${dark}`, `/res/tray/${light}`]);
+      expect(images).toEqual([`/res/tray/${whiteGlyph}`, `/res/tray/${blackGlyph}`]);
     },
   );
 

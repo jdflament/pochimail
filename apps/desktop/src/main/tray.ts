@@ -1,10 +1,10 @@
 import { join } from "node:path";
 import type { Menu, NativeImage, Tray } from "electron";
 
-/** The file a tray shows. macOS uses a template image, so the system tints it for the light or dark bar. */
+/** The file a tray shows. macOS uses a template image, so the system tints it. Elsewhere the glyph must contrast with the panel: tray-light is the white glyph (for a dark panel), tray-dark the black glyph (for a light panel). */
 export const trayImageFile = (platform: NodeJS.Platform, dark: boolean): string => {
   if (platform === "darwin") return "trayTemplate.png";
-  return `tray-${dark ? "dark" : "light"}.${platform === "win32" ? "ico" : "png"}`;
+  return `tray-${dark ? "light" : "dark"}.${platform === "win32" ? "ico" : "png"}`;
 };
 
 type TrayLike = Pick<Tray, "setImage" | "setToolTip" | "setContextMenu" | "destroy">;
