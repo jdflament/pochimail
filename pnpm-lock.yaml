@@ -232,15 +232,6 @@ importers:
 
   apps/desktop:
     dependencies:
-      '@pochimail/kernel':
-        specifier: workspace:*
-        version: link:../../packages/kernel
-      '@pochimail/logger':
-        specifier: workspace:*
-        version: link:../../packages/logger
-      '@pochimail/pipeline':
-        specifier: workspace:*
-        version: link:../../packages/pipeline
       better-sqlite3-multiple-ciphers:
         specifier: 13.1.1
         version: 13.1.1
@@ -251,9 +242,18 @@ importers:
       '@pochimail/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@pochimail/kernel':
+        specifier: workspace:*
+        version: link:../../packages/kernel
+      '@pochimail/logger':
+        specifier: workspace:*
+        version: link:../../packages/logger
       '@pochimail/mail':
         specifier: workspace:*
         version: link:../../packages/mail
+      '@pochimail/pipeline':
+        specifier: workspace:*
+        version: link:../../packages/pipeline
       '@pochimail/testing':
         specifier: workspace:*
         version: link:../../packages/testing
