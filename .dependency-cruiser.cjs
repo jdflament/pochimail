@@ -60,9 +60,16 @@ module.exports = {
       name: "adapters-use-only-pipeline-ports",
       severity: "error",
       comment:
-        "Only db may import pipeline, and only the JobQueue and OutboxStore ports it implements (job-queue.ts, outbox.ts). No adapter runs pipeline code.",
-      from: { path: `^packages/(${ADAPTERS})/src/`, pathNot: [NOT_SHIPPED, "^packages/db/src/"] },
+        "Only db (the JobQueue and OutboxStore ports it implements: job-queue.ts, outbox.ts) and net (the pure retry backoff: retry.ts) may import pipeline, and only those files. No adapter runs pipeline code.",
+      from: { path: `^packages/(${ADAPTERS})/src/`, pathNot: [NOT_SHIPPED, "^packages/(db|net)/src/"] },
       to: { path: "^packages/pipeline/src/" },
+    },
+    {
+      name: "net-uses-only-pipeline-backoff",
+      severity: "error",
+      comment: "net shares pipeline's pure retry backoff (retry.ts) and nothing else of pipeline.",
+      from: { path: "^packages/net/src/", pathNot: NOT_SHIPPED },
+      to: { path: "^packages/pipeline/src/", pathNot: "^packages/pipeline/src/retry\\.ts$" },
     },
     {
       name: "db-uses-only-pipeline-ports",
@@ -74,8 +81,8 @@ module.exports = {
     {
       name: "only-mail-adapters-use-net",
       severity: "error",
-      comment: "net is the network exit for mail providers; other packages have no reason to call the network.",
-      from: { path: "^packages/(?!gmail/|graph/|net/)[^/]+/src/" },
+      comment: "net is the network exit for mail providers; other packages have no reason to call the network. testing is test support (never shipped) and hosts the net contract suites.",
+      from: { path: "^packages/(?!gmail/|graph/|net/|testing/)[^/]+/src/" },
       to: { path: "^packages/net/src/" },
     },
     {

@@ -3,7 +3,36 @@ import type { ReadRepositories, WriteRepositories } from "@pochimail/core/ports/
 import type { AsyncResult } from "@pochimail/kernel/common";
 import type { StorageError } from "@pochimail/kernel/errors";
 import type { Database } from "better-sqlite3-multiple-ciphers";
-import { createSqliteCore } from "./sqlite-core.ts";
+import { createAccountRepository } from "./accounts/account-repository.ts";
+import { createActionLogRepository } from "./actions/action-log-repository.ts";
+import { createDerivedRepository } from "./classification/derived-repository.ts";
+import { createSignalRepository } from "./classification/signal-repository.ts";
+import { createTopicRepository } from "./classification/topic-repository.ts";
+import { createDigestStateRepository } from "./cleanup/digest-state-repository.ts";
+import { createSuggestionRepository } from "./cleanup/suggestion-repository.ts";
+import { createCursorRepository } from "./mailbox/cursor-repository.ts";
+import { createMessageRepository } from "./mailbox/message-repository.ts";
+import { createSearchRepository } from "./mailbox/search-repository.ts";
+import { createSenderRepository } from "./mailbox/sender-repository.ts";
+import { createThreadRepository } from "./mailbox/thread-repository.ts";
+
+/** Every repository's statements and logic, bound to one connection (synchronous). */
+export function createSqliteCore(db: Database) {
+  return {
+    accounts: createAccountRepository(db),
+    messages: createMessageRepository(db),
+    threads: createThreadRepository(db),
+    derived: createDerivedRepository(db),
+    senders: createSenderRepository(db),
+    suggestions: createSuggestionRepository(db),
+    actionLog: createActionLogRepository(db),
+    topics: createTopicRepository(db),
+    cursors: createCursorRepository(db),
+    signals: createSignalRepository(db),
+    digestState: createDigestStateRepository(db),
+    search: createSearchRepository(db),
+  };
+}
 
 /** Full-text search over metadata and derived data (sender, subject, snippet, category, signals). */
 export interface MessageSearch {

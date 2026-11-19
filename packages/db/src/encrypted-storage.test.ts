@@ -1,0 +1,74 @@
+import { unwrap } from "@pochimail/kernel/result";
+import Database from "better-sqlite3-multiple-ciphers";
+import { describe, expect, it } from "vitest";
+import { migrate } from "./migrator.ts";
+import { isPlainSqliteFile, openStorage } from "./open-storage.ts";
+import { freshPath, key, open } from "./test-support/storage.ts";
+
+describe("encrypted storage", () => {
+  it("rejects a wrong key and leaves no plain SQLite header (guards an unencrypted or key-ignoring database)", () => {
+    const path = freshPath();
+    open(path, key(1)).close();
+    expect(isPlainSqliteFile(path)).toBe(false);
+    const wrong = openStorage(path, key(2));
+    expect(wrong.ok).toBe(false);
+    if (!wrong.ok) {
+      expect(wrong.error.code).toBe("storage.failed");
+      expect(wrong.error.message).toBe("Could not open the database (wrong key or damaged file)");
+    }
+    expect(open(path, key(1))).toBeDefined();
+  });
+
+  it("refuses a key that is not 32 bytes (guards silently weak keys)", () => {
+    expect(openStorage(freshPath(), Buffer.alloc(16, 1)).ok).toBe(false);
+  });
+});
+
+describe("encrypted storage refusals", () => {
+  it("refuses a plain unencrypted SQLite file (guards silently reading or adopting a plaintext database)", () => {
+    const path = freshPath();
+    const plain = new Database(path);
+    plain.exec("CREATE TABLE t (x INTEGER); INSERT INTO t VALUES (1)");
+    plain.close();
+    expect(openStorage(path, key(1)).ok).toBe(false);
+  });
+
+  it("never puts the key or its hex in an error message or cause (guards key leaks into logs)", () => {
+    const path = freshPath();
+    open(path, key(1)).close();
+    const secret = key(7);
+    const failure = openStorage(path, secret);
+    expect(failure.ok).toBe(false);
+    if (failure.ok) return;
+    const text = `${failure.error.message} ${failure.error.stack} ${String(failure.error.cause)}`;
+    expect(text).not.toContain(secret.toString("hex"));
+    expect(text).not.toContain(key(1).toString("hex"));
+    const short = openStorage(freshPath(), Buffer.alloc(16, 9));
+    if (!short.ok) expect(short.error.message).not.toContain(Buffer.alloc(16, 9).toString("hex"));
+  });
+});
+
+describe("migrator", () => {
+  it("running migrations twice changes nothing (guards a re-run wiping or duplicating tables)", () => {
+    const path = freshPath();
+    const first = open(path);
+    first.writer
+      .prepare(
+        "INSERT INTO digest_state (workspace_id, account_id, last_digest_at) VALUES ('w', 'a', '2026-01-01T00:00:00.000Z')",
+      )
+      .run();
+    expect(unwrap(migrate(first.writer))).toEqual({ from: 3, to: 3 });
+    first.close();
+    const again = open(path);
+    expect(again.writer.prepare("SELECT count(*) AS n FROM digest_state").get()).toEqual({ n: 1 });
+  });
+
+  it("refuses a database written by a newer build (guards downgrade corrupting a newer schema)", () => {
+    const path = freshPath();
+    const storage = open(path);
+    storage.writer.pragma("user_version = 99");
+    storage.close();
+    const reopened = openStorage(path, key(1));
+    expect(reopened.ok).toBe(false);
+  });
+});

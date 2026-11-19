@@ -29,7 +29,7 @@ Every workspace is `packages/<name>` or `apps/<name>`. Packages are of three kin
 | `pipeline` | event bus, jobs, outbox, scheduling |
 | `logger`, `ui`, `testing` | logging with redaction; design system; fixture mailbox and eval |
 
-**Imports:** domains → `kernel` and `zod`. `workflows` → domains. Adapters → the domains whose ports they implement, plus `kernel`, `logger`, and `net` for `gmail` and `graph`; `db` also implements the `pipeline` job-queue and outbox ports. Apps compose all. Enforced by `.dependency-cruiser.cjs`.
+**Imports:** domains → `kernel` and `zod`. `workflows` → domains. Adapters → the domains whose ports they implement, plus `kernel`, `logger`, and `net` for `gmail` and `graph`; `db` also implements the `pipeline` job-queue and outbox ports and `net` reuses its retry backoff; `testing` hosts the `net` contract suites. Apps compose all. Enforced by `.dependency-cruiser.cjs`.
 
 ## Processes
 | Process | Does |
@@ -49,7 +49,7 @@ Every workspace is `packages/<name>` or `apps/<name>`. Packages are of three kin
 6. **workflows** chain each step; **pipeline** runs them as jobs with batching, retries and an outbox.
 
 ## Start reading
-Today the domain code is still in `packages/core` and `packages/mail` ([ADR 0015](docs/adr/0015-bounded-context-packages-and-quality-gates.md) splits them).
+Today the domain code is still in `packages/core` ([ADR 0015](docs/adr/0015-bounded-context-packages-and-quality-gates.md) splits them).
 - Use case: `packages/core/src/use-cases/apply-action.ts`
 - A port and its contract suite: `packages/core/src/ports/mail-provider.ts` and `packages/testing/src/mail-provider-contract.ts`
 - The scan flow: `packages/core/src/use-cases/run-scan.ts` and `packages/core/src/jobs/scan-pipeline.ts`
