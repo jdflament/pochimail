@@ -1,5 +1,5 @@
 import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
-import type { Cancelled, ProviderError } from "@pochimail/kernel/errors";
+import { type Cancelled, ProviderError } from "@pochimail/kernel/errors";
 import type { MailReader } from "@pochimail/mailbox/ports/mail-reader";
 import type { Command } from "../domain/action.ts";
 
@@ -43,4 +43,17 @@ export interface MailProvider extends MailReader<MailProviderError> {
     commands: readonly Command[],
     signal: CancelSignal,
   ): AsyncResult<readonly AppliedCommand[], MailProviderError>;
+}
+
+/**
+ * A provider call that failed part-way. What already happened is listed with its inverse, so none
+ * of it loses its undo. `code` and `message` are the underlying failure's.
+ */
+export class PartiallyApplied extends ProviderError {
+  readonly applied: readonly AppliedCommand[];
+
+  constructor(cause: ProviderError, applied: readonly AppliedCommand[]) {
+    super(cause.code, cause.message, { cause });
+    this.applied = applied;
+  }
 }

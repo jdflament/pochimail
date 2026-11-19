@@ -86,6 +86,11 @@ export interface RateLimitedClient {
 
 const IDEMPOTENT_METHODS = new Set(["GET", "HEAD", "PUT", "DELETE"]);
 const THROTTLE_STATUSES = new Set([429, 503]);
+/** Google answers 403 (not 429) with these reasons when a user or project quota is spent. */
+const THROTTLE_REASONS = /rateLimitExceeded|userRateLimitExceeded/;
+const isThrottle = (response: HttpResponse): boolean =>
+  THROTTLE_STATUSES.has(response.status) ||
+  (response.status === 403 && THROTTLE_REASONS.test(response.body));
 
 /** No provider pause is honoured beyond this: a hostile or broken header cannot park an account. */
 export const MAX_RETRY_AFTER_MS = 3_600_000;
@@ -210,7 +215,7 @@ export const createRateLimitedClient = (options: {
         const result = await options.inner.request(httpRequest);
         if (!result.ok) return result;
         const response = result.value;
-        if (!THROTTLE_STATUSES.has(response.status)) {
+        if (!isThrottle(response)) {
           if (state.announced) {
             state.announced = false;
             options.onEvent?.({ type: "SyncResumed" });

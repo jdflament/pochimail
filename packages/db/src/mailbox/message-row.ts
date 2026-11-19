@@ -3,7 +3,7 @@ import type { Row } from "../shared/sql.ts";
 import { flag, json } from "../shared/values.ts";
 
 export const MESSAGE_COLUMNS =
-  "workspace_id, id, account_id, thread_id, sender, recipients, subject, snippet, received_at, has_list_unsubscribe, opened, topic_ids, suspicious_reasons, suspicious_confidence, category";
+  "workspace_id, id, account_id, thread_id, sender, recipients, subject, snippet, received_at, has_list_unsubscribe, opened, size, topic_ids, suspicious_reasons, suspicious_confidence, category";
 
 export const messageOf = (r: Row): Message =>
   messageSchema.parse({
@@ -19,6 +19,7 @@ export const messageOf = (r: Row): Message =>
     receivedAt: r.received_at,
     hasListUnsubscribe: flag(r.has_list_unsubscribe),
     opened: flag(r.opened),
+    ...(r.size === null ? {} : { size: r.size }),
     topicIds: json(r.topic_ids),
     ...(r.suspicious_reasons === null
       ? {}

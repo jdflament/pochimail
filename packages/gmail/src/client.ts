@@ -37,8 +37,6 @@ export interface GmailReply {
   readonly json: unknown;
 }
 
-const RATE_LIMIT_REASONS = /rateLimitExceeded|userRateLimitExceeded|quotaExceeded/;
-
 function urlOf(call: GmailCall): string {
   const url = new URL(`${GMAIL_BASE}/${call.path}`);
   for (const [key, value] of Object.entries(call.query ?? {})) {
@@ -109,12 +107,8 @@ export class GmailClient {
 }
 
 /** Gmail's HTTP answer to the reply or provider error the callers branch on. */
-function answer({ status, body, retryAfter }: HttpResponse): Result<GmailReply, MailProviderError> {
+function answer({ status, body }: HttpResponse): Result<GmailReply, MailProviderError> {
   if (status === 401 || status === 404) return ok({ status, json: null });
-  if (status === 403 && RATE_LIMIT_REASONS.test(body)) {
-    const seconds = retryAfter === undefined ? Number.NaN : Number(retryAfter);
-    return err(new RateLimited(Number.isFinite(seconds) ? { retryAfterMs: seconds * 1000 } : {}));
-  }
   if (status < 200 || status >= 300) return err(new ProviderFailed(`Gmail answered ${status}`));
   return ok({ status, json: body === "" ? null : (JSON.parse(body) as unknown) });
 }

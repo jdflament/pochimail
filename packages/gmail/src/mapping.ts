@@ -46,6 +46,7 @@ export function toIncoming(message: GmailMetadata, identity: Identity): Incoming
     receivedAt: new Date(receivedMs).toISOString(),
     hasListUnsubscribe: header(message, "List-Unsubscribe") !== undefined,
     opened: !message.labelIds.includes("UNREAD"),
+    ...(message.sizeEstimate === undefined ? {} : { size: message.sizeEstimate }),
     topicIds: [],
   });
   return parsed.success ? parsed.data : null;

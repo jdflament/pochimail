@@ -117,7 +117,7 @@ export class GmailSync {
       path: "history",
       query: {
         startHistoryId: position.historyId,
-        historyTypes: "messageAdded",
+        historyTypes: ["messageAdded", "labelAdded", "labelRemoved"],
         ...(position.pageToken === "" ? {} : { pageToken: position.pageToken }),
       },
       cost: GMAIL_QUOTA_UNITS.historyList,
@@ -128,8 +128,14 @@ export class GmailSync {
     if (listed.value.status === 404) return this.startBackfill(true, signal);
     const parsed = historySchema.safeParse(listed.value.json);
     if (!parsed.success) return err(new ProviderFailed("Unexpected Gmail history"));
+    // New mail and label changes (read, archive, labels made in Gmail) are both re-read, so the
+    // stored flags never go stale; the metadata get is the authority.
     const added = [
-      ...new Set(parsed.data.history.flatMap((h) => h.messagesAdded.map((a) => a.message.id))),
+      ...new Set(
+        parsed.data.history.flatMap((h) =>
+          [...h.messagesAdded, ...h.labelsAdded, ...h.labelsRemoved].map((c) => c.message.id),
+        ),
+      ),
     ];
     const messages = await this.metadata(added, signal);
     if (!messages.ok) return messages;

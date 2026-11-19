@@ -8,7 +8,7 @@ import type { PolicyDenialReason, PolicyDenied } from "../errors.ts";
 import type { ActionId, ActionLogId } from "../ids.ts";
 import { ActionLogId as makeLogId } from "../ids.ts";
 import { type AuthorizationContext, authorize } from "../policies/authorize.ts";
-import type { MailProvider } from "../ports/mail-provider.ts";
+import { type MailProvider, PartiallyApplied } from "../ports/mail-provider.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
 import { recordEntry } from "./record-entry.ts";
 
@@ -143,7 +143,11 @@ export class ApplyAction {
         ...base(),
         outcome: "failed",
         command: action.command,
-        inverse: null,
+        // Whatever the provider did before failing keeps its inverse, so it can still be undone.
+        inverse:
+          result.error instanceof PartiallyApplied
+            ? (result.error.applied[0]?.inverse ?? null)
+            : null,
         irreversible: false,
         errorCode: result.error.code,
       };

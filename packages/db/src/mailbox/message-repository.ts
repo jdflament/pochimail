@@ -26,22 +26,22 @@ export function createMessageRepository(db: Database) {
   );
   const insertMessage = db.prepare(
     `INSERT INTO message (workspace_id, id, account_id, thread_id, sender, recipients, subject, snippet, received_at,
-       has_list_unsubscribe, opened, topic_ids, suspicious_reasons, suspicious_confidence, category, ingest_seq)
+       has_list_unsubscribe, opened, size, topic_ids, suspicious_reasons, suspicious_confidence, category, ingest_seq)
      VALUES (@workspace_id, @id, @account_id, @thread_id, @sender, @recipients, @subject, @snippet, @received_at,
-       @has_list_unsubscribe, @opened, @topic_ids, @suspicious_reasons, @suspicious_confidence, @category,
+       @has_list_unsubscribe, @opened, @size, @topic_ids, @suspicious_reasons, @suspicious_confidence, @category,
        @ingest_seq)`,
   );
   // Re-running with the same input changes nothing; category and ingest_seq are never overwritten.
   const updateMessage = db.prepare(
     `UPDATE message SET account_id = @account_id, thread_id = @thread_id, sender = @sender, recipients = @recipients,
        subject = @subject, snippet = @snippet, received_at = @received_at,
-       has_list_unsubscribe = @has_list_unsubscribe, opened = @opened, topic_ids = @topic_ids,
+       has_list_unsubscribe = @has_list_unsubscribe, opened = @opened, size = @size, topic_ids = @topic_ids,
        suspicious_reasons = @suspicious_reasons, suspicious_confidence = @suspicious_confidence
      WHERE workspace_id = @workspace_id AND id = @id
        AND (account_id IS NOT @account_id OR thread_id IS NOT @thread_id OR sender IS NOT @sender
          OR recipients IS NOT @recipients OR subject IS NOT @subject OR snippet IS NOT @snippet
          OR received_at IS NOT @received_at OR has_list_unsubscribe IS NOT @has_list_unsubscribe
-         OR opened IS NOT @opened OR topic_ids IS NOT @topic_ids
+         OR opened IS NOT @opened OR size IS NOT @size OR topic_ids IS NOT @topic_ids
          OR suspicious_reasons IS NOT @suspicious_reasons
          OR suspicious_confidence IS NOT @suspicious_confidence)`,
   );
@@ -112,6 +112,7 @@ export function createMessageRepository(db: Database) {
         received_at: m.receivedAt,
         has_list_unsubscribe: m.hasListUnsubscribe ? 1 : 0,
         opened: m.opened ? 1 : 0,
+        size: m.size ?? null,
         topic_ids: JSON.stringify(m.topicIds),
         suspicious_reasons:
           m.suspicious === undefined ? null : JSON.stringify(m.suspicious.reasons),

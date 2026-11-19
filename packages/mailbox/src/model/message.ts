@@ -26,6 +26,8 @@ export const incomingMessageSchema = z.object({
   receivedAt: timestampSchema,
   hasListUnsubscribe: z.boolean(),
   opened: z.boolean(),
+  /** The provider's size estimate in bytes, when it reports one (for "space you can free"). */
+  size: z.int().nonnegative().optional(),
   topicIds: z.array(topicIdSchema),
   /** A phishing flag the provider or a later stage raised; never a category. */
   suspicious: z

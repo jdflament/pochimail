@@ -41,8 +41,10 @@ export interface FakeGmailServer {
   add(message: FakeGmailMessage): void;
   setBody(id: string, body: string): void;
   labelsOf(id: string): readonly string[];
+  /** The user reads a message in Gmail itself. */
+  markRead(id: string): void;
   /** The next `times` requests fail with this status (and `Retry-After` when given). */
-  failNext(status: number, options?: { times?: number; retryAfter?: string }): void;
+  failNext(status: number, options?: { times?: number; skip?: number; retryAfter?: string }): void;
   /** History ids older than now are gone: `history.list` answers 404 for them. */
   expireHistory(): void;
   /** Only this bearer token is accepted from now on. */
@@ -52,7 +54,11 @@ export interface FakeGmailServer {
 
 export function createFakeGmailServer(): FakeGmailServer {
   const messages = new Map<string, Stored>();
-  const history: { id: number; added: string }[] = [];
+  const history: {
+    id: number;
+    type: "messageAdded" | "labelAdded" | "labelRemoved";
+    messageId: string;
+  }[] = [];
   const labels = new Map<string, string>([
     ["INBOX", "INBOX"],
     ["UNREAD", "UNREAD"],
@@ -62,7 +68,7 @@ export function createFakeGmailServer(): FakeGmailServer {
   let oldestKept = 0;
   let seq = 0;
   let token: string | null = null;
-  let fault: { status: number; times: number; retryAfter?: string } | null = null;
+  let fault: { status: number; times: number; skip: number; retryAfter?: string } | null = null;
   const log: RecordedRequest[] = [];
 
   const reply = (
@@ -91,6 +97,18 @@ export function createFakeGmailServer(): FakeGmailServer {
         };
     }
     return out;
+  };
+
+  /** Changes labels and writes the history entries Gmail would, for the labels that really changed. */
+  const relabel = (s: Stored, add: readonly string[], remove: readonly string[]) => {
+    for (const l of remove)
+      if (s.labels.delete(l))
+        history.push({ id: ++historyId, type: "labelRemoved", messageId: s.message.id });
+    for (const l of add)
+      if (!s.labels.has(l)) {
+        s.labels.add(l);
+        history.push({ id: ++historyId, type: "labelAdded", messageId: s.message.id });
+      }
   };
 
   const render = (s: Stored, query: URLSearchParams): Record<string, unknown> => {
@@ -151,11 +169,17 @@ export function createFakeGmailServer(): FakeGmailServer {
       if (Number(query.get("startHistoryId")) < oldestKept)
         return reply(404, { error: { code: 404, message: "Requested entity was not found." } });
       const after = Number(query.get("startHistoryId"));
-      const entries = history.filter((h) => h.id > after);
+      const wanted = new Set(query.getAll("historyTypes"));
+      const entries = history.filter((h) => h.id > after && wanted.has(h.type));
+      const key = {
+        messageAdded: "messagesAdded",
+        labelAdded: "labelsAdded",
+        labelRemoved: "labelsRemoved",
+      } as const;
       return reply(200, {
         history: entries.map((h) => ({
           id: String(h.id),
-          messagesAdded: [{ message: { id: h.added } }],
+          [key[h.type]]: [{ message: { id: h.messageId } }],
         })),
         historyId: String(historyId),
       });
@@ -167,8 +191,7 @@ export function createFakeGmailServer(): FakeGmailServer {
       for (const id of input.ids) {
         const s = messages.get(id);
         if (s === undefined) continue;
-        for (const l of input.removeLabelIds) s.labels.delete(l);
-        for (const l of input.addLabelIds) s.labels.add(l);
+        relabel(s, input.addLabelIds, input.removeLabelIds);
       }
       return reply(204, null);
     }
@@ -177,13 +200,11 @@ export function createFakeGmailServer(): FakeGmailServer {
       const stored = messages.get(decodeURIComponent(one[1] ?? ""));
       if (stored === undefined) return reply(404, { error: { code: 404, message: "Not Found" } });
       if (method === "POST" && one[2] === "trash") {
-        stored.labels.delete("INBOX");
-        stored.labels.add("TRASH");
+        relabel(stored, ["TRASH"], ["INBOX"]);
         return reply(200, { id: stored.message.id, labelIds: [...stored.labels] });
       }
       if (method === "POST" && one[2] === "untrash") {
-        stored.labels.delete("TRASH");
-        stored.labels.add("INBOX");
+        relabel(stored, ["INBOX"], ["TRASH"]);
         return reply(200, { id: stored.message.id, labelIds: [...stored.labels] });
       }
       if (method === "GET") return reply(200, project(render(stored, query), query.get("fields")));
@@ -204,7 +225,8 @@ export function createFakeGmailServer(): FakeGmailServer {
     const path = url.pathname.startsWith(PREFIX) ? url.pathname.slice(PREFIX.length) : url.pathname;
     const body = init.body === undefined ? undefined : (JSON.parse(init.body) as unknown);
     log.push({ method: init.method ?? "GET", path, query: url.searchParams, body });
-    if (fault !== null && fault.times > 0) {
+    if (fault !== null && fault.skip > 0) fault.skip -= 1;
+    else if (fault !== null && fault.times > 0) {
       fault.times -= 1;
       return reply(
         fault.status,
@@ -228,17 +250,22 @@ export function createFakeGmailServer(): FakeGmailServer {
       const labelSet = new Set(["INBOX"]);
       if (!message.opened) labelSet.add("UNREAD");
       messages.set(message.id, { message, labels: labelSet, body: "", seq: ++seq });
-      history.push({ id: ++historyId, added: message.id });
+      history.push({ id: ++historyId, type: "messageAdded", messageId: message.id });
     },
     setBody(id, body) {
       const s = messages.get(id);
       if (s) s.body = body;
     },
     labelsOf: (id) => [...(messages.get(id)?.labels ?? [])],
+    markRead(id) {
+      const s = messages.get(id);
+      if (s) relabel(s, [], ["UNREAD"]);
+    },
     failNext(status, options = {}) {
       fault = {
         status,
         times: options.times ?? 1,
+        skip: options.skip ?? 0,
         ...(options.retryAfter === undefined ? {} : { retryAfter: options.retryAfter }),
       };
     },

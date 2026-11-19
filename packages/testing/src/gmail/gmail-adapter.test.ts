@@ -1,5 +1,6 @@
 import type { MailProvider } from "@pochimail/core/ports/mail-provider";
-import { AuthExpired, RateLimited } from "@pochimail/kernel/errors";
+import { PartiallyApplied } from "@pochimail/core/ports/mail-provider";
+import { AuthExpired, ProviderFailed, RateLimited } from "@pochimail/kernel/errors";
 import type { MessageId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
 import type { SyncCursor } from "@pochimail/mailbox/ports/mail-reader";
@@ -147,5 +148,64 @@ describe("Gmail adapter", () => {
     expect(unwrap(await h.provider.fetchDisplayFields(["msg-1"], live()))).toEqual([
       { id: "msg-1", subject: "Quarterly report", snippet: "Numbers inside" },
     ]);
+  });
+
+  // Guards: stale flags after the user reads, archives or labels mail in Gmail itself.
+  it("re-reads messages whose labels changed in Gmail, and maps the size estimate", async () => {
+    const h = createGmailHarness();
+    h.deliver(makeIncomingMessage(1), makeIncomingMessage(2));
+    const first = await drain(h.provider, null);
+    const before = unwrap(await h.provider.sync(null, live())).messages.find(
+      (m) => m.id === "msg-1",
+    );
+    expect(before?.opened).toBe(false);
+    expect(typeof before?.size).toBe("number");
+    h.server.markRead("msg-1");
+    const batch = unwrap(await h.provider.sync(first.cursor, live()));
+    expect(batch.messages.map((m) => [m.id, m.opened])).toEqual([["msg-1", true]]);
+  });
+
+  // Guards: an applied half-batch losing its undo when a later chunk fails.
+  it("a failure part-way returns what was applied with its inverse", async () => {
+    const h = createGmailHarness();
+    const many = Array.from({ length: 1001 }, (_, i) => id(i + 1));
+    h.server.failNext(500, { skip: 1 });
+    const result = await h.provider.applyCommands([{ kind: "archive", messageIds: many }], live());
+    expect(!result.ok && result.error).toBeInstanceOf(PartiallyApplied);
+    const applied =
+      !result.ok && result.error instanceof PartiallyApplied ? result.error.applied : [];
+    expect(applied[0]?.command.messageIds).toHaveLength(1000);
+    expect(applied[0]?.inverse).toMatchObject({ kind: "unarchive" });
+  });
+
+  // Guards: a missing message reported as an applied command that has an inverse.
+  it("a 404 from Gmail is a failure, never an applied command", async () => {
+    const h = createGmailHarness();
+    h.server.failNext(404);
+    const archived = await h.provider.applyCommands(
+      [{ kind: "archive", messageIds: [id(1)] }],
+      live(),
+    );
+    expect(!archived.ok && archived.error).toBeInstanceOf(ProviderFailed);
+    h.server.failNext(404);
+    const trashed = await h.provider.applyCommands(
+      [{ kind: "trash", messageIds: [id(1)] }],
+      live(),
+    );
+    expect(trashed.ok).toBe(false);
+  });
+
+  // Guards: a 403 quota error hammering Gmail again instead of cooling down like a 429.
+  it("a 403 rateLimitExceeded is RateLimited and the account cools down without calling again", async () => {
+    const h = createGmailHarness();
+    h.server.failNext(403, { retryAfter: "20" });
+    const first = await h.provider.sync(null, live());
+    expect(!first.ok && first.error instanceof RateLimited && first.error.retryAfterMs).toBe(
+      20_000,
+    );
+    const calls = h.server.requests().length;
+    const second = await h.provider.sync(null, live());
+    expect(!second.ok && second.error).toBeInstanceOf(RateLimited);
+    expect(h.server.requests().length).toBe(calls);
   });
 });

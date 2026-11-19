@@ -26,11 +26,15 @@ export const metadataSchema = z.object({
 });
 export type GmailMetadata = z.infer<typeof metadataSchema>;
 
+const changedSchema = z.object({ message: z.object({ id: z.string() }) });
+
 export const historySchema = z.object({
   history: z
     .array(
       z.object({
-        messagesAdded: z.array(z.object({ message: z.object({ id: z.string() }) })).default([]),
+        messagesAdded: z.array(changedSchema).default([]),
+        labelsAdded: z.array(changedSchema).default([]),
+        labelsRemoved: z.array(changedSchema).default([]),
       }),
     )
     .default([]),
