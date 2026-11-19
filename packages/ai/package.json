@@ -4,9 +4,7 @@
   "version": "0.0.0",
   "license": "AGPL-3.0-only",
   "type": "module",
-  "exports": {
-    "./package-info": "./src/package-info.ts"
-  },
+  "exports": {},
   "scripts": {
     "typecheck": "tsc",
     "lint": "biome check .",

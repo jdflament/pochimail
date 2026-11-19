@@ -1,12 +1,6 @@
-import { AccountId } from "@pochimail/kernel/ids";
-import { unwrap } from "@pochimail/kernel/result";
 import { type Check, check, registerContract } from "@pochimail/kernel/testing/contract";
 import { createLogger, type Logger } from "@pochimail/logger/logger";
-import {
-  BlockedSocketError,
-  egressPolicy,
-  type HostAllowlist,
-} from "@pochimail/net/egress/allowlist";
+import { egressPolicy, type HostAllowlist } from "@pochimail/net/egress/allowlist";
 import {
   BlockedHostError,
   type Fetch,
@@ -99,35 +93,6 @@ export const httpClientChecks: readonly Check<HttpClientHarness>[] = [
 
   check("matches a mixed-case, trailing-dot spelling of an allowed host", async (h) => {
     expect((await h.client.request({ url: "https://GMAIL.googleapis.com./v1" })).ok).toBe(true);
-  }),
-
-  check("adds a connected account's IMAP socket and revokes it on removal", async (h) => {
-    const accountId = unwrap(AccountId("acc-imap-1"));
-    const endpoint = { host: "IMAP.example.com", port: 993 };
-    const guarded = () => h.allowlist.assertSocketAllowed(endpoint.host, endpoint.port);
-    expect(guarded).toThrow(BlockedSocketError);
-    expect(h.allowlist.allowsSocket(endpoint.host, endpoint.port)).toBe(false);
-
-    h.allowlist.addAccount({ accountId, imap: endpoint });
-    expect(guarded).not.toThrow();
-    expect(h.allowlist.allowsSocket(endpoint.host, endpoint.port)).toBe(true);
-
-    h.allowlist.removeAccount(accountId);
-    expect(guarded).toThrow(BlockedSocketError);
-    expect(h.attempts()).toEqual([]); // sockets never travel through the HTTP client
-  }),
-
-  check("does not allow an account socket on a port that was never registered", async (h) => {
-    h.allowlist.addAccount({
-      accountId: unwrap(AccountId("acc-imap-2")),
-      imap: { host: "imap.example.com", port: 993 },
-      smtp: { host: "smtp.example.com", port: 587 },
-    });
-    expect(() => h.allowlist.assertSocketAllowed("smtp.example.com", 587)).not.toThrow();
-    expect(() => h.allowlist.assertSocketAllowed("imap.example.com", 143)).toThrow(
-      BlockedSocketError,
-    );
-    expect(h.attempts()).toEqual([]);
   }),
 
   check("cancels an in-flight request and refuses an already-aborted one", async (h) => {

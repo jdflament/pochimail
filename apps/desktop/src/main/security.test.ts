@@ -2,9 +2,7 @@ import { EventEmitter } from "node:events";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { FuseV1Options } from "@electron/fuses";
-import { AccountId } from "@pochimail/kernel/ids";
-import { unwrap } from "@pochimail/kernel/result";
-import { BlockedSocketError, egressPolicy } from "@pochimail/net/egress/allowlist";
+import { egressPolicy } from "@pochimail/net/egress/allowlist";
 import { BlockedHostError, createHttpClient } from "@pochimail/net/egress/http-client";
 import type { WebContents } from "electron";
 import { describe, expect, it } from "vitest";
@@ -108,19 +106,6 @@ describe("session request filter", () => {
         allowlist: ["gmail.googleapis.com"],
       }),
     ).toBe(false);
-  });
-
-  // Guards: main's registry drifting from the account sockets registered for the worker client.
-  it("follows the shared policy when an account's IMAP socket is added and removed", () => {
-    const guarded = () => sessionEgress.assertSocketAllowed("imap.example.com", 993);
-    const accountId = unwrap(AccountId("acc-session-1"));
-    expect(guarded).toThrow(BlockedSocketError);
-
-    sessionEgress.addAccount({ accountId, imap: { host: "imap.example.com", port: 993 } });
-    expect(guarded).not.toThrow();
-
-    sessionEgress.removeAccount(accountId);
-    expect(guarded).toThrow(BlockedSocketError);
   });
 
   // Guards: main and worker drifting onto different policies or normalisations.

@@ -1,24 +1,15 @@
-import { createServer } from "node:net";
 import { describe, expect, it } from "vitest";
 import { createFakeClock } from "../fake-clock.ts";
 import { generateMailbox } from "../fixture-mailbox/generator.ts";
 import { readMailbox } from "../fixture-mailbox/mailbox-reader.ts";
-import { splitMboxRaw } from "../fixture-mailbox/mbox.ts";
 import { createHttpReplay, loadRecording, scripts } from "./http-replay.ts";
 import { gmailRecording } from "./http-wire.ts";
-import {
-  FIXTURE_IMAP_PASSWORD,
-  FIXTURE_IMAP_USER,
-  startScriptedImapServer,
-} from "./scripted-imap-server.ts";
 import { assertScrubbed, findScrubViolations } from "./scrub.ts";
-import { connectTestOnlyImap, loopbackOnlyGuard } from "./test-only-imap-client.ts";
 
 const small = generateMailbox({ seed: 20261117, scale: "small" });
 const account = small.accounts[0];
 if (!account) throw new Error("generator returned no account");
 const ids = { accountId: account.id, workspaceId: small.workspaceId };
-const login = `LOGIN "${FIXTURE_IMAP_USER}" "${FIXTURE_IMAP_PASSWORD}"`;
 const signal = () => new AbortController().signal;
 
 describe("scrubber", () => {
@@ -130,145 +121,5 @@ describe("http replay", () => {
     expect((await replay.fetch(url, { signal: signal() })).status).toBe(404);
     const dropped = createHttpReplay({ version: 1, entries: [entry(scripts.droppedConnection())] });
     await expect(dropped.fetch(url, { signal: signal() })).rejects.toThrow("fetch failed");
-  });
-});
-
-describe("scripted IMAP server", () => {
-  const start = () => startScriptedImapServer({ mbox: account.mbox });
-
-  it("binds loopback on a random port and refuses connections after close (guards a leaked listener)", async () => {
-    const a = await start();
-    const b = await start();
-    expect(a.host).toBe("127.0.0.1");
-    expect(a.port).not.toBe(b.port);
-    await a.close();
-    await b.close();
-    await expect(
-      connectTestOnlyImap(a.port, { assertSocketAllowed: loopbackOnlyGuard }),
-    ).rejects.toThrow();
-  });
-
-  it("closes open sessions on close (guards a hung test process)", async () => {
-    const server = await start();
-    const client = await connectTestOnlyImap(server.port, {
-      assertSocketAllowed: loopbackOnlyGuard,
-    });
-    await client.command(login);
-    expect(server.openConnections()).toBe(1);
-    await server.close();
-    expect(server.openConnections()).toBe(0);
-    client.close();
-  });
-
-  it("rejects wrong credentials and serves nothing before login", async () => {
-    const server = await start();
-    try {
-      const client = await connectTestOnlyImap(server.port, {
-        assertSocketAllowed: loopbackOnlyGuard,
-      });
-      expect((await client.command("SELECT INBOX")).status).toBe("NO");
-      expect((await client.command('LOGIN "x" "y"')).status).toBe("NO");
-      client.close();
-    } finally {
-      await server.close();
-    }
-  });
-
-  it("reports a changed UIDVALIDITY so a stored cursor can be detected as expired", async () => {
-    const server = await start();
-    try {
-      const client = await connectTestOnlyImap(server.port, {
-        assertSocketAllowed: loopbackOnlyGuard,
-      });
-      await client.command(login);
-      const before = (await client.command("SELECT INBOX")).untagged.join("\n");
-      server.changeUidValidity();
-      const after = (await client.command("SELECT INBOX")).untagged.join("\n");
-      expect(/UIDVALIDITY (\d+)/.exec(before)?.[1]).not.toBe(/UIDVALIDITY (\d+)/.exec(after)?.[1]);
-      client.close();
-    } finally {
-      await server.close();
-    }
-  });
-
-  it("times out instead of hanging when the server stops answering (guards a test run stuck on a silent socket)", async () => {
-    const silent = createServer(() => {});
-    await new Promise<void>((resolve) => silent.listen(0, "127.0.0.1", resolve));
-    const address = silent.address();
-    try {
-      if (address === null || typeof address === "string") throw new Error("no port");
-      await expect(
-        connectTestOnlyImap(address.port, {
-          assertSocketAllowed: loopbackOnlyGuard,
-          timeoutMs: 50,
-        }),
-      ).rejects.toThrow(/timed out/);
-    } finally {
-      silent.close();
-    }
-  });
-
-  it("kills the socket on a scripted drop and serves the next connection normally", async () => {
-    const server = await start();
-    try {
-      const client = await connectTestOnlyImap(server.port, {
-        assertSocketAllowed: loopbackOnlyGuard,
-      });
-      server.dropConnections(1);
-      await expect(client.command("NOOP")).rejects.toThrow("closed");
-      const again = await connectTestOnlyImap(server.port, {
-        assertSocketAllowed: loopbackOnlyGuard,
-      });
-      expect((await again.command("NOOP")).status).toBe("OK");
-      again.close();
-    } finally {
-      await server.close();
-    }
-  });
-
-  it("resumes with QRESYNC: only changes since the modseq, plus what vanished (guards a full re-walk after every reconnect)", async () => {
-    const server = await start();
-    try {
-      const client = await connectTestOnlyImap(server.port, {
-        assertSocketAllowed: loopbackOnlyGuard,
-      });
-      await client.command(login);
-      await client.command("ENABLE QRESYNC");
-      const first = (await client.command("SELECT INBOX")).untagged.join("\n");
-      const validity = /UIDVALIDITY (\d+)/.exec(first)?.[1];
-      const modseq = /HIGHESTMODSEQ (\d+)/.exec(first)?.[1];
-      await client.command("UID STORE 1 +FLAGS (\\Flagged)");
-      await client.command("UID MOVE 2 Archive");
-      const resumed = await client.command(`SELECT INBOX (QRESYNC (${validity} ${modseq}))`);
-      const text = resumed.untagged.join("\n");
-      expect(text).toContain("VANISHED (EARLIER) 2");
-      expect(text).toMatch(/UID 1 FLAGS \([^)]*\\Flagged/);
-      expect(text).not.toMatch(/UID 3 /);
-      expect(server.folderUids("Archive")).toHaveLength(1);
-      client.close();
-    } finally {
-      await server.close();
-    }
-  });
-
-  it("pushes EXISTS to an idling client when mail arrives (guards IDLE that never wakes the app)", async () => {
-    const server = await start();
-    try {
-      const client = await connectTestOnlyImap(server.port, {
-        assertSocketAllowed: loopbackOnlyGuard,
-      });
-      await client.command(login);
-      await client.command("SELECT INBOX");
-      client.raw("a99 IDLE");
-      expect(await client.nextUntagged()).toBe("+ idling");
-      const raw = splitMboxRaw(account.mbox)[0] ?? "";
-      server.deliver(raw);
-      expect(await client.nextUntagged()).toMatch(/^\* \d+ EXISTS$/);
-      client.raw("DONE");
-      expect(await client.nextUntagged()).toContain("OK IDLE terminated");
-      client.close();
-    } finally {
-      await server.close();
-    }
   });
 });

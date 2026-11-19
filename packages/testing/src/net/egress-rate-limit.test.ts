@@ -7,11 +7,7 @@ import { Offline, RateLimited } from "@pochimail/kernel/errors";
 import { AccountId } from "@pochimail/kernel/ids";
 import { err, ok, unwrap } from "@pochimail/kernel/result";
 import { type HttpClient, RequestCancelledError } from "@pochimail/net/egress/http-client";
-import {
-  createConnectionLimiter,
-  createRateLimitedClient,
-  systemSleep,
-} from "@pochimail/net/egress/rate-limit";
+import { createRateLimitedClient, systemSleep } from "@pochimail/net/egress/rate-limit";
 import { createFakeMailProvider } from "@pochimail/testing/fake-mail-provider";
 import { makeIncomingMessage, WS_A } from "@pochimail/testing/fixtures";
 import { createInMemoryUnitOfWork } from "@pochimail/testing/in-memory-store";
@@ -22,36 +18,6 @@ import { createFakeClock } from "../fake-clock.ts";
 registerRateLimitContract(({ inner, clock, random, sleep, onEvent }) =>
   createRateLimitedClient({ inner, clock, random, sleep, onEvent }),
 );
-
-it("frees the IMAP connection slot after fn throws, so a failure cannot leak a slot", async () => {
-  const limiter = createConnectionLimiter(1);
-  const id = unwrap(AccountId("acc-imap"));
-  await expect(
-    limiter.withConnection(id, async () => {
-      throw new Error("boom");
-    }),
-  ).rejects.toThrow("boom");
-  expect((await limiter.withConnection(id, async () => 1)).ok).toBe(true);
-});
-
-it("frees the IMAP slot after an aborted operation and refuses a second concurrent connection", async () => {
-  const limiter = createConnectionLimiter(1);
-  const id = unwrap(AccountId("acc-imap"));
-  const controller = new AbortController();
-  const running = limiter.withConnection(
-    id,
-    () =>
-      new Promise<void>((_resolve, reject) =>
-        controller.signal.addEventListener("abort", () => reject(new Error("aborted"))),
-      ),
-  );
-  const second = await limiter.withConnection(id, async () => 1);
-  expect(second.ok).toBe(false);
-  if (!second.ok) expect(second.error).toBeInstanceOf(RateLimited);
-  controller.abort();
-  await expect(running).rejects.toThrow("aborted");
-  expect((await limiter.withConnection(id, async () => 1)).ok).toBe(true);
-});
 
 describe("a wait that is pending when the caller aborts", () => {
   const account = { id: unwrap(AccountId("acc-wait")), provider: "gmail" as const };

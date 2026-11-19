@@ -3,6 +3,42 @@ import { cn } from "@pochimail/ui/lib/utils";
 import { LockIcon } from "lucide-react";
 import type * as React from "react";
 
+type StatusRegionProps = Omit<React.ComponentProps<"div">, "role" | "aria-live">;
+
+/**
+ * The one quiet, polite live region (and its text style) that both renderings below compose. It
+ * stays mounted: render it always and change its children, because a region inserted on demand is
+ * often not announced.
+ */
+function StatusRegion({ className, ...props }: StatusRegionProps) {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className={cn(
+        "flex flex-wrap items-center gap-x-4 text-caption text-muted-foreground",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+type StatusLineProps = StatusRegionProps;
+
+/** A quiet line in the page flow (never a pop-up): the live region alone, framed while it has content. */
+function StatusLine({ className, children, ...props }: StatusLineProps) {
+  return (
+    <StatusRegion
+      data-slot="status-line"
+      className={cn("gap-y-2", children && "border-y border-border py-2.5", className)}
+      {...props}
+    >
+      {children}
+    </StatusRegion>
+  );
+}
+
 type StatusStripProps = React.ComponentProps<"div"> & {
   /** 0 to 100. */
   progress: number;
@@ -36,12 +72,8 @@ function StatusStrip({
           }}
         />
       </div>
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5 text-caption text-muted-foreground">
-        <div
-          role="status"
-          aria-live="polite"
-          className="flex flex-1 flex-wrap items-center gap-x-4 gap-y-2.5"
-        >
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2.5">
+        <StatusRegion className="flex-1 gap-y-2.5">
           <span className="flex items-center gap-1.5 font-medium text-foreground">
             <LockIcon aria-hidden="true" className="size-3.75 shrink-0" />
             {headline}
@@ -57,11 +89,11 @@ function StatusStrip({
               {status}
             </span>
           ) : null}
-        </div>
+        </StatusRegion>
         {children ? <div className="ml-auto flex gap-1.5">{children}</div> : null}
       </div>
     </div>
   );
 }
 
-export { StatusStrip, type StatusStripProps };
+export { StatusLine, type StatusLineProps, StatusStrip, type StatusStripProps };

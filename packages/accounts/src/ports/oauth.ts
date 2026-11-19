@@ -36,8 +36,8 @@ export interface OAuthTokenSource {
 /** Revokes an account's credential at the provider when the account is removed (ADR 0007). */
 export interface TokenRevoker {
   /**
-   * `ok` when there is nothing to revoke at the provider (IMAP app passwords, or a provider with
-   * no user-token revocation endpoint). A provider failure is returned, but removal still proceeds
+   * `ok` when there is nothing to revoke at the provider (a provider with no user-token
+   * revocation endpoint). A provider failure is returned, but removal still proceeds
    * locally: a lost network must never keep a credential on the device.
    */
   revoke(

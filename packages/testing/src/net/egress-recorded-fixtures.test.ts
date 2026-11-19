@@ -1,7 +1,7 @@
 import { RateLimited } from "@pochimail/kernel/errors";
 import { AccountId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
-import { BlockedSocketError, egressPolicy } from "@pochimail/net/egress/allowlist";
+import { egressPolicy } from "@pochimail/net/egress/allowlist";
 import {
   BlockedHostError,
   createHttpClient,
@@ -19,9 +19,7 @@ import {
   readGraphMailbox,
 } from "@pochimail/testing/recorded/http-wire";
 import { protocolContract } from "@pochimail/testing/recorded/protocol-contract";
-import { startScriptedImapServer } from "@pochimail/testing/recorded/scripted-imap-server";
-import { readMailboxOverTestOnlyImap } from "@pochimail/testing/recorded/test-only-imap-client";
-import { afterAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { createFakeClock } from "../fake-clock.ts";
 
 const SEED = 20261117;
@@ -38,11 +36,6 @@ const clientFor = (recording: Recording) => {
   const client = createHttpClient({ allowlist: egressPolicy.create(), fetch: replay.fetch });
   return { replay, client };
 };
-
-const servers: { close(): Promise<void> }[] = [];
-afterAll(async () => {
-  await Promise.all(servers.map((s) => s.close()));
-});
 
 protocolContract("Gmail replay serves the fixture mailbox", () => {
   const { client, replay } = clientFor(gmailRecording(gmailMessages, { pageSize: 50 }));
@@ -68,24 +61,6 @@ protocolContract("Graph replay serves the fixture mailbox", () => {
   };
 });
 
-protocolContract("Scripted IMAP server serves the fixture mailbox", async () => {
-  const server = await startScriptedImapServer({ mbox: gmailAccount.mbox });
-  servers.push(server);
-  const allowlist = egressPolicy.create();
-  allowlist.addAccount({
-    accountId: unwrap(AccountId(gmailAccount.id)),
-    imap: { host: server.host, port: server.port },
-  });
-  return {
-    expected: gmailMessages.map((m) => m.message),
-    read: async () => {
-      return readMailboxOverTestOnlyImap(server.port, ids(gmailAccount), {
-        assertSocketAllowed: allowlist.assertSocketAllowed,
-      });
-    },
-  };
-});
-
 describe("recorded fixtures behind the egress client", () => {
   it("blocks a recorded host that is not on the allow-list before replay is reached (guards a fixture bypassing egress)", async () => {
     const { replay, client } = clientFor({
@@ -100,18 +75,6 @@ describe("recorded fixtures behind the egress client", () => {
     const result = await client.request({ url: "https://tracker.example.net/v1" });
     expect(!result.ok && result.error).toBeInstanceOf(BlockedHostError);
     expect(replay.requests()).toEqual([]);
-  });
-
-  it("opens no IMAP socket to the scripted server until the account registered it (guards a test reader that bypasses assertSocketAllowed)", async () => {
-    const server = await startScriptedImapServer({ mbox: gmailAccount.mbox });
-    servers.push(server);
-    const allowlist = egressPolicy.create();
-    await expect(
-      readMailboxOverTestOnlyImap(server.port, ids(gmailAccount), {
-        assertSocketAllowed: allowlist.assertSocketAllowed,
-      }),
-    ).rejects.toBeInstanceOf(BlockedSocketError);
-    expect(server.connectionsAccepted()).toBe(0);
   });
 
   it("surfaces a scripted 429 with Retry-After as RateLimited and recovers after the wait (guards M2-07 paths nobody exercises)", async () => {

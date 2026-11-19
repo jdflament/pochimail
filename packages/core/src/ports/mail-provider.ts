@@ -3,7 +3,7 @@ import type { Cancelled, ProviderError } from "@pochimail/kernel/errors";
 import type { MailReader } from "@pochimail/mailbox/ports/mail-reader";
 import type { Command } from "../domain/action.ts";
 
-/** Gmail organizes with labels; Graph and IMAP with folders. */
+/** Gmail organizes with labels; Graph with folders. */
 export const ORGANIZATION_MODELS = ["labels", "folders"] as const;
 export type OrganizationModel = (typeof ORGANIZATION_MODELS)[number];
 
@@ -22,7 +22,7 @@ export interface MailProviderCapabilities {
   readonly batchModify: { readonly maxCommands: number } | null;
   /** `true`: true delta sync (history id / delta token / QRESYNC). `false`: full or UID-range walk. */
   readonly deltaSync: boolean;
-  /** `true`: the provider can wake the app (IMAP IDLE) instead of only being polled. */
+  /** `true`: the provider can wake the app (a push channel) instead of only being polled. */
   readonly pushWakeups: boolean;
   /** `true`: RFC 8058 one-click unsubscribe can be sent. */
   readonly unsubscribeSend: boolean;

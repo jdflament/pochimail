@@ -2,7 +2,7 @@ import type { ProviderKind } from "@pochimail/accounts/model/account";
 import type { Clock } from "@pochimail/kernel/clock";
 import { RateLimited } from "@pochimail/kernel/errors";
 import type { AccountId } from "@pochimail/kernel/ids";
-import { err, ok, type Result } from "@pochimail/kernel/result";
+import { err, type Result } from "@pochimail/kernel/result";
 import { DEFAULT_RETRY_POLICY, type RetryPolicy, retryDelayMs } from "@pochimail/pipeline/retry";
 import {
   type HttpClient,
@@ -28,18 +28,16 @@ export interface BucketConfig {
   readonly refillPerMinute: number;
 }
 
-/** Gmail: 6,000 units/min/user. Graph: ~10,000 requests/10 min/mailbox. IMAP: conservative. */
+/** Gmail: 6,000 units/min/user. Graph: ~10,000 requests/10 min/mailbox. */
 export const DEFAULT_BUCKETS: Readonly<Record<ProviderKind, BucketConfig>> = {
   gmail: { capacity: 6_000, refillPerMinute: 6_000 },
   graph: { capacity: 1_000, refillPerMinute: 1_000 },
-  imap: { capacity: 120, refillPerMinute: 120 },
 };
 
 /** What the renderer shows for each provider kind (the states copy takes a display name). */
 export const PROVIDER_DISPLAY_NAMES: Readonly<Record<ProviderKind, string>> = {
   gmail: "Google",
   graph: "Microsoft",
-  imap: "IMAP",
 };
 
 /** Waits `ms` (real or fake time); resolves `false` if `signal` aborts first. */
@@ -227,32 +225,6 @@ export const createRateLimitedClient = (options: {
         }
         const delay = retryDelayMs(attempt, policy, options.random);
         if (!(await options.sleep(delay, request.signal))) return err(new RequestCancelledError());
-      }
-    },
-  };
-};
-
-/** IMAP: at most `max` simultaneous connections per account. */
-export const createConnectionLimiter = (max: number) => {
-  const open = new Map<AccountId, number>();
-  const release = (accountId: AccountId) => {
-    const left = (open.get(accountId) ?? 1) - 1;
-    if (left <= 0) open.delete(accountId);
-    else open.set(accountId, left);
-  };
-  return {
-    /** Runs `fn` holding one slot, always freed in `finally` (error or abort included). */
-    async withConnection<T>(
-      accountId: AccountId,
-      fn: () => Promise<T>,
-    ): Promise<Result<T, RateLimited>> {
-      const count = open.get(accountId) ?? 0;
-      if (count >= max) return err(new RateLimited());
-      open.set(accountId, count + 1);
-      try {
-        return ok(await fn());
-      } finally {
-        release(accountId);
       }
     },
   };
