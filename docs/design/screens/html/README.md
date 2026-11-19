@@ -7,6 +7,7 @@ File names: `Main` = Welcome, `Connect`, `Mode` = Setup, `Scan` = Overview, `Ove
 `ConnectPromise` and `ModePromise` (Setup) = the same screens with the deletion promise from `docs/product.md` in place of the old "never delete" lines. `Main` (Welcome) has no caption slot for the sentence, so it is unchanged.
 `Activity` = Activity & undo, one list that shows every state: applied with Undo and Undo all (Trash batch), undone, failed with Try again, unsubscribe that can't be undone, deletion no longer in the Trash (undo unavailable); `ActivityEmpty` = empty.
 `Delete*` = delete confirmation outcomes: `DeleteSuccess` (undo toast), `DeleteFailure` (nothing moved), `DeletePartial` (some emails stayed). The confirm itself is `ReviewDeleteConfirm`.
+`ScanDelete` = Overview with Clean up first and the GB you can free by deleting; `ScanDeleteUnknown` = the same when Outlook sizes are not known yet (no GB figure); `SummaryDelete` = Summary sheet with that figure.
 `Dark*` and `Phone*` are the dark and phone versions.
 
 Motion is not here: see `../source/Motion.dc.html` (keyframes, easing and timing in its `<style>` and `<script>`) and the motion catalog in `docs/design.md`.

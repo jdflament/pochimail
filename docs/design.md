@@ -6,7 +6,7 @@ Tokens live in `packages/ui/src/styles/` (`tokens.json` is the source, then `tok
 Calm, sober, editorial: screens read like a typeset document, not a dashboard of cards. Typography, hairline rules and open space structure the page. The mascot is the only warm element.
 - Ledgers (rows, dotted leaders, tabular numbers), never stat tiles. Containers only where content needs one (summary sheet, list blocks).
 - **Catch what matters**: people waiting on you, deadlines, things to remember. Old conversations never count as "waiting on you".
-- **Clean up** is a list of recommendations ordered by impact, each a sentence ("Unsubscribe from 120 newsletters"), a one-line reason and one "Review" button. Space you can free by deleting is shown apart from email you can archive ([ADR 0012](adr/0012-delete-moves-to-trash-with-approval.md)). What the storage bar shows is **open for the maintainer**; do not invent a meaning.
+- **Clean up** is a list of recommendations ordered by impact, each a sentence ("Unsubscribe from 120 newsletters"), a one-line reason and one "Review" button. Space you can free by deleting is shown apart from email you can archive ([ADR 0012](adr/0012-delete-moves-to-trash-with-approval.md)). The storage bar shows what stays against what can be deleted ([ADR 0012](adr/0012-delete-moves-to-trash-with-approval.md)).
 - **Summary** is a plain sheet from Pochi over the current screen, never a page: "From Pochi · date", a title, one sentence, three figures, one next step, Keep it tidy choices. It shows only what is new. Bottom sheet on phones.
 - **Saved attachments** go to the user's own storage ([ADR 0010](adr/0010-saved-attachments-go-to-user-storage.md)).
 - **Review lists** (proposed, maintainer to confirm): Pochimail may label the concerned emails in the provider and open that filtered list in the user's mail app.
@@ -56,7 +56,7 @@ No cards inside cards, icon-tile stacks, numbered section labels, eyebrow chips,
 |---|---|
 | Live progress | Line glides (600ms); each finding slides up 8px and fades in |
 | Numbers arrive | Count up once from 0 (600ms) |
-| Storage settles | Open for the maintainer, tied to the storage bar; do not implement an invented meaning |
+| Storage settles | The bar shows what stays against what can be deleted ([ADR 0012](adr/0012-delete-moves-to-trash-with-approval.md)) |
 | Clean up, then undo | Row folds away (260ms); dark Undo toast for 5s; Undo unfolds the row |
 | Pochi at rest | Breathing 1 → 1.012 wide / 1.025 tall (4.2s), blink (5.3s) |
 | Pochi finds something | Squish, bounce up 14px, settle (620ms) |
