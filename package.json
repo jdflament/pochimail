@@ -14,7 +14,7 @@
     "pnpm": ">=12.21.0 <13"
   },
   "scripts": {
-    "check": "turbo run typecheck lint knip test && pnpm lint:root && pnpm manypkg",
+    "check": "turbo run typecheck lint test && pnpm knip && pnpm lint:root && pnpm manypkg",
     "gates": "node tooling/ci/src/assert-gates.ts",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint && pnpm lint:root",
@@ -23,7 +23,7 @@
     "manypkg": "manypkg check",
     "test": "turbo run test",
     "build": "turbo run build",
-    "knip": "turbo run knip",
+    "knip": "turbo run knip --concurrency=1",
     "eval": "turbo run eval"
   },
   "devDependencies": {
