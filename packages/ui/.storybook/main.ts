@@ -10,6 +10,9 @@ const config: StorybookConfig = {
   core: { disableTelemetry: true, disableWhatsNewNotifications: true },
   viteFinal: (viteConfig) => ({
     ...viteConfig,
+    // Stories mount the real router, which reads this compile-time global (the dev gallery route,
+    // apps/desktop/src/shared/gallery-build.ts). Storybook is a dev tool, so it is on.
+    define: { ...viteConfig.define, __POCHIMAIL_GALLERY__: "true" },
     plugins: [...(viteConfig.plugins ?? []), tailwindcss()],
   }),
 };
