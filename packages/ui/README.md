@@ -8,7 +8,7 @@ The design system in code, on shadcn/ui. Components render from props alone.
 - `styles/`: tokens (light and dark), the type, spacing and radius scale, named breakpoints, the Tailwind theme.
 - `components/`: shadcn primitives (wrapped, not forked) and the composites in `docs/design.md` (ledger row, signal row, recommendation row, status strip, sheet, sidebar, mascot…).
 - `i18n/`: message catalogs and locale formatting.
-- `assets/`: fonts, brand, mascot (brand assets: see `TRADEMARKS.md`). `assets/brand/social/`: social images, `app-icon-master.svg` on the brand background token, content in the centre 80%.
+- `assets/`: fonts, brand, mascot (brand assets: see `TRADEMARKS.md`). `assets/brand/social/`: the GitHub social preview; `app-icon-master.svg` is the app icon source, content in the centre 80%.
 
 ## May import
 Its own files and its npm dependencies (Radix, CVA, Motion, sonner, lucide). Nothing from `@pochimail/*` (enforced: ui-is-presentational).
