@@ -8,7 +8,7 @@ The only way out to the network: allow-listed HTTP and OAuth PKCE sign-in, share
 - HTTP client (allow-list, timeouts, `Retry-After`, `RateLimited`), loopback OAuth PKCE, token refresh and revocation.
 
 ## May import
-`kernel`, `logger`, `zod`.
+`kernel`, `logger`, `zod`, and `core` for error types and OAuth ports until the domains are split (#102 to #104); `pipeline`'s `retry.ts` only.
 
 ## Must not contain
 - Provider-specific API code, hosts missing from `docs/security.md`.

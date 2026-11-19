@@ -31,7 +31,7 @@
     "@pochimail/core": "workspace:*",
     "@pochimail/kernel": "workspace:*",
     "@pochimail/logger": "workspace:*",
-    "@pochimail/mail": "workspace:*",
+    "@pochimail/net": "workspace:*",
     "@pochimail/pipeline": "workspace:*",
     "@pochimail/testing": "workspace:*",
     "@pochimail/typescript-config": "workspace:*",

@@ -1,5 +1,5 @@
 import { pathToFileURL } from "node:url";
-import { egressPolicy, matchesAllowlistEntry } from "@pochimail/mail/egress/allowlist";
+import { egressPolicy, matchesAllowlistEntry } from "@pochimail/net/egress/allowlist";
 import type { WebContents, WebPreferences } from "electron";
 
 /**

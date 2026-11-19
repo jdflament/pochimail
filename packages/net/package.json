@@ -1,0 +1,37 @@
+{
+  "name": "@pochimail/net",
+  "private": true,
+  "version": "0.0.0",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "exports": {
+    "./egress/allowlist": "./src/egress/allowlist.ts",
+    "./egress/http-client": "./src/egress/http-client.ts",
+    "./egress/rate-limit": "./src/egress/rate-limit.ts",
+    "./oauth/http": "./src/oauth/http.ts",
+    "./oauth/loopback": "./src/oauth/loopback.ts",
+    "./oauth/providers": "./src/oauth/providers.ts",
+    "./oauth/revoke": "./src/oauth/revoke.ts",
+    "./oauth/sign-in": "./src/oauth/sign-in.ts",
+    "./oauth/tokens": "./src/oauth/tokens.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc",
+    "lint": "biome check .",
+    "knip": "knip",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@pochimail/core": "workspace:*",
+    "@pochimail/kernel": "workspace:*",
+    "@pochimail/logger": "workspace:*",
+    "@pochimail/pipeline": "workspace:*",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@pochimail/typescript-config": "workspace:*",
+    "@types/node": "26.6.6",
+    "typescript": "7.0.2",
+    "vitest": "5.1.0"
+  }
+}
