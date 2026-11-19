@@ -1,6 +1,6 @@
 # 0016 — A few fixed email types, automatic topics
 
-Status: Proposed (2026-11-19, maintainer to confirm) · Changes: the seven fixed categories · Related: [ADR 0006](0006-local-ai-runtimes-and-models.md), [ADR 0012](0012-delete-moves-to-trash-with-approval.md)
+Status: Accepted (2026-11-19) · Changes: the seven fixed categories · Related: [ADR 0006](0006-local-ai-runtimes-and-models.md), [ADR 0012](0012-delete-moves-to-trash-with-approval.md)
 
 ## Context
 The first design used seven hand-picked categories (People, Records, Purchases & travel, Sign-ins & security, Notifications, Newsletters, Promotions) and attached rules to them. Hand-picked names cannot fit every mailbox, and safety rules tied to names break when an email is misfiled. Fully automatic categories have the opposite problem: names drift between scans, small local models cluster poorly, results cannot be measured against a ground truth, they differ across languages, and no safety rule can rely on them.
