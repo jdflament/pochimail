@@ -6,7 +6,7 @@ The shipped Electron app and its composition root (ADR 0002).
 ## Owns
 - `main/`, `preload/`, `worker/`, `model-host/`, `renderer/`: one folder per process (see ARCHITECTURE.md).
 - `shared/`: the IPC contract used by every process.
-- `build/`, `resources/`, `packaging/`: icons (per platform; the macOS `icon.icon` is exported from the layers in `docs/design/brand/icon-composer/`), tray assets, electron-builder config.
+- `build/`, `resources/`, `packaging/`: icons (per platform), tray assets, electron-builder config.
 
 ## May import
 All workspaces, only in the process that needs them: the worker composes domains, workflows, pipeline and adapters; the renderer uses `ui` and `shared/` only.

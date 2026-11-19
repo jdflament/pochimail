@@ -1,6 +1,6 @@
 # 0005 — Local storage and encryption at rest
 
-Status: Accepted (2026-11-17) · Amended by [0014](0014-store-reports-and-actions-not-mail.md) (what is stored; no FTS)
+Status: Accepted (2026-11-17) · Amended by [0014](0014-store-reports-and-actions-not-mail.md) (what is stored; no FTS); blob store amended by [0010](0010-saved-attachments-go-to-user-storage.md)
 
 ## Decision
 - **SQLite with SQLCipher-compatible encryption** through `better-sqlite3-multiple-ciphers`, pinned `13.1.1`. It ships Node-API prebuilds, so nothing is rebuilt for Electron. WAL mode, `foreign_keys=ON`, one writer (the worker).

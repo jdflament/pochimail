@@ -10,7 +10,7 @@ Pochimail is a private assistant that gives you the big picture of your email ac
 ## Jobs (chosen at setup, any combination)
 1. **Catch what matters**: people waiting on you, threads waiting on others, deadlines, important senders.
 2. **Declutter**: unsubscribe, archive old notifications, delete what is useless.
-3. **Organize**: types and topics applied as real provider labels.
+3. **Organize**: topics applied as real provider labels; types drive actions ([ADR 0016](adr/0016-fixed-types-and-automatic-topics.md)).
 4. **Save documents**: invoices, contracts, IDs, payslips, saved to a folder the user chooses ([ADR 0010](adr/0010-saved-attachments-go-to-user-storage.md)).
 
 ## Autonomy (one choice)

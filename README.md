@@ -14,9 +14,9 @@ Pochimail is **not a mail client**: any single email opens in your usual mail ap
 ## The privacy promise
 - **Your email stays on this computer.** There is no Pochimail server.
 - **Local AI only.** Models run on your device and are downloaded once, checksummed.
-- **No telemetry**, no crash reporting.
+- **No telemetry** and no crash reporting in v1.
 - **You decide.** Nothing changes without your approval unless you turn on Autopilot, which only does high-confidence, low-risk actions and tells you afterwards.
-- **Deletion is always your call**: the exact promise is in [docs/product.md](docs/product.md). Every batch is previewed and every action is logged.
+- **The promise on deleting email** is in [docs/product.md](docs/product.md). Every batch is previewed and every action is logged.
 - **No email content is stored**: only ids, dates, counts and what Pochimail did.
 
 Security design, network allow-list and threat model: [docs/security.md](docs/security.md). Report vulnerabilities privately: [SECURITY.md](SECURITY.md).

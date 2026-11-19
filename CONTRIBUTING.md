@@ -17,7 +17,7 @@ Use your own OAuth clients in a git-ignored env file (names in [ADR 0007](docs/a
 - Microsoft: public client app in Entra, redirect `http://127.0.0.1`.
 
 ## Workflow
-1. Pick an [issue](https://github.com/pochimail/pochimail/issues) (`good first issue` to start) and comment before working. No issue yet? Open one.
+1. Pick an issue from the repository's Issues tab (`good first issue` to start) and comment before working. No issue yet? Open one.
 2. Post your plan in the issue (AGENTS.md rule 2).
 3. Branch, code, run `pnpm check`, open a PR with the template.
 

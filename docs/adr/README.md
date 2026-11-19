@@ -1,16 +1,16 @@
 # Architecture decision records
 
-One file per decision. An accepted ADR wins over any rule; changing one needs the maintainer's approval.
+One file per decision. An accepted ADR wins over any rule; changing one needs approval.
 
 | # | Decision | Status |
 |---|---|---|
-| 0001 | Monorepo and package manager | Accepted; amended 0015 |
+| 0001 | Monorepo, package manager | Accepted; amended 0015 |
 | 0002 | Electron processes and IPC | Accepted |
-| 0003 | Hexagonal domains, events, outbox | Accepted; amended 0015 |
+| 0003 | Hexagonal domains, outbox | Accepted; amended 0015 |
 | 0004 | Incremental sync and wake-ups | Accepted; amended 0011 |
-| 0005 | Local storage and encryption | Accepted; amended 0014 |
-| 0006 | Local AI runtimes, models | Accepted |
-| 0007 | OAuth, credentials and scopes | Accepted |
+| 0005 | Local storage and encryption | Accepted; amended 0014, 0010 |
+| 0006 | Local AI runtimes, models | Accepted; amended 0014 |
+| 0007 | OAuth, credentials and scopes | Accepted; amended 0011, 0012 |
 | 0008 | Notifications and privacy | Accepted |
 | 0009 | Store metadata, not mail | Superseded by 0014 |
 | 0010 | Saved attachments in user storage | Accepted |
