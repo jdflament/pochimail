@@ -9,7 +9,7 @@ Status: Accepted (2026-11-17) · Amended by [0015](0015-bounded-context-packages
 - **Events** are a typed, zod-described, versioned union.
 - **Transactional outbox**: a use case writes domain rows and its events and jobs in one SQLite transaction (`UnitOfWork`). A dispatcher publishes outbox rows to the in-process bus. Delivery is at-least-once, so every handler is idempotent, keyed by event id.
 - **Job queue** (SQLite): kind, payload, priority, `runAfter`, attempts, lease owner and expiry, cursor. Workers lease and extend jobs, retry with exponential backoff and jitter, and dead-letter after N attempts. Jobs survive restarts.
-- **Pipeline**: sync → classify → signals → recommendations as stages, each consuming the previous stage's events in batches with bounded concurrency, backpressure and `AbortController` cancellation for pause and resume.
+- **Pipeline**: sync → parse → classify → signals → recommendations as stages, each consuming the previous stage's events in batches with bounded concurrency, backpressure and `AbortController` cancellation for pause and resume.
 - One composition root per app (`apps/desktop/src/worker/compose.ts`, `apps/cli/src/compose.ts`).
 - In-memory implementations of every port come with **port contract suites** that the SQLite and provider adapters must also pass.
 

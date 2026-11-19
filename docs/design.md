@@ -10,11 +10,11 @@ Calm, sober, editorial: screens read like a typeset document, not a dashboard of
 - **Summary** is a plain sheet from Pochi over the current screen, never a page: "From Pochi · date", a title, one sentence, three figures, one next step, Keep it tidy choices. It shows only what is new. Bottom sheet on phones.
 - **Saved attachments** go to the user's own storage ([ADR 0010](adr/0010-saved-attachments-go-to-user-storage.md)).
 - **Review lists** (proposed, maintainer to confirm): Pochimail may label the concerned emails in the provider and open that filtered list in the user's mail app.
-- Only types and topics that contain email are shown ([ADR 0016](adr/0016-fixed-types-and-automatic-topics.md)).
+- Only categories that contain email are shown; once [ADR 0016](adr/0016-fixed-types-and-automatic-topics.md) is accepted, types and topics.
 
 ## Tokens
 - Use the tokens as-is; never hard-code a color. Light and dark, text pairs at least 4.5:1, graphics at least 3:1.
-- Light: background `#F3F4F5`, surface `#FFFFFF`, border `#E3E5E8`, text `#15171A`, secondary `#5C6169`, tertiary `#686D75`, primary button `#15171A` on white. Dark: `#121315`, `#1A1C1F`, `#2A2D32`, `#EEF0F2`, `#A4A9B0`, `#8C9199`, primary `#EEF0F2` on `#121315`.
+- Values live in [tokens.json](../packages/ui/src/styles/tokens.json) (light and dark); do not copy them here.
 - Color never codes content; type colors are reserved for rare charts, always with a label.
 - Radius: 6, 10 (controls), 12 (buttons), 16 (cards, panels), pill. 4px spacing grid. Targets 32px, 36px sidebar items, 44px primary buttons.
 

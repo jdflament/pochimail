@@ -30,7 +30,7 @@ Pochimail is a private assistant that gives you the big picture of your email ac
 - Classification is local, cheapest first: rules, then calibrated decision heads, then a small local LLM ([ADR 0006](adr/0006-local-ai-runtimes-and-models.md)). It learns from the user's corrections, on the device.
 
 ## Principles
-1. Local first: no server, no cloud AI, no telemetry by default.
+1. Local first: no server, no cloud AI, no telemetry in v1.
 2. The assistant proposes, the user decides.
 3. Safe by default: preview, protect people, log, undo.
 4. Never block the user: background work with live progress, usable while sorting, usable offline with the last synced data.

@@ -29,7 +29,7 @@ Every workspace is `packages/<name>` or `apps/<name>`. Packages are of three kin
 | `pipeline` | event bus, jobs, outbox, scheduling |
 | `logger`, `ui`, `testing` | logging with redaction; design system; fixture mailbox and eval |
 
-**Imports:** domains → `kernel` only. `workflows` → domains. Adapters → the domains whose ports they implement, plus `kernel`, `logger`, and `net` for `gmail` and `graph`. Apps compose all. Enforced by `.dependency-cruiser.cjs`.
+**Imports:** domains → `kernel` and `zod`. `workflows` → domains. Adapters → the domains whose ports they implement, plus `kernel`, `logger`, and `net` for `gmail` and `graph`. Apps compose all. Enforced by `.dependency-cruiser.cjs`.
 
 ## Processes
 | Process | Does |

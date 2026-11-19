@@ -1,6 +1,6 @@
 # Contributing
 
-Read [ARCHITECTURE.md](ARCHITECTURE.md) and [AGENTS.md](AGENTS.md) first. Each package and app has its own short `AGENTS.md` with the rules for that area, and a README saying what it owns. Any coding agent that supports AGENTS.md picks them up; do not add tool-specific instruction files.
+Read [ARCHITECTURE.md](ARCHITECTURE.md) and [AGENTS.md](AGENTS.md) first. Packages that need area rules have their own short `AGENTS.md`, and each has a README saying what it owns. Any coding agent that supports AGENTS.md picks them up; do not add tool-specific instruction files.
 
 ## Setup
 Node and pnpm versions are pinned in `.nvmrc` and `package.json`.

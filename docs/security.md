@@ -17,7 +17,7 @@ Pochimail handles a whole mailbox. Local only: no Pochimail server, no telemetry
 |---|---|
 | Mail data and reports | Encrypted SQLite owned by the worker; only ids, dates, hashes and reports ([ADR 0014](adr/0014-store-reports-and-actions-not-mail.md)) |
 | Tokens, database key | OS keychain; Linux `basic_text` is refused unless the user chooses to continue |
-| Mailbox integrity | Nothing is deleted without your OK. Deleted emails go to the Trash, and you can undo. Every action is logged with its inverse |
+| Mailbox integrity | The promise is in [product.md](product.md). Every action is logged with its inverse |
 | Saved documents | The user's own folder, kept when an account is removed |
 | Models | SHA-256 pinned in a signed manifest |
 | App and updates | Signed builds from GitHub Releases |
@@ -57,7 +57,7 @@ Enforced by `session.webRequest` in every session and by the worker HTTP client,
 
 Sign-in pages load in the user's browser, so they are not listed. The loopback redirect and IPC ports are local. Not used: telemetry, crash reporting, a relay, cloud AI, remote images or fonts, link following, MX or autoconfig lookups.
 
-**One exception: one-click unsubscribe.** One dedicated worker path may POST `List-Unsubscribe=One-Click` to the exact `https` URL of a message's `List-Unsubscribe` header, only when the message has `List-Unsubscribe-Post`, and only after the user confirmed. No cookies, no redirects followed, no `Referer`, no IP literal or private, loopback or `localhost` address, short timeout, response discarded, every call logged without the URL. The sender learns the address is active; the UI says so. Tests must refuse `http`, redirects, private addresses and URLs that differ from the header.
+**One exception: one-click unsubscribe.** One dedicated worker path may POST `List-Unsubscribe=One-Click` to the exact `https` URL of a message's `List-Unsubscribe` header, only when the message has `List-Unsubscribe-Post`, and only after the user confirmed, or under Autopilot's rule in [ADR 0013](adr/0013-unsubscribe-suggested-user-decides.md). No cookies, no redirects followed, no `Referer`, no IP literal or private, loopback or `localhost` address, short timeout, response discarded, every call logged without the URL. The sender learns the address is active; the UI says so. Tests must refuse `http`, redirects, private addresses and URLs that differ from the header.
 
 ## Open points
 Whether the model host can be denied network access at the OS level on all three systems; which libraries parse attachments and PDFs; Google's answer on CASA for a local-only app ([ADR 0007](adr/0007-oauth-credentials-scopes.md)).
