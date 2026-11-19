@@ -110,7 +110,7 @@ export function OverviewPage() {
               <h2 id="catch-title" className="text-xl font-semibold">
                 {t("overview.catch.title")}
               </h2>
-              <span className="text-sm text-muted-foreground">{t("overview.catch.note")}</span>
+              <span className="text-ui text-muted-foreground">{t("overview.catch.note")}</span>
             </div>
             {data.toReview === 0 ? (
               <p className="text-muted-foreground">{t("overview.nothingToCatch")}</p>
@@ -156,7 +156,7 @@ export function OverviewPage() {
               <h2 id="clean-title" className="text-xl font-semibold">
                 {t("overview.clean.title")}
               </h2>
-              <span className="text-sm text-muted-foreground">{t("overview.clean.note")}</span>
+              <span className="text-ui text-muted-foreground">{t("overview.clean.note")}</span>
             </div>
             {data.cleanable.length === 0 ? (
               <p className="text-muted-foreground">{t("overview.nothingToClean")}</p>
@@ -207,7 +207,7 @@ export function OverviewPage() {
                 </ul>
               </>
             )}
-            <p className="text-sm text-muted-foreground">{t("overview.clean.never")}</p>
+            <p className="text-ui text-muted-foreground">{t("overview.clean.never")}</p>
           </section>
         </>
       )}

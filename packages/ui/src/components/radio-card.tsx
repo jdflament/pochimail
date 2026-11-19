@@ -49,7 +49,7 @@ function RadioCard({ className, title, description, badge, id, ...props }: Radio
         {description ? (
           <span
             id={descriptionId}
-            className="text-sm leading-snug break-words text-muted-foreground"
+            className="text-ui leading-snug break-words text-muted-foreground"
           >
             {description}
           </span>

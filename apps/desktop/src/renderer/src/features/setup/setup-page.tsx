@@ -37,7 +37,7 @@ export function SetupPage() {
       {settings.data ? <SetupForm initial={settings.data} /> : null}
       {settings.isError ? (
         <div className="flex flex-col items-center gap-3">
-          <p role="alert" className="text-sm text-destructive">
+          <p role="alert" className="text-ui text-destructive">
             {t("setup.settingsError")}
           </p>
           <Button variant="secondary" onClick={() => void settings.refetch()}>
@@ -104,7 +104,7 @@ function SetupForm({ initial }: { initial: Choice }) {
       <section aria-labelledby="setup-capabilities" className="flex flex-col gap-3">
         <h2 id="setup-capabilities" className="text-xl">
           {t("setup.capabilities.heading")}{" "}
-          <span className="font-sans text-sm font-normal text-muted-foreground">
+          <span className="font-sans text-ui font-normal text-muted-foreground">
             {t("setup.capabilities.hint")}
           </span>
         </h2>
@@ -142,13 +142,13 @@ function SetupForm({ initial }: { initial: Choice }) {
           ))}
         </RadioGroup>
         {autonomy === "autopilot" ? (
-          <p className="text-sm leading-snug text-foreground">
+          <p className="text-ui leading-snug text-foreground">
             {t("setup.autonomy.autopilot.reminder", {
               percent: Math.round(AUTOPILOT_CONFIDENCE_THRESHOLD * 100),
             })}
           </p>
         ) : null}
-        <p className="flex items-start gap-2 text-sm text-muted-foreground">
+        <p className="flex items-start gap-2 text-ui text-muted-foreground">
           <LockIcon aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
           {t("setup.invariants")}
         </p>
@@ -165,12 +165,12 @@ function SetupForm({ initial }: { initial: Choice }) {
           {t("setup.start")}
         </Button>
         {noneChosen ? (
-          <p id="setup-none" className="text-sm text-muted-foreground">
+          <p id="setup-none" className="text-ui text-muted-foreground">
             {t("setup.capabilities.none")}
           </p>
         ) : null}
         {start.isError ? (
-          <p role="alert" className="text-sm text-destructive">
+          <p role="alert" className="text-ui text-destructive">
             {t("setup.error")}
           </p>
         ) : null}

@@ -34,7 +34,7 @@ export function PseudoLocalePreview({ locale = "pseudo" }: { readonly locale?: L
           reviewLabel={t("overview.review", {}, options)}
         />
       </ul>
-      <p className="m-0 min-w-0 text-sm break-words text-foreground-tertiary">
+      <p className="m-0 min-w-0 text-ui break-words text-foreground-tertiary">
         {t("summary.from", { date: "2026-11-19T12:00:00Z", device }, options)}
       </p>
     </div>

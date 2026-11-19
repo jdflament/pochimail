@@ -37,7 +37,7 @@ function CheckboxCard({ className, title, description, id, ...props }: CheckboxC
         {description ? (
           <span
             id={descriptionId}
-            className="text-sm leading-snug break-words text-muted-foreground"
+            className="text-ui leading-snug break-words text-muted-foreground"
           >
             {description}
           </span>

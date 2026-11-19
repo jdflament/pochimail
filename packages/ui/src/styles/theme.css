@@ -57,11 +57,12 @@
 }
 
 /* One design scale (docs/design.md: Typography, Shape and space). Components use these names, never `text-[15px]`
-   or `@max-[560px]`. Type steps set the size only; line height stays with the component. */
+   or `@max-[560px]`. Type steps set the size only, except `ui`, which keeps the line height the old `text-sm` had. */
 @theme {
   --text-overline: 12px;
   --text-caption: 13px;
   --text-ui: 14px;
+  --text-ui--line-height: calc(1.25 / 0.875);
   --text-body: 15px;
   --text-section: 17px;
   --text-title-sm: 28px;

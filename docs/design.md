@@ -16,21 +16,22 @@ Calm, sober, editorial: screens read like a typeset document, not a dashboard of
 - Use the tokens as-is; never hard-code a color. Light and dark, text pairs at least 4.5:1, graphics at least 3:1.
 - Values live in [tokens.json](../packages/ui/src/styles/tokens.json) (light and dark); do not copy them here.
 - Color never codes content; type colors are reserved for rare charts, always with a label.
-- Radius: 6, 10 (controls), 12 (buttons), 16 (cards, panels), pill. 4px spacing grid. Targets 32px, 36px sidebar items, 44px primary buttons.
+- Radius: 3 (bars), 4 (checkbox), 6, 10 (controls), 12 (buttons), 16 (cards, panels), pill. 4px spacing grid. Targets 32px, 36px sidebar items, 44px primary buttons.
 
 ## Typography
 Two families only, self-hosted, upright (never an italic display serif): **Newsreader** for display, titles and figures, **Instrument Sans** for everything else. Japanese falls back to Hiragino Sans or Noto Sans JP. Tabular numbers for counts.
 
-| Role | Size / weight |
-|---|---|
-| Display (Newsreader) | 40 / 450 |
-| h1, one per screen (Newsreader) | 32 / 450 |
-| Figure (Newsreader) | 34 / 450 |
-| h2 | 17 / 600 |
-| Body | 15 / 400 |
-| UI | 14 / 500 |
-| Caption | 13 / 400 |
-| Overline, sidebar groups only | 12 / 600, uppercase |
+| Role | Size / weight | Class |
+|---|---|---|
+| Display (Newsreader) | 40 / 450 | `text-display` |
+| h1, one per screen (Newsreader) | 32 / 450 | `text-title` |
+| Compact h1 and signal figure (Newsreader) | 28 / 450 | `text-title-sm` |
+| Figure (Newsreader) | 34 / 450 | `text-figure` |
+| h2 | 17 / 600 | `text-section` |
+| Body | 15 / 400 | `text-body` |
+| UI | 14 / 500 | `text-ui` |
+| Caption | 13 / 400 | `text-caption` |
+| Overline, sidebar groups only | 12 / 600, uppercase | `text-overline` |
 
 ## Responsive layout
 The window is resizable, minimum 720×560. One markup, restyled by width, never separate mobile markup.

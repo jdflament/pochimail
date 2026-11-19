@@ -6,7 +6,7 @@ const meta = {
   component: Separator,
   decorators: [
     (Story) => (
-      <div className="w-64 text-sm">
+      <div className="w-64 text-ui">
         Inbox
         <Story />
         Archive
@@ -23,7 +23,7 @@ export const Vertical: Story = {
   args: { orientation: "vertical" },
   decorators: [
     (Story) => (
-      <div className="flex h-6 items-center gap-3 text-sm">
+      <div className="flex h-6 items-center gap-3 text-ui">
         Inbox
         <Story />
         Archive

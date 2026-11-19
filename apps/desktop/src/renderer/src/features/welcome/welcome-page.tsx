@@ -32,7 +32,7 @@ export function WelcomePage() {
       <Button asChild size="lg" className="mt-8 w-full max-w-104">
         <Link to="/connect">{t("welcome.cta")}</Link>
       </Button>
-      <p className="mt-4 text-sm text-foreground-tertiary">{t("welcome.openSource")}</p>
+      <p className="mt-4 text-ui text-foreground-tertiary">{t("welcome.openSource")}</p>
     </>
   );
 }

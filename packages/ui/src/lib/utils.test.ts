@@ -3,7 +3,7 @@ import { expect, it } from "vitest";
 
 // Guards: the public `lib/*` export resolves, and cn() lets the last conflicting Tailwind class win.
 it("merges conflicting Tailwind classes through its public export", () => {
-  expect(cn("px-2 text-sm", false, "px-4")).toBe("text-sm px-4");
+  expect(cn("px-2 text-ui", false, "px-4")).toBe("text-ui px-4");
 });
 
 // Guards: a named type step is not mistaken for a color, so it does not drop the text color next to it.

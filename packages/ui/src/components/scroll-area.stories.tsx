@@ -7,7 +7,7 @@ const meta = {
   args: { className: "h-40 w-64 rounded-xl border p-3", tabIndex: 0 },
   render: (args) => (
     <ScrollArea {...args}>
-      <ul className="flex flex-col gap-2 text-sm">
+      <ul className="flex flex-col gap-2 text-ui">
         {Array.from({ length: 20 }, (_, i) => i + 1).map((n) => (
           <li key={n}>Sender group {n}</li>
         ))}

@@ -60,7 +60,7 @@ function LedgerRow({
         {size ? (
           <span
             data-slot="ledger-size"
-            className="shrink-0 text-sm text-muted-foreground tabular-nums"
+            className="shrink-0 text-ui text-muted-foreground tabular-nums"
           >
             {size}
           </span>

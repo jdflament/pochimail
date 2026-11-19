@@ -41,7 +41,7 @@ function EmptyState({
         {title}
       </h2>
       {description ? (
-        <p className="m-0 max-w-65 text-sm leading-normal break-words text-muted-foreground">
+        <p className="m-0 max-w-65 text-ui leading-normal break-words text-muted-foreground">
           {description}
         </p>
       ) : null}

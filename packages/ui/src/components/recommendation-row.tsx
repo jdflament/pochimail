@@ -59,7 +59,7 @@ function RecommendationRow({
       {size ? (
         <span
           data-slot="recommendation-size"
-          className="col-start-1 row-start-2 text-sm whitespace-nowrap text-muted-foreground tabular-nums @phone:col-start-auto @phone:row-start-auto"
+          className="col-start-1 row-start-2 text-ui whitespace-nowrap text-muted-foreground tabular-nums @phone:col-start-auto @phone:row-start-auto"
         >
           {size}
         </span>
