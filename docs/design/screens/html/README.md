@@ -9,6 +9,7 @@ File names: `Main` = Welcome, `Connect`, `Mode` = Setup, `Scan` = Overview, `Ove
 `Delete*` = delete confirmation outcomes: `DeleteSuccess` (undo toast), `DeleteFailure` (nothing moved), `DeletePartial` (some emails stayed). The confirm itself is `ReviewDeleteConfirm`.
 `ScanDelete` = Overview with Clean up first and the GB you can free by deleting; `ScanDeleteUnknown` = the same when Outlook sizes are not known yet (no GB figure); `SummaryDelete` = Summary sheet with that figure.
 `Review*` = Review list: `ReviewDelete` (list, preview, a protected email left unticked), `ReviewDeleteConfirm` (one confirm, to the Trash), `ReviewUnsubscribe` (senders, Keep), `ReviewUnsubscribeConfirm` (one confirm, cannot be undone), `ReviewStates` (empty, loading, online needed).
+`SidebarTopics*` = sidebar with the five types and automatic topics (ADR 0016): `SidebarTopics` (empty ones hidden by absence), `SidebarTopicsSelection` (one account: Promotions and a topic absent because empty), `SidebarTopicMenu` (Rename, Merge into…, Hide), `SidebarTopicRename`, `SidebarTopicMerge`, `SidebarTopicHide` (undo toast), `SidebarTopicsFr` and `SidebarTopicsJa` (user's language, light only), `SettingsHiddenTopics` (Show again, light only). On phone the sidebar rows are the "Email" screen.
 `Dark*` and `Phone*` are the dark and phone versions.
 
 Motion is not here: see `../source/Motion.dc.html` (keyframes, easing and timing in its `<style>` and `<script>`) and the motion catalog in `docs/design.md`.
