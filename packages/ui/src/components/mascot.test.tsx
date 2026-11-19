@@ -2,7 +2,7 @@ import { MotionProvider } from "@pochimail/ui/components/motion-provider";
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { mascotBehaviorContract } from "../test-support/mascot-contract";
-import { Mascot, MascotProvider } from "./mascot";
+import { Mascot } from "./mascot";
 
 function renderMarkup(element: React.ReactElement): string {
   const { container } = render(element);

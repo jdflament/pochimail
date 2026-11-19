@@ -1,5 +1,5 @@
 name: check
-description: The full quality gate (install, gates, typecheck, lint, test, build, knip, manypkg). One place for the steps; ci.yml calls it from one job per OS. The caller must run actions/checkout first.
+description: The full quality gate (install, gates, typecheck, lint, test, build, knip, manypkg, arch, quality). One place for the steps; ci.yml calls it from one job per OS. The caller must run actions/checkout first.
 runs:
   using: composite
   steps:
@@ -37,4 +37,10 @@ runs:
       shell: bash
     - name: Manypkg
       run: pnpm manypkg
+      shell: bash
+    - name: Architecture boundaries
+      run: pnpm arch
+      shell: bash
+    - name: Quality rules
+      run: pnpm quality
       shell: bash

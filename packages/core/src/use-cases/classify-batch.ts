@@ -9,7 +9,7 @@ import type { MessageId, WorkspaceId } from "../ids.ts";
 import type { AiError, Classification, Classifier } from "../ports/ai.ts";
 import type { AsyncResult, CancelSignal } from "../ports/common.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
-import { err, ok } from "../result.ts";
+import { ok } from "../result.ts";
 
 export interface ClassifyBatchDeps {
   readonly uow: UnitOfWork;

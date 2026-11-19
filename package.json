@@ -14,7 +14,9 @@
     "pnpm": ">=12.21.0 <13"
   },
   "scripts": {
-    "check": "turbo run typecheck lint test && pnpm knip && pnpm lint:root && pnpm manypkg",
+    "check": "turbo run typecheck lint test && pnpm knip && pnpm lint:root && pnpm manypkg && pnpm arch && pnpm quality",
+    "arch": "depcruise --config .dependency-cruiser.cjs --ignore-known .dependency-cruiser-known-violations.json apps packages",
+    "quality": "node tooling/ci/src/check-quality.ts",
     "gates": "node tooling/ci/src/assert-gates.ts",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint && pnpm lint:root",
@@ -29,6 +31,8 @@
   "devDependencies": {
     "@biomejs/biome": "2.6.8",
     "@manypkg/cli": "0.25.1",
+    "@swc/core": "1.16.22",
+    "dependency-cruiser": "18.7.2",
     "knip": "6.45.1",
     "turbo": "2.11.11"
   }

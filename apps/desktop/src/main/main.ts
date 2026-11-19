@@ -181,7 +181,7 @@ const smokeStorage = async (): Promise<void> => {
         rows: 100_000,
       });
     });
-    console.log(`smoke:storage ${JSON.stringify({ protection, result })}`);
+    process.stdout.write(`smoke:storage ${JSON.stringify({ protection, result })}\n`);
   } finally {
     child.kill();
     rmSync(dir, { recursive: true, force: true });
@@ -209,7 +209,7 @@ const createWindow = (): void => {
   // Packaging smoke test (M0-10): report that the renderer loaded, then quit.
   if (process.env.POCHIMAIL_SMOKE === "1")
     window.webContents.once("did-finish-load", () => {
-      console.log("smoke:window-loaded");
+      process.stdout.write("smoke:window-loaded\n");
       void smokeStorage().finally(() => app.quit());
     });
   if (devServerUrl === undefined) void window.loadFile(rendererFile);

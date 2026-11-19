@@ -1,6 +1,10 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
   "files": {
     "includes": [
       "**",
@@ -10,20 +14,84 @@
       "!packages/ui/src/styles/tokens.json"
     ]
   },
-  "css": { "parser": { "tailwindDirectives": true }, "formatter": { "enabled": false } },
-  "formatter": { "indentStyle": "space", "indentWidth": 2, "lineWidth": 100 },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    },
+    "formatter": {
+      "enabled": false
+    }
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
   "linter": {
     "enabled": true,
     "rules": {
-      "suspicious": { "noExplicitAny": "error" },
-      "performance": { "noBarrelFile": "error", "noReExportAll": "error" },
-      "style": { "useImportType": "error", "useNodejsImportProtocol": "error" }
+      "suspicious": {
+        "noExplicitAny": "error",
+        "noConsole": {
+          "level": "error",
+          "options": {
+            "allow": ["error", "warn"]
+          }
+        }
+      },
+      "performance": {
+        "noBarrelFile": "error",
+        "noReExportAll": "error"
+      },
+      "style": {
+        "useImportType": "error",
+        "useNodejsImportProtocol": "error",
+        "noDefaultExport": "error",
+        "noNonNullAssertion": "error",
+        "noParameterAssign": "error",
+        "useFilenamingConvention": {
+          "level": "error",
+          "options": {
+            "filenameCases": ["kebab-case"],
+            "requireAscii": true
+          }
+        },
+        "noNestedTernary": "error",
+        "useConsistentArrayType": {
+          "level": "error",
+          "options": {
+            "syntax": "shorthand"
+          }
+        }
+      },
+      "complexity": {
+        "noExcessiveCognitiveComplexity": {
+          "level": "error",
+          "options": {
+            "maxAllowedComplexity": 15
+          }
+        },
+        "noUselessFragments": "error"
+      },
+      "correctness": {
+        "noUnusedImports": "error",
+        "noUnusedVariables": "error",
+        "noUnusedFunctionParameters": "error",
+        "useExhaustiveDependencies": "error",
+        "useHookAtTopLevel": "error"
+      }
     }
   },
   "overrides": [
     {
       "includes": ["packages/ui/src/styles/theme.css"],
-      "linter": { "rules": { "complexity": { "noImportantStyles": "off" } } }
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noImportantStyles": "off"
+          }
+        }
+      }
     },
     {
       "includes": ["packages/core/**"],
@@ -34,20 +102,125 @@
               "level": "error",
               "options": {
                 "paths": {
-                  "electron": "packages/core is pure TypeScript: no Electron (AGENTS.md §3)."
+                  "electron": "packages/core is pure TypeScript: no Electron (AGENTS.md \u00a73)."
                 },
                 "patterns": [
                   {
                     "group": ["node:*"],
-                    "message": "packages/core is pure TypeScript: no node:* (AGENTS.md §3)."
+                    "message": "packages/core is pure TypeScript: no node:* (AGENTS.md \u00a73)."
                   },
                   {
                     "group": ["electron/*"],
-                    "message": "packages/core is pure TypeScript: no Electron (AGENTS.md §3)."
+                    "message": "packages/core is pure TypeScript: no Electron (AGENTS.md \u00a73)."
                   }
                 ]
               }
             }
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "**/*.stories.tsx",
+        "**/*.config.ts",
+        "**/*.config.cjs",
+        "**/.storybook/**",
+        "**/*.d.ts"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDefaultExport": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "tooling/**",
+        "apps/cli/**",
+        "**/packaging/**",
+        "**/bench/**",
+        "packages/testing/src/eval/**",
+        "**/*.test.ts",
+        "**/*.test.tsx"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/*.test.ts", "**/*.test.tsx", "packages/testing/**"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noExcessiveCognitiveComplexity": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "apps/cli/src/scenario.ts",
+        "apps/desktop/packaging/gallery-check.ts",
+        "apps/desktop/src/main/secret-vault.ts",
+        "apps/desktop/src/model-host/serve.ts",
+        "apps/desktop/src/renderer/src/features/overview/overview-page.tsx",
+        "apps/desktop/src/shared/ipc/client.ts",
+        "apps/desktop/src/shared/ipc/secrets.ts",
+        "apps/desktop/src/shared/ipc/server.ts",
+        "packages/ai/bench/llm.ts",
+        "packages/core/src/jobs/outbox-relay.ts",
+        "packages/core/src/jobs/pipeline.ts",
+        "packages/core/src/logger.ts",
+        "packages/core/src/use-cases/apply-action.ts",
+        "packages/core/src/use-cases/build-digest.ts",
+        "packages/core/src/use-cases/classify-batch.ts",
+        "packages/core/src/use-cases/connect-account.ts",
+        "packages/core/src/use-cases/detect-signals.ts",
+        "packages/core/src/use-cases/propose-suggestions.ts",
+        "packages/core/src/use-cases/run-incremental-sync.ts",
+        "packages/core/src/use-cases/scan-runner.ts",
+        "packages/core/src/use-cases/summarize-mailbox.ts",
+        "packages/core/src/use-cases/undo-action.ts",
+        "packages/db/src/sqlite-core.ts",
+        "packages/db/src/sqlite-job-queue.ts",
+        "packages/db/src/sqlite-unit-of-work.ts",
+        "packages/mail/src/egress/http-client.ts",
+        "packages/mail/src/egress/rate-limit.ts",
+        "packages/mail/src/oauth/loopback.ts",
+        "packages/mail/src/oauth/tokens.ts",
+        "packages/ui/src/i18n/format.ts"
+      ],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noExcessiveCognitiveComplexity": "warn"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "apps/desktop/src/shared/ipc/secrets.ts",
+        "packages/core/src/use-cases/run-incremental-sync.ts",
+        "packages/core/src/use-cases/scan-runner.ts",
+        "packages/db/src/sqlite-core.ts",
+        "packages/testing/src/fixture-mailbox/generator.ts",
+        "packages/testing/src/fixture-mailbox/mbox.ts",
+        "packages/testing/src/in-memory-store.ts",
+        "packages/testing/src/workspace-rules.test.ts",
+        "packages/ui/src/components/sidebar.tsx"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "noNestedTernary": "warn"
           }
         }
       }
