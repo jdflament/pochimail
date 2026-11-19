@@ -52,7 +52,6 @@ export interface SyncHarness {
 
 const live = () => new AbortController().signal;
 const CREDENTIALS = "fake-refresh-token-do-not-store-in-rows";
-
 function cases(h: SyncHarness) {
   return {
     connect: new ConnectAccount({ uow: h.uow, secrets: h.secrets, clock: h.clock, ids: h.ids }),
