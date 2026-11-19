@@ -5,7 +5,6 @@
   "license": "AGPL-3.0-only",
   "type": "module",
   "exports": {
-    "./package-info": "./src/package-info.ts",
     "./open-storage": "./src/open-storage.ts",
     "./migrator": "./src/migrator.ts",
     "./sqlite-unit-of-work": "./src/sqlite-unit-of-work.ts",

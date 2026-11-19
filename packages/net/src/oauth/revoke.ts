@@ -9,7 +9,6 @@ import { OAUTH_PROVIDER_CONFIGS, type OAuthProviderConfig } from "./providers.ts
 const OAUTH_PROVIDER_OF: Readonly<Record<ProviderKind, "google" | "microsoft" | null>> = {
   gmail: "google",
   graph: "microsoft",
-  imap: null,
 };
 
 export interface OAuthRevokerOptions {
@@ -21,8 +20,7 @@ export interface OAuthRevokerOptions {
 /**
  * Revokes an account's credential at the provider when the account is removed (ADR 0007).
  * Google has a revocation endpoint (network.md H3). Microsoft identity platform v2.0 documents
- * no per-app user-token revocation endpoint, so removal is local for Microsoft (network.md H5);
- * IMAP app passwords have nothing to revoke.
+ * no per-app user-token revocation endpoint, so removal is local for Microsoft (network.md H5).
  */
 export const createOAuthRevoker = (options: OAuthRevokerOptions): TokenRevoker => ({
   revoke: async (

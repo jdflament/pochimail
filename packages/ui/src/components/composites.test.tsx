@@ -2,7 +2,7 @@ import { Button } from "@pochimail/ui/components/button";
 import { LedgerRow } from "@pochimail/ui/components/ledger-row";
 import { RecommendationRow } from "@pochimail/ui/components/recommendation-row";
 import { SignalRow } from "@pochimail/ui/components/signal-row";
-import { StatusStrip } from "@pochimail/ui/components/status-strip";
+import { StatusLine, StatusStrip } from "@pochimail/ui/components/status-strip";
 import { StorageBar } from "@pochimail/ui/components/storage-bar";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -115,4 +115,14 @@ it("row actions keep a 32px target and focus-visible ring", () => {
     expect(m[1]).toContain("focus-visible:ring-2");
   }
   expect(html.match(/<button/g)).toHaveLength(4);
+});
+
+// Guards: the status line losing its polite live region, or being unmounted when empty so a later message is not announced.
+it("status line stays one mounted polite status region while its content changes", () => {
+  const { rerender } = render(<StatusLine />);
+  const region = screen.getByRole("status");
+  expect(region.getAttribute("aria-live")).toBe("polite");
+  rerender(<StatusLine>Offline</StatusLine>);
+  expect(screen.getByRole("status")).toBe(region);
+  expect(region.textContent).toBe("Offline");
 });

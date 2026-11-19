@@ -42,7 +42,7 @@ export function findRecordedImports(root: string): string[] {
 }
 
 describe("the recorded-fixture harness stays dev/test only", () => {
-  it("production source never imports recorded/* by alias or relative path (guards a replay or scripted IMAP server bundled into the app)", () => {
+  it("production source never imports recorded/* by alias or relative path (guards a replay bundled into the app)", () => {
     expect(findRecordedImports(repoRoot)).toEqual([]);
   });
 

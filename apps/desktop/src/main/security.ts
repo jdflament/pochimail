@@ -9,9 +9,7 @@ import type { WebContents, WebPreferences } from "electron";
 export const allowedHosts: readonly string[] = [];
 
 /**
- * Main's view of the shared egress policy: static H1–H5 hosts plus connected account hosts.
- * Account connect/remove flows register endpoints here as they land (M2-09/M2-11); removing an
- * account revokes both its IMAP and SMTP hosts from the session filter.
+ * Main's view of the shared egress policy: the static H1–H5 hosts.
  */
 export const sessionEgress = egressPolicy.create();
 

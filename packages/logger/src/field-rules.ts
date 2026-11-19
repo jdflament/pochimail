@@ -68,7 +68,6 @@ const ENUM_VALUES: ReadonlySet<string> = new Set([
   "unsubscribe",
   "gmail",
   "outlook",
-  "imap",
   "google",
   "microsoft",
   "account",

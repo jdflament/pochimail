@@ -7,7 +7,7 @@ import { expect } from "vitest";
 export interface ProtocolHarness {
   /** What the fixture mailbox holds, read straight from the mbox. */
   readonly expected: readonly IncomingMessage[];
-  /** Reads the whole mailbox back through one protocol (Gmail JSON, Graph JSON or IMAP). */
+  /** Reads the whole mailbox back through one protocol (Gmail JSON or Graph JSON). */
   read(): Promise<readonly IncomingMessage[]>;
 }
 
@@ -30,7 +30,7 @@ export const protocolChecks: readonly Check<ProtocolHarness>[] = [
   ),
 ];
 
-/** Run this against Gmail, Graph and IMAP readers, now the fixtures and later the real adapters. */
+/** Run this against Gmail and Graph readers, now the fixtures and later the real adapters. */
 export function protocolContract(
   title: string,
   make: () => ProtocolHarness | Promise<ProtocolHarness>,

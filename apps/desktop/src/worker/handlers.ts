@@ -32,7 +32,6 @@ export interface HandlerDeps {
 const PROVIDERS: Record<Account["provider"], OutputOf<"accounts.list">[number]["provider"]> = {
   gmail: "google",
   graph: "microsoft",
-  imap: "imap",
 };
 
 type FailureReason = Extract<EventOf<"app.events">, { type: "ActionFailed" }>["reason"];

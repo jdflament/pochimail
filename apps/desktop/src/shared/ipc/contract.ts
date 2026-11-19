@@ -27,7 +27,7 @@ const queries = {
       .array(
         z.object({
           id: accountId,
-          provider: z.enum(["google", "microsoft", "imap"]),
+          provider: z.enum(["google", "microsoft"]),
           displayName: z.string().max(200),
         }),
       )

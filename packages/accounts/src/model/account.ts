@@ -6,7 +6,7 @@ import {
 } from "@pochimail/kernel/schemas";
 import { z } from "zod";
 
-export const PROVIDER_KINDS = ["gmail", "graph", "imap"] as const;
+export const PROVIDER_KINDS = ["gmail", "graph"] as const;
 export const providerKindSchema = z.enum(PROVIDER_KINDS);
 export type ProviderKind = z.infer<typeof providerKindSchema>;
 

@@ -4,8 +4,7 @@ import type { AutonomyLevel } from "@pochimail/core/policies/autonomy";
 import { err, ok, type Result } from "@pochimail/kernel/result";
 
 /**
- * The two OAuth providers of v1 (ADR 0007). Yahoo, iCloud and other IMAP accounts use app
- * passwords and never reach this module; send scopes stay out until M5/P2.
+ * The two OAuth providers of v1 (ADR 0007). Send scopes stay out until M5/P2.
  */
 export const OAUTH_PROVIDER_IDS = ["google", "microsoft"] as const;
 export type OAuthProviderId = (typeof OAUTH_PROVIDER_IDS)[number];

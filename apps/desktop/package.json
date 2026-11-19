@@ -8,7 +8,6 @@
     "#shared/*": "./src/shared/*"
   },
   "exports": {
-    "./package-info": "./src/package-info.ts",
     "./shared/i18n/screen-copy": "./src/shared/i18n/screen-copy.ts",
     "./shared/ipc/device-name": "./src/shared/ipc/device-name.ts",
     "./shared/platform": "./src/shared/platform.ts"

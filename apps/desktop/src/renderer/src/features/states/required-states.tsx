@@ -1,6 +1,6 @@
 import { Button } from "@pochimail/ui/components/button";
 import { EmptyState } from "@pochimail/ui/components/empty-state";
-import { StatusLine } from "@pochimail/ui/components/status-line";
+import { StatusLine } from "@pochimail/ui/components/status-strip";
 import { useT } from "@pochimail/ui/i18n/i18n-provider.tsx";
 
 // The required states (brief §6): each composes the one EmptyState with its pose, copy and exactly
