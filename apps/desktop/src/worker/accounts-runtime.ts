@@ -1,7 +1,7 @@
 import type { Account } from "@pochimail/accounts/model/account";
 import type { OAuthTokenSource } from "@pochimail/accounts/ports/oauth";
 import { accountSecretKey, ConnectAccount } from "@pochimail/accounts/use-cases/connect-account";
-import type { Classifier } from "@pochimail/core/ports/ai";
+import type { Classifier } from "@pochimail/classification/ports/classifier";
 import type { DeviceName } from "@pochimail/core/ports/platform";
 import { DEFAULT_APP_SETTINGS } from "@pochimail/core/ports/settings-store";
 import { openStorage } from "@pochimail/db/open-storage";
