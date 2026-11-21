@@ -1,3 +1,4 @@
+import { connectMessages } from "./connect-messages.ts";
 import { type Catalog, entry } from "./messages.ts";
 
 /**
@@ -105,9 +106,7 @@ export const ja = {
   "welcome.openSource": entry("無料のオープンソース", []),
   "onboarding.progress": entry("ステップ{current}／{total}", ["current", "total"]),
 
-  "connect.title": entry("接続", []),
-  "connect.description": entry("始めるにはメールアカウントを接続してください。", []),
-
+  ...connectMessages.ja,
   "setup.title": entry("設定", []),
   "setup.description": entry("Pochiにどのように手伝ってほしいか選んでください。", []),
   "setup.bubble": entry(

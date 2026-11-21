@@ -12,13 +12,19 @@ import { type FetchLike, postForm } from "./http.ts";
 import { openLoopbackReceiver, SIGN_IN_TIMEOUT_MS } from "./loopback.ts";
 import { createPkce, randomToken } from "./pkce.ts";
 import {
+  clientCredentialsFrom,
   clientIdFrom,
   type OAuthProviderConfig,
   type OAuthProviderId,
   oauthProviderConfig,
   scopesFor,
 } from "./providers.ts";
-import { expiresAtFrom, parseTokenResponse, scopeList } from "./token-response.ts";
+import {
+  addressFromIdToken,
+  expiresAtFrom,
+  parseTokenResponse,
+  scopeList,
+} from "./token-response.ts";
 
 export interface OAuthSignInOptions {
   /** Build-time configuration; the client id is never hard-coded (ADR 0007). */
@@ -43,6 +49,8 @@ export interface SignInGrant {
   readonly provider: OAuthProviderId;
   readonly accountProvider: ProviderKind;
   readonly refreshToken: string;
+  /** The address the user signed in as, when the provider's id token names one. */
+  readonly address: string | undefined;
   /** In memory only; never persisted, never logged. */
   readonly accessToken: string;
   readonly expiresAt: string;
@@ -97,7 +105,7 @@ export class OAuthSignIn {
 
       return await exchangeCode({
         config,
-        clientId: clientId.value,
+        clientCredentials: clientCredentialsFrom(config, clientId.value, env),
         redirectUri: receiver.value.redirectUri,
         code: callback.value,
         verifier: pkce.verifier,
@@ -138,7 +146,8 @@ const buildAuthorizeUrl = (config: OAuthProviderConfig, input: AuthorizeUrlInput
 
 interface ExchangeInput {
   readonly config: OAuthProviderConfig;
-  readonly clientId: string;
+  /** `client_id`, and `client_secret` where the provider needs it; never logged. */
+  readonly clientCredentials: Readonly<Record<string, string>>;
   readonly redirectUri: string;
   readonly code: string;
   readonly verifier: string;
@@ -160,7 +169,7 @@ const exchangeCode = async (input: ExchangeInput): AsyncResult<SignInGrant, Sign
         grant_type: "authorization_code",
         code: input.code,
         redirect_uri: input.redirectUri,
-        client_id: input.clientId,
+        ...input.clientCredentials,
         code_verifier: input.verifier,
       },
       signal,
@@ -180,6 +189,7 @@ const exchangeCode = async (input: ExchangeInput): AsyncResult<SignInGrant, Sign
     provider: config.id,
     accountProvider: config.accountProvider,
     refreshToken: tokens.refresh_token,
+    address: addressFromIdToken(tokens),
     accessToken: tokens.access_token,
     expiresAt: expiresAtFrom(tokens, input.now()),
     scopes: scopeList(tokens, input.scopes),

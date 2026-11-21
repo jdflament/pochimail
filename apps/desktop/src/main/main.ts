@@ -114,10 +114,22 @@ const demoEnv: Record<string, string> = {
   POCHIMAIL_DEMO: demo ?? "",
 };
 
+// The worker alone gets the sign-in configuration and the database location; the secret is read only in the token call.
+const workerEnv = (): Record<string, string> => ({
+  ...demoEnv,
+  POCHIMAIL_DATABASE_PATH: join(app.getPath("userData"), DATABASE_FILE),
+  ...Object.fromEntries(
+    ["POCHIMAIL_GOOGLE_CLIENT_ID", "POCHIMAIL_GOOGLE_CLIENT_SECRET"].flatMap((name) => {
+      const value = process.env[name];
+      return value === undefined ? [] : [[name, value] as const];
+    }),
+  ),
+});
+
 const connectWorker = (window: BrowserWindow): void => {
   const worker = utilityProcess.fork(join(import.meta.dirname, "worker.js"), [], {
     serviceName: "pochimail-worker",
-    env: demoEnv,
+    env: workerEnv(),
   });
   // The model host is its own process so a model crash never takes the worker down; main restarts it.
   const modelHost = superviseModelHost({

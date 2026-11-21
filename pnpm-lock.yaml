@@ -248,6 +248,9 @@ importers:
       '@pochimail/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@pochimail/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@pochimail/kernel':
         specifier: workspace:*
         version: link:../../packages/kernel

@@ -1,0 +1,135 @@
+/** Connect screen copy per locale. Plain objects, so this file needs nothing from the catalogs that spread it in. */
+export const connectMessages = {
+  en: {
+    "connect.title": { text: "Connect an email account", params: [] },
+    "connect.description": {
+      text: "Sign in with your provider. Pochimail never sees your password, and you can add more accounts later.",
+      params: [],
+    },
+    "connect.google": { text: "Continue with Google", params: [] },
+    "connect.microsoft": { text: "Continue with Microsoft", params: [] },
+    "connect.comingSoon": { text: "Coming soon", params: [] },
+    "connect.imap": { text: "Other providers (IMAP) are coming in version 1.1.", params: [] },
+    "connect.waiting": { text: "Waiting for you to sign in in your browser…", params: [] },
+    "connect.cancelled": { text: "Sign-in was cancelled. Nothing was connected.", params: [] },
+    "connect.failed": { text: "I couldn’t connect your account. Nothing was changed.", params: [] },
+    "connect.notConfigured": { text: "This build has no Google sign-in set up.", params: [] },
+    "connect.retry": { text: "Try again", params: [] },
+    "connect.promises.heading": { text: "My promises", params: [] },
+    "connect.promise.local.title": {
+      text: "Your email stays on this {device}",
+      params: ["device"],
+    },
+    "connect.promise.local.body": {
+      text: "Everything is analyzed locally. No server, no cloud AI.",
+      params: [],
+    },
+    "connect.promise.control.title": { text: "You decide what I can do", params: [] },
+    "connect.promise.control.body": {
+      text: "Next, you choose whether I only look, suggest, or act on my own.",
+      params: [],
+    },
+    "connect.promise.delete.title": { text: "Nothing is deleted without your OK", params: [] },
+    "connect.promise.delete.body": {
+      text: "Deleted emails go to the Trash, and you can undo.",
+      params: [],
+    },
+  },
+  fr: {
+    "connect.title": { text: "Connecter un compte email", params: [] },
+    "connect.description": {
+      text: "Connectez-vous auprès de votre fournisseur. Pochimail ne voit jamais votre mot de passe, et vous pourrez ajouter d’autres comptes plus tard.",
+      params: [],
+    },
+    "connect.google": { text: "Continuer avec Google", params: [] },
+    "connect.microsoft": { text: "Continuer avec Microsoft", params: [] },
+    "connect.comingSoon": { text: "Bientôt disponible", params: [] },
+    "connect.imap": {
+      text: "Les autres fournisseurs (IMAP) arrivent dans la version 1.1.",
+      params: [],
+    },
+    "connect.waiting": {
+      text: "J’attends que vous vous connectiez dans votre navigateur…",
+      params: [],
+    },
+    "connect.cancelled": {
+      text: "La connexion a été annulée. Aucun compte n’a été connecté.",
+      params: [],
+    },
+    "connect.failed": {
+      text: "Je n’ai pas pu connecter votre compte. Rien n’a été modifié.",
+      params: [],
+    },
+    "connect.notConfigured": {
+      text: "Cette version n’a pas de connexion Google configurée.",
+      params: [],
+    },
+    "connect.retry": { text: "Réessayer", params: [] },
+    "connect.promises.heading": { text: "Mes promesses", params: [] },
+    "connect.promise.local.title": {
+      text: "Vos emails restent sur ce {device}",
+      params: ["device"],
+    },
+    "connect.promise.local.body": {
+      text: "Tout est analysé en local. Aucun serveur, aucune IA dans le cloud.",
+      params: [],
+    },
+    "connect.promise.control.title": { text: "Vous décidez de ce que je peux faire", params: [] },
+    "connect.promise.control.body": {
+      text: "Ensuite, vous choisissez si je regarde seulement, si je propose ou si j’agis seul.",
+      params: [],
+    },
+    "connect.promise.delete.title": { text: "Rien n’est supprimé sans votre accord", params: [] },
+    "connect.promise.delete.body": {
+      text: "Les emails supprimés vont dans la corbeille, et vous pouvez annuler.",
+      params: [],
+    },
+  },
+  ja: {
+    "connect.title": { text: "メールアカウントを接続", params: [] },
+    "connect.description": {
+      text: "ご利用のプロバイダでサインインしてください。Pochimailがパスワードを見ることはなく、アカウントは後から追加できます。",
+      params: [],
+    },
+    "connect.google": { text: "Googleで続行", params: [] },
+    "connect.microsoft": { text: "Microsoftで続行", params: [] },
+    "connect.comingSoon": { text: "近日対応", params: [] },
+    "connect.imap": {
+      text: "その他のプロバイダ（IMAP）はバージョン1.1で対応予定です。",
+      params: [],
+    },
+    "connect.waiting": { text: "ブラウザでのサインインをお待ちしています…", params: [] },
+    "connect.cancelled": {
+      text: "サインインはキャンセルされました。アカウントは接続されていません。",
+      params: [],
+    },
+    "connect.failed": {
+      text: "アカウントを接続できませんでした。何も変更していません。",
+      params: [],
+    },
+    "connect.notConfigured": {
+      text: "このビルドにはGoogleサインインが設定されていません。",
+      params: [],
+    },
+    "connect.retry": { text: "もう一度試す", params: [] },
+    "connect.promises.heading": { text: "お約束", params: [] },
+    "connect.promise.local.title": {
+      text: "メールはこの{device}の中にとどまります",
+      params: ["device"],
+    },
+    "connect.promise.local.body": {
+      text: "すべてこの端末内で分析します。サーバーもクラウドAIも使いません。",
+      params: [],
+    },
+    "connect.promise.control.title": { text: "できることはあなたが決めます", params: [] },
+    "connect.promise.control.body": {
+      text: "次に、見るだけか、提案するか、自分で動くかを選びます。",
+      params: [],
+    },
+    "connect.promise.delete.title": { text: "ご承認なしに削除はしません", params: [] },
+    "connect.promise.delete.body": {
+      text: "削除したメールはゴミ箱に入り、元に戻せます。",
+      params: [],
+    },
+  },
+} as const;

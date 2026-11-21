@@ -92,7 +92,9 @@ describe("first-run redirect from app.state", () => {
     render(<App workerClient={fake.client} />);
     await waitFor(() => expect(screen.getByRole("list", { name: "Step 1 of 3" })).toBeTruthy());
     fireEvent.click(screen.getByRole("link", { name: "Get started" }));
-    await waitFor(() => expect(screen.getByRole("heading", { name: "Connect" })).toBeTruthy());
+    await waitFor(() =>
+      expect(screen.getByRole("heading", { name: "Connect an email account" })).toBeTruthy(),
+    );
     expect(screen.getByRole("list", { name: "Step 2 of 3" })).toBeTruthy();
     fake.close();
   });
@@ -113,7 +115,7 @@ describe("first-run redirect from app.state", () => {
     const fake = createFakeAppClient(false);
     render(<App workerClient={fake.client} />);
     fireEvent.click(await screen.findByRole("link", { name: "Get started" }));
-    const heading = await screen.findByRole("heading", { name: "Connect" });
+    const heading = await screen.findByRole("heading", { name: "Connect an email account" });
     await waitFor(() => expect(document.activeElement).toBe(heading));
     fake.close();
   });

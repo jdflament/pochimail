@@ -59,7 +59,12 @@ const s256 = (verifier: string): string =>
  * Microsoft: sign-in, token refresh and revocation run against this server over loopback http.
  */
 export const startFakeOAuthServer = async (
-  options: { readonly expiresIn?: number; readonly rotateRefreshTokens?: boolean } = {},
+  options: {
+    readonly expiresIn?: number;
+    readonly rotateRefreshTokens?: boolean;
+    /** Signed-in address the code exchange names in an (unsigned, fake) OpenID id token. */
+    readonly address?: string;
+  } = {},
 ): Promise<FakeOAuthServer> => {
   const sockets = new Set<Socket>();
   const server: Server = createServer();
@@ -163,6 +168,11 @@ export const startFakeOAuthServer = async (
           writeJson(response, 200, {
             access_token: `access-${issued}`,
             refresh_token: refresh,
+            ...(options.address === undefined
+              ? {}
+              : {
+                  id_token: `e30.${Buffer.from(JSON.stringify({ email: options.address })).toString("base64url")}.sig`,
+                }),
             token_type: "Bearer",
             expires_in: expiresIn,
           });
