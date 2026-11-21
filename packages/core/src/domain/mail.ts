@@ -1,13 +1,11 @@
 import {
   messageIdSchema,
   schemaVersion,
-  timestampSchema,
   topicIdSchema,
   workspaceIdSchema,
 } from "@pochimail/kernel/schemas";
 import { z } from "zod";
-import { signalKindSchema } from "./category.ts";
-import { attachmentIdSchema, confidenceSchema } from "./common.ts";
+import { attachmentIdSchema } from "./common.ts";
 
 export const attachmentSchema = z.object({
   schemaVersion,
@@ -28,16 +26,3 @@ export const topicSchema = z.object({
   name: z.string().trim().min(1),
 });
 export type Topic = z.infer<typeof topicSchema>;
-
-export const signalSchema = z.object({
-  schemaVersion,
-  workspaceId: workspaceIdSchema,
-  messageId: messageIdSchema,
-  kind: signalKindSchema,
-  confidence: confidenceSchema,
-  detectedAt: timestampSchema,
-});
-export type Signal = z.infer<typeof signalSchema>;
-
-/** A signal as stored: the rule's fixed reason text (never mail content) travels with it. */
-export type StoredSignal = Signal & { readonly reason: string };

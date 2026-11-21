@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { AiUnavailable } from "@pochimail/core/errors";
+import { AiUnavailable } from "@pochimail/classification/errors";
 import { err } from "@pochimail/kernel/result";
 import { describe, expect, it } from "vitest";
 import { formatSummary } from "./format.ts";

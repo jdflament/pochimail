@@ -1,14 +1,14 @@
 import type { Account } from "@pochimail/accounts/model/account";
 import { ListAccounts } from "@pochimail/accounts/use-cases/list-accounts";
+import type { Classifier } from "@pochimail/classification/ports/classifier";
+import { CountCategories } from "@pochimail/classification/use-cases/count-categories";
+import { GetOverview } from "@pochimail/cleanup/use-cases/get-overview";
+import { LatestDigest } from "@pochimail/cleanup/use-cases/latest-digest";
 import { parseDomainEvent } from "@pochimail/core/events/catalog";
-import type { Classifier } from "@pochimail/core/ports/ai";
 import type { MailProvider } from "@pochimail/core/ports/mail-provider";
 import type { DeviceName } from "@pochimail/core/ports/platform";
 import type { SettingsStore } from "@pochimail/core/ports/settings-store";
 import type { UnitOfWork } from "@pochimail/core/ports/unit-of-work";
-import { CountCategories } from "@pochimail/core/use-cases/count-categories";
-import { GetOverview } from "@pochimail/core/use-cases/get-overview";
-import { LatestDigest } from "@pochimail/core/use-cases/latest-digest";
 import { ManageSettings } from "@pochimail/core/use-cases/manage-settings";
 import { RunScan } from "@pochimail/core/use-cases/run-scan";
 import { ScanRunner } from "@pochimail/core/use-cases/scan-runner";

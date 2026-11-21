@@ -1,4 +1,4 @@
-import type { Category } from "@pochimail/core/domain/category";
+import type { Category } from "@pochimail/classification/model/category";
 import { Button } from "@pochimail/ui/components/button";
 import { EmptyState } from "@pochimail/ui/components/empty-state";
 import { RecommendationRow } from "@pochimail/ui/components/recommendation-row";

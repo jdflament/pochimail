@@ -1,0 +1,40 @@
+{
+  "name": "@pochimail/cleanup",
+  "private": true,
+  "version": "0.0.0",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "exports": {
+    "./events": "./src/events.ts",
+    "./model/digest": "./src/model/digest.ts",
+    "./model/scores": "./src/model/scores.ts",
+    "./model/suggestion": "./src/model/suggestion.ts",
+    "./policies/labels": "./src/policies/labels.ts",
+    "./policies/protection": "./src/policies/protection.ts",
+    "./ports/digest-state-repository": "./src/ports/digest-state-repository.ts",
+    "./ports/mailbox-facts": "./src/ports/mailbox-facts.ts",
+    "./ports/suggestion-repository": "./src/ports/suggestion-repository.ts",
+    "./ports/unit-of-work": "./src/ports/unit-of-work.ts",
+    "./use-cases/build-digest": "./src/use-cases/build-digest.ts",
+    "./use-cases/get-overview": "./src/use-cases/get-overview.ts",
+    "./use-cases/latest-digest": "./src/use-cases/latest-digest.ts",
+    "./use-cases/propose-suggestions": "./src/use-cases/propose-suggestions.ts",
+    "./use-cases/summarize-mailbox": "./src/use-cases/summarize-mailbox.ts",
+    "./testing/*": "./src/testing/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc",
+    "lint": "biome check .",
+    "knip": "knip",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@pochimail/kernel": "workspace:*",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@pochimail/typescript-config": "workspace:*",
+    "typescript": "7.0.2",
+    "vitest": "5.1.0"
+  }
+}

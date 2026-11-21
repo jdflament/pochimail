@@ -1,10 +1,10 @@
+import { BuildDigest } from "@pochimail/cleanup/use-cases/build-digest";
 import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
 import { type DomainError, StorageError } from "@pochimail/kernel/errors";
 import { err, ok } from "@pochimail/kernel/result";
 import type { DomainEventOf } from "../events/catalog.ts";
 import { createScanPipeline, type ScanPipelineDeps } from "../jobs/scan-pipeline.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
-import { BuildDigest } from "./build-digest.ts";
 
 export interface RunScanDeps extends Omit<ScanPipelineDeps, "onBatchProcessed"> {
   /** Delivers committed events to subscribers (the outbox relay's drain). */

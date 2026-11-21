@@ -1,5 +1,5 @@
-import { CATEGORIES } from "@pochimail/core/domain/category";
-import type { Classifier } from "@pochimail/core/ports/ai";
+import { CATEGORIES } from "@pochimail/classification/model/category";
+import type { Classifier } from "@pochimail/classification/ports/classifier";
 import { ok } from "@pochimail/kernel/result";
 
 /**

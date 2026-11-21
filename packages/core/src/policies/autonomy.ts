@@ -1,5 +1,5 @@
+import type { Category } from "@pochimail/classification/model/category";
 import type { ActionKind } from "../domain/action.ts";
-import type { Category } from "../domain/category.ts";
 
 /** Brief §2, question 2: how much the assistant may do on its own. */
 export const AUTONOMY_LEVELS = ["just-look", "suggest", "autopilot"] as const;

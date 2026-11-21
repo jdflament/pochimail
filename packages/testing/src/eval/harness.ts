@@ -4,10 +4,10 @@ import {
   categoryOf,
   SIGNAL_KINDS,
   type SignalKind,
-} from "@pochimail/core/domain/category";
-import type { Classifier } from "@pochimail/core/ports/ai";
-import { ClassifyBatch } from "@pochimail/core/use-cases/classify-batch";
-import { DetectSignals } from "@pochimail/core/use-cases/detect-signals";
+} from "@pochimail/classification/model/category";
+import type { Classifier } from "@pochimail/classification/ports/classifier";
+import { ClassifyBatch } from "@pochimail/classification/use-cases/classify-batch";
+import { DetectSignals } from "@pochimail/classification/use-cases/detect-signals";
 import { RunIncrementalSync } from "@pochimail/core/use-cases/run-incremental-sync";
 import { AccountId, MessageId, WorkspaceId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";

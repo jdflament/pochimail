@@ -1,23 +1,23 @@
+import { makeDerived } from "@pochimail/classification/testing/samples";
+import { makeSignal } from "@pochimail/classification/testing/signal-repository-contract";
+import { makeSuggestion } from "@pochimail/cleanup/testing/samples";
 import type { ActionId } from "@pochimail/core/ids";
 import type { Page } from "@pochimail/kernel/common";
 import type { AccountId, MessageId, TopicId } from "@pochimail/kernel/ids";
 import { ok, unwrap } from "@pochimail/kernel/result";
 import { type Check, check, registerContract } from "@pochimail/kernel/testing/contract";
 import { expect } from "vitest";
-import { makeDerived } from "./derived-contract.ts";
 import {
   ACCOUNT_1,
   makeAccount,
   makeActionLog,
   makeIncomingMessage,
   makeSender,
-  makeSuggestion,
   makeThread,
   makeTopic,
   WS_A,
   WS_B,
 } from "./fixtures.ts";
-import { makeSignal } from "./signal-repository-contract.ts";
 import type { UnitOfWorkHarness } from "./unit-of-work-contract.ts";
 
 type H = UnitOfWorkHarness;
@@ -79,22 +79,16 @@ export const repositoriesChecks: readonly Check<H>[] = [
       expect(unwrap(await h.uow.reads.topics.get(WS_A, makeTopic().id)).name).toBe("Trips");
     },
   ),
-  check(
-    "round-trips threads, senders and suggestions (guards a repository dropping a field)",
-    async (h) => {
-      const thread = makeThread();
-      const sender = makeSender();
-      const suggestion = makeSuggestion();
-      await write(h, async (tx) => {
-        await tx.repositories.threads.upsert(thread);
-        await tx.repositories.senders.upsert(sender);
-        await tx.repositories.suggestions.save(suggestion);
-      });
-      expect(await h.uow.reads.threads.get(WS_A, thread.id)).toEqual(ok(thread));
-      expect(await h.uow.reads.senders.get(WS_A, ACCOUNT_1, sender.address)).toEqual(ok(sender));
-      expect(await h.uow.reads.suggestions.get(WS_A, suggestion.id)).toEqual(ok(suggestion));
-    },
-  ),
+  check("round-trips threads and senders (guards a repository dropping a field)", async (h) => {
+    const thread = makeThread();
+    const sender = makeSender();
+    await write(h, async (tx) => {
+      await tx.repositories.threads.upsert(thread);
+      await tx.repositories.senders.upsert(sender);
+    });
+    expect(await h.uow.reads.threads.get(WS_A, thread.id)).toEqual(ok(thread));
+    expect(await h.uow.reads.senders.get(WS_A, ACCOUNT_1, sender.address)).toEqual(ok(sender));
+  }),
   check(
     "upsertMany twice leaves one row per message (guards a re-sync duplicating mail)",
     async (h) => {
@@ -199,22 +193,6 @@ export const repositoriesChecks: readonly Check<H>[] = [
         }),
       );
       expect(all.map((m) => m.id).sort()).toEqual(batch.map((m) => m.id).sort());
-    },
-  ),
-  check(
-    "listPending leaves out approved and dismissed suggestions (guards re-proposing decided items)",
-    async (h) => {
-      await write(h, async (tx) => {
-        await tx.repositories.suggestions.save(makeSuggestion());
-        await tx.repositories.suggestions.save(
-          makeSuggestion({ id: "sug-2" as never, state: "approved" }),
-        );
-        await tx.repositories.suggestions.save(
-          makeSuggestion({ id: "sug-3" as never, state: "dismissed" }),
-        );
-      });
-      const page = unwrap(await h.uow.reads.suggestions.listPending(WS_A, { limit: 10 }));
-      expect(page.items.map((s) => s.id)).toEqual(["sug-1"]);
     },
   ),
   check(

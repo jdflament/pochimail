@@ -1,12 +1,12 @@
-import type { Classifier } from "@pochimail/core/ports/ai";
+import type { Classifier } from "@pochimail/classification/ports/classifier";
+import { createFakeClassifier } from "@pochimail/classification/testing/fake-ai";
+import { createGroundTruthClassifier } from "@pochimail/classification/testing/ground-truth-classifier";
 import { createLogger } from "@pochimail/logger/logger";
-import { createFakeClassifier } from "@pochimail/testing/fake-ai";
 import { createFakeClock } from "@pochimail/testing/fake-clock";
 import { createFakeMailProvider } from "@pochimail/testing/fake-mail-provider";
 import { createFakeTimer } from "@pochimail/testing/fake-timer";
 import { generateMailbox, MAILBOX_SCALES } from "@pochimail/testing/fixture-mailbox/generator";
 import { ACCOUNT_1, makeAccount, makeIncomingMessage, WS_A } from "@pochimail/testing/fixtures";
-import { createGroundTruthClassifier } from "@pochimail/testing/ground-truth-classifier";
 import { createInMemoryJobQueue } from "@pochimail/testing/in-memory-job-queue";
 import { createInMemorySettingsStore } from "@pochimail/testing/in-memory-settings-store";
 import { createInMemoryUnitOfWork } from "@pochimail/testing/in-memory-store";

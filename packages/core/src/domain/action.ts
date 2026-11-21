@@ -1,7 +1,6 @@
-import { ERROR_CODES, InvalidStateError } from "@pochimail/kernel/errors";
-import { err, ok, type Result } from "@pochimail/kernel/result";
+import { suggestionIdSchema } from "@pochimail/cleanup/model/suggestion";
+import { ERROR_CODES } from "@pochimail/kernel/errors";
 import {
-  accountIdSchema,
   messageIdSchema,
   schemaVersion,
   timestampSchema,
@@ -9,13 +8,7 @@ import {
 } from "@pochimail/kernel/schemas";
 import { z } from "zod";
 import { POLICY_DENIAL_REASONS } from "../errors.ts";
-import {
-  actionIdSchema,
-  actionLogIdSchema,
-  confidenceSchema,
-  reasonsSchema,
-  suggestionIdSchema,
-} from "./common.ts";
+import { actionIdSchema, actionLogIdSchema } from "./common.ts";
 
 /** Delete means move to Trash (`trash`, restored by `untrash`): there is no permanent delete (ADR 0012). */
 export const ACTION_KINDS = [
@@ -38,27 +31,6 @@ export const commandSchema = z.object({
   label: z.string().min(1).optional(),
 });
 export type Command = z.infer<typeof commandSchema>;
-
-export const suggestionSchema = z.object({
-  schemaVersion,
-  id: suggestionIdSchema,
-  workspaceId: workspaceIdSchema,
-  accountId: accountIdSchema,
-  command: commandSchema,
-  reasons: reasonsSchema,
-  confidence: confidenceSchema,
-  state: z.enum(["pending", "approved", "dismissed"]),
-  createdAt: timestampSchema,
-});
-export type Suggestion = z.infer<typeof suggestionSchema>;
-
-/** Validated constructor: returns an `Err` rather than throwing for bad input. */
-export function createSuggestion(input: unknown): Result<Suggestion, InvalidStateError> {
-  const parsed = suggestionSchema.safeParse(input);
-  return parsed.success
-    ? ok(parsed.data)
-    : err(new InvalidStateError("Suggestion needs reasons and a confidence between 0 and 1"));
-}
 
 /**
  * The command that reverses `command`, or `null` when nothing can (unsubscribe). Pure fallback:

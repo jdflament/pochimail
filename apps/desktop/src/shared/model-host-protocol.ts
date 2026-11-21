@@ -1,5 +1,5 @@
-import { CATEGORIES } from "@pochimail/core/domain/category";
-import { incomingMessageSchema } from "@pochimail/mailbox/model/message";
+import { CATEGORIES } from "@pochimail/classification/model/category";
+import { classifiableMessageSchema } from "@pochimail/classification/model/message-facts";
 import { z } from "zod";
 
 /**
@@ -12,7 +12,7 @@ export const hostRequestSchema = z.discriminatedUnion("method", [
   z.object({
     id,
     method: z.literal("classify"),
-    messages: z.array(incomingMessageSchema).max(500),
+    messages: z.array(classifiableMessageSchema).max(500),
   }),
   z.object({
     id,

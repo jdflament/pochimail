@@ -1,0 +1,42 @@
+{
+  "name": "@pochimail/classification",
+  "private": true,
+  "version": "0.0.0",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "exports": {
+    "./errors": "./src/errors.ts",
+    "./events": "./src/events.ts",
+    "./model/category": "./src/model/category.ts",
+    "./model/derived": "./src/model/derived.ts",
+    "./model/message-facts": "./src/model/message-facts.ts",
+    "./model/scores": "./src/model/scores.ts",
+    "./model/signal": "./src/model/signal.ts",
+    "./policies/signal-rules": "./src/policies/signal-rules.ts",
+    "./ports/classifier": "./src/ports/classifier.ts",
+    "./ports/derived-repository": "./src/ports/derived-repository.ts",
+    "./ports/message-source": "./src/ports/message-source.ts",
+    "./ports/signal-repository": "./src/ports/signal-repository.ts",
+    "./ports/unit-of-work": "./src/ports/unit-of-work.ts",
+    "./use-cases/classify-batch": "./src/use-cases/classify-batch.ts",
+    "./use-cases/count-categories": "./src/use-cases/count-categories.ts",
+    "./use-cases/detect-signals": "./src/use-cases/detect-signals.ts",
+    "./use-cases/evaluate-signals": "./src/use-cases/evaluate-signals.ts",
+    "./testing/*": "./src/testing/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc",
+    "lint": "biome check .",
+    "knip": "knip",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@pochimail/kernel": "workspace:*",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@pochimail/typescript-config": "workspace:*",
+    "typescript": "7.0.2",
+    "vitest": "5.1.0"
+  }
+}

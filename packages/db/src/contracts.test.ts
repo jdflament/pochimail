@@ -1,19 +1,23 @@
 import { accountRepositoryContract } from "@pochimail/accounts/testing/account-repository-contract";
 import { createInMemorySecretStore } from "@pochimail/accounts/testing/in-memory-secret-store";
-import type { Category } from "@pochimail/core/domain/category";
-import { AiUnavailable } from "@pochimail/core/errors";
+import { AiUnavailable } from "@pochimail/classification/errors";
+import type { Category } from "@pochimail/classification/model/category";
+import { derivedContract } from "@pochimail/classification/testing/derived-contract";
+import { createGroundTruthClassifier } from "@pochimail/classification/testing/ground-truth-classifier";
+import { signalRepositoryContract } from "@pochimail/classification/testing/signal-repository-contract";
+import { signalsContract } from "@pochimail/classification/testing/signals-contract";
+import { digestContract } from "@pochimail/cleanup/testing/digest-contract";
+import { digestStateContract } from "@pochimail/cleanup/testing/digest-state-contract";
+import { suggestionRepositoryContract } from "@pochimail/cleanup/testing/suggestion-repository-contract";
+import { suggestionsContract } from "@pochimail/cleanup/testing/suggestions-contract";
 import type { ProviderError } from "@pochimail/kernel/errors";
 import { mailboxRepositoryContract } from "@pochimail/mailbox/testing/mailbox-repository-contract";
-import { derivedContract } from "@pochimail/testing/derived-contract";
-import { digestStateContract } from "@pochimail/testing/digest-state-contract";
 import { createFakeClock } from "@pochimail/testing/fake-clock";
 import { createFakeMailProvider } from "@pochimail/testing/fake-mail-provider";
-import { createGroundTruthClassifier } from "@pochimail/testing/ground-truth-classifier";
-import { insightContract } from "@pochimail/testing/insight-contract";
 import { repositoriesContract } from "@pochimail/testing/repositories-contract";
-import { signalRepositoryContract } from "@pochimail/testing/signal-repository-contract";
 import { runSyncContract } from "@pochimail/testing/sync-contract";
 import { harness, uowHarness } from "./test-support/harness.ts";
+import { classificationSeeder, cleanupSeeder } from "./test-support/seeders.ts";
 
 // The domain packages' own repository contracts, then every exported contract suite, unchanged, against SQLite (none skipped).
 accountRepositoryContract(uowHarness);
@@ -22,16 +26,26 @@ repositoriesContract(uowHarness);
 derivedContract(uowHarness);
 signalRepositoryContract(uowHarness);
 digestStateContract(uowHarness);
-insightContract(() => {
+signalsContract(() => {
   const h = harness();
   const labels = new Map<string, Category>();
   return {
+    ...classificationSeeder(h),
     uow: h.uow,
     clock: createFakeClock(),
     classifier: createGroundTruthClassifier(labels),
     labels,
     snapshot: h.snapshot,
   };
+});
+suggestionRepositoryContract(uowHarness);
+suggestionsContract(() => {
+  const h = harness();
+  return { ...cleanupSeeder(h), uow: h.uow, clock: createFakeClock() };
+});
+digestContract(() => {
+  const h = harness();
+  return { ...cleanupSeeder(h), uow: h.uow, clock: createFakeClock() };
 });
 runSyncContract(() => {
   const h = harness();

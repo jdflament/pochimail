@@ -1,5 +1,5 @@
 import type { Account } from "@pochimail/accounts/model/account";
-import type { Classifier } from "@pochimail/core/ports/ai";
+import type { Classifier } from "@pochimail/classification/ports/classifier";
 import type { DeviceName } from "@pochimail/core/ports/platform";
 import type { Clock } from "@pochimail/kernel/clock";
 import { AccountId, WorkspaceId } from "@pochimail/kernel/ids";

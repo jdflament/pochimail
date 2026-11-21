@@ -6,11 +6,13 @@ const importsOf = (source: string) =>
   [...source.matchAll(/(?:from|import\()\s*"([^"]+)"/g)].map((match) => match[1] ?? "");
 
 describe("worker architecture", () => {
-  it("handlers import core use cases and types only, never repositories, adapters or the testing package (guards business logic creeping into handlers)", () => {
+  it("handlers import use cases and types only, never repositories, adapters or the testing package (guards business logic creeping into handlers)", () => {
     const imports = importsOf(read("./handlers.ts"));
     for (const path of imports) {
       const allowed =
         path.startsWith("@pochimail/core/use-cases/") ||
+        path.startsWith("@pochimail/classification/use-cases/") ||
+        path.startsWith("@pochimail/cleanup/use-cases/") ||
         path === "@pochimail/core/ids" ||
         path === "@pochimail/accounts/model/account" ||
         path.startsWith("@pochimail/accounts/use-cases/") ||

@@ -1,4 +1,4 @@
-import { CATEGORIES, SIGNAL_KINDS } from "@pochimail/core/domain/category";
+import { CATEGORIES, SIGNAL_KINDS } from "@pochimail/classification/model/category";
 import type { ScenarioResult } from "./scenario.ts";
 import { SEED } from "./scenario.ts";
 

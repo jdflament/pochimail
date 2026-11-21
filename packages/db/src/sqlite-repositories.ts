@@ -1,4 +1,6 @@
 import type { ReadRepositories, WriteRepositories } from "@pochimail/core/ports/repositories";
+import { mailboxFactsOver } from "@pochimail/core/read-models/mailbox-facts";
+import { signalFactsOver } from "@pochimail/core/read-models/signal-facts";
 import type { AsyncResult } from "@pochimail/kernel/common";
 import type { StorageError } from "@pochimail/kernel/errors";
 import type { Message } from "@pochimail/mailbox/model/message";
@@ -90,7 +92,7 @@ export function createSqliteRepositories(db: Database): {
     getSequence: lift(core.digestState.getSequence),
   };
 
-  const reads: ReadRepositories = {
+  const base = {
     accounts,
     messages,
     threads,
@@ -102,6 +104,11 @@ export function createSqliteRepositories(db: Database): {
     cursors,
     signals,
     digestState,
+  };
+  const reads: ReadRepositories = {
+    ...base,
+    signalFacts: signalFactsOver(base),
+    mailboxFacts: mailboxFactsOver(base),
   };
   const writes: WriteRepositories = {
     accounts: { ...accounts, save: lift(core.accounts.save), remove: lift(core.accounts.remove) },

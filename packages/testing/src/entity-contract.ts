@@ -1,6 +1,8 @@
 import { accountSchema } from "@pochimail/accounts/model/account";
-import { actionLogSchema, actionSchema, suggestionSchema } from "@pochimail/core/domain/action";
-import { attachmentSchema, signalSchema, topicSchema } from "@pochimail/core/domain/mail";
+import { signalSchema } from "@pochimail/classification/model/signal";
+import { suggestionSchema } from "@pochimail/cleanup/model/suggestion";
+import { actionLogSchema, actionSchema } from "@pochimail/core/domain/action";
+import { attachmentSchema, topicSchema } from "@pochimail/core/domain/mail";
 import { incomingMessageSchema, messageSchema } from "@pochimail/mailbox/model/message";
 import { senderStatsSchema } from "@pochimail/mailbox/model/sender-stats";
 import { threadSchema } from "@pochimail/mailbox/model/thread";

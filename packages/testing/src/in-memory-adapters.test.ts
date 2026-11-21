@@ -4,11 +4,8 @@ import { Offline, RateLimited, StorageError } from "@pochimail/kernel/errors";
 import type { WorkspaceId } from "@pochimail/kernel/ids";
 import { ok } from "@pochimail/kernel/result";
 import { describe, expect, it } from "vitest";
-import { classifierContract, embedderContract, llmProviderContract } from "./ai-contract.ts";
 import { blobStoreContract } from "./blob-store-contract.ts";
-import { digestStateContract } from "./digest-state-contract.ts";
 import { exporterContract } from "./exporter-contract.ts";
-import { createFakeClassifier, createFakeEmbedder, createFakeLlmProvider } from "./fake-ai.ts";
 import { createFakeClock } from "./fake-clock.ts";
 import { createFakeExporter } from "./fake-exporter.ts";
 import { createFakeMailProvider } from "./fake-mail-provider.ts";
@@ -28,14 +25,11 @@ import { powerMonitorContract } from "./power-monitor-contract.ts";
 import { repositoriesContract } from "./repositories-contract.ts";
 import { schedulerContract } from "./scheduler-contract.ts";
 import { settingsStoreContract } from "./settings-store-contract.ts";
-import { signalRepositoryContract } from "./signal-repository-contract.ts";
 import { unitOfWorkContract } from "./unit-of-work-contract.ts";
 
 // Every in-memory adapter must pass its own contract suite.
 unitOfWorkContract(createInMemoryUnitOfWork);
 repositoriesContract(createInMemoryUnitOfWork);
-signalRepositoryContract(createInMemoryUnitOfWork);
-digestStateContract(createInMemoryUnitOfWork);
 blobStoreContract(createInMemoryBlobStore);
 secretStoreContract(createInMemorySecretStore);
 settingsStoreContract(createInMemorySettingsStore);
@@ -58,9 +52,6 @@ powerMonitorContract(() => {
 platformContract(() => createFakePlatform({ os: "macos" }));
 platformContract(() => createFakePlatform({ os: "windows" }));
 platformContract(() => createFakePlatform({ os: "linux" }));
-classifierContract(createFakeClassifier);
-embedderContract(() => createFakeEmbedder(8));
-llmProviderContract(createFakeLlmProvider);
 mailProviderContract(() => {
   const provider = createFakeMailProvider({ pageSize: 2 });
   return { provider, deliver: (...m) => provider.deliver(...m) };
@@ -115,14 +106,6 @@ describe("controllable fakes", () => {
     expect(r.ok).toBe(false);
     expect(await store.uow.reads.topics.list(ws)).toEqual(ok([]));
     expect(await store.committedOutbox()).toEqual([]);
-  });
-
-  it("the classifier reports AiUnavailable on demand (guards untested model-missing handling)", async () => {
-    const classifier = createFakeClassifier();
-    classifier.makeUnavailable();
-    const r = await classifier.classify([], live());
-    expect(r.ok).toBe(false);
-    if (!r.ok) expect(r.error.code).toBe("ai.unavailable");
   });
 
   it("a fake scheduler runs nothing until time is advanced (guards flaky sleep-based tests)", async () => {

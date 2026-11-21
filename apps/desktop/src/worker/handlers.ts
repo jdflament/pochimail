@@ -1,10 +1,10 @@
 import type { Account } from "@pochimail/accounts/model/account";
 import type { ListAccounts } from "@pochimail/accounts/use-cases/list-accounts";
+import type { CountCategories } from "@pochimail/classification/use-cases/count-categories";
+import type { GetOverview } from "@pochimail/cleanup/use-cases/get-overview";
+import type { LatestDigest } from "@pochimail/cleanup/use-cases/latest-digest";
 import type { DomainEvent } from "@pochimail/core/events/catalog";
 import type { DeviceName } from "@pochimail/core/ports/platform";
-import type { CountCategories } from "@pochimail/core/use-cases/count-categories";
-import type { GetOverview } from "@pochimail/core/use-cases/get-overview";
-import type { LatestDigest } from "@pochimail/core/use-cases/latest-digest";
 import type { ManageSettings } from "@pochimail/core/use-cases/manage-settings";
 import type { ScanRunner } from "@pochimail/core/use-cases/scan-runner";
 import type { WorkspaceId } from "@pochimail/kernel/ids";

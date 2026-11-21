@@ -1,4 +1,4 @@
-import { type StoredSignal, signalSchema } from "@pochimail/core/domain/mail";
+import { type StoredSignal, signalSchema } from "@pochimail/classification/model/signal";
 import type { Database } from "better-sqlite3-multiple-ciphers";
 import { z } from "zod";
 import { CHUNK, guard, type Row, sqlHelpers } from "../shared/sql.ts";

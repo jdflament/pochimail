@@ -1,4 +1,4 @@
-import { CATEGORIES, type Category, type SignalKind } from "@pochimail/core/domain/category";
+import { CATEGORIES, type Category } from "@pochimail/classification/model/category";
 import {
   CORRESPONDENTS,
   ITEMS,
@@ -133,7 +133,7 @@ interface Plan {
   listUnsubscribe: boolean;
   attachment: boolean;
   suspicious: boolean;
-  signals: Set<SignalKind>;
+  signals: Set<MessageLabel["signals"][number]>;
 }
 
 function pickLanguage(rng: Rng): Language {

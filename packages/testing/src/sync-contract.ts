@@ -1,13 +1,13 @@
 import type { Account } from "@pochimail/accounts/model/account";
 import type { SecretStore } from "@pochimail/accounts/ports/secret-store";
 import { ConnectAccount } from "@pochimail/accounts/use-cases/connect-account";
-import type { Category } from "@pochimail/core/domain/category";
-import { AiUnavailable } from "@pochimail/core/errors";
+import { AiUnavailable } from "@pochimail/classification/errors";
+import type { Category } from "@pochimail/classification/model/category";
+import type { Classifier } from "@pochimail/classification/ports/classifier";
+import { ClassifyBatch } from "@pochimail/classification/use-cases/classify-batch";
 import type { DomainEvent } from "@pochimail/core/events/catalog";
-import type { Classifier } from "@pochimail/core/ports/ai";
 import type { MailProvider } from "@pochimail/core/ports/mail-provider";
 import type { UnitOfWork } from "@pochimail/core/ports/unit-of-work";
-import { ClassifyBatch } from "@pochimail/core/use-cases/classify-batch";
 import {
   INCREMENTAL_SYNC_JOB,
   RunIncrementalSync,

@@ -1,11 +1,11 @@
-import { AiUnavailable } from "@pochimail/core/errors";
+import { AiUnavailable } from "@pochimail/classification/errors";
 import type {
   AiError,
   Classification,
   Classifier,
   Embedder,
   LlmProvider,
-} from "@pochimail/core/ports/ai";
+} from "@pochimail/classification/ports/classifier";
 import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
 import { Cancelled } from "@pochimail/kernel/errors";
 import type { MessageId } from "@pochimail/kernel/ids";

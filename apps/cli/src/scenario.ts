@@ -1,13 +1,23 @@
 import type { Account } from "@pochimail/accounts/model/account";
+import {
+  CATEGORIES,
+  type Category,
+  categoryOf,
+  SIGNAL_KINDS,
+  type SignalKind,
+} from "@pochimail/classification/model/category";
+import type { Classifier } from "@pochimail/classification/ports/classifier";
+import { createGroundTruthClassifier } from "@pochimail/classification/testing/ground-truth-classifier";
+import { ProposeSuggestions } from "@pochimail/cleanup/use-cases/propose-suggestions";
+import {
+  type MailboxSummary,
+  SummarizeMailbox,
+} from "@pochimail/cleanup/use-cases/summarize-mailbox";
 import type { Action } from "@pochimail/core/domain/action";
-import { type Category, categoryOf } from "@pochimail/core/domain/category";
 import { ActionId } from "@pochimail/core/ids";
 import { createScanPipeline } from "@pochimail/core/jobs/scan-pipeline";
-import type { Classifier } from "@pochimail/core/ports/ai";
 import type { UnitOfWork } from "@pochimail/core/ports/unit-of-work";
 import { ApplyAction, type ApplyOutcome } from "@pochimail/core/use-cases/apply-action";
-import { ProposeSuggestions } from "@pochimail/core/use-cases/propose-suggestions";
-import { type MailboxSummary, SummarizeMailbox } from "@pochimail/core/use-cases/summarize-mailbox";
 import { UndoAction, type UndoOutcome } from "@pochimail/core/use-cases/undo-action";
 import type { IdGenerator } from "@pochimail/kernel/id-generator";
 import { AccountId, WorkspaceId } from "@pochimail/kernel/ids";
@@ -26,7 +36,6 @@ import {
   type MailboxScale,
 } from "@pochimail/testing/fixture-mailbox/generator";
 import { readMailbox } from "@pochimail/testing/fixture-mailbox/mailbox-reader";
-import { createGroundTruthClassifier } from "@pochimail/testing/ground-truth-classifier";
 import { createInMemoryJobQueue } from "@pochimail/testing/in-memory-job-queue";
 import { createInMemoryUnitOfWork } from "@pochimail/testing/in-memory-store";
 
@@ -42,6 +51,12 @@ export interface ScenarioOptions {
   readonly wrapClassifier?: (classifier: Classifier) => Classifier;
 }
 
+/** The cleanup summary with every category and signal kind present (0 when none), as the report prints it. */
+type ScenarioSummary = Omit<MailboxSummary, "categories" | "signals"> & {
+  readonly categories: Readonly<Record<Category, number>>;
+  readonly signals: Readonly<Record<SignalKind, number>>;
+};
+
 export interface ScenarioResult {
   readonly scale: MailboxScale;
   readonly scan: {
@@ -50,7 +65,7 @@ export interface ScenarioResult {
     readonly deferred: number;
     readonly deadLettered: number;
   };
-  readonly summary: MailboxSummary;
+  readonly summary: ScenarioSummary;
   /** What was proposed; every suggestion is approved as an archive of its messages. */
   readonly suggestions: { readonly archive: number; readonly unsubscribe: number };
   readonly applied: readonly ApplyOutcome[];
@@ -149,9 +164,19 @@ export async function runScenario(options: ScenarioOptions): Promise<ScenarioRes
   }
 
   const accountIds = [...providers.keys()];
-  const summary = unwrap(
+  const counted = unwrap(
     await new SummarizeMailbox({ uow, clock }).execute({ workspaceId, accountIds }),
   );
+  const summary: ScenarioSummary = {
+    ...counted,
+    categories: Object.fromEntries(
+      CATEGORIES.map((c) => [c, counted.categories[c] ?? 0]),
+    ) as Record<Category, number>,
+    signals: Object.fromEntries(SIGNAL_KINDS.map((k) => [k, counted.signals[k] ?? 0])) as Record<
+      SignalKind,
+      number
+    >,
+  };
 
   // 2. suggestions, then apply the reversible ones with the user's approval, then undo.
   const propose = new ProposeSuggestions({ uow, clock });
@@ -166,10 +191,10 @@ export async function runScenario(options: ScenarioOptions): Promise<ScenarioRes
     for (const s of unwrap(await propose.execute({ workspaceId, accountId }, live()))) {
       // The demo user approves every suggestion as an archive of its messages. Unsubscribe is
       // never sent: it cannot be undone, so it stays a suggestion for the user (brief §2).
-      if (s.command.kind === "unsubscribe") unsubscribe += 1;
+      if (s.recommendation.kind === "unsubscribe") unsubscribe += 1;
       else archiveCount += 1;
       const categories: Category[] = [];
-      for (const id of s.command.messageIds)
+      for (const id of s.recommendation.messageIds)
         categories.push(categoryOf(unwrap(await uow.reads.messages.get(workspaceId, id))));
       items.push({
         categories,
@@ -180,7 +205,7 @@ export async function runScenario(options: ScenarioOptions): Promise<ScenarioRes
           workspaceId,
           suggestionId: s.id,
           idempotencyKey: s.id,
-          command: { kind: "archive", messageIds: s.command.messageIds },
+          command: { kind: "archive", messageIds: s.recommendation.messageIds },
           createdAt: clock.now().toISOString(),
         },
       });

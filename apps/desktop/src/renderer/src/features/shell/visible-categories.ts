@@ -1,4 +1,4 @@
-import { CATEGORIES, type Category } from "@pochimail/core/domain/category";
+import { CATEGORIES, type Category } from "@pochimail/classification/model/category";
 
 /** D5: a category with no email for the current selection is not shown; it appears as soon as it has mail. */
 export const visibleCategories = (
