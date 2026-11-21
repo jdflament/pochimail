@@ -6,7 +6,7 @@ Tokens live in `packages/ui/src/styles/` (`tokens.json` is the source, then `tok
 Calm, sober, editorial: screens read like a typeset document, not a dashboard of cards. Typography, hairline rules and open space structure the page. The mascot is the only warm element.
 - Ledgers (rows, dotted leaders, tabular numbers), never stat tiles. Containers only where content needs one (summary sheet, list blocks).
 - **Catch what matters**: people waiting on you, deadlines, things to remember. Old conversations never count as "waiting on you".
-- **Clean up** is a list of recommendations ordered by impact, each a sentence ("Unsubscribe from 120 newsletters"), a one-line reason and one "Review" button. Space you can free by deleting is shown apart from email you can archive ([ADR 0012](adr/0012-delete-moves-to-trash-with-approval.md)). The storage bar shows what stays against what can be deleted ([ADR 0012](adr/0012-delete-moves-to-trash-with-approval.md)).
+- **Clean up** is a list of recommendations ordered by impact, each a sentence ("Unsubscribe from 120 newsletters"), a one-line reason and one "Review" button. Space you can free by deleting is shown apart from email you can archive ([ADR 0012](adr/0012-delete-moves-to-trash-with-approval.md)).
 - **Summary** is a plain sheet from Pochi over the current screen, never a page: "From Pochi · date", a title, one sentence, three figures, one next step, Keep it tidy choices. It shows only what is new. Bottom sheet on phones.
 - **Saved attachments** go to the user's own storage ([ADR 0010](adr/0010-saved-attachments-go-to-user-storage.md)).
 - **Review lists** (proposed, maintainer to confirm): Pochimail may label the concerned emails in the provider and open that filtered list in the user's mail app.
@@ -32,6 +32,7 @@ Two families only, self-hosted, upright (never an italic display serif): **Newsr
 | UI | 14 / 500 | `text-ui` |
 | Caption | 13 / 400 | `text-caption` |
 | Overline, sidebar groups only | 12 / 600, uppercase | `text-overline` |
+| Line height | 1.1 headings, 1.55 copy | `leading-heading`, `leading-copy` |
 
 ## Responsive layout
 The window is resizable, minimum 720×560. One markup, restyled by width, never separate mobile markup.
