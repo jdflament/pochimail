@@ -14,9 +14,9 @@ export interface AccountProcedureDeps {
   readonly connectAccount: ConnectAccount;
   /** Runs the Google sign-in in the system browser; tokens stay in this process. */
   readonly signIn: (signal: CancelSignal) => AsyncResult<SignInGrant, SignInError>;
-  /** Revokes a refresh token at the provider, for a consent that is not kept. */
-  /** Starts the scan of a newly connected account; never throws. */
+  /** Starts the scan of a newly connected account. It may throw: that never fails the connect. */
   readonly startScan: (accountId: string) => Promise<void>;
+  /** Revokes a refresh token at the provider, for a consent that is not kept. */
   readonly revoke: (refreshToken: string, signal: CancelSignal) => Promise<unknown>;
 }
 
@@ -93,7 +93,11 @@ export const createAccountProcedures = (
         if (!connected.ok) {
           return signal.aborted ? { status: "cancelled" } : { status: "failed", reason: "unknown" };
         }
-        await deps.startScan(connected.value.account.id);
+        try {
+          await deps.startScan(connected.value.account.id);
+        } catch {
+          // The account is connected; a scan that could not start is reported by its owner, not here.
+        }
         return { status: "connected", accountId: connected.value.account.id };
       } finally {
         if (waiting === controller) waiting = undefined;

@@ -151,6 +151,7 @@ export const createAccountsRuntime = (
           operation: "scan.start",
           code: "storage.failed",
         });
+        throw new Error("first scan could not start");
       }
     },
   });
