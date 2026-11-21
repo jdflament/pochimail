@@ -25,6 +25,7 @@
     "./fake-ai": "./src/fake-ai.ts",
     "./fake-clock": "./src/fake-clock.ts",
     "./fake-exporter": "./src/fake-exporter.ts",
+    "./fake-gmail-server": "./src/fake-gmail-server.ts",
     "./fake-mail-provider": "./src/fake-mail-provider.ts",
     "./fake-oauth-server": "./src/fake-oauth-server.ts",
     "./fake-platform": "./src/fake-platform.ts",
@@ -89,6 +90,7 @@
   },
   "dependencies": {
     "@pochimail/accounts": "workspace:*",
+    "@pochimail/gmail": "workspace:*",
     "@pochimail/kernel": "workspace:*",
     "@pochimail/logger": "workspace:*",
     "@pochimail/mailbox": "workspace:*",

@@ -38,6 +38,8 @@ const INVERSE: Record<Command["kind"], Command["kind"] | null> = {
   "remove-label": "apply-label",
   "mark-handled": "unmark-handled",
   "unmark-handled": "mark-handled",
+  trash: "untrash",
+  untrash: "trash",
   unsubscribe: null,
 };
 

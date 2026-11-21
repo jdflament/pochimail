@@ -1,4 +1,4 @@
 {
-  "extends": "@pochimail/typescript-config/base.json",
+  "extends": "@pochimail/typescript-config/node-library.json",
   "include": ["src", "*.config.ts"]
 }

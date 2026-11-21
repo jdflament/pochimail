@@ -8,7 +8,7 @@ import type { PolicyDenialReason, PolicyDenied } from "../errors.ts";
 import type { ActionId, ActionLogId } from "../ids.ts";
 import { ActionLogId as makeLogId } from "../ids.ts";
 import { type AuthorizationContext, authorize } from "../policies/authorize.ts";
-import type { MailProvider } from "../ports/mail-provider.ts";
+import { type MailProvider, PartiallyApplied } from "../ports/mail-provider.ts";
 import type { UnitOfWork } from "../ports/unit-of-work.ts";
 import { recordEntry } from "./record-entry.ts";
 
@@ -138,7 +138,22 @@ export class ApplyAction {
     if (signal.aborted) return "cancelled";
     const result = await provider.applyCommands([action.command], signal);
     if (!result.ok) {
-      if (result.error instanceof Cancelled) return "cancelled";
+      const partial = result.error instanceof PartiallyApplied ? result.error : null;
+      const cause = partial === null ? result.error : partial.failure;
+      // What the provider did before failing is logged as applied, each with its own inverse, so
+      // undo reverses exactly that part; the failure of the rest is logged next to it.
+      for (const done of partial?.applied ?? []) {
+        const entry: ActionLog = {
+          ...base(),
+          outcome: "applied",
+          command: done.command,
+          inverse: done.inverse ?? inverseOf(done.command),
+          irreversible: false,
+        };
+        const saved = await recordEntry(uow, entry, "ActionApplied");
+        if (!saved.ok) return failed(saved.error);
+      }
+      if (cause instanceof Cancelled) return "cancelled";
       const entry: ActionLog = {
         ...base(),
         outcome: "failed",

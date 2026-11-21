@@ -44,7 +44,7 @@ export class UndoAction {
   constructor(private readonly deps: UndoActionDeps) {}
 
   async execute(target: UndoTarget, signal: CancelSignal): AsyncResult<UndoReport, StorageError> {
-    const { uow, provider, clock, ids } = this.deps;
+    const { uow } = this.deps;
     const ws = target.workspaceId;
     const logs =
       "actionId" in target
@@ -59,62 +59,68 @@ export class UndoAction {
 
     const outcomes: UndoOutcome[] = [];
     for (const [actionId, entries] of [...byAction].reverse()) {
-      const applied = entries.findLast((e) => e.outcome === "applied");
-      if (!applied) {
-        outcomes.push({ status: "not-applied", actionId });
-        continue;
-      }
-      if (entries.some((e) => e.outcome === "undone")) {
-        outcomes.push({ status: "already-undone", actionId });
-        continue;
-      }
-      if (applied.irreversible || applied.inverse === null) {
-        outcomes.push({ status: "irreversible", actionId });
-        continue;
-      }
-      if (signal.aborted) return { ok: true, value: { outcomes, cancelled: true } };
+      const outcome = await this.undoOne(actionId, entries, signal);
+      if (outcome === "cancelled") return { ok: true, value: { outcomes, cancelled: true } };
+      outcomes.push(outcome);
+    }
+    return { ok: true, value: { outcomes, cancelled: false } };
+  }
 
-      const result = await provider.applyCommands([applied.inverse], signal);
+  /**
+   * Reverses every `applied` entry of one action, newest first (a partially applied action has
+   * several). Entries already `undone` are skipped, so a retry continues where it stopped.
+   */
+  private async undoOne(
+    actionId: ActionId,
+    entries: readonly ActionLog[],
+    signal: CancelSignal,
+  ): Promise<UndoOutcome | "cancelled"> {
+    const { uow, provider, clock, ids } = this.deps;
+    const applied = entries.filter((e) => e.outcome === "applied");
+    if (applied.length === 0) return { status: "not-applied", actionId };
+    const done = entries.filter((e) => e.outcome === "undone").length;
+    if (done >= applied.length) return { status: "already-undone", actionId };
+    if (applied.some((e) => e.irreversible || e.inverse === null)) {
+      return { status: "irreversible", actionId };
+    }
+    for (const entry of [...applied].reverse().slice(done)) {
+      const inverse = entry.inverse;
+      if (inverse === null) return { status: "irreversible", actionId };
+      if (signal.aborted) return "cancelled";
+      const result = await provider.applyCommands([inverse], signal);
       const base = {
         schemaVersion: 1 as const,
         id: unwrap(makeLogId(ids.next("log"))),
-        workspaceId: ws,
+        workspaceId: entry.workspaceId,
         actionId,
-        idempotencyKey: applied.idempotencyKey,
-        ...(applied.batchId === undefined ? {} : { batchId: applied.batchId }),
+        idempotencyKey: entry.idempotencyKey,
+        ...(entry.batchId === undefined ? {} : { batchId: entry.batchId }),
         at: clock.now().toISOString(),
       };
       if (!result.ok) {
-        if (result.error instanceof Cancelled)
-          return { ok: true, value: { outcomes, cancelled: true } };
-        const entry: ActionLog = {
+        if (result.error instanceof Cancelled) return "cancelled";
+        const failure: ActionLog = {
           ...base,
           outcome: "failed",
-          command: applied.inverse,
+          command: inverse,
           inverse: null,
           irreversible: false,
           errorCode: result.error.code,
         };
-        await recordEntry(uow, entry, "ActionFailed", result.error.code);
-        outcomes.push({ status: "failed", actionId, error: result.error });
-        continue;
+        await recordEntry(uow, failure, "ActionFailed", result.error.code);
+        return { status: "failed", actionId, error: result.error };
       }
-      const reversed = result.value[0];
-      const entry: ActionLog = {
+      const undone: ActionLog = {
         ...base,
         outcome: "undone",
-        command: reversed?.command ?? applied.inverse,
+        command: result.value[0]?.command ?? inverse,
         // Redo stays possible: the inverse of the undo is the original command.
-        inverse: applied.command,
+        inverse: entry.command,
         irreversible: false,
       };
-      const saved = await recordEntry(uow, entry, "ActionUndone");
-      outcomes.push(
-        saved.ok
-          ? { status: "undone", actionId }
-          : { status: "failed", actionId, error: saved.error },
-      );
+      const saved = await recordEntry(uow, undone, "ActionUndone");
+      if (!saved.ok) return { status: "failed", actionId, error: saved.error };
     }
-    return { ok: true, value: { outcomes, cancelled: false } };
+    return { status: "undone", actionId };
   }
 }
