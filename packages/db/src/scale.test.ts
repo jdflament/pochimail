@@ -1,4 +1,4 @@
-import type { Category } from "@pochimail/core/domain/category";
+import type { Category } from "@pochimail/classification/model/category";
 import type { MessageId } from "@pochimail/kernel/ids";
 import { ok, unwrap } from "@pochimail/kernel/result";
 import type { IncomingMessage } from "@pochimail/mailbox/model/message";

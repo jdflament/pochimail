@@ -1,10 +1,13 @@
-import { AiUnavailable } from "@pochimail/core/errors";
-import type { Classifier } from "@pochimail/core/ports/ai";
+import { AiUnavailable } from "@pochimail/classification/errors";
+import type { Classifier } from "@pochimail/classification/ports/classifier";
+import {
+  createFakeEmbedder,
+  createFakeLlmProvider,
+} from "@pochimail/classification/testing/fake-ai";
+import { createGroundTruthClassifier } from "@pochimail/classification/testing/ground-truth-classifier";
 import { createLogger } from "@pochimail/logger/logger";
-import { createFakeEmbedder, createFakeLlmProvider } from "@pochimail/testing/fake-ai";
 import { createFakeTimer } from "@pochimail/testing/fake-timer";
 import { generateMailbox } from "@pochimail/testing/fixture-mailbox/generator";
-import { createGroundTruthClassifier } from "@pochimail/testing/ground-truth-classifier";
 import type { MessagePortMain } from "electron";
 import { describe, expect, it, vi } from "vitest";
 import { type HostProcess, superviseModelHost } from "../main/model-host-supervisor.ts";

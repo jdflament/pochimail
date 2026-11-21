@@ -1,4 +1,4 @@
-import { suggestionSchema } from "@pochimail/core/domain/action";
+import { suggestionSchema } from "@pochimail/cleanup/model/suggestion";
 import type { Database } from "better-sqlite3-multiple-ciphers";
 import type { z } from "zod";
 import { decodeCursor, page } from "../shared/paging.ts";
@@ -11,7 +11,7 @@ const suggestionOf = (r: Row) =>
     id: r.id,
     workspaceId: r.workspace_id,
     accountId: r.account_id,
-    command: json(r.command),
+    recommendation: json(r.command),
     reasons: json(r.reasons),
     confidence: r.confidence,
     state: r.state,
@@ -57,7 +57,7 @@ export function createSuggestionRepository(db: Database) {
           v.state,
           v.confidence,
           v.createdAt,
-          JSON.stringify(v.command),
+          JSON.stringify(v.recommendation),
           JSON.stringify(v.reasons),
         );
       }),

@@ -1,8 +1,9 @@
+import { makeDerived } from "@pochimail/classification/testing/samples";
+import { makeSignal } from "@pochimail/classification/testing/signal-repository-contract";
+import { makeSuggestion } from "@pochimail/cleanup/testing/samples";
 import type { MessageId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
-import { makeDerived } from "@pochimail/testing/derived-contract";
-import { ACCOUNT_1, makeSuggestion, makeThread, WS_A } from "@pochimail/testing/fixtures";
-import { makeSignal } from "@pochimail/testing/signal-repository-contract";
+import { ACCOUNT_1, makeThread, WS_A } from "@pochimail/testing/fixtures";
 import { describe, expect, it } from "vitest";
 import { harness, mail } from "./test-support/harness.ts";
 

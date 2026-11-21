@@ -1,5 +1,5 @@
+import { CATEGORIES, type Category } from "@pochimail/classification/model/category";
 import { ACTION_KINDS, type Command } from "@pochimail/core/domain/action";
-import { CATEGORIES, type Category } from "@pochimail/core/domain/category";
 import type { PolicyDenied } from "@pochimail/core/errors";
 import type { Authorization, AuthorizationContext } from "@pochimail/core/policies/authorize";
 import {

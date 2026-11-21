@@ -1,4 +1,4 @@
-import { CATEGORIES } from "@pochimail/core/domain/category";
+import { CATEGORIES } from "@pochimail/classification/model/category";
 import { describe, expect, it } from "vitest";
 import { mailProviderContract } from "../mail-provider-contract.ts";
 import { createFixtureMailProvider } from "./fixture-mail-provider.ts";

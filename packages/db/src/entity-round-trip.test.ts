@@ -1,7 +1,7 @@
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { Category } from "@pochimail/core/domain/category";
+import type { Category } from "@pochimail/classification/model/category";
 import { unwrap } from "@pochimail/kernel/result";
 import type { IncomingMessage } from "@pochimail/mailbox/model/message";
 import { entityRoundTripContract } from "@pochimail/testing/entity-contract";

@@ -1,4 +1,4 @@
-import type { Category } from "@pochimail/core/domain/category";
+import type { Category } from "@pochimail/classification/model/category";
 
 // FAKE DATA ONLY: invented brands, invented people, reserved example domains. No real mail,
 // no real address, no real company.

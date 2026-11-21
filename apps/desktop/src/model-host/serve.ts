@@ -1,4 +1,4 @@
-import type { Classifier, Embedder, LlmProvider } from "@pochimail/core/ports/ai";
+import type { Classifier, Embedder, LlmProvider } from "@pochimail/classification/ports/classifier";
 import type { Transport } from "../shared/ipc/transport.ts";
 import { type HostResponse, hostRequestSchema } from "../shared/model-host-protocol.ts";
 

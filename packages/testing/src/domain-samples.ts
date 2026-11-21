@@ -1,6 +1,7 @@
 import { PROVIDER_KINDS } from "@pochimail/accounts/model/account";
+import { CATEGORIES, SIGNAL_KINDS } from "@pochimail/classification/model/category";
+import { RECOMMENDATION_KINDS } from "@pochimail/cleanup/model/suggestion";
 import { ACTION_KINDS } from "@pochimail/core/domain/action";
-import { CATEGORIES, SIGNAL_KINDS } from "@pochimail/core/domain/category";
 
 // Fake data only: every address is on example.com, every text is invented.
 
@@ -101,7 +102,7 @@ export const sampleBuilders = {
     ...base(r),
     id: id(r, "s"),
     accountId: id(r, "a"),
-    command: command(r),
+    recommendation: { ...command(r), kind: r.pick(RECOMMENDATION_KINDS) },
     reasons: reasons(r),
     confidence: confidence(r),
     state: r.pick(["pending", "approved", "dismissed"]),

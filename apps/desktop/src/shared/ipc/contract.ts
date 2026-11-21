@@ -1,4 +1,4 @@
-import { categorySchema } from "@pochimail/core/domain/category";
+import { categorySchema } from "@pochimail/classification/model/category";
 import { AUTONOMY_LEVELS } from "@pochimail/core/policies/autonomy";
 import { DEVICE_NAMES } from "@pochimail/core/ports/platform";
 import { CAPABILITIES } from "@pochimail/core/ports/settings-store";

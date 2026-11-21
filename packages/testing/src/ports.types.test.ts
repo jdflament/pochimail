@@ -33,7 +33,10 @@ describe("port type tests", () => {
     type Mutating = "save" | "upsert" | "upsertMany" | "append" | "set" | "setCategory" | "delete";
     type MutatingOnReads = { [K in keyof Reads]: Extract<keyof Reads[K], Mutating> }[keyof Reads];
     expectTypeOf<MutatingOnReads>().toBeNever();
-    // And the read side covers exactly the repositories the write side has.
-    expectTypeOf<keyof Reads>().toEqualTypeOf<keyof Transaction["repositories"]>();
+    // And the read side covers exactly the repositories the write side has, plus the composed read models.
+    type ReadModels = "signalFacts" | "mailboxFacts";
+    expectTypeOf<Exclude<keyof Reads, ReadModels>>().toEqualTypeOf<
+      keyof Transaction["repositories"]
+    >();
   });
 });

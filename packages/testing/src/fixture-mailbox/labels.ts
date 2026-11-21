@@ -1,4 +1,4 @@
-import { CATEGORIES, SIGNAL_KINDS } from "@pochimail/core/domain/category";
+import { CATEGORIES, SIGNAL_KINDS } from "@pochimail/classification/model/category";
 import { z } from "zod";
 
 export const LANGUAGES = ["en", "fr", "ja"] as const;

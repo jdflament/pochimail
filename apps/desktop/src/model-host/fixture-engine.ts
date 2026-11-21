@@ -1,6 +1,9 @@
-import { createFakeEmbedder, createFakeLlmProvider } from "@pochimail/testing/fake-ai";
+import {
+  createFakeEmbedder,
+  createFakeLlmProvider,
+} from "@pochimail/classification/testing/fake-ai";
+import { createGroundTruthClassifier } from "@pochimail/classification/testing/ground-truth-classifier";
 import { generateMailbox } from "@pochimail/testing/fixture-mailbox/generator";
-import { createGroundTruthClassifier } from "@pochimail/testing/ground-truth-classifier";
 import { DEMO_SEED, type DemoScale } from "../shared/demo.ts";
 import type { ModelHostEngine } from "./serve.ts";
 

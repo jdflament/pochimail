@@ -1,16 +1,11 @@
 import { accountSchema } from "@pochimail/accounts/model/account";
 import {
-  actionLogSchema,
-  actionSchema,
-  createSuggestion,
-  suggestionSchema,
-} from "@pochimail/core/domain/action";
-import {
   CATEGORIES,
   categoryOf,
   categorySchema,
   signalKindSchema,
-} from "@pochimail/core/domain/category";
+} from "@pochimail/classification/model/category";
+import { actionLogSchema, actionSchema } from "@pochimail/core/domain/action";
 import { incomingMessageSchema, messageSchema } from "@pochimail/mailbox/model/message";
 import { describe, expect, it } from "vitest";
 import { rng, sampleBuilders } from "./domain-samples.ts";
@@ -19,24 +14,6 @@ import { entityRoundTripContract } from "./entity-contract.ts";
 entityRoundTripContract();
 
 const r = rng(42);
-
-describe("Suggestion invariants", () => {
-  it("rejects a suggestion without reasons (UI could not explain it)", () => {
-    const s = { ...sampleBuilders.suggestion(r), reasons: [] };
-    expect(createSuggestion(s).ok).toBe(false);
-    expect(suggestionSchema.safeParse(s).success).toBe(false);
-  });
-  it.each([-0.01, 1.01, Number.NaN])(
-    "rejects confidence %s outside 0..1 (autopilot threshold bypass)",
-    (confidence) => {
-      const s = { ...sampleBuilders.suggestion(r), confidence };
-      expect(createSuggestion(s).ok).toBe(false);
-    },
-  );
-  it("accepts a valid suggestion", () => {
-    expect(createSuggestion(sampleBuilders.suggestion(r)).ok).toBe(true);
-  });
-});
 
 describe("fixed vocabularies", () => {
   it("has exactly the 7 brief categories (a renamed or extra category breaks the sidebar)", () => {

@@ -1,4 +1,4 @@
-import type { Category } from "@pochimail/core/domain/category";
+import type { Category } from "@pochimail/classification/model/category";
 import {
   AccountSwitcher,
   AccountSwitcherContent,

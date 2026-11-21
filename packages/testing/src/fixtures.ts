@@ -1,7 +1,7 @@
 import type { Account } from "@pochimail/accounts/model/account";
-import type { ActionLog, Suggestion } from "@pochimail/core/domain/action";
+import type { ActionLog } from "@pochimail/core/domain/action";
 import type { Topic } from "@pochimail/core/domain/mail";
-import type { ActionId, ActionLogId, SuggestionId } from "@pochimail/core/ids";
+import type { ActionId, ActionLogId } from "@pochimail/core/ids";
 import type { AccountId, MessageId, ThreadId, TopicId, WorkspaceId } from "@pochimail/kernel/ids";
 import type { IncomingMessage } from "@pochimail/mailbox/model/message";
 import type { SenderStats } from "@pochimail/mailbox/model/sender-stats";
@@ -67,19 +67,6 @@ export const makeSender = (over: Partial<SenderStats> = {}): SenderStats => ({
   repliedCount: 0,
   lastMessageAt: AT,
   vip: false,
-  ...over,
-});
-
-export const makeSuggestion = (over: Partial<Suggestion> = {}): Suggestion => ({
-  schemaVersion: 1,
-  id: "sug-1" as SuggestionId,
-  workspaceId: WS_A,
-  accountId: ACCOUNT_1,
-  command: { kind: "archive", messageIds: ["msg-1" as MessageId] },
-  reasons: ["Never opened"],
-  confidence: 0.9,
-  state: "pending",
-  createdAt: AT,
   ...over,
 });
 

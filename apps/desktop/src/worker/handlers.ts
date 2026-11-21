@@ -1,10 +1,10 @@
 import type { Account } from "@pochimail/accounts/model/account";
 import type { ListAccounts } from "@pochimail/accounts/use-cases/list-accounts";
+import type { CountCategories } from "@pochimail/classification/use-cases/count-categories";
+import type { GetDigestStatus } from "@pochimail/cleanup/use-cases/get-digest-status";
+import type { GetOverview } from "@pochimail/cleanup/use-cases/get-overview";
 import type { DomainEvent } from "@pochimail/core/events/catalog";
 import type { DeviceName } from "@pochimail/core/ports/platform";
-import type { CountCategories } from "@pochimail/core/use-cases/count-categories";
-import type { GetOverview } from "@pochimail/core/use-cases/get-overview";
-import type { LatestDigest } from "@pochimail/core/use-cases/latest-digest";
 import type { ManageSettings } from "@pochimail/core/use-cases/manage-settings";
 import type { ScanRunner } from "@pochimail/core/use-cases/scan-runner";
 import type { WorkspaceId } from "@pochimail/kernel/ids";
@@ -22,7 +22,7 @@ export interface HandlerDeps {
   readonly listAccounts: ListAccounts;
   readonly getOverview: GetOverview;
   readonly categories: CountCategories;
-  readonly latestDigest: LatestDigest;
+  readonly digestStatus: GetDigestStatus;
   readonly settings: ManageSettings;
   readonly scans: ScanRunner;
   readonly events: Pick<EventBus<DomainEvent>, "subscribe">;
@@ -93,7 +93,7 @@ export function createHandlers(deps: HandlerDeps): Handlers {
       },
       "scan.status": ({ accountIds }) =>
         deps.scans.live(accountIds.map((id) => unwrapOrThrow(AccountId(id)))),
-      "digest.get": () => deps.latestDigest.get(),
+      "digest.get": () => deps.digestStatus.execute(),
       "settings.get": async () => unwrapOrThrow(await deps.settings.get(workspaceId)),
       "settings.update": async (patch) => {
         unwrapOrThrow(await deps.settings.update(workspaceId, patch));

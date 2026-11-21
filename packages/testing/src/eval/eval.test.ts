@@ -1,11 +1,11 @@
 import { readFileSync } from "node:fs";
-import type { Category } from "@pochimail/core/domain/category";
-import type { Classifier } from "@pochimail/core/ports/ai";
+import type { Category } from "@pochimail/classification/model/category";
+import type { Classifier } from "@pochimail/classification/ports/classifier";
+import { createGroundTruthClassifier } from "@pochimail/classification/testing/ground-truth-classifier";
 import { ok } from "@pochimail/kernel/result";
 import { describe, expect, it } from "vitest";
 import { generateMailbox } from "../fixture-mailbox/generator.ts";
 import { readMailbox } from "../fixture-mailbox/mailbox-reader.ts";
-import { createGroundTruthClassifier } from "../ground-truth-classifier.ts";
 import { compareToBaseline } from "./compare.ts";
 import { degradeClassifier } from "./degraded-classifier.ts";
 import { runEval } from "./harness.ts";

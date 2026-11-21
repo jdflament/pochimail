@@ -3,7 +3,7 @@ import {
   type Category,
   categorySchema,
   DEFAULT_CATEGORY,
-} from "@pochimail/core/domain/category";
+} from "@pochimail/classification/model/category";
 import { NotFound } from "@pochimail/kernel/errors";
 import { err, ok } from "@pochimail/kernel/result";
 import type { IncomingMessage } from "@pochimail/mailbox/model/message";

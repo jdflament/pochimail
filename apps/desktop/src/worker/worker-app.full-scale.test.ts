@@ -1,4 +1,5 @@
-import { SummarizeMailbox } from "@pochimail/core/use-cases/summarize-mailbox";
+import { createGroundTruthClassifier } from "@pochimail/classification/testing/ground-truth-classifier";
+import { SummarizeMailbox } from "@pochimail/cleanup/use-cases/summarize-mailbox";
 import { createLogger } from "@pochimail/logger/logger";
 import { createFakeTimer } from "@pochimail/testing/fake-timer";
 import {
@@ -6,7 +7,6 @@ import {
   MAILBOX_SCALES,
   MOCK_DATASET,
 } from "@pochimail/testing/fixture-mailbox/generator";
-import { createGroundTruthClassifier } from "@pochimail/testing/ground-truth-classifier";
 import { describe, expect, it } from "vitest";
 import { DEMO_SEED } from "../shared/demo.ts";
 import { createWorkerApp } from "./app.ts";

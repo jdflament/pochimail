@@ -1,4 +1,4 @@
-import { CATEGORIES, SIGNAL_KINDS } from "@pochimail/core/domain/category";
+import { CATEGORIES, SIGNAL_KINDS } from "@pochimail/classification/model/category";
 import type { EvalReport } from "./report.ts";
 
 /** A class may lose at most this much precision or recall before the gate fails. */

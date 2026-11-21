@@ -11,7 +11,6 @@ import {
   StorageError,
 } from "@pochimail/kernel/errors";
 import { expect, it } from "vitest";
-import { AiUnavailable } from "./errors.ts";
 
 // Guards: callers branch on stable codes; renaming a class or message must not change them.
 it("exposes stable codes and a shared hierarchy for every provider failure", () => {
@@ -31,17 +30,10 @@ it("exposes stable codes and a shared hierarchy for every provider failure", () 
 
 // Guards: port callers branch on these codes, and every one must be catchable as a DomainError.
 it("exposes stable codes for storage, AI, cancellation and event failures", () => {
-  const errors = [
-    new StorageError(),
-    new NotFound("Topic"),
-    new AiUnavailable(),
-    new Cancelled(),
-    new EventError(),
-  ];
+  const errors = [new StorageError(), new NotFound("Topic"), new Cancelled(), new EventError()];
   expect(errors.map((e) => e.code)).toEqual([
     "storage.failed",
     "storage.not_found",
-    "ai.unavailable",
     "operation.cancelled",
     "event.invalid",
   ]);

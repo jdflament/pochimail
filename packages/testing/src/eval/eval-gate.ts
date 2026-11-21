@@ -1,8 +1,8 @@
 import { readFileSync, writeFileSync } from "node:fs";
-import type { Category } from "@pochimail/core/domain/category";
+import type { Category } from "@pochimail/classification/model/category";
+import { createGroundTruthClassifier } from "@pochimail/classification/testing/ground-truth-classifier";
 import { describe, expect, it } from "vitest";
 import { generateMailbox, type MailboxScale } from "../fixture-mailbox/generator.ts";
-import { createGroundTruthClassifier } from "../ground-truth-classifier.ts";
 import { compareToBaseline, DEFAULT_TOLERANCE, describeRegressions } from "./compare.ts";
 import { degradeClassifier } from "./degraded-classifier.ts";
 import { runEval } from "./harness.ts";

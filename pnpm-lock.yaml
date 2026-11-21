@@ -207,6 +207,12 @@ importers:
       '@pochimail/accounts':
         specifier: workspace:*
         version: link:../../packages/accounts
+      '@pochimail/classification':
+        specifier: workspace:*
+        version: link:../../packages/classification
+      '@pochimail/cleanup':
+        specifier: workspace:*
+        version: link:../../packages/cleanup
       '@pochimail/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -245,6 +251,12 @@ importers:
       '@pochimail/accounts':
         specifier: workspace:*
         version: link:../../packages/accounts
+      '@pochimail/classification':
+        specifier: workspace:*
+        version: link:../../packages/classification
+      '@pochimail/cleanup':
+        specifier: workspace:*
+        version: link:../../packages/cleanup
       '@pochimail/core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -257,9 +269,6 @@ importers:
       '@pochimail/logger':
         specifier: workspace:*
         version: link:../../packages/logger
-      '@pochimail/mailbox':
-        specifier: workspace:*
-        version: link:../../packages/mailbox
       '@pochimail/net':
         specifier: workspace:*
         version: link:../../packages/net
@@ -394,11 +403,55 @@ importers:
         specifier: 4.6.7
         version: 4.6.7
 
+  packages/classification:
+    dependencies:
+      '@pochimail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      zod:
+        specifier: 4.6.7
+        version: 4.6.7
+    devDependencies:
+      '@pochimail/typescript-config':
+        specifier: workspace:*
+        version: link:../../tooling/typescript
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: 5.1.0
+        version: 5.1.0(@types/node@26.6.6)(jsdom@31.0.1(@noble/hashes@1.8.0))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+
+  packages/cleanup:
+    dependencies:
+      '@pochimail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      zod:
+        specifier: 4.6.7
+        version: 4.6.7
+    devDependencies:
+      '@pochimail/typescript-config':
+        specifier: workspace:*
+        version: link:../../tooling/typescript
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: 5.1.0
+        version: 5.1.0(@types/node@26.6.6)(jsdom@31.0.1(@noble/hashes@1.8.0))(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+
   packages/core:
     dependencies:
       '@pochimail/accounts':
         specifier: workspace:*
         version: link:../accounts
+      '@pochimail/classification':
+        specifier: workspace:*
+        version: link:../classification
+      '@pochimail/cleanup':
+        specifier: workspace:*
+        version: link:../cleanup
       '@pochimail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -427,6 +480,12 @@ importers:
       '@pochimail/accounts':
         specifier: workspace:*
         version: link:../accounts
+      '@pochimail/classification':
+        specifier: workspace:*
+        version: link:../classification
+      '@pochimail/cleanup':
+        specifier: workspace:*
+        version: link:../cleanup
       '@pochimail/core':
         specifier: workspace:*
         version: link:../core
@@ -607,6 +666,12 @@ importers:
       '@pochimail/accounts':
         specifier: workspace:*
         version: link:../accounts
+      '@pochimail/classification':
+        specifier: workspace:*
+        version: link:../classification
+      '@pochimail/cleanup':
+        specifier: workspace:*
+        version: link:../cleanup
       '@pochimail/gmail':
         specifier: workspace:*
         version: link:../gmail
