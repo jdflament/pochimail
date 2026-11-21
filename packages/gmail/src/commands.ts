@@ -2,7 +2,7 @@ import { type Command, inverseOf } from "@pochimail/core/domain/action";
 import type { AppliedCommand, MailProviderError } from "@pochimail/core/ports/mail-provider";
 import { PartiallyApplied } from "@pochimail/core/ports/mail-provider";
 import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
-import { ProviderError, ProviderFailed } from "@pochimail/kernel/errors";
+import { ProviderFailed } from "@pochimail/kernel/errors";
 import type { MessageId } from "@pochimail/kernel/ids";
 import { err, ok } from "@pochimail/kernel/result";
 import { GMAIL_QUOTA_UNITS } from "@pochimail/net/egress/rate-limit";
@@ -46,10 +46,7 @@ export class GmailCommands {
                 },
               ];
         const soFar = [...applied, ...partial];
-        const wrap = result.error instanceof ProviderError && soFar.length > 0;
-        return err(
-          wrap ? new PartiallyApplied(result.error as ProviderError, soFar) : result.error,
-        );
+        return err(soFar.length > 0 ? new PartiallyApplied(result.error, soFar) : result.error);
       }
       applied.push({ command, inverse: inverseOf(command) });
     }

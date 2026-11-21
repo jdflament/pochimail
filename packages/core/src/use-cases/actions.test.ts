@@ -1,19 +1,31 @@
-import { StorageError } from "@pochimail/kernel/errors";
-import { err, ok } from "@pochimail/kernel/result";
+import { Offline, StorageError } from "@pochimail/kernel/errors";
+import { MessageId, WorkspaceId } from "@pochimail/kernel/ids";
+import { err, ok, unwrap } from "@pochimail/kernel/result";
 import type { OutboxEntry } from "@pochimail/pipeline/outbox";
 import { eventSinkOver } from "@pochimail/pipeline/outbox-event-sink";
+import { expect, it } from "vitest";
 import type { ActionLog } from "../domain/action.ts";
 import { inverseOf } from "../domain/action.ts";
-import type { MailProvider, MailProviderCapabilities } from "../ports/mail-provider.ts";
+import { ActionId } from "../ids.ts";
+import {
+  type MailProvider,
+  type MailProviderCapabilities,
+  PartiallyApplied,
+} from "../ports/mail-provider.ts";
 import type { ReadRepositories, WriteRepositories } from "../ports/repositories.ts";
 import type { Transaction, UnitOfWork } from "../ports/unit-of-work.ts";
 import { type ActionHarness, describeActionUseCases } from "./action-contract.ts";
+import { ApplyAction } from "./apply-action.ts";
+import { UndoAction } from "./undo-action.ts";
 
-function memoryHarness(capabilities: MailProviderCapabilities): ActionHarness {
+function memoryHarness(
+  capabilities: MailProviderCapabilities,
+): ActionHarness & { failPartlyAt(id: string): void } {
   let logs: ActionLog[] = [];
   let outbox: OutboxEntry[] = [];
   const archived = new Set<string>();
   const failing = new Set<string>();
+  let partlyAt: string | null = null;
   let mutations = 0;
 
   const actionLog = {
@@ -50,6 +62,25 @@ function memoryHarness(capabilities: MailProviderCapabilities): ActionHarness {
       const applied = [];
       for (const command of commands) {
         const ids = command.messageIds.map(String);
+        if (partlyAt !== null && ids.includes(partlyAt)) {
+          // Applies the ids before the failing one, then fails part-way.
+          const done = command.messageIds.slice(0, ids.indexOf(partlyAt));
+          for (const id of done) archived.add(String(id));
+          mutations++;
+          return err(
+            new PartiallyApplied(
+              new Offline(),
+              done.length === 0
+                ? []
+                : [
+                    {
+                      command: { ...command, messageIds: done },
+                      inverse: inverseOf({ ...command, messageIds: done }),
+                    },
+                  ],
+            ),
+          );
+        }
         if (ids.some((id) => failing.has(id)))
           return err(new (await import("@pochimail/kernel/errors")).Offline());
         for (const id of ids) {
@@ -73,6 +104,9 @@ function memoryHarness(capabilities: MailProviderCapabilities): ActionHarness {
     })(),
     isArchived: async (id) => archived.has(id),
     mutations: () => mutations,
+    failPartlyAt: (id) => {
+      partlyAt = id;
+    },
     failFor: (ids) => {
       for (const id of ids) failing.add(id);
     },
@@ -96,3 +130,55 @@ describeActionUseCases("batch modify, folders", () =>
     batchModify: { maxCommands: 50 },
   }),
 );
+
+// Guards: a half-applied action whose applied part cannot be undone, or an undo that touches the rest.
+it("a provider failing part-way logs the applied part as applied and undo restores exactly that part", async () => {
+  const h = memoryHarness({ ...base, batchModify: { maxCommands: 50 } });
+  const ws = unwrap(WorkspaceId("wsp_1"));
+  const ids = [1, 2, 3].map((n) => unwrap(MessageId(`m${n}`)));
+  h.failPartlyAt("m3");
+  const apply = new ApplyAction(h);
+  const report = await apply.execute(
+    {
+      items: [
+        {
+          action: {
+            schemaVersion: 1,
+            id: unwrap(ActionId("act_1")),
+            workspaceId: ws,
+            idempotencyKey: "k1",
+            command: { kind: "archive", messageIds: ids },
+            createdAt: "2026-11-17T10:00:00.000Z",
+          },
+          authorization: {
+            autonomy: "suggest",
+            categories: ["newsletters"],
+            confidence: 0.95,
+            userConfirmed: true,
+          },
+        },
+      ],
+    },
+    { aborted: false, addEventListener() {}, removeEventListener() {} },
+  );
+  expect(report.outcomes[0]?.status).toBe("failed");
+  expect(await h.isArchived("m1")).toBe(true);
+  expect(await h.isArchived("m2")).toBe(true);
+  expect(await h.isArchived("m3")).toBe(false);
+  const logged = unwrap(await h.uow.reads.actionLog.listForAction(ws, unwrap(ActionId("act_1"))));
+  expect(logged.map((e) => e.outcome)).toEqual(["applied", "failed"]);
+  expect(logged[0]?.command.messageIds).toEqual(ids.slice(0, 2));
+  expect(logged[0]?.inverse).toEqual({ kind: "unarchive", messageIds: ids.slice(0, 2) });
+
+  const undo = new UndoAction(h);
+  const undone = unwrap(
+    await undo.execute(
+      { workspaceId: ws, actionId: unwrap(ActionId("act_1")) },
+      { aborted: false, addEventListener() {}, removeEventListener() {} },
+    ),
+  );
+  expect(undone.outcomes[0]?.status).toBe("undone");
+  expect(await h.isArchived("m1")).toBe(false);
+  expect(await h.isArchived("m2")).toBe(false);
+  expect(await h.isArchived("m3")).toBe(false);
+});

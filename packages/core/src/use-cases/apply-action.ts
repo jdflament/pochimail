@@ -138,16 +138,27 @@ export class ApplyAction {
     if (signal.aborted) return "cancelled";
     const result = await provider.applyCommands([action.command], signal);
     if (!result.ok) {
-      if (result.error instanceof Cancelled) return "cancelled";
+      const partial = result.error instanceof PartiallyApplied ? result.error : null;
+      const cause = partial === null ? result.error : partial.failure;
+      // What the provider did before failing is logged as applied, each with its own inverse, so
+      // undo reverses exactly that part; the failure of the rest is logged next to it.
+      for (const done of partial?.applied ?? []) {
+        const entry: ActionLog = {
+          ...base(),
+          outcome: "applied",
+          command: done.command,
+          inverse: done.inverse ?? inverseOf(done.command),
+          irreversible: false,
+        };
+        const saved = await recordEntry(uow, entry, "ActionApplied");
+        if (!saved.ok) return failed(saved.error);
+      }
+      if (cause instanceof Cancelled) return "cancelled";
       const entry: ActionLog = {
         ...base(),
         outcome: "failed",
         command: action.command,
-        // Whatever the provider did before failing keeps its inverse, so it can still be undone.
-        inverse:
-          result.error instanceof PartiallyApplied
-            ? (result.error.applied[0]?.inverse ?? null)
-            : null,
+        inverse: null,
         irreversible: false,
         errorCode: result.error.code,
       };
