@@ -37,8 +37,11 @@ export function ConnectPage() {
   const connect = useMutation({
     mutationFn: async () => {
       // Adding an account to an existing setup skips Setup (the choices are already made).
-      const existing = await client.call("accounts.list");
-      const outcome = await client.call("accounts.connect", { provider: "google" });
+      // Both calls leave at once: the port keeps order, so a Cancel pressed right away reaches the worker after the
+      // connect has started (awaiting the list first let it arrive early, find nothing to cancel, and hang the sign-in).
+      const listing = client.call("accounts.list");
+      const connecting = client.call("accounts.connect", { provider: "google" });
+      const [existing, outcome] = await Promise.all([listing, connecting]);
       return { outcome, firstAccount: existing.length === 0 };
     },
     onSuccess: async ({ outcome, firstAccount }) => {
