@@ -41,8 +41,13 @@ export function ConnectPage() {
       // connect has started (awaiting the list first let it arrive early, find nothing to cancel, and hang the sign-in).
       const listing = client.call("accounts.list");
       const connecting = client.call("accounts.connect", { provider: "google" });
-      const [existing, outcome] = await Promise.all([listing, connecting]);
-      return { outcome, firstAccount: existing.length === 0 };
+      // The connect outcome is the truth: a failed list only means "treat it as a first account".
+      const [existing, outcome] = await Promise.allSettled([listing, connecting]);
+      if (outcome.status === "rejected") throw outcome.reason;
+      return {
+        outcome: outcome.value,
+        firstAccount: existing.status === "rejected" || existing.value.length === 0,
+      };
     },
     onSuccess: async ({ outcome, firstAccount }) => {
       if (outcome.status !== "connected") return;
