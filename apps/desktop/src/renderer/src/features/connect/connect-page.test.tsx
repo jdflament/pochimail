@@ -12,7 +12,12 @@ import { createAppRouter } from "../../router.tsx";
 
 afterEach(cleanup);
 
-const harness = (outcomes: OutputOf<"accounts.connect">[], existing = 0, hang = false) => {
+const harness = (
+  outcomes: OutputOf<"accounts.connect">[],
+  existing = 0,
+  hang = false,
+  listFails = false,
+) => {
   let release: (() => void) | undefined;
   const { port1, port2 } = new MessageChannel();
   port1.start();
@@ -22,12 +27,14 @@ const harness = (outcomes: OutputOf<"accounts.connect">[], existing = 0, hang = 
     procedures: {
       "app.state": () => ({ status: "ready" as const, hasConnectedAccount: existing > 0 }),
       "device.name": () => "Mac" as const,
-      "accounts.list": () =>
-        Array.from({ length: existing }, (_, n) => ({
+      "accounts.list": () => {
+        if (listFails) throw new Error("list failed");
+        return Array.from({ length: existing }, (_, n) => ({
           id: `acc-${n}`,
           provider: "google" as const,
           displayName: "a@example.test",
-        })),
+        }));
+      },
       "accounts.cancelConnect": () => {
         release?.();
       },
@@ -98,6 +105,13 @@ describe("Connect screen", () => {
     fireEvent.click(await screen.findByRole("button", { name: /Continue with Google/ }));
     expect((await screen.findByRole("alert")).textContent).toContain("no Google sign-in");
     expect(screen.getByRole("button", { name: "Try again" })).toBeTruthy();
+  });
+
+  it("a failing account list does not hide a connect: it goes to Setup as a first account", async () => {
+    const h = harness([{ status: "connected", accountId: "acc-1" }], 0, false, true);
+    fireEvent.click(await screen.findByRole("button", { name: /Continue with Google/ }));
+    await waitFor(() => expect(h.router.state.location.pathname).toBe("/setup"));
+    expect(screen.queryByRole("alert")).toBeNull();
   });
 
   it("Cancel while waiting stops the sign-in and shows the cancelled state", async () => {

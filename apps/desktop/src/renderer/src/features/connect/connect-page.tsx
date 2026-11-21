@@ -37,9 +37,17 @@ export function ConnectPage() {
   const connect = useMutation({
     mutationFn: async () => {
       // Adding an account to an existing setup skips Setup (the choices are already made).
-      const existing = await client.call("accounts.list");
-      const outcome = await client.call("accounts.connect", { provider: "google" });
-      return { outcome, firstAccount: existing.length === 0 };
+      // Both calls leave at once: the port keeps order, so a Cancel pressed right away reaches the worker after the
+      // connect has started (awaiting the list first let it arrive early, find nothing to cancel, and hang the sign-in).
+      const listing = client.call("accounts.list");
+      const connecting = client.call("accounts.connect", { provider: "google" });
+      // The connect outcome is the truth: a failed list only means "treat it as a first account".
+      const [existing, outcome] = await Promise.allSettled([listing, connecting]);
+      if (outcome.status === "rejected") throw outcome.reason;
+      return {
+        outcome: outcome.value,
+        firstAccount: existing.status === "rejected" || existing.value.length === 0,
+      };
     },
     onSuccess: async ({ outcome, firstAccount }) => {
       if (outcome.status !== "connected") return;

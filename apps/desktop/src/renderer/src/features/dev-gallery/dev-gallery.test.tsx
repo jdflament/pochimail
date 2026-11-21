@@ -29,6 +29,8 @@ const openGallery = async () => {
     { getWorkerClient: () => Promise.resolve(client) },
     { initialEntries: ["/gallery"] },
   );
+  // The route is a lazy chunk: load it first so the wait below is on rendering, not on a cold module transform (slow on CI).
+  await import("./dev-gallery-page.tsx");
   render(<App workerClient={client} router={router} />);
   await screen.findByRole("heading", { level: 1, name: "Dev gallery" });
 };
