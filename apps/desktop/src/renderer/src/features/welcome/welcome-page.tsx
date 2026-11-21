@@ -18,21 +18,25 @@ export function WelcomePage() {
   const device = deviceLabel(deviceName.data ?? "device", locale);
 
   return (
-    <>
-      <h1 className="text-balance text-display leading-tight">{t("welcome.headline")}</h1>
+    <div className="flex flex-col items-center gap-4.5">
+      <h1 className="text-balance text-title leading-heading @phone:text-display">
+        {t("welcome.headline")}
+      </h1>
       {/* Held invisible until the device name resolves, so the copy never flips from "device" to "Mac". */}
       <p
         className={cn(
-          "mt-6 text-pretty text-base leading-relaxed text-muted-foreground",
+          "max-w-narrow text-pretty text-base leading-copy text-muted-foreground",
           deviceName.isPending && "invisible",
         )}
       >
         {t("welcome.description", { device })}
       </p>
-      <Button asChild size="lg" className="mt-8 w-full max-w-104">
-        <Link to="/connect">{t("welcome.cta")}</Link>
-      </Button>
-      <p className="mt-4 text-ui text-foreground-tertiary">{t("welcome.openSource")}</p>
-    </>
+      <div className="mt-1.5 flex flex-col items-center gap-3">
+        <Button asChild size="lg" className="min-w-65 text-body">
+          <Link to="/connect">{t("welcome.cta")}</Link>
+        </Button>
+        <p className="text-caption text-foreground-tertiary">{t("welcome.openSource")}</p>
+      </div>
+    </div>
   );
 }

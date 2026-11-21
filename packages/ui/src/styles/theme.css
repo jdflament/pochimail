@@ -69,6 +69,8 @@
   --text-title: 32px;
   --text-figure: 34px;
   --text-display: 40px;
+  --leading-heading: 1.1;
+  --leading-copy: 1.55;
 
   --font-weight-title: 450;
   --tracking-title: -0.02em;

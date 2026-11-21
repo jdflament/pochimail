@@ -117,4 +117,18 @@ describe("first-run redirect from app.state", () => {
     await waitFor(() => expect(document.activeElement).toBe(heading));
     fake.close();
   });
+
+  // Guards: the brand, headline and button drifting from Main.html (an oversized mascot, a full-width button).
+  it("Welcome keeps the reference scale: 240px Pochi, display headline, 260px minimum button", async () => {
+    const fake = createFakeAppClient(false);
+    render(<App workerClient={fake.client} />);
+    const heading = await screen.findByRole("heading", { name: /Clean up your email/ });
+    expect(heading.className).toContain("@phone:text-display");
+    expect(heading.className).toContain("leading-heading");
+    expect(document.querySelector("[data-slot=mascot]")?.className).toContain("w-60");
+    const cta = screen.getByRole("link", { name: "Get started" });
+    expect(cta.className).toContain("min-w-65");
+    expect(cta.className).not.toContain("w-full");
+    fake.close();
+  });
 });
