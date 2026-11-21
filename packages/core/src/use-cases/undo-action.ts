@@ -44,7 +44,7 @@ export class UndoAction {
   constructor(private readonly deps: UndoActionDeps) {}
 
   async execute(target: UndoTarget, signal: CancelSignal): AsyncResult<UndoReport, StorageError> {
-    const { uow, provider, clock, ids } = this.deps;
+    const { uow } = this.deps;
     const ws = target.workspaceId;
     const logs =
       "actionId" in target
