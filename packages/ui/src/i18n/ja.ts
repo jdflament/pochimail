@@ -1,5 +1,6 @@
 import { connectMessages } from "./connect-messages.ts";
 import { type Catalog, entry } from "./messages.ts";
+import { overviewCleanMessages } from "./overview-clean-messages.ts";
 
 /**
  * Japanese catalog. Polite です・ます register, natural product Japanese, no machine-literal
@@ -13,14 +14,14 @@ export const ja = {
   "overview.email.count": entry("{count, plural, =0 {メールはありません} other {#件のメール}}", [
     "count",
   ]),
-  "overview.size.free": entry("合計{total, number} GBのうち、{size, number} GBを空けられます。", [
-    "size",
-    "total",
-  ]),
   "scan.failed": entry(
     "仕分けを最後まで終えられませんでした。何も変更していません。もう一度始めると、止まったところから続けます。",
     [],
   ),
+  "overview.size.free": entry("合計{total, number} GBのうち、{size, number} GBを空けられます。", [
+    "size",
+    "total",
+  ]),
   "overview.review": entry("確認する", []),
   "overview.pause": entry("一時停止", []),
   "overview.resume": entry("再開", []),
@@ -30,6 +31,10 @@ export const ja = {
   "overview.accounts": entry("{count, plural, other {#件のアカウント}}", ["count"]),
   "overview.catch.note": entry("これらは整理しません", []),
   "overview.clean.note": entry("確認するまで何も実行されません", []),
+  "overview.clean.summary": entry("{total}使用中", ["total"]),
+  "overview.clean.keep": entry("残すもの", []),
+  "overview.clean.free": entry("削除できるもの", []),
+  "overview.clean.never": entry("大切そうなメールは、自動では選択されません。", []),
   "overview.waiting.title": entry("{count, plural, other {人があなたの返信を待っています}}", [
     "count",
   ]),
@@ -44,19 +49,6 @@ export const ja = {
     "count",
   ]),
   "overview.important.detail": entry("よく返信する相手です", []),
-  "overview.clean.headline": entry("件を整理できます（全体で{total, number}件）", ["total"]),
-  "overview.clean.summary": entry("{total, number}件を整理済み", ["total"]),
-  "overview.clean.keep": entry("残すもの", []),
-  "overview.clean.free": entry("整理できるもの", []),
-  "overview.clean.never": entry("人とのやり取り、記録、領収書は整理しません。", []),
-  "overview.rec.newsletters.sentence": entry("ニュースレターの配信を停止する", []),
-  "overview.rec.newsletters.reason": entry("退会できる定期配信の送信元です", []),
-  "overview.rec.promotions.sentence": entry("広告メールの配信を停止する", []),
-  "overview.rec.promotions.reason": entry("セールや宣伝のメールです", []),
-  "overview.rec.notifications.sentence": entry("通知をアーカイブする", []),
-  "overview.rec.notifications.reason": entry("アプリやSNSからの通知です", []),
-  "overview.rec.signins.sentence": entry("ログイン用コードをアーカイブする", []),
-  "overview.rec.signins.reason": entry("ワンタイムコードとログインの通知です", []),
   "overview.scan.progress": entry("{total, number}件中{processed, number}件を整理しました", [
     "processed",
     "total",
@@ -107,6 +99,7 @@ export const ja = {
   "onboarding.progress": entry("ステップ{current}／{total}", ["current", "total"]),
 
   ...connectMessages.ja,
+  ...overviewCleanMessages.ja,
   "setup.title": entry("設定", []),
   "setup.description": entry("Pochiにどのように手伝ってほしいか選んでください。", []),
   "setup.bubble": entry(

@@ -32,6 +32,7 @@ export function mailboxFactsOver(reads: Reads): MailboxFacts {
           receivedAt: m.receivedAt,
           opened: m.opened,
           hasListUnsubscribe: m.hasListUnsubscribe,
+          size: m.size ?? null,
         })),
         nextCursor: page.value.nextCursor,
       });

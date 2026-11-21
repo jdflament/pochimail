@@ -1,5 +1,6 @@
 import { connectMessages } from "./connect-messages.ts";
 import { type Catalog, entry } from "./messages.ts";
+import { overviewCleanMessages } from "./overview-clean-messages.ts";
 
 /**
  * French catalog. Typed against the English keys: a missing key or a renamed placeholder fails
@@ -14,14 +15,14 @@ export const fr = {
     "{count, plural, =0 {Aucun email} one {# email} other {# emails}}",
     ["count"],
   ),
-  "overview.size.free": entry("{size, number} Go à libérer, sur {total, number} Go", [
-    "size",
-    "total",
-  ]),
   "scan.failed": entry(
     "Je n'ai pas pu finir le tri. Rien n'a été modifié. Relancez-le et je reprendrai là où je me suis arrêté.",
     [],
   ),
+  "overview.size.free": entry("{size, number} Go à libérer, sur {total, number} Go", [
+    "size",
+    "total",
+  ]),
   "overview.review": entry("Examiner", []),
   "overview.pause": entry("Pause", []),
   "overview.resume": entry("Reprendre", []),
@@ -31,6 +32,13 @@ export const fr = {
   "overview.accounts": entry("{count, plural, one {# compte} other {# comptes}}", ["count"]),
   "overview.catch.note": entry("Je ne nettoie jamais ces emails", []),
   "overview.clean.note": entry("Rien ne se passe avant que vous ayez examiné", []),
+  "overview.clean.summary": entry("{total} utilisés", ["total"]),
+  "overview.clean.keep": entry("Reste", []),
+  "overview.clean.free": entry("Peut être supprimé", []),
+  "overview.clean.never": entry(
+    "Les emails qui semblent importants ne sont jamais sélectionnés pour vous.",
+    [],
+  ),
   "overview.waiting.title": entry(
     "{count, plural, one {personne vous attend} other {personnes vous attendent}}",
     ["count"],
@@ -49,25 +57,6 @@ export const fr = {
     ["count"],
   ),
   "overview.important.detail": entry("Des expéditeurs à qui vous répondez souvent", []),
-  "overview.clean.headline": entry("emails à nettoyer, sur {total, number}", ["total"]),
-  "overview.clean.summary": entry("{total, number} emails triés", ["total"]),
-  "overview.clean.keep": entry("À garder", []),
-  "overview.clean.free": entry("À nettoyer", []),
-  "overview.clean.never": entry(
-    "Les conversations avec des personnes, les documents et les reçus ne sont jamais nettoyés.",
-    [],
-  ),
-  "overview.rec.newsletters.sentence": entry("Se désabonner des newsletters", []),
-  "overview.rec.newsletters.reason": entry("Des expéditeurs réguliers que vous pouvez quitter", []),
-  "overview.rec.promotions.sentence": entry("Se désabonner des promotions", []),
-  "overview.rec.promotions.reason": entry("Des emails de ventes et de marketing", []),
-  "overview.rec.notifications.sentence": entry("Archiver les notifications", []),
-  "overview.rec.notifications.reason": entry(
-    "Des alertes d’applications et de réseaux sociaux",
-    [],
-  ),
-  "overview.rec.signins.sentence": entry("Archiver les codes de connexion", []),
-  "overview.rec.signins.reason": entry("Des codes à usage unique et des alertes de connexion", []),
   "overview.scan.progress": entry("{processed, number} emails triés sur {total, number}", [
     "processed",
     "total",
@@ -125,6 +114,7 @@ export const fr = {
   "onboarding.progress": entry("Étape {current} sur {total}", ["current", "total"]),
 
   ...connectMessages.fr,
+  ...overviewCleanMessages.fr,
   "setup.title": entry("Configuration", []),
   "setup.description": entry("Choisissez comment Pochi peut vous aider.", []),
   "setup.bubble": entry(

@@ -1,4 +1,5 @@
 import { connectMessages } from "./connect-messages.ts";
+import { overviewCleanMessages } from "./overview-clean-messages.ts";
 
 /**
  * English is the default and the fallback. French and Japanese ship in v1 (P13, decided 2026-11-19);
@@ -34,14 +35,14 @@ export const messages = {
   "overview.email.count": entry("{count, plural, =0 {No emails} one {# email} other {# emails}}", [
     "count",
   ]),
-  "overview.size.free": entry("{size, number} GB you can free, out of {total, number} GB", [
-    "size",
-    "total",
-  ]),
   "scan.failed": entry(
     "I could not finish sorting. Nothing was changed. Start again and I will continue where I stopped.",
     [],
   ),
+  "overview.size.free": entry("{size, number} GB you can free, out of {total, number} GB", [
+    "size",
+    "total",
+  ]),
   "overview.review": entry("Review", []),
   "overview.pause": entry("Pause", []),
   "overview.resume": entry("Resume", []),
@@ -51,6 +52,10 @@ export const messages = {
   "overview.accounts": entry("{count, plural, one {# account} other {# accounts}}", ["count"]),
   "overview.catch.note": entry("I never clean these", []),
   "overview.clean.note": entry("Nothing happens until you review it", []),
+  "overview.clean.summary": entry("{total} used", ["total"]),
+  "overview.clean.keep": entry("Stays", []),
+  "overview.clean.free": entry("Can be deleted", []),
+  "overview.clean.never": entry("Emails that look important are never selected for you.", []),
   "overview.waiting.title": entry(
     "{count, plural, one {person is waiting on you} other {people are waiting on you}}",
     ["count"],
@@ -69,22 +74,6 @@ export const messages = {
     ["count"],
   ),
   "overview.important.detail": entry("Senders you often reply to", []),
-  "overview.clean.headline": entry("emails you can clean up, out of {total, number}", ["total"]),
-  "overview.clean.summary": entry("{total, number} emails sorted", ["total"]),
-  "overview.clean.keep": entry("Worth keeping", []),
-  "overview.clean.free": entry("Can be cleaned", []),
-  "overview.clean.never": entry(
-    "Conversations with people, records and receipts are never cleaned.",
-    [],
-  ),
-  "overview.rec.newsletters.sentence": entry("Unsubscribe from newsletters", []),
-  "overview.rec.newsletters.reason": entry("Regular senders you can leave", []),
-  "overview.rec.promotions.sentence": entry("Unsubscribe from promotion senders", []),
-  "overview.rec.promotions.reason": entry("Sales and marketing emails", []),
-  "overview.rec.notifications.sentence": entry("Archive notifications", []),
-  "overview.rec.notifications.reason": entry("App and social alerts", []),
-  "overview.rec.signins.sentence": entry("Archive sign-in codes", []),
-  "overview.rec.signins.reason": entry("One-time codes and login alerts", []),
   "overview.scan.progress": entry("{processed, number} of {total, number} emails sorted", [
     "processed",
     "total",
@@ -136,6 +125,7 @@ export const messages = {
   "onboarding.progress": entry("Step {current} of {total}", ["current", "total"]),
 
   ...connectMessages.en,
+  ...overviewCleanMessages.en,
   "setup.title": entry("Set up", []),
   "setup.description": entry("Choose how Pochi can help.", []),
   "setup.bubble": entry(

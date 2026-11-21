@@ -1,5 +1,6 @@
 import { AUTONOMY_LEVELS } from "@pochimail/actions/policies/autonomy";
 import { categorySchema } from "@pochimail/classification/model/category";
+import { CLEAN_UP_KINDS } from "@pochimail/cleanup/policies/clean-up-actions";
 import { z } from "zod";
 import { DEVICE_NAMES } from "../platform-port.ts";
 import { CAPABILITIES } from "../settings.ts";
@@ -43,14 +44,19 @@ const queries = {
       deadlines: z.number().int().nonnegative(),
       important: z.number().int().nonnegative(),
       oldestWaitingDays: z.number().int().nonnegative(),
-      cleanable: z
+      actions: z
         .array(
           z.object({
-            category: z.enum(["newsletters", "promotions", "notifications", "sign-ins-security"]),
+            kind: z.enum(CLEAN_UP_KINDS),
+            category: z.string().min(1),
             count: z.number().int().nonnegative(),
+            bytes: z.number().int().nonnegative().nullable(),
+            protectedCount: z.number().int().nonnegative(),
+            sizeKnown: z.boolean(),
           }),
         )
-        .max(4),
+        .max(10),
+      totalBytes: z.number().int().nonnegative().nullable(),
     }),
   },
   /** Email counts per category over the given accounts (the switcher's selection); counts only, never content. */

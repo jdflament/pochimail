@@ -9,6 +9,7 @@
     "./model/digest": "./src/model/digest.ts",
     "./model/scores": "./src/model/scores.ts",
     "./model/suggestion": "./src/model/suggestion.ts",
+    "./policies/clean-up-actions": "./src/policies/clean-up-actions.ts",
     "./policies/labels": "./src/policies/labels.ts",
     "./ports/digest-state-repository": "./src/ports/digest-state-repository.ts",
     "./ports/digest-tally": "./src/ports/digest-tally.ts",

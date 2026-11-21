@@ -10,6 +10,8 @@ export interface MessageFact {
   readonly receivedAt: string;
   readonly opened: boolean;
   readonly hasListUnsubscribe: boolean;
+  /** The provider's size in bytes; null while unverified (ADR 0012). */
+  readonly size: number | null;
 }
 
 export interface MessageFactsQuery {

@@ -81,7 +81,7 @@ export function createHandlers(deps: HandlerDeps): Handlers {
             input.accountId === undefined ? undefined : unwrapOrThrow(AccountId(input.accountId)),
           ),
         );
-        return { ...overview, cleanable: [...overview.cleanable] };
+        return { ...overview, actions: [...overview.actions] };
       },
       "mailbox.categories": async ({ accountIds }) => {
         return unwrapOrThrow(

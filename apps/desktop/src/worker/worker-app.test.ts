@@ -157,10 +157,10 @@ describe("worker app over the real IPC layer", () => {
     const counts = await client.call("mailbox.categories", {
       accountIds: mailbox.accounts.map((a) => a.id),
     });
-    for (const { category, count } of all.cleanable) expect(count).toBe(counts[category]);
-    expect(all.cleanable.map((c) => c.count)).toEqual(
-      [...all.cleanable.map((c) => c.count)].sort((a, b) => b - a),
-    );
+    // A proposal never covers more emails than its category holds.
+    for (const { kind, category, count } of all.actions)
+      if (kind !== "save")
+        expect(count).toBeLessThanOrEqual(counts[category as keyof typeof counts]);
     close();
   });
 
