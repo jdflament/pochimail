@@ -1,7 +1,7 @@
+import type { ActionId } from "@pochimail/actions/ids";
 import { makeDerived } from "@pochimail/classification/testing/samples";
 import { makeSignal } from "@pochimail/classification/testing/signal-repository-contract";
 import { makeSuggestion } from "@pochimail/cleanup/testing/samples";
-import type { ActionId } from "@pochimail/core/ids";
 import type { Page } from "@pochimail/kernel/common";
 import type { AccountId, MessageId, TopicId } from "@pochimail/kernel/ids";
 import { ok, unwrap } from "@pochimail/kernel/result";

@@ -43,9 +43,9 @@ module.exports = {
       name: "workflows-only-orchestrate",
       severity: "error",
       comment:
-        "workflows turns events into commands across domains. It never touches adapters, pipeline, ui or apps.",
+        "workflows turns events into commands across domains and assembles the scan as pipeline jobs (the job runner, retry policy and outbox types it is built from). It never touches adapters, ui or apps; the direction is workflows uses pipeline, never the reverse (pipeline-knows-no-domain).",
       from: { path: "^packages/workflows/src/", pathNot: NOT_SHIPPED },
-      to: { path: `^apps/|^packages/(${ADAPTERS}|ui|pipeline|testing)/` },
+      to: { path: `^apps/|^packages/(${ADAPTERS}|ui|testing)/` },
     },
     {
       name: "adapters-are-independent",
@@ -127,28 +127,6 @@ module.exports = {
       to: { circular: true },
     },
     {
-      name: "legacy-core-is-pure",
-      severity: "error",
-      comment:
-        "Transitional until packages/core is split into domains (ADR 0015); delete this rule with the package.",
-      from: { path: "^packages/core/src/" },
-      to: {
-        path: "^(packages|apps)/",
-        pathNot: "^packages/(core|kernel|pipeline|accounts|mailbox|classification|cleanup)/src/",
-      },
-    },
-    {
-      name: "legacy-core-npm-allowlist",
-      severity: "error",
-      comment:
-        "core may only use zod. Anything else is an adapter concern and belongs behind a port.",
-      from: { path: "^packages/core/src/" },
-      to: {
-        dependencyTypes: ["npm", "npm-dev", "npm-peer", "npm-optional"],
-        pathNot: "node_modules/zod/",
-      },
-    },
-    {
       name: "domains-npm-allowlist",
       severity: "error",
       comment:
@@ -160,25 +138,6 @@ module.exports = {
       to: {
         dependencyTypes: ["npm", "npm-dev", "npm-peer", "npm-optional"],
         pathNot: "node_modules/zod/",
-      },
-    },
-    {
-      name: "legacy-adapters-depend-on-core-only",
-      severity: "error",
-      comment:
-        "db, mail and ai implement core ports. They never import each other or the UI: the composition root (apps) wires them together. They may use the logger.",
-      from: { path: "^packages/(db|mail|ai)/src/" },
-      to: {
-        path: "^(packages|apps)/",
-        // testing access is governed by "testing-only-in-tests"; domain packages and kernel are allowed during the split.
-        pathNot: [
-          "^packages/core/src/",
-          "^packages/$1/src/",
-          "^packages/logger/src/",
-          "^packages/pipeline/src/", // governed by adapters-use-only-pipeline-ports and db-uses-only-pipeline-ports
-          "^packages/testing/",
-          `^packages/(${DOMAINS}|kernel|net)/src/`,
-        ],
       },
     },
     {

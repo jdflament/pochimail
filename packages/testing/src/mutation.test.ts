@@ -1,11 +1,6 @@
-import { createHash } from "node:crypto";
-import type { BlobStore } from "@pochimail/core/ports/blob-store";
-import type { UnitOfWork } from "@pochimail/core/ports/unit-of-work";
 import { failingChecks } from "@pochimail/kernel/testing/contract";
 import { describe, expect, it } from "vitest";
-import { blobStoreChecks } from "./blob-store-contract.ts";
 import { createFakeClock } from "./fake-clock.ts";
-import { createInMemoryBlobStore } from "./in-memory-blob-store.ts";
 import { createInMemoryJobQueue } from "./in-memory-job-queue.ts";
 import { createFakeScheduler } from "./in-memory-scheduler.ts";
 import { createInMemoryUnitOfWork } from "./in-memory-store.ts";
@@ -13,6 +8,7 @@ import { jobQueueChecks } from "./job-queue-contract.ts";
 import { repositoriesChecks } from "./repositories-contract.ts";
 import { schedulerChecks } from "./scheduler-contract.ts";
 import { unitOfWorkChecks } from "./unit-of-work-contract.ts";
+import type { UnitOfWork } from "./uow-types.ts";
 
 const noopStop = (_real: () => void) => () => {};
 
@@ -63,24 +59,6 @@ describe("contract suites catch broken adapters", () => {
   it("the correct in-memory unit of work passes both suites (guards mutation tests that fail for the wrong reason)", async () => {
     expect(await failingChecks(unitOfWorkChecks, createInMemoryUnitOfWork)).toEqual([]);
     expect(await failingChecks(repositoriesChecks, createInMemoryUnitOfWork)).toEqual([]);
-  });
-
-  it("a blob store that returns the caller's buffer fails the BlobStore suite", async () => {
-    const broken = (): BlobStore => {
-      const blobs = new Map<string, Uint8Array>();
-      return {
-        async put(bytes) {
-          const sha256 = createHash("sha256").update(bytes).digest("hex");
-          blobs.set(sha256, bytes); // no copy
-          return { ok: true, value: { sha256, sizeBytes: bytes.byteLength } };
-        },
-        get: createInMemoryBlobStore().get,
-        has: async (sha) => ({ ok: true, value: blobs.has(sha) }),
-      };
-    };
-    const failed = await failingChecks(blobStoreChecks, broken);
-    expect(failed.length).toBeGreaterThan(0);
-    expect(await failingChecks(blobStoreChecks, createInMemoryBlobStore)).toEqual([]);
   });
 
   it("a job queue that hands a claimed job out twice fails the JobQueue suite", async () => {

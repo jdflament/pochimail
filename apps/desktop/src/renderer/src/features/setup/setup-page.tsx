@@ -1,9 +1,7 @@
-import { AUTONOMY_LEVELS, AUTOPILOT_CONFIDENCE_THRESHOLD } from "@pochimail/core/policies/autonomy";
 import {
-  type AppSettings,
-  CAPABILITIES,
-  type Capability,
-} from "@pochimail/core/ports/settings-store";
+  AUTONOMY_LEVELS,
+  AUTOPILOT_CONFIDENCE_THRESHOLD,
+} from "@pochimail/actions/policies/autonomy";
 import { Button } from "@pochimail/ui/components/button";
 import { CheckboxCard } from "@pochimail/ui/components/checkbox-card";
 import { RadioCard } from "@pochimail/ui/components/radio-card";
@@ -14,6 +12,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { LockIcon } from "lucide-react";
 import { useRef, useState } from "react";
+import { type AppSettings, CAPABILITIES, type Capability } from "#shared/settings.ts";
 import { queryKeys } from "../../lib/query/keys.ts";
 import { useWorkerClient } from "../../lib/worker-context.tsx";
 

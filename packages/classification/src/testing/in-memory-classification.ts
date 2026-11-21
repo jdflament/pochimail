@@ -5,6 +5,7 @@ import { CATEGORIES } from "../model/category.ts";
 import type { DerivedMessage } from "../model/derived.ts";
 import type { ClassifiableMessage } from "../model/message-facts.ts";
 import type { StoredSignal } from "../model/signal.ts";
+import type { Topic } from "../model/topic.ts";
 import type { ClassificationUnitOfWork } from "../ports/unit-of-work.ts";
 import { makeDerived, makeMessage, OWNER_ADDRESS, type Seeder, WS_A } from "./samples.ts";
 
@@ -18,18 +19,21 @@ interface Data {
   messages: Map<string, ClassifiableMessage & { category: string }>;
   derived: Map<string, DerivedMessage>;
   signals: Map<string, StoredSignal>;
+  topics: Map<string, Topic>;
   senders: Map<string, { vip: boolean; repliedCount: number }>;
 }
 const empty = (): Data => ({
   messages: new Map(),
   derived: new Map(),
   signals: new Map(),
+  topics: new Map(),
   senders: new Map(),
 });
 const clone = (d: Data): Data => ({
   messages: new Map(d.messages),
   derived: new Map(d.derived),
   signals: new Map(d.signals),
+  topics: new Map(d.topics),
   senders: new Map(d.senders),
 });
 
@@ -76,6 +80,14 @@ export function createInMemoryClassification(): InMemoryClassification {
             .map(copy),
         );
       },
+    },
+    topics: {
+      get: async (ws, id) => {
+        const t = data().topics.get(`${ws}/${id}`);
+        return t ? ok(copy(t)) : err(new NotFound("Topic"));
+      },
+      list: async (ws) =>
+        ok([...data().topics.values()].filter((t) => t.workspaceId === ws).map(copy)),
     },
     messages: {
       get: async (ws, id) => {
@@ -143,6 +155,13 @@ export function createInMemoryClassification(): InMemoryClassification {
                 if (s.workspaceId === ws && scope.has(s.messageId)) draft.signals.delete(k);
               for (const s of signals)
                 draft.signals.set(`${s.workspaceId}/${s.messageId}/${s.kind}`, copy(s));
+              return ok(undefined);
+            },
+          },
+          topics: {
+            ...r.topics,
+            save: async (t) => {
+              draft.topics.set(`${t.workspaceId}/${t.id}`, copy(t));
               return ok(undefined);
             },
           },

@@ -1,5 +1,5 @@
-import type { Notification, Notifier } from "@pochimail/core/ports/notifier";
 import { type Check, check, registerContract } from "@pochimail/kernel/testing/contract";
+import type { Notification, Notifier } from "@pochimail/workflows/ports/notifier";
 import { expect } from "vitest";
 
 export interface NotifierHarness {

@@ -1,16 +1,16 @@
 import type { OAuthTokenSource } from "@pochimail/accounts/ports/oauth";
-import type { Command } from "@pochimail/core/domain/action";
+import type { Command } from "@pochimail/actions/model/action";
 import type {
   AppliedCommand,
-  MailProvider,
+  MailCommands,
   MailProviderCapabilities,
   MailProviderError,
-} from "@pochimail/core/ports/mail-provider";
+} from "@pochimail/actions/ports/mail-commands";
 import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
 import { Cancelled } from "@pochimail/kernel/errors";
 import type { AccountId } from "@pochimail/kernel/ids";
 import { err } from "@pochimail/kernel/result";
-import type { SyncCursor } from "@pochimail/mailbox/ports/mail-reader";
+import type { MailReader, SyncCursor } from "@pochimail/mailbox/ports/mail-reader";
 import type { RateLimitedClient } from "@pochimail/net/egress/rate-limit";
 import { GmailClient } from "./client.ts";
 import { BATCH_MODIFY_MAX, GmailCommands } from "./commands.ts";
@@ -33,7 +33,7 @@ export interface GmailProviderDeps extends Identity {
   readonly sync?: GmailSyncOptions;
 }
 
-export interface GmailProvider extends MailProvider {
+export interface GmailProvider extends MailReader<MailProviderError>, MailCommands {
   /** Subject and snippet by id, for a screen; fetched live, never stored. Not part of any port yet. */
   fetchDisplayFields(
     ids: readonly string[],

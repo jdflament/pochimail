@@ -1,4 +1,4 @@
-import type { DeviceName } from "@pochimail/core/ports/platform";
+import type { DeviceName } from "../platform-port.ts";
 
 const DEVICE_BY_OS: Readonly<Record<string, DeviceName>> = {
   darwin: "Mac",

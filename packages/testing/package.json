@@ -75,8 +75,10 @@
     "eval:update-baseline": "EVAL_UPDATE_BASELINE=1 EVAL_BASELINE=eval/baseline.small.json vitest run --config vitest.eval.config.ts"
   },
   "devDependencies": {
-    "@pochimail/core": "workspace:*",
+    "@pochimail/actions": "workspace:*",
+    "@pochimail/documents": "workspace:*",
     "@pochimail/typescript-config": "workspace:*",
+    "@pochimail/workflows": "workspace:*",
     "@types/node": "26.6.6",
     "typescript": "7.0.2",
     "vitest": "5.1.0"

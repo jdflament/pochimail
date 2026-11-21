@@ -10,16 +10,16 @@ describe("worker architecture", () => {
     const imports = importsOf(read("./handlers.ts"));
     for (const path of imports) {
       const allowed =
-        path.startsWith("@pochimail/core/use-cases/") ||
+        path.startsWith("@pochimail/workflows/use-cases/") ||
         path.startsWith("@pochimail/classification/use-cases/") ||
         path.startsWith("@pochimail/cleanup/use-cases/") ||
-        path === "@pochimail/core/ids" ||
+        path === "./manage-settings.ts" ||
         path === "@pochimail/accounts/model/account" ||
         path.startsWith("@pochimail/accounts/use-cases/") ||
-        path === "@pochimail/core/events/catalog" ||
+        path === "@pochimail/workflows/events" ||
         path === "@pochimail/kernel/ids" ||
         path === "@pochimail/pipeline/event-bus" ||
-        path === "@pochimail/core/ports/platform" ||
+        path === "../shared/platform-port.ts" ||
         path === "../shared/ipc/contract.ts" ||
         path === "../shared/ipc/server.ts";
       expect(allowed, `handlers.ts must not import ${path}`).toBe(true);

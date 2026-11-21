@@ -1,5 +1,5 @@
-import { deviceNameContract } from "@pochimail/testing/device-name-contract";
 import { describe, expect, it } from "vitest";
+import { deviceNameContract } from "../../test-support/device-name-contract.ts";
 import { createPlatformAdapter } from "../platform.ts";
 import { createRpcClient } from "./client.ts";
 import { serveRpc } from "./server.ts";

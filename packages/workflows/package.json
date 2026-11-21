@@ -1,0 +1,39 @@
+{
+  "name": "@pochimail/workflows",
+  "private": true,
+  "version": "0.0.0",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "exports": {
+    "./events": "./src/events.ts",
+    "./jobs/scan-pipeline": "./src/jobs/scan-pipeline.ts",
+    "./ports/mail-provider": "./src/ports/mail-provider.ts",
+    "./ports/notifier": "./src/ports/notifier.ts",
+    "./ports/unit-of-work": "./src/ports/unit-of-work.ts",
+    "./use-cases/run-incremental-sync": "./src/use-cases/run-incremental-sync.ts",
+    "./use-cases/run-scan": "./src/use-cases/run-scan.ts",
+    "./use-cases/scan-runner": "./src/use-cases/scan-runner.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc",
+    "lint": "biome check .",
+    "knip": "knip",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@pochimail/accounts": "workspace:*",
+    "@pochimail/actions": "workspace:*",
+    "@pochimail/classification": "workspace:*",
+    "@pochimail/cleanup": "workspace:*",
+    "@pochimail/documents": "workspace:*",
+    "@pochimail/kernel": "workspace:*",
+    "@pochimail/mailbox": "workspace:*",
+    "@pochimail/pipeline": "workspace:*",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@pochimail/typescript-config": "workspace:*",
+    "typescript": "7.0.2",
+    "vitest": "5.1.0"
+  }
+}

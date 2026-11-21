@@ -1,4 +1,3 @@
-import type { Transaction, UnitOfWork } from "@pochimail/core/ports/unit-of-work";
 import type { Clock } from "@pochimail/kernel/clock";
 import type { CancelSignal } from "@pochimail/kernel/common";
 import { Cancelled, StorageError } from "@pochimail/kernel/errors";
@@ -12,6 +11,7 @@ import { z } from "zod";
 import { exclusiveResult, type Storage } from "./open-storage.ts";
 import { accountIdOf, guardPayload } from "./payload-guard.ts";
 import { createSqliteRepositories, type MessageSearch } from "./sqlite-repositories.ts";
+import type { Transaction, UnitOfWork } from "./unit-of-work-types.ts";
 
 // Rows are parsed at the boundary. Events are loosely typed on purpose: the catalog (core) owns
 // their shape, this adapter only has to give back what it was given.

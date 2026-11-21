@@ -1,6 +1,5 @@
 import type { Account } from "@pochimail/accounts/model/account";
 import type { Classifier } from "@pochimail/classification/ports/classifier";
-import type { DeviceName } from "@pochimail/core/ports/platform";
 import type { Clock } from "@pochimail/kernel/clock";
 import { AccountId, WorkspaceId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
@@ -9,10 +8,11 @@ import type { Timer } from "@pochimail/pipeline/event-batching";
 import { createFixtureMailProvider } from "@pochimail/testing/fixture-mailbox/fixture-mail-provider";
 import { FIXTURE_NOW, generateMailbox } from "@pochimail/testing/fixture-mailbox/generator";
 import { createInMemoryJobQueue } from "@pochimail/testing/in-memory-job-queue";
-import { createInMemorySettingsStore } from "@pochimail/testing/in-memory-settings-store";
 import { createInMemoryUnitOfWork } from "@pochimail/testing/in-memory-store";
 import { DEMO_SEED, type DemoScale } from "../shared/demo.ts";
+import type { DeviceName } from "../shared/platform-port.ts";
 import type { WorkerAdapters } from "./app.ts";
+import { createInMemorySettingsStore } from "./in-memory-settings-store.ts";
 
 export interface FixtureAdapterOptions {
   readonly scale: DemoScale;

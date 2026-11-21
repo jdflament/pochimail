@@ -1,7 +1,7 @@
-import type { Command } from "@pochimail/core/domain/action";
-import type { MailProvider } from "@pochimail/core/ports/mail-provider";
-import type { Transaction, UnitOfWork } from "@pochimail/core/ports/unit-of-work";
+import type { Command } from "@pochimail/actions/model/action";
+import type { MailProvider } from "@pochimail/workflows/ports/mail-provider";
 import { describe, expectTypeOf, it } from "vitest";
+import type { Transaction, UnitOfWork } from "./uow-types.ts";
 
 // Compile-time tests: `pnpm typecheck` fails if any @ts-expect-error stops being an error.
 

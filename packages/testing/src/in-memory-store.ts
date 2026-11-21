@@ -1,9 +1,5 @@
+import type { ActionLog } from "@pochimail/actions/model/action";
 import { CATEGORIES, DEFAULT_CATEGORY } from "@pochimail/classification/model/category";
-import type { ActionLog } from "@pochimail/core/domain/action";
-import type { ReadRepositories, WriteRepositories } from "@pochimail/core/ports/repositories";
-import type { Transaction, UnitOfWork } from "@pochimail/core/ports/unit-of-work";
-import { mailboxFactsOver } from "@pochimail/core/read-models/mailbox-facts";
-import { signalFactsOver } from "@pochimail/core/read-models/signal-facts";
 import type { AsyncResult, CancelSignal, Page, PageRequest } from "@pochimail/kernel/common";
 import { Cancelled, NotFound, StorageError } from "@pochimail/kernel/errors";
 import type { WorkspaceId } from "@pochimail/kernel/ids";
@@ -13,6 +9,9 @@ import type { Message } from "@pochimail/mailbox/model/message";
 import type { OutboxEntry, OutboxRecord, OutboxStore } from "@pochimail/pipeline/outbox";
 import { eventSinkOver } from "@pochimail/pipeline/outbox-event-sink";
 import { copy, type Data, emptyData, key, removeAccount } from "./in-memory-store-data.ts";
+import { mailboxFactsOver } from "./read-models/mailbox-facts.ts";
+import { signalFactsOver } from "./read-models/signal-facts.ts";
+import type { ReadRepositories, Transaction, UnitOfWork, WriteRepositories } from "./uow-types.ts";
 
 function paginate<T>(sorted: readonly T[], page: PageRequest): Page<T> {
   const start = page.cursor === undefined ? 0 : Number(page.cursor);

@@ -1,8 +1,8 @@
+import { AUTONOMY_LEVELS } from "@pochimail/actions/policies/autonomy";
 import { categorySchema } from "@pochimail/classification/model/category";
-import { AUTONOMY_LEVELS } from "@pochimail/core/policies/autonomy";
-import { DEVICE_NAMES } from "@pochimail/core/ports/platform";
-import { CAPABILITIES } from "@pochimail/core/ports/settings-store";
 import { z } from "zod";
+import { DEVICE_NAMES } from "../platform-port.ts";
+import { CAPABILITIES } from "../settings.ts";
 
 /**
  * The typed contract every screen uses (ADR 0002, M4-01). Handlers backed by core use cases live in worker/handlers.ts (M4-02).

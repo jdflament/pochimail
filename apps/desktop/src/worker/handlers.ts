@@ -3,15 +3,15 @@ import type { ListAccounts } from "@pochimail/accounts/use-cases/list-accounts";
 import type { CountCategories } from "@pochimail/classification/use-cases/count-categories";
 import type { GetDigestStatus } from "@pochimail/cleanup/use-cases/get-digest-status";
 import type { GetOverview } from "@pochimail/cleanup/use-cases/get-overview";
-import type { DomainEvent } from "@pochimail/core/events/catalog";
-import type { DeviceName } from "@pochimail/core/ports/platform";
-import type { ManageSettings } from "@pochimail/core/use-cases/manage-settings";
-import type { ScanRunner } from "@pochimail/core/use-cases/scan-runner";
 import type { WorkspaceId } from "@pochimail/kernel/ids";
 import { AccountId } from "@pochimail/kernel/ids";
 import type { EventBus } from "@pochimail/pipeline/event-bus";
+import type { DomainEvent } from "@pochimail/workflows/events";
+import type { ScanRunner } from "@pochimail/workflows/use-cases/scan-runner";
 import type { EventOf, OutputOf } from "../shared/ipc/contract.ts";
 import type { Handlers } from "../shared/ipc/server.ts";
+import type { DeviceName } from "../shared/platform-port.ts";
+import type { ManageSettings } from "./manage-settings.ts";
 
 /**
  * What the handlers may touch: core use cases and the event bus, nothing else. No repositories, no adapters, no

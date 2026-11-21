@@ -1,6 +1,6 @@
-import { type Command, inverseOf } from "@pochimail/core/domain/action";
-import type { AppliedCommand, MailProviderError } from "@pochimail/core/ports/mail-provider";
-import { PartiallyApplied } from "@pochimail/core/ports/mail-provider";
+import { type Command, inverseOf } from "@pochimail/actions/model/action";
+import type { AppliedCommand, MailProviderError } from "@pochimail/actions/ports/mail-commands";
+import { PartiallyApplied } from "@pochimail/actions/ports/mail-commands";
 import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
 import { ProviderFailed } from "@pochimail/kernel/errors";
 import type { MessageId } from "@pochimail/kernel/ids";

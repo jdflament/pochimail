@@ -1,10 +1,9 @@
-import { type Command, inverseOf } from "@pochimail/core/domain/action";
+import { type Command, inverseOf } from "@pochimail/actions/model/action";
 import type {
   AppliedCommand,
-  MailProvider,
   MailProviderCapabilities,
   MailProviderError,
-} from "@pochimail/core/ports/mail-provider";
+} from "@pochimail/actions/ports/mail-commands";
 import {
   Cancelled,
   Conflict,
@@ -16,6 +15,7 @@ import { err, ok } from "@pochimail/kernel/result";
 import { createFaults, type Faults } from "@pochimail/kernel/testing/faults";
 import type { IncomingMessage } from "@pochimail/mailbox/model/message";
 import type { SyncCursor } from "@pochimail/mailbox/ports/mail-reader";
+import type { MailProvider } from "@pochimail/workflows/ports/mail-provider";
 import { readMailbox } from "./mailbox-reader.ts";
 
 /** What archive/label commands did to one message, kept in memory only. */

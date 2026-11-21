@@ -5,14 +5,6 @@ import { CountCategories } from "@pochimail/classification/use-cases/count-categ
 import { GetDigestStatus } from "@pochimail/cleanup/use-cases/get-digest-status";
 import { GetOverview } from "@pochimail/cleanup/use-cases/get-overview";
 import { RecordDigestReady } from "@pochimail/cleanup/use-cases/record-digest-ready";
-import { parseDomainEvent } from "@pochimail/core/events/catalog";
-import type { MailProvider } from "@pochimail/core/ports/mail-provider";
-import type { DeviceName } from "@pochimail/core/ports/platform";
-import type { SettingsStore } from "@pochimail/core/ports/settings-store";
-import type { UnitOfWork } from "@pochimail/core/ports/unit-of-work";
-import { ManageSettings } from "@pochimail/core/use-cases/manage-settings";
-import { RunScan } from "@pochimail/core/use-cases/run-scan";
-import { ScanRunner } from "@pochimail/core/use-cases/scan-runner";
 import type { Clock } from "@pochimail/kernel/clock";
 import type { WorkspaceId } from "@pochimail/kernel/ids";
 import type { Logger } from "@pochimail/logger/logger";
@@ -21,9 +13,17 @@ import { createInMemoryEventBus } from "@pochimail/pipeline/in-memory-event-bus"
 import type { JobQueue } from "@pochimail/pipeline/job-queue";
 import type { OutboxStore } from "@pochimail/pipeline/outbox";
 import { createOutboxRelay } from "@pochimail/pipeline/outbox-relay";
+import { parseDomainEvent } from "@pochimail/workflows/events";
+import type { MailProvider } from "@pochimail/workflows/ports/mail-provider";
+import type { WorkflowUnitOfWork as UnitOfWork } from "@pochimail/workflows/ports/unit-of-work";
+import { RunScan } from "@pochimail/workflows/use-cases/run-scan";
+import { ScanRunner } from "@pochimail/workflows/use-cases/scan-runner";
 import type { Handlers } from "../shared/ipc/server.ts";
+import type { DeviceName } from "../shared/platform-port.ts";
+import type { SettingsStore } from "../shared/settings.ts";
 import { createDigestTally } from "./digest-tally.ts";
 import { createHandlers } from "./handlers.ts";
+import { ManageSettings } from "./manage-settings.ts";
 
 /**
  * Everything the worker needs from the outside, as ports. The fixture bundle (dev/E2E) and M2's SQLite and real

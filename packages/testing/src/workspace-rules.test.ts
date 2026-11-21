@@ -36,13 +36,14 @@ describe("workspace rules (ADR 0001)", () => {
     expect(names).toEqual(
       [
         "@pochimail/accounts",
+        "@pochimail/actions",
         "@pochimail/ai",
         "@pochimail/ci",
         "@pochimail/classification",
         "@pochimail/cli",
         "@pochimail/cleanup",
-        "@pochimail/core",
         "@pochimail/db",
+        "@pochimail/documents",
         "@pochimail/desktop",
         "@pochimail/gmail",
         "@pochimail/graph",
@@ -54,6 +55,7 @@ describe("workspace rules (ADR 0001)", () => {
         "@pochimail/testing",
         "@pochimail/typescript-config",
         "@pochimail/ui",
+        "@pochimail/workflows",
       ].sort(),
     );
   });

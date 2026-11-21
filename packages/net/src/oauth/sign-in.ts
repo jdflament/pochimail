@@ -4,7 +4,7 @@ import {
   SignInCancelled,
 } from "@pochimail/accounts/errors";
 import type { ProviderKind } from "@pochimail/accounts/model/account";
-import type { AutonomyLevel } from "@pochimail/core/policies/autonomy";
+import type { AutonomyLevel } from "@pochimail/actions/policies/autonomy";
 import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
 import { ProviderFailed } from "@pochimail/kernel/errors";
 import { err, ok } from "@pochimail/kernel/result";

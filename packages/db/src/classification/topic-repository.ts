@@ -1,4 +1,4 @@
-import { topicSchema } from "@pochimail/core/domain/mail";
+import { topicSchema } from "@pochimail/classification/model/topic";
 import type { Database } from "better-sqlite3-multiple-ciphers";
 import { z } from "zod";
 import { find, guard, sqlHelpers } from "../shared/sql.ts";

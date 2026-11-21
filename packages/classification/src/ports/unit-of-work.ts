@@ -5,6 +5,7 @@ import type { Result } from "@pochimail/kernel/result";
 import type { DerivedReader, DerivedRepository } from "./derived-repository.ts";
 import type { MessageLabeler, MessageSource, SignalFactsSource } from "./message-source.ts";
 import type { SignalReader, SignalRepository } from "./signal-repository.ts";
+import type { TopicReader, TopicRepository } from "./topic-repository.ts";
 
 /** Only exists inside `ClassificationUnitOfWork.run`: the sole way to write derived rows or events. */
 export interface ClassificationTransaction {
@@ -12,6 +13,7 @@ export interface ClassificationTransaction {
     readonly derived: DerivedRepository;
     readonly signals: SignalRepository;
     readonly messages: MessageLabeler;
+    readonly topics: TopicRepository;
   };
   readonly events: EventSink;
 }
@@ -24,6 +26,7 @@ export interface ClassificationUnitOfWork {
   readonly reads: {
     readonly derived: DerivedReader;
     readonly signals: SignalReader;
+    readonly topics: TopicReader;
     readonly messages: MessageSource;
     readonly signalFacts: SignalFactsSource;
   };

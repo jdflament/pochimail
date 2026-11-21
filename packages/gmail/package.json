@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@pochimail/accounts": "workspace:*",
-    "@pochimail/core": "workspace:*",
+    "@pochimail/actions": "workspace:*",
     "@pochimail/kernel": "workspace:*",
     "@pochimail/mailbox": "workspace:*",
     "@pochimail/net": "workspace:*",

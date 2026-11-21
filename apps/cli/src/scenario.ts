@@ -1,8 +1,13 @@
 import type { Account } from "@pochimail/accounts/model/account";
+import { ActionId } from "@pochimail/actions/ids";
+import type { Action } from "@pochimail/actions/model/action";
+import { ApplyAction, type ApplyOutcome } from "@pochimail/actions/use-cases/apply-action";
+import { UndoAction, type UndoOutcome } from "@pochimail/actions/use-cases/undo-action";
 import {
   CATEGORIES,
   type Category,
   categoryOf,
+  PROTECTED_CATEGORIES,
   SIGNAL_KINDS,
   type SignalKind,
 } from "@pochimail/classification/model/category";
@@ -13,13 +18,6 @@ import {
   type MailboxSummary,
   SummarizeMailbox,
 } from "@pochimail/cleanup/use-cases/summarize-mailbox";
-import type { Action } from "@pochimail/core/domain/action";
-import { ActionId } from "@pochimail/core/ids";
-import { createScanPipeline } from "@pochimail/core/jobs/scan-pipeline";
-import { PROTECTED_CATEGORIES } from "@pochimail/core/policies/autonomy";
-import type { UnitOfWork } from "@pochimail/core/ports/unit-of-work";
-import { ApplyAction, type ApplyOutcome } from "@pochimail/core/use-cases/apply-action";
-import { UndoAction, type UndoOutcome } from "@pochimail/core/use-cases/undo-action";
 import type { IdGenerator } from "@pochimail/kernel/id-generator";
 import { AccountId, WorkspaceId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
@@ -39,6 +37,8 @@ import {
 import { readMailbox } from "@pochimail/testing/fixture-mailbox/mailbox-reader";
 import { createInMemoryJobQueue } from "@pochimail/testing/in-memory-job-queue";
 import { createInMemoryUnitOfWork } from "@pochimail/testing/in-memory-store";
+import { createScanPipeline } from "@pochimail/workflows/jobs/scan-pipeline";
+import type { WorkflowUnitOfWork as UnitOfWork } from "@pochimail/workflows/ports/unit-of-work";
 
 /** Same seed as the eval gate, so the demo and the eval describe the same mailbox. */
 export const SEED = 20261117;
@@ -233,6 +233,7 @@ export async function runScenario(options: ScenarioOptions): Promise<ScenarioRes
           authorization: {
             autonomy: "suggest" as const,
             categories,
+            protectedCategories: PROTECTED_CATEGORIES,
             confidence,
             userConfirmed: true,
           },

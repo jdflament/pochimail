@@ -1,6 +1,3 @@
-import type { ReadRepositories, WriteRepositories } from "@pochimail/core/ports/repositories";
-import { mailboxFactsOver } from "@pochimail/core/read-models/mailbox-facts";
-import { signalFactsOver } from "@pochimail/core/read-models/signal-facts";
 import type { AsyncResult } from "@pochimail/kernel/common";
 import type { StorageError } from "@pochimail/kernel/errors";
 import type { Message } from "@pochimail/mailbox/model/message";
@@ -17,6 +14,9 @@ import { createMessageRepository } from "./mailbox/message-repository.ts";
 import { createSearchRepository } from "./mailbox/search-repository.ts";
 import { createSenderRepository } from "./mailbox/sender-repository.ts";
 import { createThreadRepository } from "./mailbox/thread-repository.ts";
+import { mailboxFactsOver } from "./read-models/mailbox-facts.ts";
+import { signalFactsOver } from "./read-models/signal-facts.ts";
+import type { ReadRepositories, WriteRepositories } from "./unit-of-work-types.ts";
 
 /** Every repository's statements and logic, bound to one connection (synchronous). */
 export function createSqliteCore(db: Database) {

@@ -1,5 +1,5 @@
-import type { OperatingSystem, Platform } from "@pochimail/core/ports/platform";
 import { deviceNameFromOS } from "./ipc/device-name.ts";
+import type { OperatingSystem, Platform } from "./platform-port.ts";
 
 const OS: Readonly<Record<string, OperatingSystem>> = {
   darwin: "macos",

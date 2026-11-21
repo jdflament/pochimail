@@ -1,9 +1,9 @@
-import type { MailProvider } from "@pochimail/core/ports/mail-provider";
-import { PartiallyApplied } from "@pochimail/core/ports/mail-provider";
+import { PartiallyApplied } from "@pochimail/actions/ports/mail-commands";
 import { AuthExpired, ProviderFailed, RateLimited } from "@pochimail/kernel/errors";
 import type { MessageId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
 import type { SyncCursor } from "@pochimail/mailbox/ports/mail-reader";
+import type { MailProvider } from "@pochimail/workflows/ports/mail-provider";
 import { describe, expect, it } from "vitest";
 import { makeIncomingMessage } from "../fixtures.ts";
 import { createGmailHarness } from "./gmail-harness.ts";

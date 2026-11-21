@@ -94,7 +94,17 @@
       }
     },
     {
-      "includes": ["packages/core/**"],
+      "includes": [
+        "packages/accounts/**",
+        "packages/mailbox/**",
+        "packages/classification/**",
+        "packages/cleanup/**",
+        "packages/actions/**",
+        "packages/documents/**",
+        "packages/workflows/**",
+        "!**/testing/**",
+        "!**/*.test.ts"
+      ],
       "linter": {
         "rules": {
           "style": {
@@ -102,16 +112,16 @@
               "level": "error",
               "options": {
                 "paths": {
-                  "electron": "packages/core is pure TypeScript: no Electron (AGENTS.md \u00a73)."
+                  "electron": "Domain and workflow code is pure TypeScript: no Electron (AGENTS.md rule 10)."
                 },
                 "patterns": [
                   {
                     "group": ["node:*"],
-                    "message": "packages/core is pure TypeScript: no node:* (AGENTS.md \u00a73)."
+                    "message": "Domain and workflow code is pure TypeScript: no node:* (AGENTS.md rule 10)."
                   },
                   {
                     "group": ["electron/*"],
-                    "message": "packages/core is pure TypeScript: no Electron (AGENTS.md \u00a73)."
+                    "message": "Domain and workflow code is pure TypeScript: no Electron (AGENTS.md rule 10)."
                   }
                 ]
               }
@@ -178,14 +188,14 @@
         "packages/pipeline/src/outbox-relay.ts",
         "packages/pipeline/src/job-runner.ts",
         "packages/logger/src/redaction.ts",
-        "packages/core/src/use-cases/apply-action.ts",
+        "packages/actions/src/use-cases/apply-action.ts",
         "packages/cleanup/src/use-cases/build-digest.ts",
         "packages/classification/src/use-cases/classify-batch.ts",
         "packages/accounts/src/use-cases/connect-account.ts",
-        "packages/core/src/use-cases/run-incremental-sync.ts",
-        "packages/core/src/use-cases/scan-runner.ts",
+        "packages/workflows/src/use-cases/run-incremental-sync.ts",
+        "packages/workflows/src/use-cases/scan-runner.ts",
         "packages/cleanup/src/use-cases/summarize-mailbox.ts",
-        "packages/core/src/use-cases/undo-action.ts",
+        "packages/actions/src/use-cases/undo-action.ts",
         "packages/db/src/actions/action-log-repository.ts",
         "packages/db/src/classification/signal-repository.ts",
         "packages/db/src/mailbox/message-repository.ts",
@@ -208,8 +218,8 @@
     {
       "includes": [
         "apps/desktop/src/shared/ipc/secrets.ts",
-        "packages/core/src/use-cases/run-incremental-sync.ts",
-        "packages/core/src/use-cases/scan-runner.ts",
+        "packages/workflows/src/use-cases/run-incremental-sync.ts",
+        "packages/workflows/src/use-cases/scan-runner.ts",
         "packages/db/src/actions/action-log-repository.ts",
         "packages/db/src/classification/signal-repository.ts",
         "packages/testing/src/fixture-mailbox/generator.ts",

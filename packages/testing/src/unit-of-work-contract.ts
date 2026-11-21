@@ -1,10 +1,10 @@
-import type { UnitOfWork } from "@pochimail/core/ports/unit-of-work";
 import { StorageError } from "@pochimail/kernel/errors";
 import type { TopicId, WorkspaceId } from "@pochimail/kernel/ids";
 import { err, ok } from "@pochimail/kernel/result";
 import { type Check, check, registerContract } from "@pochimail/kernel/testing/contract";
 import type { OutboxEntry } from "@pochimail/pipeline/outbox";
 import { expect } from "vitest";
+import type { UnitOfWork } from "./uow-types.ts";
 
 export interface UnitOfWorkHarness {
   readonly uow: UnitOfWork;
