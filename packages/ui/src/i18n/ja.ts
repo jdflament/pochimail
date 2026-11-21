@@ -105,8 +105,26 @@ export const ja = {
   "welcome.openSource": entry("無料のオープンソース", []),
   "onboarding.progress": entry("ステップ{current}／{total}", ["current", "total"]),
 
-  "connect.title": entry("接続", []),
-  "connect.description": entry("始めるにはメールアカウントを接続してください。", []),
+  "connect.title": entry("メールアカウントを接続", []),
+  "connect.description": entry(
+    "プロバイダーでサインインします。Pochimailがパスワードを見ることはなく、アカウントは後から追加できます。",
+    [],
+  ),
+  "connect.google": entry("Googleで続ける", []),
+  "connect.microsoft": entry("Microsoftで続ける", []),
+  "connect.promises": entry("私の約束", []),
+  "connect.promise.local.title": entry("メールはこの{device}の外に出ません", ["device"]),
+  "connect.promise.local.body": entry(
+    "すべてこの端末内で分析します。サーバーもクラウドAIも使いません。",
+    [],
+  ),
+  "connect.promise.control.title": entry("私にできることはあなたが決めます", []),
+  "connect.promise.control.body": entry(
+    "次に、見るだけか、提案するか、自分で行動するかを選びます。",
+    [],
+  ),
+  "connect.promise.delete.title": entry("あなたの了承なしに削除しません", []),
+  "connect.promise.delete.body": entry("削除したメールはゴミ箱に移り、元に戻せます。", []),
 
   "setup.title": entry("設定", []),
   "setup.description": entry("Pochiにどのように手伝ってほしいか選んでください。", []),

@@ -19,7 +19,8 @@ export function OnboardingLayout() {
   const total = ONBOARDING_PATHS.length;
   const router = useRouter();
   // Setup shows Pochi inside its speech bubble and needs room for the card rows.
-  const isSetup = pathname === "/setup";
+  // Only Welcome shows Pochi up here; Connect and Setup need the width for their columns and rows.
+  const isWelcome = pathname === "/welcome";
   const content = useRef<HTMLDivElement>(null);
 
   // The previous screen's focused control unmounts on navigation: once the new screen has rendered,
@@ -59,10 +60,10 @@ export function OnboardingLayout() {
       <main
         className={cn(
           "mx-auto flex w-full flex-1 flex-col items-center justify-center gap-4.5 px-4 pt-2 pb-6 @phone:px-12 @phone:pt-4 @phone:pb-12",
-          isSetup ? "max-w-5xl" : "max-w-xl",
+          isWelcome ? "max-w-xl" : "max-w-5xl",
         )}
       >
-        {isSetup ? null : <Mascot size="lg" />}
+        {isWelcome ? <Mascot size="lg" /> : null}
         <div
           key={pathname}
           ref={content}

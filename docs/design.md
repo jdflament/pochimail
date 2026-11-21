@@ -32,7 +32,7 @@ Two families only, self-hosted, upright (never an italic display serif): **Newsr
 | UI | 14 / 500 | `text-ui` |
 | Caption | 13 / 400 | `text-caption` |
 | Overline, sidebar groups only | 12 / 600, uppercase | `text-overline` |
-| Line height | 1.1 headings, 1.55 copy | `leading-heading`, `leading-copy` |
+| Line height | 1.1 display, 1.55 copy, font default elsewhere | `leading-heading`, `leading-copy`, `leading-natural` |
 
 ## Responsive layout
 The window is resizable, minimum 720×560. One markup, restyled by width, never separate mobile markup.

@@ -35,7 +35,9 @@ export function WelcomePage() {
         <Button asChild size="lg" className="min-w-65 text-body">
           <Link to="/connect">{t("welcome.cta")}</Link>
         </Button>
-        <p className="text-caption text-foreground-tertiary">{t("welcome.openSource")}</p>
+        <p className="text-caption leading-natural text-foreground-tertiary">
+          {t("welcome.openSource")}
+        </p>
       </div>
     </div>
   );

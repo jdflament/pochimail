@@ -31,15 +31,6 @@ const fakeWorker = () => {
   return createRpcClient(fromDomPort(port1));
 };
 
-const waitFor = async <T,>(read: () => T | null): Promise<T> => {
-  for (let attempt = 0; attempt < 50; attempt += 1) {
-    const value = read();
-    if (value) return value;
-    await new Promise((resolve) => setTimeout(resolve, 100));
-  }
-  throw new Error("Welcome did not render");
-};
-
 const Onboarding = ({ path }: { path: string }) => {
   const client = fakeWorker();
   const router = createAppRouter(
@@ -51,33 +42,58 @@ const Onboarding = ({ path }: { path: string }) => {
 
 export default { title: "Screens/Onboarding", parameters: { layout: "fullscreen" } };
 
-// Guards: Welcome drifting from docs/design/screens/html/Main.html (oversized Pochi or headline, wrong button or step pill).
-// Runs in a real browser, where Tailwind has produced the computed sizes.
+// Guards: a screen drifting from docs/design/screens/html (Main.html, ConnectPromise.html): oversized Pochi or headline,
+// wrong button, row or step-pill size. Runs in a real browser, where Tailwind has produced the computed sizes.
+type Sizes = Record<string, number>;
+const checkSizes = async (
+  canvasElement: HTMLElement,
+  screen: string,
+  expected: Sizes,
+  read: (query: (selector: string) => Element | null) => Sizes,
+) => {
+  const query = (selector: string) => canvasElement.querySelector(selector);
+  for (let attempt = 0; attempt < 50 && !query("h1"); attempt += 1)
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  const measured = read(query);
+  if (JSON.stringify(measured) !== JSON.stringify(expected))
+    throw new Error(
+      `${screen} differs from its reference: ${JSON.stringify(measured)} vs ${JSON.stringify(expected)}`,
+    );
+};
+// A missing element reads as 0 and fails the check.
+const box = (element: Element | null, side: "width" | "height") =>
+  Math.round(element?.getBoundingClientRect()[side] ?? 0);
+const fontSize = (element: Element | null) =>
+  element ? parseFloat(getComputedStyle(element).fontSize) : 0;
+const phone = () => window.innerWidth < 560;
+
 export const Welcome = {
   render: () => <Onboarding path="/welcome" />,
-  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
-    const heading = await waitFor(() => canvasElement.querySelector("h1"));
-    // A missing element reads as width 0 and fails the check.
-    const width = (selector: string) =>
-      Math.round(canvasElement.querySelector(selector)?.getBoundingClientRect().width ?? 0);
-    const measured = {
-      headline: parseFloat(getComputedStyle(heading).fontSize),
-      pochi: width("[data-slot=mascot]"),
-      button: width("a[href='/connect']"),
-      stepPill: width("[aria-current=step]"),
-    };
-    const expected = {
-      headline: window.innerWidth < 560 ? 32 : 40,
-      pochi: 240,
-      button: 260,
-      stepPill: 20,
-    };
-    if (JSON.stringify(measured) !== JSON.stringify(expected)) {
-      throw new Error(
-        `Welcome differs from Main.html: ${JSON.stringify(measured)} vs ${JSON.stringify(expected)}`,
-      );
-    }
-  },
+  play: ({ canvasElement }: { canvasElement: HTMLElement }) =>
+    checkSizes(
+      canvasElement,
+      "Welcome",
+      { headline: phone() ? 32 : 40, pochi: 240, button: 260, stepPill: 20 },
+      (query) => ({
+        headline: fontSize(query("h1")),
+        pochi: box(query("[data-slot=mascot]"), "width"),
+        button: box(query("a[href='/connect']"), "width"),
+        stepPill: box(query("[aria-current=step]"), "width"),
+      }),
+    ),
 };
-export const Connect = { render: () => <Onboarding path="/connect" /> };
+export const Connect = {
+  render: () => <Onboarding path="/connect" />,
+  play: ({ canvasElement }: { canvasElement: HTMLElement }) =>
+    checkSizes(
+      canvasElement,
+      "Connect",
+      { headline: phone() ? 28 : 32, provider: 52, stepPill: 20 },
+      (query) => ({
+        headline: fontSize(query("h1")),
+        provider: box(query("main button"), "height"),
+        stepPill: box(query("[aria-current=step]"), "width"),
+      }),
+    ),
+};
 export const Setup = { render: () => <Onboarding path="/setup" /> };

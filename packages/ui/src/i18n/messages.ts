@@ -133,8 +133,26 @@ export const messages = {
   "welcome.openSource": entry("Free and open source", []),
   "onboarding.progress": entry("Step {current} of {total}", ["current", "total"]),
 
-  "connect.title": entry("Connect", []),
-  "connect.description": entry("Connect an email account to get started.", []),
+  "connect.title": entry("Connect an email account", []),
+  "connect.description": entry(
+    "Sign in with your provider. Pochimail never sees your password, and you can add more accounts later.",
+    [],
+  ),
+  "connect.google": entry("Continue with Google", []),
+  "connect.microsoft": entry("Continue with Microsoft", []),
+  "connect.promises": entry("My promises", []),
+  "connect.promise.local.title": entry("Your email stays on this {device}", ["device"]),
+  "connect.promise.local.body": entry(
+    "Everything is analyzed locally. No server, no cloud AI.",
+    [],
+  ),
+  "connect.promise.control.title": entry("You decide what I can do", []),
+  "connect.promise.control.body": entry(
+    "Next, you choose whether I only look, suggest, or act on my own.",
+    [],
+  ),
+  "connect.promise.delete.title": entry("Nothing is deleted without your OK", []),
+  "connect.promise.delete.body": entry("Deleted emails go to the Trash, and you can undo.", []),
 
   "setup.title": entry("Set up", []),
   "setup.description": entry("Choose how Pochi can help.", []),
