@@ -8,7 +8,7 @@ import type { CancelSignal } from "@pochimail/kernel/common";
 import { AuthExpired, Cancelled, Offline, ProviderFailed } from "@pochimail/kernel/errors";
 import { err, ok, type Result } from "@pochimail/kernel/result";
 import { type FetchLike, postForm } from "./http.ts";
-import type { OAuthProviderConfig } from "./providers.ts";
+import { clientCredentialsFrom, type OAuthProviderConfig } from "./providers.ts";
 import { expiresAtFrom, parseTokenResponse, scopeList } from "./token-response.ts";
 
 /** Refresh this long before the provider's expiry, so a request in flight never carries a dead token. */
@@ -17,6 +17,8 @@ export const TOKEN_EXPIRY_SKEW_MS = 60_000;
 export interface AccessTokenSourceOptions {
   readonly config: OAuthProviderConfig;
   readonly clientId: string;
+  /** Build-time config; the client secret is read from it for the refresh call only. */
+  readonly env: Readonly<Record<string, string | undefined>>;
   /** Where the account's refresh token lives; written by sign-in through `ConnectAccount`. */
   readonly secretKey: string;
   readonly secrets: SecretStore;
@@ -62,7 +64,7 @@ export const createAccessTokenSource = (options: AccessTokenSourceOptions): OAut
         {
           grant_type: "refresh_token",
           refresh_token: stored.value,
-          client_id: clientId,
+          ...clientCredentialsFrom(config, clientId, options.env),
         },
         signal,
       );

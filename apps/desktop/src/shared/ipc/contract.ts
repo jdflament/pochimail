@@ -98,7 +98,27 @@ const queries = {
   },
 } as const;
 
+/** Why a sign-in failed, as a closed set the screen can explain; never a provider message, URL or token. */
+export const CONNECT_FAILURES = ["not-configured", "no-address", "unknown"] as const;
+
+/** Sign-in waits for the person in their browser (five minutes, ADR 0007), so this one call outlives the default RPC timeout. */
+export const CONNECT_CALL_TIMEOUT_MS = 6 * 60_000;
+
 const mutations = {
+  /** Real sign-in in the system browser, run by the worker. The answer carries no token: those never leave it. */
+  "accounts.connect": {
+    input: z.object({ provider: z.literal("google") }),
+    output: z.discriminatedUnion("status", [
+      z.object({ status: z.literal("connected"), accountId }),
+      z.object({ status: z.literal("cancelled") }),
+      z.object({ status: z.literal("failed"), reason: z.enum(CONNECT_FAILURES) }),
+    ]),
+  },
+  /** Stops a sign-in that is waiting for the person; the waiting `accounts.connect` then answers `cancelled`. */
+  "accounts.cancelConnect": {
+    input: z.undefined(),
+    output: z.undefined(),
+  },
   "scan.start": {
     input: z.object({ accountId }),
     output: z.object({ jobId }),

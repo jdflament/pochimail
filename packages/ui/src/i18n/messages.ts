@@ -1,3 +1,5 @@
+import { connectMessages } from "./connect-messages.ts";
+
 /**
  * English is the default and the fallback. French and Japanese ship in v1 (P13, decided 2026-11-19);
  * every user-facing string lives in a catalog so more languages need no code changes.
@@ -133,9 +135,7 @@ export const messages = {
   "welcome.openSource": entry("Free and open source", []),
   "onboarding.progress": entry("Step {current} of {total}", ["current", "total"]),
 
-  "connect.title": entry("Connect", []),
-  "connect.description": entry("Connect an email account to get started.", []),
-
+  ...connectMessages.en,
   "setup.title": entry("Set up", []),
   "setup.description": entry("Choose how Pochi can help.", []),
   "setup.bubble": entry(

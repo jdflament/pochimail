@@ -5,10 +5,11 @@ import { demoScale } from "../shared/demo.ts";
 import type { Handlers } from "../shared/ipc/server.ts";
 import { serveRpc } from "../shared/ipc/server.ts";
 import { createPlatformAdapter } from "../shared/platform.ts";
+import { createAccountsRuntime } from "./accounts-runtime.ts";
 import { createWorkerApp } from "./app.ts";
 import { createModelHostClient } from "./model-host-client.ts";
 import { acceptPorts } from "./ports.ts";
-import { acceptStart } from "./start.ts";
+import { acceptStart, type WorkerStart } from "./start.ts";
 
 // Runs inside Electron's utilityProcess: the composition root of the app (M4-02).
 const platform = createPlatformAdapter(process.platform, process.cwd());
@@ -44,12 +45,16 @@ process.parentPort.on("message", (event) => {
   port.start();
 });
 
-// Until M2's real adapters exist only demo mode (fixture mailbox, dev/E2E) has data; otherwise every query answers empty.
+// The database key and the keychain-backed SecretStore come from main in one start message.
+const started = new Promise<WorkerStart>((resolve) => acceptStart(process.parentPort, resolve));
+
+// Only accounts are real so far; every other query answers empty until its adapters land. Demo mode (dev/E2E) has fixture data.
 const emptyHandlers: Handlers = {
   procedures: {
     "app.state": () => ({ status: "ready", hasConnectedAccount: false }),
     "device.name": () => platform.deviceName(),
     "accounts.list": () => [],
+    "accounts.connect": () => ({ status: "failed" as const, reason: "unknown" as const }),
     "overview.get": () => ({
       scanned: 0,
       toReview: 0,
@@ -78,10 +83,33 @@ const emptyHandlers: Handlers = {
   },
 };
 
+/** Demo mode has no Google: "connecting" answers with the first fixture account, so onboarding can be tried end to end. */
+const withDemoConnect = (demo: Handlers): Handlers => ({
+  ...demo,
+  procedures: {
+    ...demo.procedures,
+    "accounts.connect": async () => {
+      const [first] = (await demo.procedures["accounts.list"]?.(undefined)) ?? [];
+      return first === undefined
+        ? { status: "failed" as const, reason: "unknown" as const }
+        : { status: "connected" as const, accountId: first.id };
+    },
+  },
+});
+
+/** Real accounts over the empty answers; with no database key they stay empty. */
+const realHandlers = async (): Promise<Handlers> => {
+  const databasePath = process.env.POCHIMAIL_DATABASE_PATH;
+  if (databasePath === undefined) return emptyHandlers;
+  const accounts = createAccountsRuntime(await started, { databasePath, env: process.env });
+  if (accounts === undefined) return emptyHandlers;
+  return { ...emptyHandlers, procedures: { ...emptyHandlers.procedures, ...accounts } };
+};
+
 const scale = demoScale(process.env.POCHIMAIL_DEMO);
 const handlers: Promise<Handlers> =
   scale === undefined
-    ? Promise.resolve(emptyHandlers)
+    ? realHandlers()
     : import("./fixture-adapters.ts")
         .then(({ createFixtureAdapters }) =>
           createFixtureAdapters({
@@ -93,7 +121,7 @@ const handlers: Promise<Handlers> =
             newJobId: () => crypto.randomUUID(),
           }),
         )
-        .then((adapters) => createWorkerApp(adapters).handlers)
+        .then((adapters) => withDemoConnect(createWorkerApp(adapters).handlers))
         .catch(() => {
           logger.error("demo data failed to load", { operation: "start" });
           return emptyHandlers;
@@ -120,6 +148,3 @@ acceptPorts(process.parentPort, (port) => {
     dispose?.();
   };
 });
-
-// The database key and the keychain-backed SecretStore come from main; the composition root (M2-02) consumes them.
-acceptStart(process.parentPort, () => undefined);

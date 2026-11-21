@@ -28,6 +28,7 @@ runOAuthTokenSourceContract(async () => {
     source: createAccessTokenSource({
       config: { ...googleConfig, tokenUrl: server.tokenUrl },
       clientId: CLIENT_ID,
+      env: {},
       secretKey: SECRET_KEY,
       secrets,
       fetch: loopbackFetch,
@@ -48,6 +49,7 @@ const sourceWith = (fetch: FetchLike) => {
   return createAccessTokenSource({
     config: googleConfig,
     clientId: CLIENT_ID,
+    env: {},
     secretKey: SECRET_KEY,
     secrets,
     fetch,
@@ -99,6 +101,7 @@ it("two concurrent token calls share one refresh request (guards posting the sam
     const source = createAccessTokenSource({
       config: { ...googleConfig, tokenUrl: server.tokenUrl },
       clientId: CLIENT_ID,
+      env: {},
       secretKey: SECRET_KEY,
       secrets,
       fetch: loopbackFetch,
@@ -135,6 +138,7 @@ it("a failed rotated-token write keeps the fresh access token usable (guards thr
     const source = createAccessTokenSource({
       config: { ...googleConfig, tokenUrl: server.tokenUrl },
       clientId: CLIENT_ID,
+      env: {},
       secretKey: SECRET_KEY,
       secrets: lockedKeychain,
       fetch: loopbackFetch,
@@ -148,4 +152,22 @@ it("a failed rotated-token write keeps the fresh access token usable (guards thr
   } finally {
     await server.close();
   }
+});
+
+it("a refresh sends the client secret from env (guards a refresh that silently drops it)", async () => {
+  const server = await startFakeOAuthServer();
+  const secrets = createInMemorySecretStore();
+  await secrets.set(SECRET_KEY, server.issueRefreshToken());
+  const source = createAccessTokenSource({
+    config: { ...googleConfig, tokenUrl: server.tokenUrl },
+    clientId: CLIENT_ID,
+    env: { POCHIMAIL_GOOGLE_CLIENT_SECRET: "fake-client-secret" },
+    secretKey: SECRET_KEY,
+    secrets,
+    fetch: loopbackFetch,
+  });
+  expect((await source.token(new AbortController().signal)).ok).toBe(true);
+  const refresh = server.requests().find((r) => r.params.grant_type === "refresh_token");
+  expect(refresh?.params.client_secret).toBe("fake-client-secret");
+  await server.close();
 });

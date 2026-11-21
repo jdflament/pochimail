@@ -1,4 +1,5 @@
 import {
+  CONNECT_CALL_TIMEOUT_MS,
   type EventOf,
   type InputOf,
   type OutputOf,
@@ -114,10 +115,13 @@ export const createRpcClient = (transport: Transport, options: { timeoutMs?: num
         return Promise.reject(new RpcError("BAD_INPUT", `invalid input for ${name}`));
       return new Promise<OutputOf<N>>((resolve, reject) => {
         const id = nextId++;
-        const timer = setTimeout(() => {
-          pending.delete(id);
-          reject(new RpcError("TIMEOUT", "worker did not answer"));
-        }, timeoutMs);
+        const timer = setTimeout(
+          () => {
+            pending.delete(id);
+            reject(new RpcError("TIMEOUT", "worker did not answer"));
+          },
+          name === "accounts.connect" ? CONNECT_CALL_TIMEOUT_MS : timeoutMs,
+        );
         pending.set(id, {
           timer,
           reject,

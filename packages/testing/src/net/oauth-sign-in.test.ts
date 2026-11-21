@@ -214,3 +214,48 @@ it("a sign-in nobody answers times out and frees the port (guards a listener han
     await server.close();
   }
 });
+
+it("sends the client secret only in the code exchange and reads the signed-in address (guards a secret on the consent URL and a grant without an address)", async () => {
+  const server = await startFakeOAuthServer({ address: "Person@Example.test" });
+  try {
+    const opened: string[] = [];
+    const signIn = new OAuthSignIn({
+      env: { ...ENV, POCHIMAIL_GOOGLE_CLIENT_SECRET: "fake-client-secret" },
+      openBrowser: followRedirect(opened),
+      fetch: loopbackFetch,
+    });
+    const result = await signIn.execute(
+      { provider: "google", autonomy: "suggest", config: localConfig(server) },
+      live(),
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.address).toBe("person@example.test");
+    expect(opened.join(" ")).not.toContain("fake-client-secret");
+    const exchange = server.requests().find((r) => r.params.grant_type === "authorization_code");
+    expect(exchange?.params.client_secret).toBe("fake-client-secret");
+    expect(JSON.stringify(result.value)).not.toContain("fake-client-secret");
+  } finally {
+    await server.close();
+  }
+});
+
+it("omits the client secret when the build has none (guards an empty client_secret field)", async () => {
+  const server = await startFakeOAuthServer();
+  try {
+    const signIn = new OAuthSignIn({
+      env: ENV,
+      openBrowser: followRedirect([]),
+      fetch: loopbackFetch,
+    });
+    const result = await signIn.execute(
+      { provider: "google", autonomy: "suggest", config: localConfig(server) },
+      live(),
+    );
+    expect(result.ok && result.value.address).toBe(undefined);
+    const exchange = server.requests().find((r) => r.params.grant_type === "authorization_code");
+    expect(exchange?.params).not.toHaveProperty("client_secret");
+  } finally {
+    await server.close();
+  }
+});

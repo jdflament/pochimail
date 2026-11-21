@@ -1,3 +1,4 @@
+import { connectMessages } from "./connect-messages.ts";
 import { type Catalog, entry } from "./messages.ts";
 
 /**
@@ -123,9 +124,7 @@ export const fr = {
   "welcome.openSource": entry("Gratuit et open source", []),
   "onboarding.progress": entry("Étape {current} sur {total}", ["current", "total"]),
 
-  "connect.title": entry("Connexion", []),
-  "connect.description": entry("Connectez un compte email pour commencer.", []),
-
+  ...connectMessages.fr,
   "setup.title": entry("Configuration", []),
   "setup.description": entry("Choisissez comment Pochi peut vous aider.", []),
   "setup.bubble": entry(

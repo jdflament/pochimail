@@ -18,6 +18,8 @@ export interface OAuthProviderConfig {
   readonly accountProvider: ProviderKind;
   /** Build-time config key; official builds inject the id, forks register their own (ADR 0007). */
   readonly clientIdEnv: string;
+  /** Build-time config key of the client secret, for providers whose installed-app token call requires one. */
+  readonly clientSecretEnv?: string;
   readonly authorizeUrl: string;
   readonly tokenUrl: string;
   /** `null`: the provider documents no user-token revocation endpoint; removal deletes locally only. */
@@ -36,6 +38,7 @@ export const OAUTH_PROVIDER_CONFIGS: Readonly<Record<OAuthProviderId, OAuthProvi
     id: "google",
     accountProvider: "gmail",
     clientIdEnv: "POCHIMAIL_GOOGLE_CLIENT_ID",
+    clientSecretEnv: "POCHIMAIL_GOOGLE_CLIENT_SECRET",
     authorizeUrl: "https://accounts.google.com/o/oauth2/v2/auth",
     tokenUrl: "https://oauth2.googleapis.com/token",
     revokeUrl: "https://oauth2.googleapis.com/revoke",
@@ -81,6 +84,22 @@ export const clientIdFrom = (
 ): Result<string, MissingClientConfig> => {
   const clientId = env[config.clientIdEnv]?.trim() ?? "";
   return clientId.length === 0 ? err(new MissingClientConfig(config.id)) : ok(clientId);
+};
+
+/**
+ * The token-call fields that identify the app: the client id, plus the client secret when the provider
+ * needs one and the build has it. Read only here, for the token call; never logged or returned.
+ */
+export const clientCredentialsFrom = (
+  config: OAuthProviderConfig,
+  clientId: string,
+  env: Readonly<Record<string, string | undefined>>,
+): Readonly<Record<string, string>> => {
+  const secret =
+    config.clientSecretEnv === undefined ? "" : (env[config.clientSecretEnv]?.trim() ?? "");
+  return secret.length === 0
+    ? { client_id: clientId }
+    : { client_id: clientId, client_secret: secret };
 };
 
 /**
