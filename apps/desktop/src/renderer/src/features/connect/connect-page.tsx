@@ -1,10 +1,11 @@
+import googleLogo from "@pochimail/ui/assets/providers/google.svg";
+import microsoftLogo from "@pochimail/ui/assets/providers/microsoft.svg";
 import { useLocale, useT } from "@pochimail/ui/i18n/i18n-provider.tsx";
 import { deviceLabel } from "@pochimail/ui/i18n/locale.ts";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../../lib/query/keys.ts";
 import { useWorkerClient } from "../../lib/worker-context.tsx";
 import { ProviderButton } from "./provider-button.tsx";
-import { GoogleLogo, MicrosoftLogo } from "./provider-logos.tsx";
 
 const PROMISES = ["local", "control", "delete"] as const;
 
@@ -24,8 +25,12 @@ export function ConnectPage() {
         <h1 className="text-title-sm leading-natural @phone:text-title">{t("connect.title")}</h1>
         <p className="text-body leading-copy text-muted-foreground">{t("connect.description")}</p>
         <div className="flex flex-col gap-2.5">
-          <ProviderButton logo={<GoogleLogo />}>{t("connect.google")}</ProviderButton>
-          <ProviderButton logo={<MicrosoftLogo />}>{t("connect.microsoft")}</ProviderButton>
+          <ProviderButton logo={<img src={googleLogo} alt="" width={20} height={20} />}>
+            {t("connect.google")}
+          </ProviderButton>
+          <ProviderButton logo={<img src={microsoftLogo} alt="" width={18} height={18} />}>
+            {t("connect.microsoft")}
+          </ProviderButton>
         </div>
       </div>
       <div className="flex flex-[1_1_18.75rem] flex-col">

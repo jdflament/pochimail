@@ -1,3 +1,8 @@
+import { connectEn } from "./connect.ts";
+import { entry } from "./entry.ts";
+
+export { entry };
+
 /**
  * English is the default and the fallback. French and Japanese ship in v1 (P13, decided 2026-11-19);
  * every user-facing string lives in a catalog so more languages need no code changes.
@@ -10,12 +15,6 @@ export type UserLocale = (typeof USER_LOCALES)[number];
 export type Locale = UserLocale | "pseudo";
 
 export type MessageEntry = { readonly text: string; readonly params: readonly string[] };
-
-/** Catalog authoring helper: the tuple keeps `{placeholders}` typed (code: `{name, plural, ...}`). */
-export const entry = <const Params extends readonly string[]>(text: string, params: Params) => ({
-  text,
-  params,
-});
 
 /**
  * ICU-style patterns: `{name}`, `{name, number}`, `{name, date, long}` and
@@ -133,26 +132,7 @@ export const messages = {
   "welcome.openSource": entry("Free and open source", []),
   "onboarding.progress": entry("Step {current} of {total}", ["current", "total"]),
 
-  "connect.title": entry("Connect an email account", []),
-  "connect.description": entry(
-    "Sign in with your provider. Pochimail never sees your password, and you can add more accounts later.",
-    [],
-  ),
-  "connect.google": entry("Continue with Google", []),
-  "connect.microsoft": entry("Continue with Microsoft", []),
-  "connect.promises": entry("My promises", []),
-  "connect.promise.local.title": entry("Your email stays on this {device}", ["device"]),
-  "connect.promise.local.body": entry(
-    "Everything is analyzed locally. No server, no cloud AI.",
-    [],
-  ),
-  "connect.promise.control.title": entry("You decide what I can do", []),
-  "connect.promise.control.body": entry(
-    "Next, you choose whether I only look, suggest, or act on my own.",
-    [],
-  ),
-  "connect.promise.delete.title": entry("Nothing is deleted without your OK", []),
-  "connect.promise.delete.body": entry("Deleted emails go to the Trash, and you can undo.", []),
+  ...connectEn,
 
   "setup.title": entry("Set up", []),
   "setup.description": entry("Choose how Pochi can help.", []),

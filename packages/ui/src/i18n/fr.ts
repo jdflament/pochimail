@@ -1,3 +1,4 @@
+import { connectFr } from "./connect.ts";
 import { type Catalog, entry } from "./messages.ts";
 
 /**
@@ -123,29 +124,7 @@ export const fr = {
   "welcome.openSource": entry("Gratuit et open source", []),
   "onboarding.progress": entry("Étape {current} sur {total}", ["current", "total"]),
 
-  "connect.title": entry("Connecter un compte email", []),
-  "connect.description": entry(
-    "Connectez-vous auprès de votre fournisseur. Pochimail ne voit jamais votre mot de passe, et vous pourrez ajouter d’autres comptes plus tard.",
-    [],
-  ),
-  "connect.google": entry("Continuer avec Google", []),
-  "connect.microsoft": entry("Continuer avec Microsoft", []),
-  "connect.promises": entry("Mes promesses", []),
-  "connect.promise.local.title": entry("Vos emails restent sur votre {device}", ["device"]),
-  "connect.promise.local.body": entry(
-    "Tout est analysé localement. Aucun serveur, aucune IA dans le cloud.",
-    [],
-  ),
-  "connect.promise.control.title": entry("Vous décidez de ce que je peux faire", []),
-  "connect.promise.control.body": entry(
-    "Ensuite, vous choisissez si je regarde seulement, si je propose ou si j’agis seul.",
-    [],
-  ),
-  "connect.promise.delete.title": entry("Rien n’est supprimé sans votre accord", []),
-  "connect.promise.delete.body": entry(
-    "Les emails supprimés vont dans la corbeille, et vous pouvez annuler.",
-    [],
-  ),
+  ...connectFr,
 
   "setup.title": entry("Configuration", []),
   "setup.description": entry("Choisissez comment Pochi peut vous aider.", []),
