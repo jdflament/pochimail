@@ -97,13 +97,23 @@ const withDemoConnect = (demo: Handlers): Handlers => ({
   },
 });
 
-/** Real accounts over the empty answers; with no database key they stay empty. */
+/** The real app over the empty answers; with no database key they stay empty. */
 const realHandlers = async (): Promise<Handlers> => {
   const databasePath = process.env.POCHIMAIL_DATABASE_PATH;
   if (databasePath === undefined) return emptyHandlers;
-  const accounts = createAccountsRuntime(await started, { databasePath, env: process.env });
-  if (accounts === undefined) return emptyHandlers;
-  return { ...emptyHandlers, procedures: { ...emptyHandlers.procedures, ...accounts } };
+  const app = createAccountsRuntime(await started, {
+    databasePath,
+    env: process.env,
+    timer,
+    logger,
+    deviceName: () => platform.deviceName(),
+    classifier: modelHost.classifier,
+  });
+  if (app === undefined) return emptyHandlers;
+  return {
+    procedures: { ...emptyHandlers.procedures, ...app.handlers.procedures },
+    subscriptions: { ...emptyHandlers.subscriptions, ...app.handlers.subscriptions },
+  };
 };
 
 const scale = demoScale(process.env.POCHIMAIL_DEMO);

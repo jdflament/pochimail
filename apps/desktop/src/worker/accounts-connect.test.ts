@@ -58,6 +58,7 @@ const setup = async (options: {
     configs: { google: { ...config, revokeUrl: server.revokeUrl } },
   });
   const procedures = createAccountProcedures({
+    startScan: async () => undefined,
     revoke: (token, signal) => revoker.revoke("gmail", token, signal),
     workspaceId,
     uow: store.uow,

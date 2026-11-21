@@ -32,6 +32,7 @@
     "@pochimail/cleanup": "workspace:*",
     "@pochimail/core": "workspace:*",
     "@pochimail/db": "workspace:*",
+    "@pochimail/gmail": "workspace:*",
     "@pochimail/kernel": "workspace:*",
     "@pochimail/logger": "workspace:*",
     "@pochimail/net": "workspace:*",

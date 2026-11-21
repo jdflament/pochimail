@@ -263,6 +263,9 @@ importers:
       '@pochimail/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@pochimail/gmail':
+        specifier: workspace:*
+        version: link:../../packages/gmail
       '@pochimail/kernel':
         specifier: workspace:*
         version: link:../../packages/kernel
