@@ -5,11 +5,13 @@ import { createSuggestion } from "./model/suggestion.ts";
 import { digestContract } from "./testing/digest-contract.ts";
 import { digestStateContract } from "./testing/digest-state-contract.ts";
 import { createInMemoryCleanup } from "./testing/in-memory-cleanup.ts";
+import { createInMemoryDigestTally } from "./testing/in-memory-digest-tally.ts";
 import { ACCOUNT_1, makeSuggestion, WS_A } from "./testing/samples.ts";
 import { suggestionRepositoryContract } from "./testing/suggestion-repository-contract.ts";
 import { suggestionsContract } from "./testing/suggestions-contract.ts";
+import { GetDigestStatus } from "./use-cases/get-digest-status.ts";
 import { GetOverview } from "./use-cases/get-overview.ts";
-import { LatestDigest } from "./use-cases/latest-digest.ts";
+import { RecordDigestReady } from "./use-cases/record-digest-ready.ts";
 
 const fakeClock = () => {
   let at = Date.parse("2026-01-01T00:00:00.000Z");
@@ -23,7 +25,11 @@ const fakeClock = () => {
 
 digestStateContract(() => createInMemoryCleanup());
 suggestionRepositoryContract(() => createInMemoryCleanup());
-suggestionsContract(() => ({ ...createInMemoryCleanup(), clock: fakeClock() }));
+suggestionsContract(() => ({
+  ...createInMemoryCleanup(),
+  clock: fakeClock(),
+  protectedLabels: ["people"],
+}));
 digestContract(() => ({ ...createInMemoryCleanup(), clock: fakeClock() }));
 
 describe("Suggestion invariants", () => {
@@ -62,9 +68,10 @@ describe("GetOverview", () => {
   });
 });
 
-describe("LatestDigest", () => {
+describe("digest status", () => {
   it("counts a delivered event once (guards double counting on at-least-once delivery)", () => {
-    const latest = new LatestDigest();
+    const tally = createInMemoryDigestTally();
+    const record = new RecordDigestReady({ tally });
     const event = {
       id: "digest:acc-1:since",
       type: "DigestReady" as const,
@@ -73,8 +80,8 @@ describe("LatestDigest", () => {
       occurredAt: "2026-01-01T00:00:00.000Z",
       payload: { itemCount: 3 },
     };
-    latest.handle(event);
-    latest.handle(event);
-    expect(latest.get()).toEqual({ ready: true, itemCount: 3 });
+    record.execute(event);
+    record.execute(event);
+    expect(new GetDigestStatus({ tally }).execute()).toEqual({ ready: true, itemCount: 3 });
   });
 });

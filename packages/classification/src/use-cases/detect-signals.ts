@@ -74,9 +74,4 @@ export class DetectSignals {
     if (!committed.ok) return committed;
     return ok(rows);
   }
-
-  /** What an earlier `execute` stored, read back without evaluating anything again. */
-  async stored(request: DetectSignalsRequest): AsyncResult<readonly MessageSignal[], StorageError> {
-    return this.deps.uow.reads.signals.listForMessages(request.workspaceId, request.messageIds);
-  }
 }

@@ -2,8 +2,9 @@ import type { Account } from "@pochimail/accounts/model/account";
 import { ListAccounts } from "@pochimail/accounts/use-cases/list-accounts";
 import type { Classifier } from "@pochimail/classification/ports/classifier";
 import { CountCategories } from "@pochimail/classification/use-cases/count-categories";
+import { GetDigestStatus } from "@pochimail/cleanup/use-cases/get-digest-status";
 import { GetOverview } from "@pochimail/cleanup/use-cases/get-overview";
-import { LatestDigest } from "@pochimail/cleanup/use-cases/latest-digest";
+import { RecordDigestReady } from "@pochimail/cleanup/use-cases/record-digest-ready";
 import { parseDomainEvent } from "@pochimail/core/events/catalog";
 import type { MailProvider } from "@pochimail/core/ports/mail-provider";
 import type { DeviceName } from "@pochimail/core/ports/platform";
@@ -21,6 +22,7 @@ import type { JobQueue } from "@pochimail/pipeline/job-queue";
 import type { OutboxStore } from "@pochimail/pipeline/outbox";
 import { createOutboxRelay } from "@pochimail/pipeline/outbox-relay";
 import type { Handlers } from "../shared/ipc/server.ts";
+import { createDigestTally } from "./digest-tally.ts";
 import { createHandlers } from "./handlers.ts";
 
 /**
@@ -72,8 +74,9 @@ export function createWorkerApp(adapters: WorkerAdapters): WorkerApp {
   };
   void flush(); // events committed before a restart still go out
 
-  const latestDigest = new LatestDigest();
-  bus.subscribe("DigestReady", (event) => latestDigest.handle(event));
+  const tally = createDigestTally();
+  const recordDigest = new RecordDigestReady({ tally });
+  bus.subscribe("DigestReady", (event) => recordDigest.execute(event));
 
   const scans = new ScanRunner({
     uow,
@@ -98,7 +101,7 @@ export function createWorkerApp(adapters: WorkerAdapters): WorkerApp {
     listAccounts: new ListAccounts({ uow }),
     getOverview: new GetOverview({ uow, clock }),
     categories: new CountCategories({ uow }),
-    latestDigest,
+    digestStatus: new GetDigestStatus({ tally }),
     settings: new ManageSettings({ store: adapters.settings }),
     scans,
     events: bus,

@@ -16,6 +16,7 @@ import {
 import type { Action } from "@pochimail/core/domain/action";
 import { ActionId } from "@pochimail/core/ids";
 import { createScanPipeline } from "@pochimail/core/jobs/scan-pipeline";
+import { PROTECTED_CATEGORIES } from "@pochimail/core/policies/autonomy";
 import type { UnitOfWork } from "@pochimail/core/ports/unit-of-work";
 import { ApplyAction, type ApplyOutcome } from "@pochimail/core/use-cases/apply-action";
 import { UndoAction, type UndoOutcome } from "@pochimail/core/use-cases/undo-action";
@@ -179,7 +180,7 @@ export async function runScenario(options: ScenarioOptions): Promise<ScenarioRes
   };
 
   // 2. suggestions, then apply the reversible ones with the user's approval, then undo.
-  const propose = new ProposeSuggestions({ uow, clock });
+  const propose = new ProposeSuggestions({ uow, clock, protectedLabels: PROTECTED_CATEGORIES });
   const archive = new Map<
     AccountId,
     { action: Action; categories: Category[]; confidence: number }[]

@@ -17,7 +17,6 @@ import {
   SuggestionId,
 } from "../model/suggestion.ts";
 import { PROPOSABLE_LABELS } from "../policies/labels.ts";
-import { isProtectedLabel } from "../policies/protection.ts";
 import type { DecisionFact, MailboxFacts, MessageFact } from "../ports/mailbox-facts.ts";
 import type { CleanupUnitOfWork } from "../ports/unit-of-work.ts";
 
@@ -28,6 +27,8 @@ export const MIN_SENDER_MESSAGES = 3;
 export interface ProposeSuggestionsDeps {
   readonly uow: CleanupUnitOfWork;
   readonly clock: Clock;
+  /** Labels whose mail is never proposed for cleanup (brief §2, ADR 0012); the composition names them, classification owns the labels. */
+  readonly protectedLabels: readonly string[];
 }
 
 export interface ProposeSuggestionsRequest {
@@ -65,7 +66,7 @@ export class ProposeSuggestions {
     const proposals: Suggestion[] = [];
     for (const [sender, rows] of [...collected.value].sort(([a], [b]) => (a < b ? -1 : 1))) {
       if (rows.length < MIN_SENDER_MESSAGES) continue;
-      if (rows.some((r) => isProtectedLabel(r.message.category))) continue;
+      if (rows.some((r) => this.deps.protectedLabels.includes(r.message.category))) continue;
       if (!rows.every((r) => PROPOSABLE_LABELS.includes(r.message.category))) continue;
       const proposal = propose(rows);
       if (!proposal) continue;

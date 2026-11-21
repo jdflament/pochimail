@@ -10,6 +10,8 @@ import { ACCOUNT_1, live, type Seeder, type SeedRow, WS_A } from "./samples.ts";
 export interface SuggestionsHarness extends Seeder {
   readonly uow: CleanupUnitOfWork;
   readonly clock: Clock;
+  /** The labels the adapter under test treats as protected; the contract seeds "people". */
+  readonly protectedLabels: readonly string[];
 }
 
 const unopenedPromos = (extra: Partial<NonNullable<SeedRow["message"]>> = {}) =>
@@ -27,10 +29,11 @@ const unopenedPromos = (extra: Partial<NonNullable<SeedRow["message"]>> = {}) =>
 
 const suggestionsFor = async (h: SuggestionsHarness) =>
   unwrap(
-    await new ProposeSuggestions({ uow: h.uow, clock: h.clock }).execute(
-      { workspaceId: WS_A, accountId: ACCOUNT_1 },
-      live(),
-    ),
+    await new ProposeSuggestions({
+      uow: h.uow,
+      clock: h.clock,
+      protectedLabels: h.protectedLabels,
+    }).execute({ workspaceId: WS_A, accountId: ACCOUNT_1 }, live()),
   );
 
 export const suggestionsChecks: readonly Check<SuggestionsHarness>[] = [

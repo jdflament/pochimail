@@ -10,6 +10,7 @@ import { digestContract } from "@pochimail/cleanup/testing/digest-contract";
 import { digestStateContract } from "@pochimail/cleanup/testing/digest-state-contract";
 import { suggestionRepositoryContract } from "@pochimail/cleanup/testing/suggestion-repository-contract";
 import { suggestionsContract } from "@pochimail/cleanup/testing/suggestions-contract";
+import { PROTECTED_CATEGORIES } from "@pochimail/core/policies/autonomy";
 import type { ProviderError } from "@pochimail/kernel/errors";
 import { mailboxRepositoryContract } from "@pochimail/mailbox/testing/mailbox-repository-contract";
 import { createFakeClock } from "@pochimail/testing/fake-clock";
@@ -41,7 +42,12 @@ signalsContract(() => {
 suggestionRepositoryContract(uowHarness);
 suggestionsContract(() => {
   const h = harness();
-  return { ...cleanupSeeder(h), uow: h.uow, clock: createFakeClock() };
+  return {
+    ...cleanupSeeder(h),
+    uow: h.uow,
+    clock: createFakeClock(),
+    protectedLabels: PROTECTED_CATEGORIES,
+  };
 });
 digestContract(() => {
   const h = harness();

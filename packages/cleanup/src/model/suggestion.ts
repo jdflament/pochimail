@@ -16,8 +16,8 @@ export type SuggestionId = Brand<string, "SuggestionId">;
 export const SuggestionId = makeId<SuggestionId>("SuggestionId");
 export const suggestionIdSchema = brandedId(SuggestionId);
 
-/** What a recommendation can propose. Delete always means Trash after approval (ADR 0012). */
-export const RECOMMENDATION_KINDS = ["archive", "delete", "unsubscribe", "label", "save"] as const;
+/** What a recommendation proposes today; a kind is added with the use case that proposes it. */
+export const RECOMMENDATION_KINDS = ["archive", "unsubscribe"] as const;
 export const recommendationKindSchema = z.enum(RECOMMENDATION_KINDS);
 export type RecommendationKind = z.infer<typeof recommendationKindSchema>;
 

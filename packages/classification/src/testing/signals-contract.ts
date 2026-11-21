@@ -161,7 +161,9 @@ export const signalsChecks: readonly Check<SignalsHarness>[] = [
 
       h.clock.advance(DAY);
       const fresh = new DetectSignals({ uow: h.uow, clock: h.clock });
-      expect(unwrap(await fresh.stored(request))).toEqual(first);
+      expect(unwrap(await h.uow.reads.signals.listForMessages(WS_A, request.messageIds))).toEqual(
+        first,
+      );
 
       unwrap(await fresh.execute(request, live()));
       expect(JSON.stringify(((await h.snapshot()) as Record<string, unknown>).signals)).toBe(
