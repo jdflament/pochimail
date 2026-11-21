@@ -1,10 +1,10 @@
-import { DEFAULT_APP_SETTINGS } from "@pochimail/core/ports/settings-store";
 import { createLogger } from "@pochimail/logger/logger";
 import type { Timer } from "@pochimail/pipeline/event-batching";
 import { demoScale } from "../shared/demo.ts";
 import type { Handlers } from "../shared/ipc/server.ts";
 import { serveRpc } from "../shared/ipc/server.ts";
 import { createPlatformAdapter } from "../shared/platform.ts";
+import { DEFAULT_APP_SETTINGS } from "../shared/settings.ts";
 import { createAccountsRuntime } from "./accounts-runtime.ts";
 import { createWorkerApp } from "./app.ts";
 import { createModelHostClient } from "./model-host-client.ts";

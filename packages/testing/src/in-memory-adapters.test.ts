@@ -4,35 +4,25 @@ import { Offline, RateLimited, StorageError } from "@pochimail/kernel/errors";
 import type { WorkspaceId } from "@pochimail/kernel/ids";
 import { ok } from "@pochimail/kernel/result";
 import { describe, expect, it } from "vitest";
-import { blobStoreContract } from "./blob-store-contract.ts";
-import { exporterContract } from "./exporter-contract.ts";
 import { createFakeClock } from "./fake-clock.ts";
-import { createFakeExporter } from "./fake-exporter.ts";
 import { createFakeMailProvider } from "./fake-mail-provider.ts";
-import { createFakePlatform } from "./fake-platform.ts";
 import { createFakePowerMonitor } from "./fake-power-monitor.ts";
-import { createInMemoryBlobStore } from "./in-memory-blob-store.ts";
 import { createInMemoryJobQueue } from "./in-memory-job-queue.ts";
 import { createInMemoryNotifier } from "./in-memory-notifier.ts";
 import { createFakeScheduler } from "./in-memory-scheduler.ts";
-import { createInMemorySettingsStore } from "./in-memory-settings-store.ts";
 import { createInMemoryUnitOfWork } from "./in-memory-store.ts";
 import { jobQueueContract } from "./job-queue-contract.ts";
 import { mailProviderContract } from "./mail-provider-contract.ts";
 import { notifierContract } from "./notifier-contract.ts";
-import { platformContract } from "./platform-contract.ts";
 import { powerMonitorContract } from "./power-monitor-contract.ts";
 import { repositoriesContract } from "./repositories-contract.ts";
 import { schedulerContract } from "./scheduler-contract.ts";
-import { settingsStoreContract } from "./settings-store-contract.ts";
 import { unitOfWorkContract } from "./unit-of-work-contract.ts";
 
 // Every in-memory adapter must pass its own contract suite.
 unitOfWorkContract(createInMemoryUnitOfWork);
 repositoriesContract(createInMemoryUnitOfWork);
-blobStoreContract(createInMemoryBlobStore);
 secretStoreContract(createInMemorySecretStore);
-settingsStoreContract(createInMemorySettingsStore);
 jobQueueContract(() => {
   const clock = createFakeClock();
   return { queue: createInMemoryJobQueue(clock), clock };
@@ -49,14 +39,10 @@ powerMonitorContract(() => {
   const monitor = createFakePowerMonitor();
   return { monitor, change: (c) => monitor.set(c) };
 });
-platformContract(() => createFakePlatform({ os: "macos" }));
-platformContract(() => createFakePlatform({ os: "windows" }));
-platformContract(() => createFakePlatform({ os: "linux" }));
 mailProviderContract(() => {
   const provider = createFakeMailProvider({ pageSize: 2 });
   return { provider, deliver: (...m) => provider.deliver(...m) };
 });
-exporterContract(createFakeExporter);
 
 describe("controllable fakes", () => {
   const live = () => new AbortController().signal;

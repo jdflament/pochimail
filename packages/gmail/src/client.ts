@@ -1,5 +1,5 @@
 import type { OAuthTokenSource } from "@pochimail/accounts/ports/oauth";
-import type { MailProviderError } from "@pochimail/core/ports/mail-provider";
+import type { MailProviderError } from "@pochimail/actions/ports/mail-commands";
 import type { AsyncResult, CancelSignal } from "@pochimail/kernel/common";
 import {
   AuthExpired,

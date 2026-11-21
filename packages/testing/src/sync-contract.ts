@@ -5,13 +5,6 @@ import { AiUnavailable } from "@pochimail/classification/errors";
 import type { Category } from "@pochimail/classification/model/category";
 import type { Classifier } from "@pochimail/classification/ports/classifier";
 import { ClassifyBatch } from "@pochimail/classification/use-cases/classify-batch";
-import type { DomainEvent } from "@pochimail/core/events/catalog";
-import type { MailProvider } from "@pochimail/core/ports/mail-provider";
-import type { UnitOfWork } from "@pochimail/core/ports/unit-of-work";
-import {
-  INCREMENTAL_SYNC_JOB,
-  RunIncrementalSync,
-} from "@pochimail/core/use-cases/run-incremental-sync";
 import type { Clock } from "@pochimail/kernel/clock";
 import { AuthExpired, type ProviderError, RateLimited } from "@pochimail/kernel/errors";
 import type { IdGenerator } from "@pochimail/kernel/id-generator";
@@ -21,8 +14,15 @@ import { type Check, check, registerContract } from "@pochimail/kernel/testing/c
 import type { IncomingMessage } from "@pochimail/mailbox/model/message";
 import { MAX_SNIPPET_CHARS } from "@pochimail/mailbox/policies/sanitize-incoming";
 import type { OutboxEntry } from "@pochimail/pipeline/outbox";
+import type { DomainEvent } from "@pochimail/workflows/events";
+import type { MailProvider } from "@pochimail/workflows/ports/mail-provider";
+import {
+  INCREMENTAL_SYNC_JOB,
+  RunIncrementalSync,
+} from "@pochimail/workflows/use-cases/run-incremental-sync";
 import { expect } from "vitest";
 import { makeIncomingMessage, WS_A, WS_B } from "./fixtures.ts";
+import type { UnitOfWork } from "./uow-types.ts";
 
 /**
  * What the use-case suite needs from a mailbox + storage stack. The in-memory adapters (M1-09)

@@ -21,10 +21,11 @@
   },
   "dependencies": {
     "@pochimail/accounts": "workspace:*",
+    "@pochimail/actions": "workspace:*",
     "@pochimail/classification": "workspace:*",
     "@pochimail/cleanup": "workspace:*",
-    "@pochimail/core": "workspace:*",
     "@pochimail/kernel": "workspace:*",
-    "@pochimail/testing": "workspace:*"
+    "@pochimail/testing": "workspace:*",
+    "@pochimail/workflows": "workspace:*"
   }
 }

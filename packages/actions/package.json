@@ -1,0 +1,37 @@
+{
+  "name": "@pochimail/actions",
+  "private": true,
+  "version": "0.0.0",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "exports": {
+    "./errors": "./src/errors.ts",
+    "./events": "./src/events.ts",
+    "./ids": "./src/ids.ts",
+    "./model/action": "./src/model/action.ts",
+    "./policies/authorize": "./src/policies/authorize.ts",
+    "./policies/autonomy": "./src/policies/autonomy.ts",
+    "./ports/action-log-repository": "./src/ports/action-log-repository.ts",
+    "./ports/mail-commands": "./src/ports/mail-commands.ts",
+    "./ports/unit-of-work": "./src/ports/unit-of-work.ts",
+    "./use-cases/apply-action": "./src/use-cases/apply-action.ts",
+    "./use-cases/record-entry": "./src/use-cases/record-entry.ts",
+    "./use-cases/undo-action": "./src/use-cases/undo-action.ts",
+    "./testing/*": "./src/testing/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc",
+    "lint": "biome check .",
+    "knip": "knip",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@pochimail/kernel": "workspace:*",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@pochimail/typescript-config": "workspace:*",
+    "typescript": "7.0.2",
+    "vitest": "5.1.0"
+  }
+}

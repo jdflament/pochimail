@@ -29,7 +29,7 @@ Every workspace is `packages/<name>` or `apps/<name>`. Packages are of three kin
 | `pipeline` | event bus, jobs, outbox, scheduling |
 | `logger`, `ui`, `testing` | logging with redaction; design system; fixture mailbox and eval |
 
-**Imports:** domains → `kernel` and `zod`. `workflows` → domains. Adapters → the domains whose ports they implement, plus `kernel`, `logger`, and `net` for `gmail` and `graph`; `db` also implements the `pipeline` job-queue and outbox ports and `net` reuses its retry backoff; `testing` hosts the `net` contract suites. Apps compose all. Enforced by `.dependency-cruiser.cjs`.
+**Imports:** domains → `kernel` and `zod`. `workflows` → domains and `pipeline` (it assembles the scan as jobs; `pipeline` never imports a domain). Adapters → the domains whose ports they implement, plus `kernel`, `logger`, and `net` for `gmail` and `graph`; `db` also implements the `pipeline` job-queue and outbox ports and `net` reuses its retry backoff; `testing` hosts the `net` contract suites. Apps compose all. Enforced by `.dependency-cruiser.cjs`.
 
 ## Processes
 | Process | Does |
@@ -49,10 +49,9 @@ Every workspace is `packages/<name>` or `apps/<name>`. Packages are of three kin
 6. **workflows** chain each step; **pipeline** runs them as jobs with batching, retries and an outbox.
 
 ## Start reading
-Accounts, mailbox, classification and cleanup live in their packages; the rest of the domain code is still in `packages/core` ([ADR 0015](docs/adr/0015-bounded-context-packages-and-quality-gates.md) splits them).
 - Use case: `packages/accounts/src/use-cases/connect-account.ts`
 - A port and its contract suite: `packages/accounts/src/ports/secret-store.ts` and `packages/accounts/src/testing/secret-store-contract.ts`
-- The scan flow: `packages/core/src/use-cases/run-scan.ts` and `packages/core/src/jobs/scan-pipeline.ts`
+- The scan flow: `packages/workflows/src/use-cases/run-scan.ts` and `packages/workflows/src/jobs/scan-pipeline.ts`
 - IPC: `apps/desktop/src/shared/ipc/`
 - Boundaries: `.dependency-cruiser.cjs`
 

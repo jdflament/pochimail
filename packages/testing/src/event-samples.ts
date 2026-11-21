@@ -1,4 +1,4 @@
-import type { DomainEvent } from "@pochimail/core/events/catalog";
+import type { DomainEvent } from "@pochimail/workflows/events";
 
 // Fake data only. Cast once: branded IDs are validated by the catalog schema on publish.
 const base = (id: string) => ({

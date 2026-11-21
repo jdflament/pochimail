@@ -1,5 +1,5 @@
-import { blobStoreContract } from "@pochimail/testing/blob-store-contract";
-import { createInMemoryBlobStore } from "@pochimail/testing/in-memory-blob-store";
+import { blobStoreContract } from "@pochimail/documents/testing/blob-store-contract";
+import { createInMemoryBlobStore } from "@pochimail/documents/testing/in-memory-blob-store";
 import { createInMemoryUnitOfWork } from "@pochimail/testing/in-memory-store";
 import { repositoriesContract } from "@pochimail/testing/repositories-contract";
 import { unitOfWorkContract } from "@pochimail/testing/unit-of-work-contract";

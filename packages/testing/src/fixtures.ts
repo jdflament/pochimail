@@ -1,7 +1,7 @@
 import type { Account } from "@pochimail/accounts/model/account";
-import type { ActionLog } from "@pochimail/core/domain/action";
-import type { Topic } from "@pochimail/core/domain/mail";
-import type { ActionId, ActionLogId } from "@pochimail/core/ids";
+import type { ActionId, ActionLogId } from "@pochimail/actions/ids";
+import type { ActionLog } from "@pochimail/actions/model/action";
+import type { Topic } from "@pochimail/classification/model/topic";
 import type { AccountId, MessageId, ThreadId, TopicId, WorkspaceId } from "@pochimail/kernel/ids";
 import type { IncomingMessage } from "@pochimail/mailbox/model/message";
 import type { SenderStats } from "@pochimail/mailbox/model/sender-stats";

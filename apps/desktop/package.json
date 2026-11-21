@@ -28,9 +28,9 @@
   "devDependencies": {
     "@electron/fuses": "2.1.3",
     "@pochimail/accounts": "workspace:*",
+    "@pochimail/actions": "workspace:*",
     "@pochimail/classification": "workspace:*",
     "@pochimail/cleanup": "workspace:*",
-    "@pochimail/core": "workspace:*",
     "@pochimail/db": "workspace:*",
     "@pochimail/gmail": "workspace:*",
     "@pochimail/kernel": "workspace:*",
@@ -40,6 +40,7 @@
     "@pochimail/testing": "workspace:*",
     "@pochimail/typescript-config": "workspace:*",
     "@pochimail/ui": "workspace:*",
+    "@pochimail/workflows": "workspace:*",
     "@rolldown/plugin-babel": "0.3.1",
     "@tailwindcss/vite": "4.3.5",
     "@tanstack/react-query": "5.90.21",

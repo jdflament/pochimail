@@ -1,7 +1,7 @@
 import { accountRepositoryContract } from "@pochimail/accounts/testing/account-repository-contract";
 import { createInMemorySecretStore } from "@pochimail/accounts/testing/in-memory-secret-store";
 import { AiUnavailable } from "@pochimail/classification/errors";
-import type { Category } from "@pochimail/classification/model/category";
+import { type Category, PROTECTED_CATEGORIES } from "@pochimail/classification/model/category";
 import { derivedContract } from "@pochimail/classification/testing/derived-contract";
 import { createGroundTruthClassifier } from "@pochimail/classification/testing/ground-truth-classifier";
 import { signalRepositoryContract } from "@pochimail/classification/testing/signal-repository-contract";
@@ -10,7 +10,6 @@ import { digestContract } from "@pochimail/cleanup/testing/digest-contract";
 import { digestStateContract } from "@pochimail/cleanup/testing/digest-state-contract";
 import { suggestionRepositoryContract } from "@pochimail/cleanup/testing/suggestion-repository-contract";
 import { suggestionsContract } from "@pochimail/cleanup/testing/suggestions-contract";
-import { PROTECTED_CATEGORIES } from "@pochimail/core/policies/autonomy";
 import type { ProviderError } from "@pochimail/kernel/errors";
 import { mailboxRepositoryContract } from "@pochimail/mailbox/testing/mailbox-repository-contract";
 import { createFakeClock } from "@pochimail/testing/fake-clock";

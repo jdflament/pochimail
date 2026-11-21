@@ -3,8 +3,6 @@ import { createInMemorySecretStore } from "@pochimail/accounts/testing/in-memory
 import { accountSecretKey, ConnectAccount } from "@pochimail/accounts/use-cases/connect-account";
 import { MarkAccountNeedsReauth } from "@pochimail/accounts/use-cases/mark-account-needs-reauth";
 import { RemoveAccount } from "@pochimail/accounts/use-cases/remove-account";
-import { domainEventSchema } from "@pochimail/core/events/catalog";
-import { RunIncrementalSync } from "@pochimail/core/use-cases/run-incremental-sync";
 import { AuthExpired, Cancelled } from "@pochimail/kernel/errors";
 import { oauthProviderConfig, scopeUpgradeNeeded } from "@pochimail/net/oauth/providers";
 import { createOAuthRevoker } from "@pochimail/net/oauth/revoke";
@@ -15,6 +13,8 @@ import { startFakeOAuthServer } from "@pochimail/testing/fake-oauth-server";
 import { makeIncomingMessage, WS_A } from "@pochimail/testing/fixtures";
 import { createInMemoryUnitOfWork } from "@pochimail/testing/in-memory-store";
 import { loopbackFetch } from "@pochimail/testing/loopback-fetch";
+import { domainEventSchema } from "@pochimail/workflows/events";
+import { RunIncrementalSync } from "@pochimail/workflows/use-cases/run-incremental-sync";
 import { expect, it } from "vitest";
 import { createFakeClock } from "../fake-clock.ts";
 

@@ -1,0 +1,31 @@
+{
+  "name": "@pochimail/documents",
+  "private": true,
+  "version": "0.0.0",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "exports": {
+    "./events": "./src/events.ts",
+    "./ids": "./src/ids.ts",
+    "./model/attachment": "./src/model/attachment.ts",
+    "./ports/blob-store": "./src/ports/blob-store.ts",
+    "./ports/exporter": "./src/ports/exporter.ts",
+    "./testing/*": "./src/testing/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc",
+    "lint": "biome check .",
+    "knip": "knip",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@pochimail/kernel": "workspace:*",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@pochimail/typescript-config": "workspace:*",
+    "@types/node": "26.6.6",
+    "typescript": "7.0.2",
+    "vitest": "5.1.0"
+  }
+}

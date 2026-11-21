@@ -1,7 +1,7 @@
-import { parseDomainEvent } from "@pochimail/core/events/catalog";
 import { createLogger } from "@pochimail/logger/logger";
 import { createEventBatcher } from "@pochimail/pipeline/event-batching";
 import { createInMemoryEventBus } from "@pochimail/pipeline/in-memory-event-bus";
+import { parseDomainEvent } from "@pochimail/workflows/events";
 import { describe, expect, it } from "vitest";
 import { eventBusContract } from "./event-bus-contract.ts";
 import { sampleEvent } from "./event-samples.ts";

@@ -32,21 +32,21 @@ const lint = (path: string, source: string) => {
 };
 
 describe("lint rules (AGENTS.md §3, §4)", () => {
-  it("rejects node:* imports in packages/core (the core must stay pure)", () => {
+  it("rejects node:* imports in packages/actions (domain code must stay pure)", () => {
     expect(
-      lint("packages/core/src/a.ts", 'import fs from "node:fs";\nexport const x = fs;\n').failed,
+      lint("packages/actions/src/a.ts", 'import fs from "node:fs";\nexport const x = fs;\n').failed,
     ).toBe(true);
   });
 
-  it("rejects electron imports in packages/core", () => {
+  it("rejects electron imports in packages/actions", () => {
     expect(
-      lint("packages/core/src/b.ts", 'import { app } from "electron";\nexport const x = app;\n')
+      lint("packages/actions/src/b.ts", 'import { app } from "electron";\nexport const x = app;\n')
         .failed,
     ).toBe(true);
   });
 
-  it("accepts clean code in packages/core, and node:* outside it (the rule is scoped, not global)", () => {
-    expect(lint("packages/core/src/c.ts", "export const x = 1;\n").failed).toBe(false);
+  it("accepts clean code in packages/actions, and node:* outside it (the rule is scoped, not global)", () => {
+    expect(lint("packages/actions/src/c.ts", "export const x = 1;\n").failed).toBe(false);
     expect(
       lint("packages/db/src/d.ts", 'import fs from "node:fs";\nexport const x = fs;\n').failed,
     ).toBe(false);

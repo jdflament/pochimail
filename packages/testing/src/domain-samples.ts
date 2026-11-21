@@ -1,7 +1,7 @@
 import { PROVIDER_KINDS } from "@pochimail/accounts/model/account";
+import { ACTION_KINDS } from "@pochimail/actions/model/action";
 import { CATEGORIES, SIGNAL_KINDS } from "@pochimail/classification/model/category";
 import { RECOMMENDATION_KINDS } from "@pochimail/cleanup/model/suggestion";
-import { ACTION_KINDS } from "@pochimail/core/domain/action";
 
 // Fake data only: every address is on example.com, every text is invented.
 

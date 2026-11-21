@@ -13,6 +13,8 @@ export const CATEGORIES = [
 ] as const;
 export const categorySchema = z.enum(CATEGORIES);
 export type Category = z.infer<typeof categorySchema>;
+/** People mail is never touched without explicit approval (brief §2 invariants); the composition passes this to cleanup and actions. */
+export const PROTECTED_CATEGORIES: readonly Category[] = ["people"];
 /** A message that arrives unclassified is filed here until the classifier says otherwise. */
 export const DEFAULT_CATEGORY: Category = "notifications";
 /** Narrows a stored message's opaque label (the mailbox does not know the closed set). */

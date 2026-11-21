@@ -1,4 +1,4 @@
-import { actionLogSchema } from "@pochimail/core/domain/action";
+import { actionLogSchema } from "@pochimail/actions/model/action";
 import type { Database } from "better-sqlite3-multiple-ciphers";
 import type { z } from "zod";
 import { decodeCursor, page } from "../shared/paging.ts";

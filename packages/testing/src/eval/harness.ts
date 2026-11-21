@@ -8,10 +8,10 @@ import {
 import type { Classifier } from "@pochimail/classification/ports/classifier";
 import { ClassifyBatch } from "@pochimail/classification/use-cases/classify-batch";
 import { DetectSignals } from "@pochimail/classification/use-cases/detect-signals";
-import { RunIncrementalSync } from "@pochimail/core/use-cases/run-incremental-sync";
 import { AccountId, MessageId, WorkspaceId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
 import type { Message } from "@pochimail/mailbox/model/message";
+import { RunIncrementalSync } from "@pochimail/workflows/use-cases/run-incremental-sync";
 import { createFakeClock } from "../fake-clock.ts";
 import { createFixtureMailProvider } from "../fixture-mailbox/fixture-mail-provider.ts";
 import { FIXTURE_NOW, type GeneratedMailbox } from "../fixture-mailbox/generator.ts";

@@ -1,9 +1,9 @@
 import type { Account } from "@pochimail/accounts/model/account";
+import type { ActionLog } from "@pochimail/actions/model/action";
 import type { DerivedMessage } from "@pochimail/classification/model/derived";
 import type { StoredSignal } from "@pochimail/classification/model/signal";
+import type { Topic } from "@pochimail/classification/model/topic";
 import type { Suggestion } from "@pochimail/cleanup/model/suggestion";
-import type { ActionLog } from "@pochimail/core/domain/action";
-import type { Topic } from "@pochimail/core/domain/mail";
 import type { WorkspaceId } from "@pochimail/kernel/ids";
 import type { Message } from "@pochimail/mailbox/model/message";
 import type { SenderStats } from "@pochimail/mailbox/model/sender-stats";

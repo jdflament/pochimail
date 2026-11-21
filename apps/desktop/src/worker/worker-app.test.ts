@@ -8,7 +8,6 @@ import { createFakeTimer } from "@pochimail/testing/fake-timer";
 import { generateMailbox, MAILBOX_SCALES } from "@pochimail/testing/fixture-mailbox/generator";
 import { ACCOUNT_1, makeAccount, makeIncomingMessage, WS_A } from "@pochimail/testing/fixtures";
 import { createInMemoryJobQueue } from "@pochimail/testing/in-memory-job-queue";
-import { createInMemorySettingsStore } from "@pochimail/testing/in-memory-settings-store";
 import { createInMemoryUnitOfWork } from "@pochimail/testing/in-memory-store";
 import { describe, expect, it, vi } from "vitest";
 import { DEMO_SEED } from "../shared/demo.ts";
@@ -18,6 +17,7 @@ import { serveRpc } from "../shared/ipc/server.ts";
 import { fromDomPort } from "../shared/ipc/transport.ts";
 import { createWorkerApp, type WorkerAdapters } from "./app.ts";
 import { createFixtureAdapters } from "./fixture-adapters.ts";
+import { createInMemorySettingsStore } from "./in-memory-settings-store.ts";
 
 const silent = createLogger({ sink: { write: () => {} } });
 const mailbox = generateMailbox({ seed: DEMO_SEED, scale: "small" });

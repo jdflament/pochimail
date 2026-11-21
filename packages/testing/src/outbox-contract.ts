@@ -1,4 +1,3 @@
-import type { UnitOfWork } from "@pochimail/core/ports/unit-of-work";
 import { StorageError } from "@pochimail/kernel/errors";
 import type { EventEnvelope } from "@pochimail/kernel/event";
 import type { TopicId, WorkspaceId } from "@pochimail/kernel/ids";
@@ -9,6 +8,7 @@ import type { OutboxEntry, OutboxStore } from "@pochimail/pipeline/outbox";
 import { createOutboxRelay } from "@pochimail/pipeline/outbox-relay";
 import { describe, expect, it } from "vitest";
 import { sampleEvent } from "./event-samples.ts";
+import type { UnitOfWork } from "./uow-types.ts";
 
 export interface OutboxContractHarness {
   /** Transactions whose outbox appends land in `store` on commit. */

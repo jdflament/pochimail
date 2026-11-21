@@ -1,11 +1,11 @@
 import type { OAuthTokenSource } from "@pochimail/accounts/ports/oauth";
-import type { MailProvider } from "@pochimail/core/ports/mail-provider";
 import { createGmailProvider, type GmailProvider } from "@pochimail/gmail/provider";
 import { ok } from "@pochimail/kernel/result";
 import type { IncomingMessage } from "@pochimail/mailbox/model/message";
 import { egressPolicy } from "@pochimail/net/egress/allowlist";
 import { createHttpClient } from "@pochimail/net/egress/http-client";
 import { createRateLimitedClient } from "@pochimail/net/egress/rate-limit";
+import type { MailProvider } from "@pochimail/workflows/ports/mail-provider";
 import { createFakeClock } from "../fake-clock.ts";
 import { createFakeGmailServer, type FakeGmailServer } from "../fake-gmail-server.ts";
 import { ACCOUNT_1, WS_A } from "../fixtures.ts";

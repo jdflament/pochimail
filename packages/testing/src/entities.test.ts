@@ -1,11 +1,11 @@
 import { accountSchema } from "@pochimail/accounts/model/account";
+import { actionLogSchema, actionSchema } from "@pochimail/actions/model/action";
 import {
   CATEGORIES,
   categoryOf,
   categorySchema,
   signalKindSchema,
 } from "@pochimail/classification/model/category";
-import { actionLogSchema, actionSchema } from "@pochimail/core/domain/action";
 import { incomingMessageSchema, messageSchema } from "@pochimail/mailbox/model/message";
 import { describe, expect, it } from "vitest";
 import { rng, sampleBuilders } from "./domain-samples.ts";
