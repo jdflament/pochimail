@@ -5,6 +5,7 @@ import { createSqliteUnitOfWork } from "@pochimail/db/sqlite-unit-of-work";
 import { WorkspaceId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
 import { platformFetch } from "@pochimail/net/oauth/http";
+import { createOAuthRevoker } from "@pochimail/net/oauth/revoke";
 import { OAuthSignIn } from "@pochimail/net/oauth/sign-in";
 import { createAccountProcedures } from "./account-procedures.ts";
 import type { WorkerStart } from "./start.ts";
@@ -34,7 +35,9 @@ export const createAccountsRuntime = (
     openBrowser: start.openBrowser,
     fetch: platformFetch,
   });
+  const revoker = createOAuthRevoker({ fetch: platformFetch });
   return createAccountProcedures({
+    revoke: (token, signal) => revoker.revoke("gmail", token, signal),
     workspaceId: LOCAL_WORKSPACE,
     uow,
     connectAccount: new ConnectAccount({

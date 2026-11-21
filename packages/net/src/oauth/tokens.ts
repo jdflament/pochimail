@@ -18,7 +18,7 @@ export interface AccessTokenSourceOptions {
   readonly config: OAuthProviderConfig;
   readonly clientId: string;
   /** Build-time config; the client secret is read from it for the refresh call only. */
-  readonly env?: Readonly<Record<string, string | undefined>>;
+  readonly env: Readonly<Record<string, string | undefined>>;
   /** Where the account's refresh token lives; written by sign-in through `ConnectAccount`. */
   readonly secretKey: string;
   readonly secrets: SecretStore;
@@ -64,7 +64,7 @@ export const createAccessTokenSource = (options: AccessTokenSourceOptions): OAut
         {
           grant_type: "refresh_token",
           refresh_token: stored.value,
-          ...clientCredentialsFrom(config, clientId, options.env ?? {}),
+          ...clientCredentialsFrom(config, clientId, options.env),
         },
         signal,
       );

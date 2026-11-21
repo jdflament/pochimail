@@ -12,7 +12,8 @@ import { createAppRouter } from "../../router.tsx";
 
 afterEach(cleanup);
 
-const harness = (outcomes: OutputOf<"accounts.connect">[], existing = 0) => {
+const harness = (outcomes: OutputOf<"accounts.connect">[], existing = 0, hang = false) => {
+  let release: (() => void) | undefined;
   const { port1, port2 } = new MessageChannel();
   port1.start();
   port2.start();
@@ -27,8 +28,12 @@ const harness = (outcomes: OutputOf<"accounts.connect">[], existing = 0) => {
           provider: "google" as const,
           displayName: "a@example.test",
         })),
-      "accounts.connect": () => {
+      "accounts.cancelConnect": () => {
+        release?.();
+      },
+      "accounts.connect": async () => {
         connects += 1;
+        if (hang) await new Promise<void>((resolve) => (release = resolve));
         return outcomes.shift() ?? { status: "failed" as const, reason: "unknown" as const };
       },
       "settings.get": () => ({
@@ -93,5 +98,18 @@ describe("Connect screen", () => {
     fireEvent.click(await screen.findByRole("button", { name: /Continue with Google/ }));
     expect((await screen.findByRole("alert")).textContent).toContain("no Google sign-in");
     expect(screen.getByRole("button", { name: "Try again" })).toBeTruthy();
+  });
+
+  it("Cancel while waiting stops the sign-in and shows the cancelled state", async () => {
+    harness([{ status: "cancelled" }], 0, true);
+    fireEvent.click(await screen.findByRole("button", { name: /Continue with Google/ }));
+    fireEvent.click(await screen.findByRole("button", { name: "Cancel" }));
+    expect((await screen.findByRole("alert")).textContent).toContain("Sign-in was cancelled");
+  });
+
+  it("a consent without an address explains itself", async () => {
+    harness([{ status: "failed", reason: "no-address" }]);
+    fireEvent.click(await screen.findByRole("button", { name: /Continue with Google/ }));
+    expect((await screen.findByRole("alert")).textContent).toContain("email address");
   });
 });

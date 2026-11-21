@@ -14,6 +14,8 @@ export interface AccountProcedureDeps {
   readonly connectAccount: ConnectAccount;
   /** Runs the Google sign-in in the system browser; tokens stay in this process. */
   readonly signIn: (signal: CancelSignal) => AsyncResult<SignInGrant, SignInError>;
+  /** Revokes a refresh token at the provider, for a consent that is not kept. */
+  readonly revoke: (refreshToken: string, signal: CancelSignal) => Promise<unknown>;
 }
 
 type ConnectOutcome = OutputOf<"accounts.connect">;
@@ -37,13 +39,18 @@ const failureOf = (error: SignInError): ConnectOutcome => {
  */
 export const createAccountProcedures = (
   deps: AccountProcedureDeps,
-): Pick<Handlers["procedures"], "accounts.connect" | "accounts.list" | "app.state"> => {
+): Pick<
+  Handlers["procedures"],
+  "accounts.connect" | "accounts.cancelConnect" | "accounts.list" | "app.state"
+> => {
   const list = new ListAccounts({ uow: deps.uow });
   const accounts = async () => {
     const listed = await list.execute(deps.workspaceId);
     if (!listed.ok) throw listed.error;
     return listed.value;
   };
+  // At most one sign-in waits at a time; Cancel aborts it, which closes the loopback listener.
+  let waiting: AbortController | undefined;
   return {
     "app.state": async () => ({
       status: "ready",
@@ -55,23 +62,39 @@ export const createAccountProcedures = (
         provider: PROVIDERS[account.provider],
         displayName: account.address,
       })),
+    "accounts.cancelConnect": () => {
+      waiting?.abort();
+    },
     "accounts.connect": async (): Promise<ConnectOutcome> => {
-      const signal = new AbortController().signal;
-      const grant = await deps.signIn(signal);
-      if (!grant.ok) return failureOf(grant.error);
-      if (grant.value.address === undefined) return { status: "failed", reason: "unknown" };
-      const connected = await deps.connectAccount.execute(
-        {
-          workspaceId: deps.workspaceId,
-          provider: grant.value.accountProvider,
-          address: grant.value.address,
-          credentials: grant.value.refreshToken,
-          grantedScopes: grant.value.scopes,
-        },
-        signal,
-      );
-      if (!connected.ok) return { status: "failed", reason: "unknown" };
-      return { status: "connected", accountId: connected.value.account.id };
+      waiting?.abort();
+      const controller = new AbortController();
+      waiting = controller;
+      const { signal } = controller;
+      try {
+        const grant = await deps.signIn(signal);
+        if (!grant.ok) return failureOf(grant.error);
+        if (grant.value.address === undefined) {
+          // Consent without an address cannot become an account: do not leave the grant alive at the provider.
+          await deps.revoke(grant.value.refreshToken, new AbortController().signal);
+          return { status: "failed", reason: "no-address" };
+        }
+        const connected = await deps.connectAccount.execute(
+          {
+            workspaceId: deps.workspaceId,
+            provider: grant.value.accountProvider,
+            address: grant.value.address,
+            credentials: grant.value.refreshToken,
+            grantedScopes: grant.value.scopes,
+          },
+          signal,
+        );
+        if (!connected.ok) {
+          return signal.aborted ? { status: "cancelled" } : { status: "failed", reason: "unknown" };
+        }
+        return { status: "connected", accountId: connected.value.account.id };
+      } finally {
+        if (waiting === controller) waiting = undefined;
+      }
     },
   };
 };

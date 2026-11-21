@@ -4,11 +4,12 @@ import { ConnectAccount } from "@pochimail/accounts/use-cases/connect-account";
 import { WorkspaceId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
 import { type OAuthProviderConfig, oauthProviderConfig } from "@pochimail/net/oauth/providers";
+import { createOAuthRevoker } from "@pochimail/net/oauth/revoke";
 import { OAuthSignIn } from "@pochimail/net/oauth/sign-in";
 import { type FakeOAuthServer, startFakeOAuthServer } from "@pochimail/testing/fake-oauth-server";
 import { createInMemoryUnitOfWork } from "@pochimail/testing/in-memory-store";
 import { loopbackFetch } from "@pochimail/testing/loopback-fetch";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { createRpcClient } from "../shared/ipc/client.ts";
 import { serveRpc } from "../shared/ipc/server.ts";
 import { fromDomPort } from "../shared/ipc/transport.ts";
@@ -25,6 +26,8 @@ const setup = async (options: {
   address?: string;
   env?: Record<string, string>;
   deny?: boolean;
+  /** The browser never comes back: a person who is still deciding. */
+  hang?: boolean;
 }) => {
   const server = await startFakeOAuthServer(
     options.address === undefined ? {} : { address: options.address },
@@ -36,10 +39,13 @@ const setup = async (options: {
     authorizeUrl: server.authorizeUrl,
     tokenUrl: server.tokenUrl,
   };
+  const opened: string[] = [];
   const signIn = new OAuthSignIn({
     env: options.env ?? { POCHIMAIL_GOOGLE_CLIENT_ID: "test-client" },
     fetch: loopbackFetch,
     openBrowser: async (url) => {
+      opened.push(url);
+      if (options.hang) return;
       const consent = await fetch(url, { redirect: "manual" });
       const location = consent.headers.get("location");
       if (location !== null) void fetch(location).catch(() => undefined);
@@ -47,7 +53,12 @@ const setup = async (options: {
   });
   const store = createInMemoryUnitOfWork();
   const secrets = createInMemorySecretStore();
+  const revoker = createOAuthRevoker({
+    fetch: loopbackFetch,
+    configs: { google: { ...config, revokeUrl: server.revokeUrl } },
+  });
   const procedures = createAccountProcedures({
+    revoke: (token, signal) => revoker.revoke("gmail", token, signal),
     workspaceId,
     uow: store.uow,
     connectAccount: new ConnectAccount({
@@ -64,6 +75,8 @@ const setup = async (options: {
   return {
     client,
     secrets,
+    server,
+    opened,
     close: () => {
       port1.close();
       port2.close();
@@ -109,11 +122,28 @@ describe("accounts.connect", () => {
       reason: "not-configured",
     });
     missing.close();
-    const noAddress = await setup({});
-    expect(await noAddress.client.call("accounts.connect", { provider: "google" })).toEqual({
+  });
+
+  it("a consent without an address fails as no-address and revokes the refresh token", async () => {
+    const { client, server, close } = await setup({});
+    expect(await client.call("accounts.connect", { provider: "google" })).toEqual({
       status: "failed",
-      reason: "unknown",
+      reason: "no-address",
     });
-    noAddress.close();
+    expect(await client.call("accounts.list")).toEqual([]);
+    const revoked = server.requests().find((r) => r.path === "/revoke");
+    expect(revoked?.params.token).toMatch(/^refresh-/);
+    close();
+  });
+
+  it("Cancel while waiting answers cancelled and closes the loopback listener", async () => {
+    const { client, opened, close } = await setup({ address: "person@example.test", hang: true });
+    const waiting = client.call("accounts.connect", { provider: "google" });
+    await vi.waitFor(() => expect(opened).toHaveLength(1));
+    const redirect = new URL(opened[0] ?? "").searchParams.get("redirect_uri") ?? "";
+    await client.call("accounts.cancelConnect");
+    expect(await waiting).toEqual({ status: "cancelled" });
+    await expect(fetch(redirect, { signal: AbortSignal.timeout(1000) })).rejects.toThrow();
+    close();
   });
 });

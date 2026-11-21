@@ -14,6 +14,11 @@ export const connectMessages = {
     "connect.cancelled": { text: "Sign-in was cancelled. Nothing was connected.", params: [] },
     "connect.failed": { text: "I couldn’t connect your account. Nothing was changed.", params: [] },
     "connect.notConfigured": { text: "This build has no Google sign-in set up.", params: [] },
+    "connect.cancel": { text: "Cancel", params: [] },
+    "connect.noAddress": {
+      text: "Google didn’t share your email address, so I couldn’t connect your account. Nothing was changed.",
+      params: [],
+    },
     "connect.retry": { text: "Try again", params: [] },
     "connect.promises.heading": { text: "My promises", params: [] },
     "connect.promise.local.title": {
@@ -64,6 +69,11 @@ export const connectMessages = {
       text: "Cette version n’a pas de connexion Google configurée.",
       params: [],
     },
+    "connect.cancel": { text: "Annuler", params: [] },
+    "connect.noAddress": {
+      text: "Google n’a pas partagé votre adresse email, je n’ai donc pas pu connecter votre compte. Rien n’a été modifié.",
+      params: [],
+    },
     "connect.retry": { text: "Réessayer", params: [] },
     "connect.promises.heading": { text: "Mes promesses", params: [] },
     "connect.promise.local.title": {
@@ -109,6 +119,11 @@ export const connectMessages = {
     },
     "connect.notConfigured": {
       text: "このビルドにはGoogleサインインが設定されていません。",
+      params: [],
+    },
+    "connect.cancel": { text: "キャンセル", params: [] },
+    "connect.noAddress": {
+      text: "Googleからメールアドレスが共有されなかったため、アカウントを接続できませんでした。何も変更していません。",
       params: [],
     },
     "connect.retry": { text: "もう一度試す", params: [] },

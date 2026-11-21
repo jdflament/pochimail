@@ -78,6 +78,7 @@ it("a dead refresh token marks only that account needs_reauth while another acco
     const tokenSource = createAccessTokenSource({
       config: { ...oauthProviderConfig("google"), tokenUrl: server.tokenUrl },
       clientId: CLIENT_ID,
+      env: {},
       secretKey: accountSecretKey(broken),
       secrets: ctx.secrets,
       fetch: loopbackFetch,

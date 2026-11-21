@@ -19,7 +19,8 @@ const problemKey = (outcome: Outcome | undefined, threw: boolean) => {
   if (threw) return "connect.failed";
   if (outcome?.status === "cancelled") return "connect.cancelled";
   if (outcome?.status !== "failed") return undefined;
-  return outcome.reason === "not-configured" ? "connect.notConfigured" : "connect.failed";
+  if (outcome.reason === "not-configured") return "connect.notConfigured";
+  return outcome.reason === "no-address" ? "connect.noAddress" : "connect.failed";
 };
 
 /** Connect: sign in with the provider in the system browser. No token ever reaches this screen, only the outcome. */
@@ -48,6 +49,7 @@ export function ConnectPage() {
     },
   });
 
+  const cancel = useMutation({ mutationFn: () => client.call("accounts.cancelConnect") });
   const key = problemKey(connect.isError ? undefined : connect.data?.outcome, connect.isError);
 
   return (
@@ -88,9 +90,16 @@ export function ConnectPage() {
             </Button>
           </div>
         )}
-        <p role="status" className="min-h-5 text-caption text-foreground-tertiary">
-          {connect.isPending ? t("connect.waiting") : t("connect.imap")}
-        </p>
+        <div className="flex min-h-8 items-center gap-3">
+          <p role="status" className="text-caption text-foreground-tertiary">
+            {connect.isPending ? t("connect.waiting") : t("connect.imap")}
+          </p>
+          {connect.isPending ? (
+            <Button variant="secondary" size="sm" onClick={() => cancel.mutate()}>
+              {t("connect.cancel")}
+            </Button>
+          ) : null}
+        </div>
       </div>
       <ConnectPromises device={deviceName.data ?? "device"} />
     </div>
