@@ -12,7 +12,12 @@ import { createAppRouter } from "../../router.tsx";
 
 afterEach(cleanup);
 
-const harness = (outcomes: OutputOf<"accounts.connect">[], existing = 0, hang = false, listFails = false) => {
+const harness = (
+  outcomes: OutputOf<"accounts.connect">[],
+  existing = 0,
+  hang = false,
+  listFails = false,
+) => {
   let release: (() => void) | undefined;
   const { port1, port2 } = new MessageChannel();
   port1.start();
