@@ -37,7 +37,7 @@ export function OnboardingLayout() {
 
   return (
     <div className="@container flex min-h-screen flex-col">
-      <header className="flex justify-center pt-6">
+      <header className="flex h-11 items-center justify-center">
         <ol
           aria-label={t("onboarding.progress", { current, total })}
           className="m-0 flex list-none items-center gap-1.5 p-0"
@@ -48,7 +48,9 @@ export function OnboardingLayout() {
               aria-current={position + 1 === current ? "step" : undefined}
               className={cn(
                 "h-1.5 rounded-full transition-[width,background-color] duration-(--duration-panel) ease-(--ease-out) motion-reduce:transition-none",
-                position + 1 === current ? "w-5 bg-foreground" : "w-1.5 bg-border",
+                position + 1 === current && "w-5",
+                position + 1 !== current && "w-1.5",
+                position + 1 <= current ? "bg-foreground" : "bg-border",
               )}
             />
           ))}
@@ -56,7 +58,7 @@ export function OnboardingLayout() {
       </header>
       <main
         className={cn(
-          "mx-auto flex w-full flex-1 flex-col items-center justify-center gap-4.5 px-4 pb-12 @phone:px-8",
+          "mx-auto flex w-full flex-1 flex-col items-center justify-center gap-4.5 px-4 pt-2 pb-6 @phone:px-12 @phone:pt-4 @phone:pb-12",
           isSetup ? "max-w-5xl" : "max-w-xl",
         )}
       >
@@ -65,7 +67,7 @@ export function OnboardingLayout() {
           key={pathname}
           ref={content}
           className={cn(
-            "animate-screen-in motion-reduce:animate-none flex w-full flex-col items-center text-center [&_h1]:rounded-md [&_h1]:outline-none [&_h1]:focus-visible:ring-2 [&_h1]:focus-visible:ring-ring [&_h1]:focus-visible:ring-offset-2 [&_h1]:focus-visible:ring-offset-background",
+            "animate-screen-in motion-reduce:animate-none flex w-full flex-col items-center text-center [&_h1]:outline-none",
           )}
         >
           <Outlet />
