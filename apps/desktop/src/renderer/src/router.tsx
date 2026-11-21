@@ -1,3 +1,4 @@
+import { CLEAN_UP_KINDS, type CleanUpKind } from "@pochimail/cleanup/policies/clean-up-actions";
 import {
   createMemoryHistory,
   createRootRouteWithContext,
@@ -78,9 +79,16 @@ const overviewRoute = createRoute({
   component: OverviewPage,
 });
 
+/** Which clean-up list the Review button opened; the Review screens themselves come later. */
+const categorySearch = (search: Record<string, unknown>): { review?: CleanUpKind } => {
+  const review = CLEAN_UP_KINDS.find((kind) => kind === search.review);
+  return review === undefined ? {} : { review };
+};
+
 const categoryRoute = createRoute({
   getParentRoute: () => shellRoute,
   path: "/category/$categoryId",
+  validateSearch: categorySearch,
   component: CategoryPage,
 });
 

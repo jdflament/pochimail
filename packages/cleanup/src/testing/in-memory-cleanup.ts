@@ -161,6 +161,7 @@ export function createInMemoryCleanup(): InMemoryCleanup {
           receivedAt: new Date(Date.UTC(2026, 0, 1) + n * 60_000).toISOString(),
           opened: false,
           hasListUnsubscribe: false,
+          size: null,
           ...row.message,
           seq: existing?.seq ?? ++counter,
           decision: {

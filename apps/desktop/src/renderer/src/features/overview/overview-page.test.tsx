@@ -19,7 +19,8 @@ const empty: Overview = {
   deadlines: 0,
   important: 0,
   oldestWaitingDays: 0,
-  cleanable: [],
+  actions: [],
+  totalBytes: 0,
 };
 const sorted: Overview = {
   scanned: 1000,
@@ -28,9 +29,48 @@ const sorted: Overview = {
   deadlines: 1,
   important: 2,
   oldestWaitingDays: 9,
-  cleanable: [
-    { category: "newsletters", count: 300 },
-    { category: "notifications", count: 120 },
+  totalBytes: 6_400_000_000,
+  actions: [
+    {
+      kind: "delete",
+      category: "promotions",
+      count: 4820,
+      bytes: 1_800_000_000,
+      protectedCount: 3,
+      sizeKnown: true,
+    },
+    {
+      kind: "delete",
+      category: "notifications",
+      count: 1290,
+      bytes: 900_000_000,
+      protectedCount: 0,
+      sizeKnown: true,
+    },
+    {
+      kind: "unsubscribe",
+      category: "newsletters",
+      count: 120,
+      bytes: 50_000_000,
+      protectedCount: 0,
+      sizeKnown: true,
+    },
+    {
+      kind: "archive",
+      category: "notifications",
+      count: 11650,
+      bytes: 300_000_000,
+      protectedCount: 0,
+      sizeKnown: true,
+    },
+    {
+      kind: "save",
+      category: "records",
+      count: 128,
+      bytes: 10_000_000,
+      protectedCount: 0,
+      sizeKnown: true,
+    },
   ],
 };
 
@@ -112,7 +152,7 @@ const setup = (initial: Record<string, Overview>, path = "/overview") => {
     { initialEntries: [path] },
   );
   render(<App workerClient={client} router={router} />);
-  return state;
+  return Object.assign(state, { router });
 };
 
 describe("overview", () => {
@@ -121,12 +161,57 @@ describe("overview", () => {
     expect(await screen.findByRole("heading", { level: 1, name: "Overview" })).toBeTruthy();
     expect(await screen.findByText("people are waiting on you")).toBeTruthy();
     expect(screen.getByText("The oldest has waited 9 days")).toBeTruthy();
-    expect(screen.getByText("Unsubscribe from newsletters")).toBeTruthy();
-    expect(screen.getByText("Archive notifications")).toBeTruthy();
-    expect(screen.queryByText("Unsubscribe from promotion senders")).toBeNull();
+    expect(screen.getByText("Unsubscribe from 120 newsletters")).toBeTruthy();
+    expect(screen.getByText("Archive 11,650 old notifications")).toBeTruthy();
+    expect(screen.getByText("Save 128 attachments")).toBeTruthy();
+    expect(screen.queryByText("Delete 1,420 expired sign-in codes")).toBeNull();
+    expect(screen.getByText("Emails that look important are never selected for you.")).toBeTruthy();
+  });
+
+  it("puts Clean up before Catch what matters and shows the space only from deleting (guards the section order and archive inflating the GB figure)", async () => {
+    setup({ all: sorted });
+    const clean = await screen.findByRole("heading", { name: "Clean up" });
+    const catchWhatMatters = screen.getByRole("heading", { name: "Catch what matters" });
+    expect(clean.compareDocumentPosition(catchWhatMatters)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(screen.getByText("2.7 GB")).toBeTruthy();
+    expect(screen.getByText("Delete 4,820 old promotions")).toBeTruthy();
+    expect(screen.getByText("These don’t free space")).toBeTruthy();
+  });
+
+  it("opens the right Review for each row (guards a Review that opens the wrong list)", async () => {
+    const user = userEvent.setup();
+    const state = setup({ all: sorted });
+    await screen.findByText("Archive 11,650 old notifications");
+    const archive = screen.getByText("Archive 11,650 old notifications").closest("li");
+    await user.click(within(archive as HTMLElement).getByRole("button", { name: "Review" }));
+    expect(await screen.findByRole("heading", { name: /notifications/iu })).toBeTruthy();
+    expect(state.router.state.location.search).toMatchObject({ review: "archive" });
+  });
+
+  it("shows no figure while sizes are unknown, only the one sentence (guards a made-up GB number)", async () => {
+    setup({
+      all: {
+        ...sorted,
+        totalBytes: null,
+        actions: [
+          {
+            kind: "delete",
+            category: "promotions",
+            count: 4820,
+            bytes: null,
+            protectedCount: 0,
+            sizeKnown: false,
+          },
+        ],
+      },
+    });
     expect(
-      screen.getByText("Conversations with people, records and receipts are never cleaned."),
+      await screen.findByText(
+        "I don’t know the size of your Outlook emails yet, so I can’t tell how much space deleting would free.",
+      ),
     ).toBeTruthy();
+    expect(screen.getByText("Not known yet")).toBeTruthy();
+    expect(screen.queryByText(/GB/u)).toBeNull();
   });
 
   it("changes figures in place when a progress event arrives, without going back to a loading state (guards flicker and stale numbers)", async () => {
@@ -211,7 +296,7 @@ describe("overview", () => {
     );
     await screen.findByText("people are waiting on you");
     expect(state.asked).toEqual(["a2"]);
-    expect(screen.queryByText("Unsubscribe from newsletters")).toBeNull();
+    expect(screen.queryByText(/^Unsubscribe from/u)).toBeNull();
     expect(within(document.body).getByText("1 account")).toBeTruthy();
   });
 
