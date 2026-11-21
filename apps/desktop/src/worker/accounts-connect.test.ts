@@ -26,6 +26,8 @@ const setup = async (options: {
   address?: string;
   env?: Record<string, string>;
   deny?: boolean;
+  /** The first scan cannot start. */
+  failScan?: boolean;
   /** The browser never comes back: a person who is still deciding. */
   hang?: boolean;
 }) => {
@@ -58,6 +60,9 @@ const setup = async (options: {
     configs: { google: { ...config, revokeUrl: server.revokeUrl } },
   });
   const procedures = createAccountProcedures({
+    startScan: async () => {
+      if (options.failScan) throw new Error("scan.start failed");
+    },
     revoke: (token, signal) => revoker.revoke("gmail", token, signal),
     workspaceId,
     uow: store.uow,
@@ -103,6 +108,15 @@ describe("accounts.connect", () => {
     expect(await client.call("app.state")).toEqual({ status: "ready", hasConnectedAccount: true });
     const stored = await secrets.get(`account/${workspaceId}/${accounts[0]?.id}`);
     expect(stored.ok && stored.value).toMatch(/^refresh-/);
+    close();
+  });
+
+  it("still answers connected when the first scan cannot start", async () => {
+    const { client, close } = await setup({ address: "person@example.test", failScan: true });
+    expect((await client.call("accounts.connect", { provider: "google" })).status).toBe(
+      "connected",
+    );
+    expect(await client.call("accounts.list")).toHaveLength(1);
     close();
   });
 
