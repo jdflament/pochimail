@@ -53,7 +53,7 @@ export interface WorkerApp {
   idle(): Promise<void>;
 }
 
-/** The worker's composition root: core use cases wired to the adapters it is given, behind the typed IPC handlers. */
+/** The worker's composition root: domain use cases and workflows wired to the adapters it is given, behind the typed IPC handlers. */
 export function createWorkerApp(adapters: WorkerAdapters): WorkerApp {
   const { uow, workspaceId, clock } = adapters;
   const bus = createInMemoryEventBus({

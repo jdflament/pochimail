@@ -1,21 +1,36 @@
+import { createInMemoryAccounts } from "@pochimail/accounts/testing/in-memory-accounts";
 import { StorageError } from "@pochimail/kernel/errors";
-import type { AccountId } from "@pochimail/kernel/ids";
+import type { AccountId, WorkspaceId } from "@pochimail/kernel/ids";
 import { err, ok } from "@pochimail/kernel/result";
 import type { RunScan, RunScanOutcome } from "@pochimail/workflows/use-cases/run-scan";
 import { ScanRunner } from "@pochimail/workflows/use-cases/scan-runner";
 import { describe, expect, it, vi } from "vitest";
-import { ACCOUNT_1, makeAccount, WS_A } from "./fixtures.ts";
-import { createInMemoryUnitOfWork } from "./in-memory-store.ts";
+import type { WorkflowUnitOfWork } from "./ports/unit-of-work.ts";
 
 type Execute = RunScan["execute"];
 
+const WS_A = "ws-a" as WorkspaceId;
+const ACCOUNT_1 = "acc-1" as AccountId;
+
 const setup = async (execute: Execute) => {
-  const store = createInMemoryUnitOfWork();
-  await store.uow.run((tx) => tx.repositories.accounts.save(makeAccount()));
+  const accounts = createInMemoryAccounts();
+  await accounts.uow.run((tx) =>
+    tx.repositories.accounts.save({
+      schemaVersion: 1,
+      id: ACCOUNT_1,
+      workspaceId: WS_A,
+      provider: "gmail",
+      address: "owner@example.com",
+      connectedAt: "2026-01-01T00:00:00.000Z",
+      grantedScopes: [],
+    }),
+  );
+  // ScanRunner only reads accounts; the rest of the unit of work is not touched here.
+  const uow = accounts.uow as unknown as WorkflowUnitOfWork;
   let jobs = 0;
   const scanFor = vi.fn(() => ({ execute }) as unknown as RunScan);
   const runner = new ScanRunner({
-    uow: store.uow,
+    uow,
     workspaceId: WS_A,
     newJobId: () => `job-${++jobs}`,
     scanFor,

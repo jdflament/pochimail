@@ -1,3 +1,4 @@
+// Guards: a settings patch overwriting fields it does not name, and a legacy stored row breaking the screen.
 import type { WorkspaceId } from "@pochimail/kernel/ids";
 import { unwrap } from "@pochimail/kernel/result";
 import { expect, it } from "vitest";

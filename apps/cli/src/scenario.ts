@@ -81,8 +81,8 @@ export interface ScenarioResult {
 const live = () => new AbortController().signal;
 
 /**
- * Composition root of the M1 demo: fixture mailbox + in-memory adapters + core use cases.
- * Wiring only; every decision is made by `packages/core`.
+ * Composition root of the M1 demo: fixture mailbox + in-memory adapters + domain use cases and workflows.
+ * Wiring only; every decision is made by the domain packages and `packages/workflows`.
  */
 export async function runScenario(options: ScenarioOptions): Promise<ScenarioResult> {
   const mailbox = generateMailbox({ seed: SEED, scale: options.scale });

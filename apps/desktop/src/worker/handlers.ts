@@ -14,7 +14,7 @@ import type { DeviceName } from "../shared/platform-port.ts";
 import type { ManageSettings } from "./manage-settings.ts";
 
 /**
- * What the handlers may touch: core use cases and the event bus, nothing else. No repositories, no adapters, no
+ * What the handlers may touch: domain use cases and the event bus, nothing else. No repositories, no adapters, no
  * business rules here (ADR 0002 / M4-02): a handler parses its input, calls one use case and shapes the answer.
  */
 export interface HandlerDeps {
